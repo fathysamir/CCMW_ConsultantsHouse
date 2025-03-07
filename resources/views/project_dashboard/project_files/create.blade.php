@@ -44,12 +44,11 @@
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="against_id">{{$folder->label1}}</label>
+                            <label for="against_id">{{ $folder->label1 }}</label>
                             <select class="form-control" id="against_id" name="against_id">
                                 <option value="" selected disabled>please select</option>
                                 @foreach ($stake_holders as $stake_holder)
-                                    <option value="{{ $stake_holder->id }}"
-                                       >{{ $stake_holder->name }} -
+                                    <option value="{{ $stake_holder->id }}">{{ $stake_holder->name }} -
                                         {{ $stake_holder->role }}</option>
                                 @endforeach
                             </select>
@@ -58,20 +57,18 @@
                             <!-- Name Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="start_date">{{$folder->label2}}</label>
+                                    <label for="start_date">{{ $folder->label2 }}</label>
                                     <input type="date"style="background-color:#fff;" name="start_date" id="start_date"
-                                        class="form-control date"
-                                        placeholder="Start Date"value="{{ old('start_date') }}">
+                                        class="form-control date" placeholder="Start Date"value="{{ old('start_date') }}">
                                 </div>
                             </div>
 
                             <!-- Email Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="end_date">{{$folder->label3}}</label>
+                                    <label for="end_date">{{ $folder->label3 }}</label>
                                     <input type="date"style="background-color:#fff;" name="end_date" id="end_date"
-                                        class="form-control date"
-                                        placeholder="End Date"value="{{ old('end_date') }}">
+                                        class="form-control date" placeholder="End Date"value="{{ old('end_date') }}">
                                 </div>
                             </div>
 
@@ -84,7 +81,7 @@
 
                         <div class="row">
                             <!-- Name Input -->
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 @if ($folder->potential_impact == '1')
                                     <div class="row">
                                         <p style="margin-right: 10px;">Potential Impact : </p>
@@ -114,6 +111,11 @@
                             </div>
 
                             <!-- Email Input -->
+                            
+
+
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;">
@@ -129,8 +131,6 @@
 
                                 </div>
                             </div>
-
-
                         </div>
 
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"

@@ -37,7 +37,7 @@ class AccountController extends ApiController
                     ->orWhere('recovery_phone_no', 'LIKE', '%' . $request->search . '%');
             });
         }
-        $all_accounts = $all_accounts->paginate(12);
+ $all_accounts = $all_accounts->paginate(12);
         $search = $request->search;
         return view('dashboard.home', compact('all_accounts', 'search'));
 

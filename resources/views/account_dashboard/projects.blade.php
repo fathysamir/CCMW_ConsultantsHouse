@@ -112,11 +112,11 @@
     <div class="row">
         @foreach ($EPS as $category)
             <div class="col-md-12" id="EPS_{{ $category->id }}">
-                <div class="card shadow mb-4"style="border-radius:15px;">
+                <div class="card shadow mb-4"style="border-radius:15px;margin-bottom: 0.5rem !important;">
                     <div
-                        class="card-body"style="border-radius:15px;box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);padding-top:0.75rem;padding-bottom:0.75rem;">
+                        class="card-body"style="border-radius:15px;box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);padding-top:0.1rem;padding-bottom:0.1rem;">
                         <div class="card-text my-2"
-                            onclick="getEPSandProject('{{ $category->id }}','{{ $category->name }}',this);"style="cursor:pointer;">
+                            onclick="getEPSandProject('{{ $category->id }}','{{ $category->name }}',this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;">
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <img id="logo" src="{{ asset('dashboard/assets/images/file.png') }}" width="25"
@@ -485,9 +485,9 @@
                             // Loop through each category in response.data
                             response.data.forEach(category => {
                                 div += `<div class="col-md-12" id="EPS_${category.id}">
-                                        <div class="card shadow mb-4" style="border-radius:15px;">
-                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.75rem; padding-bottom:0.75rem;">
-                                                <div class="card-text my-2" onclick="getEPSandProject('${category.id}','${category.name}', this);"style="cursor:pointer;">
+                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
+                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
+                                                <div class="card-text my-2" onclick="getEPSandProject('${category.id}','${category.name}', this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;">
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">
                                                             <img id="logo" src="${category.image ? category.image : '{{ asset('dashboard/assets/images/file.png') }}'}" width="25"
@@ -514,9 +514,9 @@
 
                                             div += `<div class="col-md-12" id="project_${project.id}">
                                                 
-                                        <div class="card shadow mb-4" style="border-radius:15px;">
-                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.75rem; padding-bottom:0.75rem;">
-                                                <div class="card-text my-2" style="cursor:pointer;"oncontextmenu="showContextMenu(event, '${project.id}','${project.name}')">
+                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
+                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
+                                                <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"oncontextmenu="showContextMenu(event, '${project.id}','${project.name}')">
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">
                                                             <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
@@ -578,9 +578,9 @@
                                         response.data.forEach(project => {
 
                                             div += `<div class="col-md-12" id="project_${project.id}">
-                                        <div class="card shadow mb-4" style="border-radius:15px;">
-                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.75rem; padding-bottom:0.75rem;">
-                                                <div class="card-text my-2" style="cursor:pointer;"`;
+                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
+                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
+                                                <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"`;
                                             if (eps_name == 'Archive') {
                                                 div +=
                                                     `oncontextmenu="showContextMenu2(event, '${project.id}','${project.name}')"`;

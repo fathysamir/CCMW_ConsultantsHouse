@@ -47,7 +47,7 @@
         .table-container tbody {
             overflow-y: auto;
             display: block;
-            height: calc(660px - 40px);
+            height: calc(450px - 40px);
             /* Adjust based on your header height */
         }
 
@@ -68,12 +68,12 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 5%;
+            width: 7%;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 50%;
+            width: 48%;
         }
 
         .table-container th:nth-child(4),
@@ -209,8 +209,8 @@
                                         <td>{{ $file->code }}</td>
                                         <td>{{ $file->name }}</td>
                                         <td>{{ $file->against ? $file->against->role : '_' }}</td>
-                                        <td>{{ date('d-M-Y', strtotime($file->start_date)) }}</td>
-                                        <td>{{ date('d-M-Y', strtotime($file->end_date)) }}</td>
+                                        <td>{{ $file->start_date ? date('d-M-Y', strtotime($file->start_date)) : '_' }}</td>
+                                        <td>{{ $file->end_date ? date('d-M-Y', strtotime($file->end_date)) : '_' }}</td>
                                         <td>{{ $file->user ? $file->user->name : '_' }}</td>
 
                                         
@@ -281,16 +281,107 @@
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
+       
 
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
             $("#check").removeClass("sorting_asc");
+            const parentDiv = document.getElementById('dataTable-1_wrapper');
+
+            if (parentDiv) {
+                const rowDiv = parentDiv.querySelector('.row');
+
+                if (rowDiv) {
+                    const colDivs = rowDiv.querySelectorAll('.col-md-6');
+
+                    if (colDivs.length > 0) {
+                        colDivs[0].classList.remove('col-md-6');
+                        colDivs[0].classList.add('col-md-2');
+                    }
+
+                    // Create a new dropdown element
+                    let new_down_list = document.createElement('div');
+                    new_down_list.className = "col-sm-12 col-md-4";
+                    new_down_list.innerHTML = `
+                                <div class="dropdown" id="Action-DIV">
+                                    <button class="btn btn-sm dropdown-toggle  btn-secondary" type="button"
+                                        id="actionButton" aria-haspopup="true" aria-expanded="false">
+                                        Open Actions
+                                    </button>
+                                    <div class="dropdown-menu " id="actionList" style="position: absolute;left:-50px; ">
+                                        
+                                    </div>
+                                </div>
+                            `;
+
+                    // Append the new dropdown to the row
+                    rowDiv.appendChild(new_down_list);
+
+                    // Get the button and dropdown menu
+                    const actionButton = new_down_list.querySelector('#actionButton');
+                    const actionList = new_down_list.querySelector('#actionList');
+
+                    // Toggle dropdown on button click
+                    actionButton.addEventListener('click', function(event) {
+                        event.stopPropagation(); // Prevent the click from bubbling up
+                        if (actionList.style.display === 'block') {
+                            actionList.style.display = 'none';
+                        } else {
+                            actionList.style.display = 'block';
+                        }
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function(event) {
+                        if (!event.target.closest('.dropdown')) {
+                            actionList.style.display = 'none';
+                        }
+                    });
+                }
+            }
+
+            // Select all the checkboxes with the class "row-checkbox"
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            const actionDiv = document.getElementById('Action-DIV');
+
+            // Initially hide the Action-DIV
+            if (actionDiv) {
+                actionDiv.style.display = 'none';
+            }
+
+            // Add an event listener to each checkbox
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    // Get the number of checkboxes that are checked
+                    const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+
+                    // If more than one checkbox is checked, display the Action-DIV, else hide it
+                    if (checkedCheckboxes.length > 1) {
+                        actionDiv.style.display = 'block';
+                    } else {
+                        actionDiv.style.display = 'none';
+                    }
+                });
+            });
+            document.getElementById('select-all').addEventListener('change', function() {
+                const checkboxes = document.getElementsByClassName('row-checkbox');
+                for (let checkbox of checkboxes) {
+                    checkbox.checked = this.checked;
+                }
+                const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+
+                // If more than one checkbox is checked, display the Action-DIV, else hide it
+                if (checkedCheckboxes.length > 1) {
+                    actionDiv.style.display = 'block';
+                } else {
+                    actionDiv.style.display = 'none';
+                }
+            });
+
+
+
             $('.change-owner-btn').on('click', function() {
                 var fileId = $(this).data('file-id');
                 var fileOwner = $(this).data('file-owner-id');
@@ -338,6 +429,9 @@
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            },{
+                "targets": 7, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }]
         });

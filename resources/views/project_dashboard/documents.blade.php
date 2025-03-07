@@ -47,7 +47,7 @@
         .table-container tbody {
             overflow-y: auto;
             display: block;
-            height: calc(660px - 40px);
+            height: calc(450px - 40px);
             /* Adjust based on your header height */
         }
 
@@ -480,10 +480,6 @@
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
 
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
@@ -1026,6 +1022,9 @@
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            },{
+                "targets": 8, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }]
         });

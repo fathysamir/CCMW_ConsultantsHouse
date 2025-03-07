@@ -210,10 +210,10 @@
     <div class="row">
         @foreach ($EPS as $category)
             <div class="col-md-12" id="EPS_{{ $category->id }}">
-                <div class="card shadow mb-4"style="border-radius:15px;">
+                <div class="card shadow mb-4"style="border-radius:15px;margin-bottom: 0.5rem !important;">
                     <div
-                        class="card-body"style="border-radius:15px;box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);padding-top:0.75rem;padding-bottom:0.75rem;">
-                        <div class="card-text my-2" onclick="getEPS('{{ $category->id }}',this);"style="cursor:pointer;"@if(!in_array($category->name,['Archive','Recycle Bin']))
+                        class="card-body"style="border-radius:15px;box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);padding-top:0.1rem;padding-bottom:0.1rem;">
+                        <div class="card-text my-2" onclick="getEPS('{{ $category->id }}',this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"@if(!in_array($category->name,['Archive','Recycle Bin']))
                             oncontextmenu="showContextMenu(event, '{{ $category->id }}','{{ $category->name }}')" @endif>
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -461,9 +461,9 @@
                             // Loop through each category in response.data
                             response.data.forEach(category => {
                                 div += `<div class="col-md-12" id="EPS_${category.id}">
-                                        <div class="card shadow mb-4" style="border-radius:15px;">
-                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.75rem; padding-bottom:0.75rem;">
-                                                <div class="card-text my-2" onclick="getEPS('${category.id}', this);"style="cursor:pointer;"
+                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
+                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
+                                                <div class="card-text my-2" onclick="getEPS('${category.id}', this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"
                                                         oncontextmenu="showContextMenu(event, '${category.id}','${category.name}')">
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">

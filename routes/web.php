@@ -13,6 +13,7 @@ use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\DocumentController;
 use App\Http\Controllers\Dashboard\FileController;
+use App\Http\Controllers\Dashboard\FileDocumentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -172,6 +173,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/files/delete/{id}', [FileController::class, 'delete'])->name('project.files.delete');
     Route::get('/project/files/archive/{id}', [FileController::class, 'archive'])->name('project.files.archive');
     Route::post('/project/file/change-owner', [FileController::class, 'changeOwner'])->name('project.file.change-owner');
+
+    Route::get('/project/file/{id}/documents', [FileDocumentController::class, 'index'])->name('project.file-documents.index');
 
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 

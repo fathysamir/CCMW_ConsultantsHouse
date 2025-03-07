@@ -15,7 +15,7 @@
                     
                         @forelse($Folders as $folder)
                             @if($folder->shortcut=='1')
-                                <a class="nav-link pl-3" href="{{ route('switch.folder', $folder->id) }}">
+                                <a class="nav-link pl-3 l-link"style="color:rgb(80, 78, 78);" href="{{ route('switch.folder', $folder->id) }}">
                                     <span class="ml-1 item-text">{{ $folder->name }}</span>
                                 </a>
                             @endif
