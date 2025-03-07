@@ -14,12 +14,14 @@ use App\Models\User;
 use App\Models\ProjectFolder;
 use App\Models\ProjectFile;
 use App\Models\StorageFile;
-use App\Models\Project;
+use App\Models\FileDocument;
 use Illuminate\Validation\Rule;
 
 class FileDocumentController extends ApiController
 {
     public function index($id){
-
+        $file=ProjectFile::where('slug',$id)->first();
+        $documents=FileDocument::where('file_id',$file->id)->get();
+        return view('project_dashboard.file_documents.index',compact('documents','file'));
     }
 }

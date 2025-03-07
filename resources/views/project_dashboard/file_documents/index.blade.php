@@ -68,38 +68,59 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 7%;
+            width: 9%;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 48%;
+            width: 12.2%;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 10%;
+            width: 9.5%;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 10%;
+            width: 9.5%;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 10%;
+            width: 8.8%;
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
-            width: 10%;
+            width: 4%;
         }
 
         .table-container th:nth-child(8),
         .table-container td:nth-child(8) {
-            width: 4%;
+            width: 8.8%;
         }
+        .table-container th:nth-child(9),
+        .table-container td:nth-child(9) {
+            width: 8.8%;
+        }
+        .table-container th:nth-child(10),
+        .table-container td:nth-child(10) {
+            width: 8.8%;
+        }
+        .table-container th:nth-child(11),
+        .table-container td:nth-child(11) {
+            width: 8.8%;
+        }
+        .table-container th:nth-child(12),
+        .table-container td:nth-child(12) {
+            width: 8.8%;
+        }
+        .table-container th:nth-child(13),
+        .table-container td:nth-child(13) {
+            width: 2%;
+        }
+
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
@@ -134,19 +155,16 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                max-height:650px;
-                                                                            } */
+                                                                                        max-height:650px;
+                                                                                    } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{$folder->name}}</h2>
+            <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
-            @if($folder->name!='Recycle Bin' &&  $folder->name!='Archive')
-            <a type="button" href="{{ route('project.files.create') }}"
-            class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create File</a>
-            @endif
+           
         </div>
     </div>
     @if (session('error'))
@@ -182,54 +200,62 @@
                                         </div>
                                     </th>
 
-                                    <th><b>File ID</b></th>
-                                    <th><b>File Name</b></th>
-                                    <th><b>{{$folder->label1}}</b></th>
-                                    <th><b>{{$folder->label2}}</b></th>
-                                    <th><b>{{$folder->label3}}</b></th>
-                                    <th><b>File Owner</b></th>
-
+                                    <th></th>
+                                    <th><b>Subject</b></th>
+                                    <th><b>Date</b></th>
+                                    <th><b>Return Date</b></th>
+                                    <th><b>Reference</b></th>
+                                    <th><b>Rev.</b></th>
+                                    <th><b>From</b></th>
+                                    <th><b>To</b></th>
+                                    <th><b>SN</b></th>
+                                    <th><b>Status</b></th>
+                                    <th><b>Note</b></th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
 
-                                @foreach ($all_files as $file)
+                                @foreach ($documents as $document)
                                     <tr>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
-                                                    class="custom-control-input row-checkbox"data-file-id="{{ $file->id }}"
-                                                    id="checkbox-{{ $file->id }}" value="{{ $file->id }}">
+                                                    class="custom-control-input row-checkbox"data-file-id="{{ $document->id }}"
+                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}">
                                                 <label class="custom-control-label"
-                                                    for="checkbox-{{ $file->id }}"></label>
+                                                    for="checkbox-{{ $document->id }}"></label>
                                             </div>
                                         </td>
+                                        <td>
+                                            <span class="fe fe-23 fe-volume-2" style="color: rgb(45, 209, 45);"></span>
+                                            <label style="@if($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>C</span></label>
+                                            <label style="@if($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>N</span></label>
+                                            <label style="@if($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>T</span></label>
+                                            <label>{{ $document->document->docType->name }}</label>
+                                        </td>
 
-                                        <td>{{ $file->code }}</td>
-                                        <td><a class="l-link"style="color:rgb(80, 78, 78);"style="color:" href="{{ route('project.file-documents.index',$file->slug) }}">{{ $file->name }}</a></td>
-                                        <td>{{ $file->against ? $file->against->role : '_' }}</td>
-                                        <td>{{ $file->start_date ? date('d-M-Y', strtotime($file->start_date)) : '_' }}</td>
-                                        <td>{{ $file->end_date ? date('d-M-Y', strtotime($file->end_date)) : '_' }}</td>
-                                        <td>{{ $file->user ? $file->user->name : '_' }}</td>
-
-                                        
+                                        <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
+                                                href=""><span class="fe fe-22 @if($document->narrative != null) fe-file-text @else fe-file @endif"></span> {{ $document->document->subject}}</a>
+                                        </td>
+                                       
+                                        <td>{{ $document->document->start_date ? date('d.M.Y', strtotime($document->document->start_date)) : '_' }}
+                                        </td>
+                                        <td>{{ $document->document->end_date ? date('d.M.Y', strtotime($document->document->end_date)) : '_' }}</td>
+                                        <td>{{ $document->document->reference }}</td>
+                                        <td>{{ $document->document->revision }}</td>
+                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->role : '_' }}</td>
+                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->role : '_' }}</td>
+                                        <td>{{ $document->sn }}</td>
+                                        <td>{{ $document->document->status }}</td>
+                                        <td>{{ strlen($document->document->notes) > 25 ? substr($document->document->notes, 0, 25) . '...' : $document->document->notes }}</td>
                                         <td>
                                             <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.files.edit', $file->slug) }}">Edit</a>
-                                                <a id="Change_Owner_btn_{{ $file->id }}"
-                                                    class="dropdown-item change-owner-btn" href="javascript:void(0);"
-                                                    data-file-id="{{ $file->id }}"data-file-owner-id="{{ $file->user_id }}">Change
-                                                    Owner</a>
-                                                <a class="dropdown-item" href="">Copy</a>
-                                                <a class="dropdown-item" href="">Move</a>
-                                                <a class="dropdown-item" href="javascript:void(0);"onclick="confirmArchive('{{ route('project.files.archive', $file->id) }}')">Archive</a>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);"onclick="confirmDelete('{{ route('project.files.delete', $file->id) }}')">Delete</a>
+                                                
                                             </div>
                                         </td>
                                     </tr>
@@ -241,38 +267,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="changeOwnerModal" tabindex="-1" role="dialog" aria-labelledby="changeOwnerModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="changeOwnerModalLabel">Change File Owner</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="changeOwnerForm">
-                        @csrf
-                        <input type="hidden" id="fileId" name="file_id">
-                        <div class="form-group">
-                            <label for="newOwner">Select New Owner</label>
-                            <select class="form-control" id="newOwner" name="new_owner_id" required>
-                                <option value="" disabled selected>Select Owner</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveOwnerChange">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -281,7 +276,7 @@
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
-       
+
 
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
@@ -382,39 +377,7 @@
 
 
 
-            $('.change-owner-btn').on('click', function() {
-                var fileId = $(this).data('file-id');
-                var fileOwner = $(this).data('file-owner-id');
-                $('#fileId').val(fileId);
-                $('#newOwner').val(fileOwner); // Set the document ID in the hidden input
-                $('#changeOwnerModal').modal('show'); // Show the modal
-            });
 
-            // Handle the form submission via AJAX
-            $('#saveOwnerChange').on('click', function() {
-                var formData = $('#changeOwnerForm').serialize(); // Serialize form data
-                var fileId = $('#fileId').val(); // Get the document ID
-
-                $.ajax({
-                    url: "{{ route('project.file.change-owner') }}", // Route for changing owner
-                    type: "POST",
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            $('#changeOwnerModal').modal('hide');
-                            alert('Owner changed successfully!');
-                            // Hide the modal
-                            location.reload(); // Reload the page to reflect changes
-                        } else {
-                            alert('Failed to change owner.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('An error occurred. Please try again.');
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
         });
     </script>
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
@@ -431,21 +394,12 @@
                 "targets": 0, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             },{
-                "targets": 7, // Target the first column (index 0)
+                "targets": 1, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 12, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }]
         });
-    </script>
-    <script>
-        function confirmDelete(url) {
-            if (confirm('Are you sure you want to delete this File? This action cannot be undone.')) {
-                window.location.href = url; // Redirect to delete route
-            }
-        }
-        function confirmArchive(url) {
-            if (confirm('Are you sure you want to archive this File? This action cannot be undone.')) {
-                window.location.href = url; // Redirect to delete route
-            }
-        }
     </script>
 @endpush

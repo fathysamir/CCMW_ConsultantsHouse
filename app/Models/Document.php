@@ -67,7 +67,7 @@ class Document extends Model
 
     public function files()
     {
-        return $this->belongsToMany(FileDocument::class, 'file_documents', 'document_id','file_id');
+        return $this->belongsToMany(ProjectFile::class,'file_documents', 'document_id','file_id');
     }
 
 
