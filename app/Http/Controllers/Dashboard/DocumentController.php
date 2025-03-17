@@ -118,6 +118,8 @@ class DocumentController extends ApiController
 
     public function all_documents()
     {
+        session()->forget('current_file_doc');
+        session()->forget('current_view');
         $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
@@ -169,7 +171,25 @@ class DocumentController extends ApiController
             $doc->analyzed = '0';
         }
         $doc->save();
-        return redirect('/project/all-documents')->with('success', 'Document Updated successfully.');
+       
+        if(session()->has('current_view') && session('current_view')=='file_doc'){
+            if($request->action=='save'){ 
+                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
+            }else{
+                $current_file_doc = session('current_file_doc'); 
+                session()->forget('current_file_doc');
+                session()->forget('current_view');
+
+                return redirect('/project/file-document-first-analyses/'.$current_file_doc )->with('success', 'Document Updated successfully.');
+            }
+        }else{
+            if($request->action=='save'){
+                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
+            }else{
+                return redirect('/project/all-documents')->with('success', 'Document Updated successfully.');
+            }
+        }
+        
     }
     public function getFolderFiles($folderId)
     {

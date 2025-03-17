@@ -73,22 +73,22 @@
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 12.2%;
+            width: 19%;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 9.5%;
+            width: 6.5%;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 9.5%;
+            width: 7.7%;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 8.8%;
+            width: 10.6%;
         }
 
         .table-container th:nth-child(7),
@@ -100,25 +100,30 @@
         .table-container td:nth-child(8) {
             width: 8.8%;
         }
+
         .table-container th:nth-child(9),
         .table-container td:nth-child(9) {
             width: 8.8%;
         }
+
         .table-container th:nth-child(10),
         .table-container td:nth-child(10) {
-            width: 8.8%;
+            width: 3%;
         }
+
         .table-container th:nth-child(11),
         .table-container td:nth-child(11) {
-            width: 8.8%;
+            width: 6.8%;
         }
+
         .table-container th:nth-child(12),
         .table-container td:nth-child(12) {
-            width: 8.8%;
+            width: 13.8%;
         }
+
         .table-container th:nth-child(13),
         .table-container td:nth-child(13) {
-            width: 2%;
+            width: 3%;
         }
 
         /* Maintain styles from your original table */
@@ -155,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                        max-height:650px;
-                                                                                    } */
+                                                                                                                                max-height:650px;
+                                                                                                                            } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -164,7 +169,7 @@
             <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
-           
+
         </div>
     </div>
     @if (session('error'))
@@ -189,7 +194,7 @@
                     <div class="table-container">
 
                         <!-- Table -->
-                        <table class="table datatables" id="dataTable-1">
+                        <table class="table datatables" id="dataTable-1" style="font-size: 0.7rem;">
 
                             <thead>
                                 <tr>
@@ -200,24 +205,177 @@
                                         </div>
                                     </th>
 
-                                    <th></th>
-                                    <th><b>Subject</b></th>
-                                    <th><b>Date</b></th>
-                                    <th><b>Return Date</b></th>
-                                    <th><b>Reference</b></th>
+                                    <th><label id="all_with_tags"><span class="fe fe-23 fe-volume-2"
+                                                style="color: rgb(169, 169, 169);"></span></label>
+                                        <label id="all_for_claim"
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>C</span></label>
+                                        <label id="all_for_notice"
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
+                                        <label id="all_for_timeline"
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>T</span></label>
+                                    </th>
+                                    <th><b>Subject </b>
+                                        <span id="subjectFilterIcon" style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="subjectFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select class="form-control"id="subjectFilterType"style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control"type="text" id="subjectFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applySubjectFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearSubjectFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
+                                    <th><b>Date </b> <span id="dateFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="dateFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select class="form-control"id="dateFilterType"style="margin-bottom: 5px;">
+                                                <option value="equals">Equals</option>
+                                                <option value="not-equals">Not Equals</option>
+                                                <option value="start-from">Start From</option>
+                                                <option value="end-to">End To</option>
+
+                                            </select>
+                                            <input class="form-control date"type="date" id="dateFilterInput" placeholder="Enter date"style="margin-bottom: 5px;">
+                                            <button id="applyDateFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearDateFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
+                                    <th><b>Return Date </b>
+                                        <span id="returnFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div  class="form-group"id="returnFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select class="form-control"id="returnFilterType"style="margin-bottom: 5px;">
+                                                <option value="equals">Equals</option>
+                                                <option value="not-equals">Not Equals</option>
+                                                <option value="start-from">Start From</option>
+                                                <option value="end-to">End To</option>
+
+                                            </select>
+                                            <input class="form-control date"type="date" id="returnFilterInput" placeholder="Enter date"style="margin-bottom: 5px;">
+                                            <button id="applyReturnFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearReturnFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
+                                    <th><b>Reference </b> <span id="referenceFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="referenceFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select id="referenceFilterType"class="form-control"style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control"type="text" id="referenceFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyReferenceFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearReferenceFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
                                     <th><b>Rev.</b></th>
-                                    <th><b>From</b></th>
-                                    <th><b>To</b></th>
+                                    <th><b>From </b> <span id="fromFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="fromFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select id="fromFilterType"class="form-control"style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control"type="text" id="fromFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyFromFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearFromFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
+                                    <th><b>To </b> <span id="toFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="toFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select id="toFilterType"class="form-control"style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control"type="text" id="toFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyToFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearToFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
                                     <th><b>SN</b></th>
-                                    <th><b>Status</b></th>
-                                    <th><b>Note</b></th>
+                                    <th><b>Status </b> <span id="statusFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="statusFilterDiv"
+                                            style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
+                                            <select id="statusFilterType"class="form-control"style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control"type="text" id="statusFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyStatusFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearStatusFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
+                                    <th><b>Note </b> <span id="noteFilterIcon"
+                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                            class="fe fe-23 fe-filter"></span>
+
+                                        <!-- Hidden Filter Div -->
+                                        <div class="form-group" id="noteFilterDiv"
+                                            style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);width:150px;">
+                                            <select id="noteFilterType" class="form-control" style="margin-bottom: 5px;">
+                                                <option value="contains">Contains</option>
+                                                <option value="equals">Equal</option>
+                                                <option value="not-equals">Not Equal</option>
+                                                <option value="starts-with">Starts With</option>
+                                                <option value="ends-with">Ends With</option>
+                                            </select>
+                                            <input class="form-control" type="text" id="noteFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyNoteFilter" class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearNoteFilter" class="btn mb-2 btn-outline-warning">Clear</button>
+                                        </div>
+                                    </th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
 
                                 @foreach ($documents as $document)
-                                    <tr>
+                                    <tr @if($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -228,34 +386,48 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="fe fe-23 fe-volume-2" style="color: rgb(45, 209, 45);"></span>
-                                            <label style="@if($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>C</span></label>
-                                            <label style="@if($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>N</span></label>
-                                            <label style="@if($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:17px;height:17px;border-radius: 50%;text-align:center;"><span>T</span></label>
+
+                                            <label class="with_tag @if (count($document->tags) != 0) active @endif"><span
+                                                    class="fe fe-23 fe-volume-2"
+                                                    style="@if (count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
+                                            <label class="for_claim @if ($document->forClaim == '1') active @endif"
+                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>C</span></label>
+                                            <label class="for_notice @if ($document->forLetter == '1') active @endif"
+                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
+                                            <label class="for_timeline @if ($document->forChart == '1') active @endif"
+                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>T</span></label>
+                                            <br>
+                                            <span
+                                                class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
                                             <label>{{ $document->document->docType->name }}</label>
                                         </td>
 
                                         <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
-                                                href=""><span class="fe fe-22 @if($document->narrative != null) fe-file-text @else fe-file @endif"></span> {{ $document->document->subject}}</a>
+                                                href="{{ route('project.file-document-first-analyses',$document->id) }}">
+                                                {{ $document->document->subject }}</a>
                                         </td>
-                                       
-                                        <td>{{ $document->document->start_date ? date('d.M.Y', strtotime($document->document->start_date)) : '_' }}
+
+                                        <td>{{ $document->document->start_date ? date('d.M.y', strtotime($document->document->start_date)) : '_' }}
                                         </td>
-                                        <td>{{ $document->document->end_date ? date('d.M.Y', strtotime($document->document->end_date)) : '_' }}</td>
+                                        <td>{{ $document->document->end_date ? date('d.M.y', strtotime($document->document->end_date)) : '_' }}
+                                        </td>
                                         <td>{{ $document->document->reference }}</td>
                                         <td>{{ $document->document->revision }}</td>
-                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->role : '_' }}</td>
-                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->role : '_' }}</td>
+                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->role : '_' }}
+                                        </td>
+                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->role : '_' }}
+                                        </td>
                                         <td>{{ $document->sn }}</td>
                                         <td>{{ $document->document->status }}</td>
-                                        <td>{{ strlen($document->document->notes) > 25 ? substr($document->document->notes, 0, 25) . '...' : $document->document->notes }}</td>
+                                        <td>{{ $document->notes1 }}
+                                        </td>
                                         <td>
                                             <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                
+
                                             </div>
                                         </td>
                                     </tr>
@@ -361,12 +533,15 @@
                 });
             });
             document.getElementById('select-all').addEventListener('change', function() {
-                const checkboxes = document.getElementsByClassName('row-checkbox');
-                for (let checkbox of checkboxes) {
-                    checkbox.checked = this.checked;
-                }
-                const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+                const visibleCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox');
 
+                visibleCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
                 // If more than one checkbox is checked, display the Action-DIV, else hide it
                 if (checkedCheckboxes.length > 1) {
                     actionDiv.style.display = 'block';
@@ -378,6 +553,205 @@
 
 
 
+        });
+    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const filters = {
+                all_with_tags: false,
+                all_for_claim: false,
+                all_for_notice: false,
+                all_for_timeline: false,
+                subject: {
+                    type: "",
+                    value: ""
+                },
+                reference: {
+                    type: "",
+                    value: ""
+                },
+                from: {
+                    type: "",
+                    value: ""
+                },
+                to: {
+                    type: "",
+                    value: ""
+                },
+                status: {
+                    type: "",
+                    value: ""
+                },
+                note: {
+                    type: "",
+                    value: ""
+                },
+                date: {
+                    type: "",
+                    value: ""
+                },
+                return: {
+                    type: "",
+                    value: ""
+                },
+            };
+
+            function applyFilters() {
+                document.querySelectorAll("tbody tr").forEach((row) => {
+                    let show = true;
+
+                    // 🔹 Tag Filtering
+                    if (filters.all_with_tags) show = row.querySelector(".with_tag.active");
+                    if (filters.all_for_claim) show = show && row.querySelector(".for_claim.active");
+                    if (filters.all_for_notice) show = show && row.querySelector(".for_notice.active");
+                    if (filters.all_for_timeline) show = show && row.querySelector(".for_timeline.active");
+
+                    // 🔹 General Column Filtering (Subject, Reference, From, To, Status, Note)
+                    show = show && applyTextFilter(row.cells[2], filters.subject); // Subject
+                    show = show && applyTextFilter(row.cells[5], filters.reference); // Reference
+                    show = show && applyTextFilter(row.cells[7], filters.from); // From
+                    show = show && applyTextFilter(row.cells[8], filters.to); // To
+                    show = show && applyTextFilter(row.cells[10], filters.status); // Status
+                    show = show && applyTextFilter(row.cells[11], filters.note); // Note
+
+                    // 🔹 Date Filtering (Start Date, Return Date)
+                    show = show && applyDateFilter(row.cells[3], filters.date); // Start Date
+                    show = show && applyDateFilter(row.cells[4], filters.return); // Return Date
+
+                    row.style.display = show ? "" : "none";
+                });
+            }
+
+            function applyTextFilter(cell, filter) {
+                if (!cell || !filter.value) return true; // No filter applied
+                let text = cell.textContent.trim().toLowerCase();
+                let filterValue = filter.value.toLowerCase();
+
+                switch (filter.type) {
+                    case "contains":
+                        return text.includes(filterValue);
+                    case "equals":
+                        return text === filterValue;
+                    case "not-equals":
+                        return text !== filterValue;
+                    case "starts-with":
+                        return text.startsWith(filterValue);
+                    case "ends-with":
+                        return text.endsWith(filterValue);
+                    default:
+                        return true;
+                }
+            }
+            const monthMap = {
+                "Jan": "01",
+                "Feb": "02",
+                "Mar": "03",
+                "Apr": "04",
+                "May": "05",
+                "Jun": "06",
+                "Jul": "07",
+                "Aug": "08",
+                "Sep": "09",
+                "Oct": "10",
+                "Nov": "11",
+                "Dec": "12"
+            };
+
+            function formatTableDate(dateStr) {
+                let parts = dateStr.split(".");
+                if (parts.length === 3) {
+                    let day = parts[0].padStart(2, "0"); // Ensure two digits
+                    let month = monthMap[parts[1]];
+                    let year = "20" + parts[2]; // Assuming years are in 2000s
+                    return `${year}-${month}-${day}`;
+                }
+                return null;
+            }
+
+            function applyDateFilter(cell, filter) {
+
+                if (!cell || !filter.value) return true;
+                let cellDate = formatTableDate(cell.textContent.trim());
+                let filterDate = filter.value;
+              
+                if (!(cellDate) || !(filterDate)) return false; // Invalid date
+                switch (filter.type) {
+                    case "equals":
+                        console.log(cellDate === filterDate);
+                        return cellDate === filterDate;
+                    case "not-equals":
+                        return cellDate !== filterDate;
+                    case "start-from":
+                        return cellDate >= filterDate;
+                    case "end-to":
+                        return cellDate <= filterDate;
+                    default:
+                        return true;
+                }
+            }
+
+
+            function toggleFilter(id) {
+                filters[id] = !filters[id];
+                const label = document.getElementById(id);
+
+                if (id === "all_with_tags") {
+                    label.querySelector("span").style.color = filters[id] ? "rgb(45, 209, 45)" :
+                        "rgb(169, 169, 169)";
+                } else {
+                    label.style.backgroundColor = filters[id] ? "rgb(45, 209, 45)" : "rgb(169, 169, 169)";
+                }
+
+                applyFilters();
+            }
+
+            document.getElementById("all_with_tags").addEventListener("click", () => toggleFilter("all_with_tags"));
+            document.getElementById("all_for_claim").addEventListener("click", () => toggleFilter("all_for_claim"));
+            document.getElementById("all_for_notice").addEventListener("click", () => toggleFilter(
+                "all_for_notice"));
+            document.getElementById("all_for_timeline").addEventListener("click", () => toggleFilter(
+                "all_for_timeline"));
+
+            function setupFilterUI(field) {
+               
+                let filterIcon = document.getElementById(`${field}FilterIcon`);
+                let filterDiv = document.getElementById(`${field}FilterDiv`);
+                let filterType = document.getElementById(`${field}FilterType`);
+                let filterInput = document.getElementById(`${field}FilterInput`);
+                let applyFilterBtn = document.getElementById(
+                    `apply${field.charAt(0).toUpperCase() + field.slice(1)}Filter`);
+                let clearFilterBtn = document.getElementById(
+                    `clear${field.charAt(0).toUpperCase() + field.slice(1)}Filter`);
+
+                filterIcon.addEventListener("click", function(event) {
+                    event.stopPropagation();
+                    filterDiv.style.display = filterDiv.style.display === "none" ? "block" : "none";
+                });
+
+                document.addEventListener("click", function(event) {
+                    if (!filterDiv.contains(event.target) && event.target !== filterIcon) {
+                        filterDiv.style.display = "none";
+                    }
+                });
+
+                applyFilterBtn.addEventListener("click", function() {
+                    filters[field].type = filterType.value;
+                    filters[field].value = filterInput.value;
+                    applyFilters();
+                    filterDiv.style.display = "none";
+                });
+
+                clearFilterBtn.addEventListener("click", function() {
+                    filters[field].type = "";
+                    filters[field].value = "";
+                    applyFilters();
+                    filterDiv.style.display = "none";
+                });
+            }
+
+            // Setup filters for all fields
+            ["subject", "reference", "from", "to", "status", "note", "date", "return"].forEach(setupFilterUI);
         });
     </script>
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
@@ -393,8 +767,20 @@
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
-            },{
+            }, {
                 "targets": 1, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 4, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 6, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 9, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 11, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }, {
                 "targets": 12, // Target the first column (index 0)
@@ -402,4 +788,16 @@
             }]
         });
     </script>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+     <script>
+         document.addEventListener("DOMContentLoaded", function() {
+ 
+             flatpickr(".date", {
+                 enableTime: false,
+                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+             });
+ 
+         });
+     </script>
 @endpush

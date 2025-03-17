@@ -68,12 +68,12 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 7%;
+            width: 4%;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 48%;
+            width: 51%;
         }
 
         .table-container th:nth-child(4),
@@ -182,7 +182,7 @@
                                         </div>
                                     </th>
 
-                                    <th><b>File ID</b></th>
+                                    <th><b>NO.</b></th>
                                     <th><b>File Name</b></th>
                                     <th><b>{{$folder->label1}}</b></th>
                                     <th><b>{{$folder->label2}}</b></th>

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectFile extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'project_files';
 
     protected $fillable = [

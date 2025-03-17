@@ -157,6 +157,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/delete-selected-docs', [DocumentController::class, 'deleteSelectedDocs'])->name('project.document.delete-selected-docs');
     Route::post('/project/assign-to-file-for-all', [DocumentController::class, 'assignToFileForAll'])->name('project.document.assign-to-file-for-all');
 
+    Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc,$id) {
+        session(['current_view' => 'file_doc']);
+        session(['current_file_doc' => $doc]);
+        
+        return redirect()->route('project.edit-document',$id);
+    });
 
     Route::get('/switch-folder/{id}', function ($id) {
         //session(['current_account_id' => $id]);
@@ -175,6 +181,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/file/change-owner', [FileController::class, 'changeOwner'])->name('project.file.change-owner');
 
     Route::get('/project/file/{id}/documents', [FileDocumentController::class, 'index'])->name('project.file-documents.index');
+    Route::get('/project/file-document-first-analyses/{id}', [FileDocumentController::class, 'file_document_first_analyses'])->name('project.file-document-first-analyses');
+    Route::post('/project/file-document-first-analyses/store/{id}', [FileDocumentController::class, 'store_file_document_first_analyses'])->name('project.file-document-first-analyses.store');
+    Route::post('/project/upload-editor-image', [FileDocumentController::class, 'upload_editor_image'])->name('upload_editor_image');
 
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 

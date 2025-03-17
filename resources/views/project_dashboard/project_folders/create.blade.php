@@ -51,7 +51,7 @@
                     </div>
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" name="potential_impact"id="customCheck1">
-                        <label class="custom-control-label" for="customCheck1">Has Potential Impact</label>
+                        <label class="custom-control-label" for="customCheck1">For Claim Files</label>
                       </div>
                       <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" name="shortcut"id="shortcut">

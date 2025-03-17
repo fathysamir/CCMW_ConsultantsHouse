@@ -188,8 +188,15 @@
                                 {{ $document->analyzed ? 'checked' : '' }}>
                             <label class="custom-control-label" for="analyzed">Notify for Analysis</label>
                         </div>
-                        <button type="submit" class="btn mb-2 btn-outline-primary" id="btn-outline-primary"
-                            style="margin-top: 10px;">Update</button>
+                        <input type="hidden" name="action" id="formAction" value="save">
+                        <div class="text-right" style="margin-top: 10px;">
+                            <button type="submit"
+                                class="btn mb-2 btn-outline-success"onclick="document.getElementById('formAction').value='save'">Save</button>
+                            <button type="submit" class="btn mb-2 btn-outline-primary"
+                                onclick="document.getElementById('formAction').value='update'">Update</button>
+                            <button type="button" class="btn mb-2 btn-outline-secondary"@if(session()->has('current_view') && session('current_view')=='file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @else 
+                                onclick="window.location.href='/project/all-documents'" @endif>Back</button>
+                        </div>
                     </form>
                 </div> <!-- /.col -->
             </div>

@@ -38,7 +38,7 @@ class AuthController extends Controller
             return Redirect::back()->withErrors($validator)->withInput($request->all());
         }
         if (Auth::attempt(['email' => request('email'),'password' => request('password')])) {
-
+            
             return redirect('/accounts');
         } else {
 
@@ -59,6 +59,7 @@ class AuthController extends Controller
 
     public function logout()
     {
+        session()->flush();
         Auth::logout();
 
         // auth()->guard('admin')->logout();

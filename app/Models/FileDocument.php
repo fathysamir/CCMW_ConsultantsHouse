@@ -46,7 +46,10 @@ class FileDocument extends Model
     {
         return $this->belongsTo(ProjectFile::class, 'file_id','id')->withTrashed();
     }
-   
+    public function tags()
+    {
+        return $this->belongsToMany(ContractTag::class,'file_documents_tags', 'file_document_id', 'contract_tag_id');
+    }
     
 
 }

@@ -82,8 +82,9 @@
             transition: width 0.1s ease;
             /* Smooth transition for width changes */
         }
+
         .l-link:hover {
-            color:#1b68ff !important;
+            color: #1b68ff !important;
         }
     </style>
 </head>
@@ -93,7 +94,7 @@
         @include('project_dashboard.layout.header')
         @include('project_dashboard.layout.side_menu')
 
-        <main role="main" class="main-content" style="padding-top: 0px;" >
+        <main role="main" class="main-content" style="padding-top: 0px;">
             <div class="container-fluid">
                 <div class="row justify-content-center">
                     <div class="col-12">
@@ -101,7 +102,7 @@
                     </div> <!-- .col-12 -->
                 </div> <!-- .row -->
             </div> <!-- .container-fluid -->
-            
+
         </main> <!-- main -->
     </div> <!-- .wrapper -->
     <script src="{{ asset('dashboard/js/jquery.min.js') }}"></script>
@@ -136,6 +137,8 @@
     <script src="{{ asset('dashboard/js/dropzone.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/uppy.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/quill.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
+
     <script>
         $('.select2').select2({
             theme: 'bootstrap4',
@@ -212,21 +215,21 @@
         var editor = document.getElementById('editor');
         if (editor) {
             var toolbarOptions = [
-                [{
-                    'font': []
-                }],
+                // [{
+                //     'font': []
+                // }],
                 [{
                     'header': [1, 2, 3, 4, 5, 6, false]
                 }],
                 ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{
-                        'header': 1
-                    },
-                    {
-                        'header': 2
-                    }
-                ],
+                // ['blockquote', 'code-block'],
+                // [{
+                //         'header': 1
+                //     },
+                //     {
+                //         'header': 2
+                //     }
+                // ],
                 [{
                         'list': 'ordered'
                     },
@@ -234,13 +237,13 @@
                         'list': 'bullet'
                     }
                 ],
-                [{
-                        'script': 'sub'
-                    },
-                    {
-                        'script': 'super'
-                    }
-                ],
+                // [{
+                //         'script': 'sub'
+                //     },
+                //     {
+                //         'script': 'super'
+                //     }
+                // ],
                 [{
                         'indent': '-1'
                     },
@@ -261,13 +264,144 @@
                 [{
                     'align': []
                 }],
+                ['image'],
                 ['clean'] // remove formatting button
             ];
-            var quill = new Quill(editor, {
+            var quill = new Quill('#editor', {
                 modules: {
-                    toolbar: toolbarOptions
+                    toolbar: {
+                        container: toolbarOptions,
+                        handlers: {
+                            image: function() {
+                                // Show custom image modal
+                                $('#insertImageModal').modal('show');
+                            }
+                        }
+                    },
+                    imageResize: { // Move imageResize outside of toolbar
+                        displayStyles: {
+                            backgroundColor: 'black',
+                            border: 'none',
+                            color: 'white'
+                        },
+                        modules: ['Resize', 'DisplaySize', 'Toolbar']
+                    }
                 },
                 theme: 'snow'
+            });
+            document.querySelector('.close').addEventListener('click', function() {
+
+                $('#insertImageModal').modal('hide');
+            });
+
+            document.getElementById('insertImageBtn').addEventListener('click', async function() {
+                var imageUrl = document.getElementById('imageUrlInput').value;
+                var altText = document.getElementById('imageAltInput').value;
+                var fileInput = document.getElementById('uploadImageInput');
+
+                if (fileInput.files.length > 0) {
+                    // If user selected an image file, upload it
+                    var file = fileInput.files[0];
+                    var formData = new FormData();
+                    formData.append('image', file);
+
+                    try {
+                        let response = await fetch('/project/upload-editor-image', { // Laravel route
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        });
+
+                        let result = await response.json();
+                        if (result.success) {
+                            imageUrl = '/' + result.file.path;
+                        } else {
+                            alert('Image upload failed');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                        return;
+                    }
+                }
+
+                // Insert Image into Quill Editor with Alt Text
+                if (imageUrl) {
+                    var range = quill.getSelection(); // Get cursor position
+
+                    if (!range) {
+                        range = {
+                            index: quill.getLength()
+                        }; // If null, insert at the end
+                    }
+
+                    var imgTag = `<img src="${imageUrl}" alt="${altText}">`;
+                    quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
+                } else {
+                    alert('Please provide an image URL or upload a file.');
+                }
+
+                // Close modal
+                $('#insertImageModal').modal('hide');
+
+                // Clear inputs
+                document.getElementById('imageUrlInput').value = '';
+                document.getElementById('uploadImageInput').value = '';
+                document.getElementById('imageAltInput').value = '';
+            });
+            // var quill = new Quill('#editor', {
+            //     modules: {
+            //         toolbar: {
+            //             container: toolbarOptions,
+            //             handlers: {
+            //                 image: function() {
+            //                     var input = document.createElement('input');
+            //                     input.setAttribute('type', 'file');
+            //                     input.setAttribute('accept', 'image/*');
+            //                     input.click();
+
+            //                     input.onchange = async function() {
+            //                         var file = input.files[0];
+            //                         if (file) {
+            //                             var formData = new FormData();
+            //                             formData.append('image', file);
+
+            //                             try {
+            //                                 let response = await fetch(
+            //                                 '/project/upload-editor-image', { // <-- Change this URL to your backend route
+            //                                     method: 'POST',
+            //                                     body: formData,
+            //                                     headers: {
+            //                                         'X-CSRF-TOKEN': document.querySelector(
+            //                                             'meta[name="csrf-token"]').content
+            //                                     }
+            //                                 });
+
+            //                                 let result = await response.json();
+            //                                 if (result.success) {
+            //                                     var range = quill.getSelection();
+            //                                     quill.insertEmbed(range.index, 'image', '/' + result
+            //                                         .file.path);
+            //                                 } else {
+            //                                     alert('Image upload failed');
+            //                                 }
+            //                             } catch (error) {
+            //                                 console.error('Upload error:', error);
+            //                             }
+            //                         }
+            //                     };
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     theme: 'snow'
+            // });
+
+            document.querySelector('#formNarrative').addEventListener('submit', function() {
+                document.querySelector('#narrative').value = quill.root.innerHTML;
             });
         }
         // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -377,24 +511,24 @@
 
             if (currentWidth === 100) {
                 logo.setAttribute('width', '50');
-            //     const tableHeader = document.querySelector('.table-container thead');
-            //     const tablebody = document.querySelector('.table-container tbody');
-            // if (tableHeader) {
-            //     tableHeader.style.width = '100%';
-            //     tablebody.style.width = '100%'; // Set the header width to 100%
-            // } // Decrease width
+                //     const tableHeader = document.querySelector('.table-container thead');
+                //     const tablebody = document.querySelector('.table-container tbody');
+                // if (tableHeader) {
+                //     tableHeader.style.width = '100%';
+                //     tablebody.style.width = '100%'; // Set the header width to 100%
+                // } // Decrease width
             } else {
-            //     const tableHeader = document.querySelector('.table-container thead');
-            //     const tablebody = document.querySelector('.table-container tbody');
-            // if (tableHeader) {
-            //     tableHeader.style.width = ''; // Set the header width to 100%
-            //     tablebody.style.width = ''; 
-            // } // 
+                //     const tableHeader = document.querySelector('.table-container thead');
+                //     const tablebody = document.querySelector('.table-container tbody');
+                // if (tableHeader) {
+                //     tableHeader.style.width = ''; // Set the header width to 100%
+                //     tablebody.style.width = ''; 
+                // } // 
                 logo.setAttribute('width', '100'); // Increase width
             }
         }
     </script>
-     @stack('scripts')
+    @stack('scripts')
     <!-- Global site tag (gtag.js) - Google Analytics -->
     {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
