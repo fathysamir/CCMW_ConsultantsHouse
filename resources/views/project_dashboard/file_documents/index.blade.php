@@ -169,7 +169,7 @@
             <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
-
+            <button type="button" class="btn mb-2 btn-success"onclick="window.location.href='/export-word-claim-docs/<?php echo $file->slug; ?>'">Export</button>
         </div>
     </div>
     @if (session('error'))

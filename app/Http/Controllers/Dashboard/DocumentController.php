@@ -28,8 +28,9 @@ class DocumentController extends ApiController
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
 
-        return view('project_dashboard.upload_documents.upload_single_doc', compact('documents_types', 'users', 'stake_holders', 'threads'));
+        return view('project_dashboard.upload_documents.upload_single_doc', compact('documents_types', 'users', 'stake_holders', 'threads','folders'));
     }
 
     public function store_single_doc(Request $request)
@@ -64,7 +65,13 @@ class DocumentController extends ApiController
         if ($request->analyzed) {
             $doc->analyzed = '1';
         }
+        if ($request->analysis_complete) {
+            $doc->analysis_complete = '1';
+        }
         $doc->save();
+        if($request->file_id){
+            FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+        }
         return redirect('/project/all-documents')->with('success', 'Document Created successfully.');
 
     }
@@ -138,7 +145,9 @@ class DocumentController extends ApiController
         $stake_holders = $project->stakeHolders;
         $document = Document::where('slug', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->where('id', '!=', $document->id)->pluck('reference');
-        return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads'));
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+
+        return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads','folders'));
     }
 
     public function update_document(Request $request, $id)
@@ -170,7 +179,19 @@ class DocumentController extends ApiController
         } else {
             $doc->analyzed = '0';
         }
+        if ($request->analysis_complete) {
+            $doc->analysis_complete = '1';
+        } else {
+            $doc->analysis_complete = '0';
+        }
         $doc->save();
+        if ($request->file_id) {
+            $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $doc->id)->first();
+            if (!$fileDoc) {
+                FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+            }
+        }
+        
        
         if(session()->has('current_view') && session('current_view')=='file_doc'){
             if($request->action=='save'){ 

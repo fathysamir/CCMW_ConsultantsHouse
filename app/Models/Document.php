@@ -27,7 +27,8 @@ class Document extends Model
         'notes',
         'storage_file_id',
         'analyzed',
-        'threads'
+        'threads',
+        'analysis_complete'
     ];
 
     protected $allowedSorts = [

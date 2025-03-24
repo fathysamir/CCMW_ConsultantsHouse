@@ -150,6 +150,25 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
+                            <label>Assign Document To File</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select class="form-control" id="folder_id">
+                                        <option value="" disabled selected>Select Folder</option>
+                                        @foreach ($folders as $key => $name)
+                                            <option value="{{ $key }}">{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 d-none files_">
+                                    <select class="form-control" id="newFile" name="file_id">
+                                        <option value="" disabled selected>Select File</option>
+        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="Note">Note</label>
                             <textarea name="notes" rows="5" id="Note" class="form-control" placeholder="Note">{{ old('notes') }}</textarea>
                         </div>
@@ -164,6 +183,10 @@
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"id="analyzed" name="analyzed">
                             <label class="custom-control-label" for="analyzed">Notify for Analysis</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"id="analysis_complete" name="analysis_complete">
+                            <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                         </div>
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
                             style="margin-top: 10px;">Create</button>
@@ -180,7 +203,39 @@
 
     <script>
         $(document).ready(function() {
+            $('#folder_id').change(function() {
+                let folderId = $(this).val();
 
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                    folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.files_').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.files_').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();

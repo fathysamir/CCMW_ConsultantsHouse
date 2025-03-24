@@ -10,7 +10,7 @@
                     <form method="post" action="{{ route('project.update-document', $document->slug) }}"
                         enctype="multipart/form-data">
                         @csrf
-                      
+
                         <input type="hidden" id="doc_id" name="doc_id" required value="{{ $document->storage_file_id }}">
                         <div class="row">
                             <!-- Type Input -->
@@ -161,6 +161,30 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Start Date Input -->
+
+                        <div class="form-group mb-3">
+                            <label>Assign Document To File</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select class="form-control" id="folder_id">
+                                        <option value="" disabled selected>Select Folder</option>
+                                        @foreach ($folders as $key => $name)
+                                            <option value="{{ $key }}">{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 d-none files_">
+                                    <select class="form-control" id="newFile" name="file_id">
+                                        <option value="" disabled selected>Select File</option>
+        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <div class="form-group mb-3">
                             <label for="Note">Note</label>
                             <textarea name="notes" rows="5" id="Note" class="form-control" placeholder="Note">{{ $document->notes }}</textarea>
@@ -188,13 +212,19 @@
                                 {{ $document->analyzed ? 'checked' : '' }}>
                             <label class="custom-control-label" for="analyzed">Notify for Analysis</label>
                         </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"id="analysis_complete"
+                                name="analysis_complete"{{ $document->analysis_complete ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
+                        </div>
                         <input type="hidden" name="action" id="formAction" value="save">
                         <div class="text-right" style="margin-top: 10px;">
                             <button type="submit"
                                 class="btn mb-2 btn-outline-success"onclick="document.getElementById('formAction').value='save'">Save</button>
                             <button type="submit" class="btn mb-2 btn-outline-primary"
                                 onclick="document.getElementById('formAction').value='update'">Update</button>
-                            <button type="button" class="btn mb-2 btn-outline-secondary"@if(session()->has('current_view') && session('current_view')=='file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @else 
+                            <button type="button"
+                                class="btn mb-2 btn-outline-secondary"@if (session()->has('current_view') && session('current_view') == 'file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @else 
                                 onclick="window.location.href='/project/all-documents'" @endif>Back</button>
                         </div>
                     </form>
@@ -207,6 +237,39 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('#folder_id').change(function() {
+                let folderId = $(this).val();
+
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                    folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.files_').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.files_').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();
@@ -269,7 +332,7 @@
                                 const $viewPdf = $('#viewPdf');
                                 $viewPdf.removeClass('d-none');
                                 $viewPdf.attr('data-file-path', file
-                                    .path) // Set or add the attribute
+                                        .path) // Set or add the attribute
                                     .off('click')
                                     .on('click', function() {
                                         window.open('/' + $(this).attr('data-file-path'),

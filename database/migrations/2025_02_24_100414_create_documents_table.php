@@ -34,6 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('storage_file_id');
             $table->foreign('storage_file_id')->references('id')->on('storage_files')->onDelete('cascade');
             $table->enum('analyzed', ['0', '1'])->default('0');
+            $table->enum('analysis_complete', ['0', '1'])->default('0');
             $table->json('threads')->nullable();
             $table->timestamps();
             $table->softDeletes();
