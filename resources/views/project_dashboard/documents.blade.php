@@ -112,8 +112,7 @@
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
         }
-    </style>
-    <style>
+    
         .table-container tbody::-webkit-scrollbar {
             width: 6px;
         }
@@ -216,8 +215,8 @@
                                         <td>{{ $document->reference }}</td>
                                         <td>{{ $document->subject }}</td>
                                         <td>{{ date('d-M-Y', strtotime($document->start_date)) }}</td>
-                                        <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->role : '_' }}</td>
-                                        <td>{{ $document->toStakeHolder ? $document->toStakeHolder->role : '_' }}</td>
+                                        <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->narrative : '_' }}</td>
+                                        <td>{{ $document->toStakeHolder ? $document->toStakeHolder->narrative : '_' }}</td>
 
                                         <td>{{ $document->revision }}</td>
                                         <td>
@@ -1023,7 +1022,7 @@
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
-            },{
+            }, {
                 "targets": 8, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }]

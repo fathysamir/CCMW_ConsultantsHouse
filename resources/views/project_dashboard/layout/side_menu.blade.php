@@ -56,8 +56,12 @@
                                 class="ml-1 item-text">Upload Single Document</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href=""><span class="ml-1 item-text">Upload Group of
+                        <a class="nav-link pl-3" style="font-size: 0.8rem;" href="{{ route('project.upload-group-documents') }}"><span class="ml-1 item-text">Upload Group of
                                 Documents</span></a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" style="font-size: 0.8rem;" href="{{ route('import_docs_view') }}"><span class="ml-1 item-text">Import Documents from Excel</span></a>
                     </li>
 
 

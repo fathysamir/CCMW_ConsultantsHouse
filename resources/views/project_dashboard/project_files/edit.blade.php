@@ -82,55 +82,55 @@
                             <textarea name="notes" rows="7" id="Note" class="form-control" placeholder="Note">{{ old('notes',$file->notes) }}</textarea>
                         </div>
 
-                        <div class="row">
-                            <!-- Name Input -->
-                            <div class="col-md-6">
-                                @if ($folder->potential_impact == '1')
-                                    <div class="row">
-                                        <p style="margin-right: 10px;">Potential Impact : </p>
-                                        <div class="custom-control custom-checkbox" style="margin-right: 20px;">
-                                            <input type="checkbox" class="custom-control-input" name="time"id="time" @if($file->time == '1') checked @endif>
-                                            <label class="custom-control-label" for="time">Time</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox"style="margin-right: 20px;">
-                                            <input type="checkbox" class="custom-control-input"
-                                                name="prolongation_cost"id="prolongation_cost"@if($file->prolongation_cost == '1') checked @endif>
-                                            <label class="custom-control-label" for="prolongation_cost">Prolongation
-                                                Cost</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox"style="margin-right: 20px;">
-                                            <input type="checkbox" class="custom-control-input"
-                                                name="disruption_cost"id="disruption_cost"@if($file->disruption_cost == '1') checked @endif>
-                                            <label class="custom-control-label" for="disruption_cost">Disruption
-                                                Cost</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input"
-                                                name="variation"id="variation"@if($file->variation == '1') checked @endif>
-                                            <label class="custom-control-label" for="variation">Variation</label>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Email Input -->
-                            <div class="col-md-6">
+                       
+                        <div class="col-md-12">
+                            @if ($folder->potential_impact == '1')
                                 <div class="row">
+                                    <p style="margin-right: 10px;">Potential Impact : </p>
+                                    <div class="custom-control custom-checkbox" style="margin-right: 20px;">
+                                        <input type="checkbox" class="custom-control-input" name="time"id="time"@if($file->time == '1') checked @endif>
+                                        <label class="custom-control-label" for="time">Time</label>
+                                    </div>
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;">
-                                        <input type="checkbox" class="custom-control-input" name="closed"id="closed"@if($file->closed == '1') checked @endif>
-                                        <label class="custom-control-label" for="closed">Closed</label>
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="prolongation_cost"id="prolongation_cost"@if($file->prolongation_cost == '1') checked @endif>
+                                        <label class="custom-control-label" for="prolongation_cost">Prolongation
+                                            Cost</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox"style="margin-right: 20px;">
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="disruption_cost"id="disruption_cost"@if($file->disruption_cost == '1') checked @endif>
+                                        <label class="custom-control-label" for="disruption_cost">Disruption
+                                            Cost</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input"
-                                            name="assess_not_pursue"id="assess_not_pursue"@if($file->assess_not_pursue == '1') checked @endif>
-                                        <label class="custom-control-label" for="assess_not_pursue">Assessed Not To
-                                            Pursue</label>
+                                            name="variation"id="variation"@if($file->variation == '1') checked @endif>
+                                        <label class="custom-control-label" for="variation">Variation</label>
                                     </div>
-
                                 </div>
+                            @endif
+                        </div>
+
+                        <!-- Email Input -->
+                        
+
+
+                   
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="custom-control custom-checkbox"style="margin-right: 20px;">
+                                    <input type="checkbox" class="custom-control-input" name="closed"id="closed"@if($file->closed == '1') checked @endif>
+                                    <label class="custom-control-label" for="closed">Closed</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input"
+                                        name="assess_not_pursue"id="assess_not_pursue"@if($file->assess_not_pursue == '1') checked @endif>
+                                    <label class="custom-control-label" for="assess_not_pursue">Assessed Not To
+                                        Pursue</label>
+                                </div>
+
                             </div>
-
-
                         </div>
 
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"

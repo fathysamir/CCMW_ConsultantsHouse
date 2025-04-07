@@ -1,24 +1,26 @@
 @extends('project_dashboard.layout.app')
-@section('title', 'Project Home - Edit Document')
+@section('title', 'Project Home - Check Document')
 @section('content')
-    <h2 class="page-title">Edit Document</h2>
+    <h2 class="page-title">Edit "{{ $document->reference }}" Document</h2>
 
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <form method="post" action="{{ route('project.update-document', $document->slug) }}"
+                    <form id="updateTestDocumentForm" method="post"
+                        action="{{ route('project.upload-group-documents.update-test-document', $document->id) }}"
                         enctype="multipart/form-data">
-                        @csrf
 
-                        <input type="hidden" id="doc_id" name="doc_id" required value="{{ $document->storage_file_id }}">
+
+                        <input type="hidden" id="doc_id" name="doc_id" required
+                            value="{{ $document->storage_file_id }}">
                         <div class="row">
                             <!-- Type Input -->
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="type">Type <span style="color: red">*</span></label>
                                     <select class="form-control" id="type" required name="doc_type">
-                                        <option value="" disabled>please select</option>
+                                        <option value="" disabled selected>please select</option>
                                         @foreach ($documents_types as $type)
                                             <option value="{{ $type->id }}"
                                                 {{ $document->doc_type_id == $type->id ? 'selected' : '' }}>
@@ -34,7 +36,7 @@
                                 <div class="form-group mb-3">
                                     <label for="owner">Analyzed By <span style="color: red">*</span></label>
                                     <select class="form-control" id="owner" required name="user_id">
-                                        <option value="" disabled>please select</option>
+                                        <option value="" disabled selected>please select</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}"
                                                 {{ $document->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}
@@ -108,7 +110,7 @@
                                 <div class="form-group mb-3">
                                     <label for="from_id">From</label>
                                     <select class="form-control" id="from_id" name="from_id">
-                                        <option disabled>please select</option>
+                                        <option disabled selected>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
                                             <option value="{{ $stake_holder->id }}"
                                                 {{ $document->from_id == $stake_holder->id ? 'selected' : '' }}>
@@ -123,7 +125,7 @@
                                 <div class="form-group mb-3">
                                     <label for="to_id">To</label>
                                     <select class="form-control" id="to_id" name="to_id">
-                                        <option disabled>please select</option>
+                                        <option disabled selected>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
                                             <option value="{{ $stake_holder->id }}"
                                                 {{ $document->to_id == $stake_holder->id ? 'selected' : '' }}>
@@ -178,7 +180,7 @@
                                 <div class="col-md-6 d-none files_">
                                     <select class="form-control" id="newFile" name="file_id">
                                         <option value="" disabled selected>Select File</option>
-        
+
                                     </select>
                                 </div>
                             </div>
@@ -217,15 +219,10 @@
                                 name="analysis_complete"{{ $document->analysis_complete ? 'checked' : '' }}>
                             <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                         </div>
-                        <input type="hidden" name="action" id="formAction" value="save">
+
                         <div class="text-right" style="margin-top: 10px;">
-                            <button type="submit"
-                                class="btn mb-2 btn-outline-success"onclick="document.getElementById('formAction').value='save'">Save</button>
-                            <button type="submit" class="btn mb-2 btn-outline-primary"
-                                onclick="document.getElementById('formAction').value='update'">Update</button>
-                            <button type="button"
-                                class="btn mb-2 btn-outline-secondary"@if (session()->has('current_view') && session('current_view') == 'file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @else 
-                                onclick="window.location.href='/project/all-documents'" @endif>Back</button>
+                            <button type="submit" class="btn mb-2 btn-outline-success">Save</button>
+
                         </div>
                     </form>
                 </div> <!-- /.col -->
@@ -244,7 +241,7 @@
 
                 $.ajax({
                     url: '/project/folder/get-files/' +
-                    folderId, // Adjust the route to your API endpoint
+                        folderId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let fileDropdown = $('#newFile');
@@ -367,7 +364,32 @@
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
             });
+            const form = document.getElementById('updateTestDocumentForm');
 
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.close(); // ✅ Close the tab
+                        } else {
+                            alert("Something went wrong while saving the document.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Failed to save the document.");
+                    });
+            });
             const withReturnCheckbox = document.getElementById("With-Return");
             const endDateDiv = document.getElementById("end_date").closest(".col-md-6");
 

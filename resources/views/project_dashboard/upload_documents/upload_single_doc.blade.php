@@ -98,7 +98,7 @@
                                     <select class="form-control" id="from_id" name="from_id">
                                         <option selected disabled>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
-                                            <option value="{{ $stake_holder->id }}">{{ $stake_holder->name }} -
+                                            <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
                                                 {{ $stake_holder->role }}</option>
                                         @endforeach
                                     </select>
@@ -112,7 +112,7 @@
                                     <select class="form-control" id="to_id" name="to_id">
                                         <option selected disabled>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
-                                            <option value="{{ $stake_holder->id }}">{{ $stake_holder->name }} -
+                                            <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
                                                 {{ $stake_holder->role }}</option>
                                         @endforeach
                                     </select>

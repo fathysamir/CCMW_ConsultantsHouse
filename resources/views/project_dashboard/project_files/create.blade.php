@@ -79,7 +79,7 @@
                             <textarea name="notes" rows="7" id="Note" class="form-control" placeholder="Note">{{ old('notes') }}</textarea>
                         </div>
 
-                        <div class="row">
+                        
                             <!-- Name Input -->
                             <div class="col-md-12">
                                 @if ($folder->potential_impact == '1')
@@ -114,8 +114,7 @@
                             
 
 
-                        </div>
-                        <div class="row">
+                       
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;">
@@ -131,7 +130,7 @@
 
                                 </div>
                             </div>
-                        </div>
+                        
 
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
                             style="margin-top: 10px;">Create</button>

@@ -14,6 +14,8 @@ use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\DocumentController;
 use App\Http\Controllers\Dashboard\FileController;
 use App\Http\Controllers\Dashboard\FileDocumentController;
+use App\Http\Controllers\Dashboard\ImportDocumentController;
+use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -186,6 +188,20 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/upload-editor-image', [FileDocumentController::class, 'upload_editor_image'])->name('upload_editor_image');
     Route::get('/export-word-claim-docs/{id}', [FileDocumentController::class, 'exportWordClaimDocs']);
 
+    Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
+    Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');
+    Route::post('/upload-multi-files', [ImportDocumentController::class, 'upload_multi_files'])->name('upload_multi_files');
+    Route::post('/get-headers', [ImportDocumentController::class, 'getHeaders'])->name('getHeaders');
+    Route::post('/start-import', [ImportDocumentController::class, 'start_import'])->name('start_import');
+
+    Route::get('/project/upload-group-documents', [UploadGroupDocumentController::class, 'index'])->name('project.upload-group-documents');
+    Route::get('/formate_date', [UploadGroupDocumentController::class, 'formate_date'])->name('formate_date');
+    Route::post('/group-documents/upload-multi-files', [UploadGroupDocumentController::class, 'upload_multi_files'])->name('group-documents.upload_multi_files');
+    Route::post('/group-documents/save-documents', [UploadGroupDocumentController::class, 'saveDocuments'])->name('group-documents.saveDocuments');
+    Route::get('/group-documents/document/{id}', [UploadGroupDocumentController::class, 'view_doc'])->name('group-documents.view_doc');
+    Route::post('/group-documents/update-test-document/{id}', [UploadGroupDocumentController::class, 'update_test_document'])->name('project.upload-group-documents.update-test-document');
+    Route::get('/group-documents/check_test_documents', [UploadGroupDocumentController::class, 'check_test_documents'])->name('group-documents.check_test_documents');
+    Route::get('/group-documents/import_group_documents', [UploadGroupDocumentController::class, 'import_group_documents'])->name('group-documents.import_group_documents');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     

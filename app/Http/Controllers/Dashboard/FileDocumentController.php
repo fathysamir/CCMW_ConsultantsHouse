@@ -36,16 +36,17 @@ class FileDocumentController extends ApiController
         $section = $phpWord->addSection();
         
         $chapter = '4'; // Dynamic chapter number
-        $sectionNumber = '1'; // Dynamic section number
+        $sectionNumber = '2'; // Dynamic section number
         $phpWord->addNumberingStyle(
             'multilevel',
             [
                 'type' => 'multilevel',
                 'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
                 'levels' => [
-                    ['Heading1', 'format' => 'decimal', 'text' => $chapter . '.%' . $sectionNumber . '.'],
-                    ['Heading2', 'format' => 'decimal', 'text' => $chapter . '.%' . $sectionNumber . '.%2.'],
-                    ['Heading3', 'format' => 'decimal', 'text' => $chapter . '.%' . $sectionNumber . '.%2.%3.'],
+                    ['Heading0', 'format' => 'decimal', 'text' => "%1.", 'start' => (int)$chapter],
+                    ['Heading1', 'format' => 'decimal', 'text' => "%1.%2", 'start' => (int)$sectionNumber],
+                    ['Heading2', 'format' => 'decimal', 'text' => "%1.%2.%3", 'start' => 1,],
+                    ['Heading3', 'format' => 'decimal', 'text' => "%1.%2.%3.%4", 'start' => 1,],
                     ['Heading3', 'format' => 'decimal', 'text' => '']
                 ],
             ]
@@ -227,7 +228,7 @@ class FileDocumentController extends ApiController
         ]);
           
         $phpWord->addTitleStyle(1, $GetStandardStylesH1,$GetParagraphStyleH1);
-        $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 0]));
+        $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 1]));
         $phpWord->addTitleStyle(3, $GetStandardStylesH3,$GetParagraphStyleH3);
 
         $file=ProjectFile::where('slug',$id)->first();
@@ -275,7 +276,7 @@ class FileDocumentController extends ApiController
 
            
             // Create a List Item Run (allows inline text styling + footnotes inside list items)
-            $listItemRun = $section->addListItemRun(1, 'multilevel','listParagraphStyle');
+            $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
 
             // Add the main sentence
             $listItemRun->addText("On ",$GetStandardStylesP);
@@ -357,12 +358,12 @@ class FileDocumentController extends ApiController
                                     ]);
                         
                                     // Add Image
-                                    $textRun->addImage($fullImagePath, [
+                                    $shape =$textRun->addImage($fullImagePath, [
                                         'width' => 100,
                                         'height' => 80,
                                         'alignment' => 'left'
                                     ]);
-                        
+                                   
                                     // Add Caption (Alt text)
                                     if (!empty($altText)) {
                                         $textRun->addTextBreak(); // New line
@@ -462,7 +463,7 @@ class FileDocumentController extends ApiController
                             try {
                                 if($existedList){
                                    
-                                    $listItemRun2 = $section->addListItemRun(3, 'multilevel', [
+                                    $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
                                         'spaceBefore'=> 0,
                                         'spaceAfter' => 240,
                                         'lineHeight' => '1.5',

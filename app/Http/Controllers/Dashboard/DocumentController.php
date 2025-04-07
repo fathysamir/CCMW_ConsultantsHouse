@@ -95,7 +95,9 @@ class DocumentController extends ApiController
                 'file' => $storageFile
             ]);
         }
-        $fileName = time() . '_' . $file->getClientOriginalName();
+        $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $cleanedName = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
+        $fileName = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
 
         // Create project-specific folder in public path
         $projectFolder = 'projects/' . auth()->user()->current_project_id . '/documents';
