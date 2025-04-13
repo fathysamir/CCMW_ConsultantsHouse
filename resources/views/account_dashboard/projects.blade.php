@@ -66,19 +66,19 @@
     </style>
     <style>
         /* #epsTree {
-                            list-style-type: none;
-                            padding-left: 20px;
-                        }
+                                        list-style-type: none;
+                                        padding-left: 20px;
+                                    }
 
-                        #epsTree li {
-                            margin: 5px 0;
-                            cursor: pointer;
-                        }
+                                    #epsTree li {
+                                        margin: 5px 0;
+                                        cursor: pointer;
+                                    }
 
-                        #epsTree ul {
-                            padding-left: 20px;
-                            border-left: 1px solid #ccc;
-                        } */
+                                    #epsTree ul {
+                                        padding-left: 20px;
+                                        border-left: 1px solid #ccc;
+                                    } */
 
         .category-name {
             font-weight: bold;
@@ -172,7 +172,7 @@
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
 
-            
+
         });
     </script>
     <script>
@@ -511,25 +511,24 @@
 
                                         // Loop through each category in response.data
                                         response.data.forEach(project => {
-
+                                            let safeProjectName = project.name.replace(/"/g,
+                                                '&quot;').replace(/'/g, '&#39;');
                                             div += `<div class="col-md-12" id="project_${project.id}">
-                                                
-                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
-                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
-                                                <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"oncontextmenu="showContextMenu(event, '${project.id}','${project.name}')">
-                                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
-                                                                style="border-radius: 5px; margin-bottom: 5px;">
-                                                            <strong class="card-title my-0">${project.name} - ${project.code}</strong>
+                                                        <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
+                                                            <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
+                                                                <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"
+                                                                    oncontextmenu="showContextMenu(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')">
+                                                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                                                            <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
+                                                                                style="border-radius: 5px; margin-bottom: 5px;">
+                                                                            <strong class="card-title my-0">${project.name} - ${project.code}</strong>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>`;
+                                                    </div>`;
                                         });
 
                                         // Close the children div
@@ -544,14 +543,17 @@
                                     // Append the generated HTML after the clicked element
                                     $(element).after(div);
                                     document.querySelectorAll('[id^="project_"]').forEach(div => {
-                div.addEventListener('click', function() {
-                    let projectId = this.id.replace('project_', ''); // Extract ID from div
-                    let switchProjectUrl = `/switch-project/${projectId}`; // Laravel route
+                                        div.addEventListener('click', function() {
+                                            let projectId = this.id.replace(
+                                                'project_', ''
+                                            ); // Extract ID from div
+                                            let switchProjectUrl =
+                                                `/switch-project/${projectId}`; // Laravel route
 
-                    // Redirect to the switch project route
-                    window.location.href = switchProjectUrl;
-                });
-            });
+                                            // Redirect to the switch project route
+                                            window.location.href = switchProjectUrl;
+                                        });
+                                    });
                                 },
                                 error: function(xhr, status, error) {
                                     // Handle the error response here
@@ -562,7 +564,7 @@
 
                             icon.removeClass('fe-chevron-right').addClass(
                                 'fe-chevron-down'); // Change to down arrow
-                               
+
 
                         } else {
                             $.ajax({
@@ -576,20 +578,22 @@
 
                                         // Loop through each category in response.data
                                         response.data.forEach(project => {
-
-                                            div += `<div class="col-md-12" id="project_${project.id}">
+                                            let safeProjectName = project.name.replace(/"/g,
+                                                '&quot;').replace(/'/g, '&#39;');
+                                            div +=
+                                                `<div class="col-md-12" id="project_${project.id}">
                                         <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
                                             <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
                                                 <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"`;
                                             if (eps_name == 'Archive') {
                                                 div +=
-                                                    `oncontextmenu="showContextMenu2(event, '${project.id}','${project.name}')"`;
+                                                    `oncontextmenu="showContextMenu2(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
                                             } else if (eps_name == 'Recycle Bin') {
                                                 div +=
-                                                    `oncontextmenu="showContextMenu3(event, '${project.id}','${project.name}')"`;
+                                                    `oncontextmenu="showContextMenu3(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
                                             } else {
                                                 div +=
-                                                    `oncontextmenu="showContextMenu(event, '${project.id}','${project.name}')"`;
+                                                    `oncontextmenu="showContextMenu(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
                                             }
                                             div += `>
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -616,15 +620,20 @@
                                         $(element).after(div);
                                         icon.removeClass('fe-chevron-right').addClass(
                                             'fe-chevron-down'); // Change to down arrow
-                                            document.querySelectorAll('[id^="project_"]').forEach(div => {
-                div.addEventListener('click', function() {
-                    let projectId = this.id.replace('project_', ''); // Extract ID from div
-                    let switchProjectUrl = `/switch-project/${projectId}`; // Laravel route
+                                        document.querySelectorAll('[id^="project_"]').forEach(
+                                            div => {
+                                                div.addEventListener('click', function() {
+                                                    let projectId = this.id.replace(
+                                                        'project_', ''
+                                                    ); // Extract ID from div
+                                                    let switchProjectUrl =
+                                                        `/switch-project/${projectId}`; // Laravel route
 
-                    // Redirect to the switch project route
-                    window.location.href = switchProjectUrl;
-                });
-            });
+                                                    // Redirect to the switch project route
+                                                    window.location.href =
+                                                        switchProjectUrl;
+                                                });
+                                            });
 
                                     }
 

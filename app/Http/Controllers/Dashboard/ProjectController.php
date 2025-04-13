@@ -47,9 +47,9 @@ class ProjectController extends ApiController
             'Consultant',
             'Sub-Contractor',
             'Authority',
-            'Another contractor',
-            'Lower-Tier subcontractor',
-            'Other',
+            'Another Contractor',
+            'Lower-Tier Subcontractor',
+            'Other'
         ];
         $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
         $route = 'projects.store_project';
@@ -79,9 +79,9 @@ class ProjectController extends ApiController
             'Consultant',
             'Sub-Contractor',
             'Authority',
-            'Another contractor',
-            'Lower-Tier subcontractor',
-            'Other',
+            'Another Contractor',
+            'Lower-Tier Subcontractor',
+            'Other'
         ];
         $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
         return view('account_dashboard.projects.edit', compact('roles', 'project', 'EPS'));

@@ -153,11 +153,13 @@ class UploadGroupDocumentController extends ApiController
             'status' => $request->status,
             'notes' => $request->notes,
             'storage_file_id' => intval($request->doc_id),
-            'file_id'=>$request->file_id,
             'threads' => $request->threads && count($request->threads) > 0 ? json_encode($request->threads) : null
 
         ]);
         $doc = TestDocument::where('id', $id)->first();
+        if ($request->file_id) {
+            $doc->file_id = $request->file_id;
+        }
         if ($request->analyzed) {
             $doc->analyzed = '1';
         } else {

@@ -43,7 +43,7 @@
                 <polygon class="st0" points="78,33 15,33 24,15 87,15 	" />
               </g>
             </svg> --}}
-            <img src="{{asset('dashboard/assets/images/logo.png')}}" width="400" style="border-radius: 12px;">
+            <img src="{{asset('dashboard/assets/images/logo.png')}}" width="360" style="border-radius: 12px;">
           </a>
           <h1 class="h6 mb-3" style="color:aliceblue;font-size:200%">CCMW Sign in</h1>
           @if ($errors->any())
