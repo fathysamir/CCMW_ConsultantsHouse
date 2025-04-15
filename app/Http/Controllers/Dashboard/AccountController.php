@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Account;
-use App\Models\StakeHolder;
+use App\Models\Category;
 use App\Models\ContractTag;
 use App\Models\DocType;
+use App\Models\ProjectFolder;
 use App\Models\ContractSetting;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -61,118 +62,90 @@ class AccountController extends ApiController
         // if ($validator->fails()) {
         //     return Redirect::back()->withInput()->withErrors($validator);
         // }
-        $file = $request->file('logo');
-        $spreadsheet = IOFactory::load($file->getRealPath());
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray();
+        
 
-        foreach ($rows as $row) {
-            $role = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $row[2]));
-            $narrative = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $row[3]));
-            $name = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $row[4]));
+        $account = Account::create([
+             'name' => $request->name,
+             'email' => $request->email,
+             'phone_no' => $request->country_code . $request->phone,
+             'security_question' => $request->security_question,
+             'security_answer' => $request->security_answer,
+             'recovery_email' => $request->recovery_email,
+             'recovery_phone_no' => $request->recovery_country_code . $request->recovery_phone
 
-            $StakeHolder = StakeHolder::whereRaw('LOWER(REGEXP_REPLACE(narrative, "[^a-z0-9]", "")) = ?', [$narrative])
-            ->whereRaw('LOWER(REGEXP_REPLACE(role, "[^a-z0-9]", "")) = ?', [$role])
-            ->whereRaw('LOWER(REGEXP_REPLACE(name, "[^a-z0-9]", "")) = ?', [$name])
-            ->whereHas('project', function ($query) use ($row) {
-                $query->where('imported_ids', $row[1]); // Assuming $row[0] = project_id from Excel
-            })
-            ->first();
-            if($StakeHolder){
-                if($StakeHolder->imported_ids == null){
-                    $StakeHolder->imported_ids=$row[0];
-                }else{
-                    $StakeHolder->imported_ids=$StakeHolder->imported_ids . ',' . $row[0];
+         ]);
 
-                }
-                $StakeHolder->save();
-            }else{
-                dd($row[0]);
-            }
+        if(!$request->active){
+            $account->active='0';
+            $account->save();
+        }
+        $last_Category = Category::orderBy('id', 'desc')->first();
+
+        $last_number = 0;
+        if ($last_Category && preg_match('/EPS-(\d+)$/', $last_Category->code, $matches)) {
+            $last_number = intval($matches[1]); // Extract the last numeric part safely
         }
 
-        // $account = Account::create([
-        //      'name' => $request->name,
-        //      'email' => $request->email,
-        //      'phone_no' => $request->country_code . $request->phone,
-        //      'security_question' => $request->security_question,
-        //      'security_answer' => $request->security_answer,
-        //      'recovery_email' => $request->recovery_email,
-        //      'recovery_phone_no' => $request->recovery_country_code . $request->recovery_phone
+        do {
+            $process_last_number = 'EPS-' . sprintf('%06d', $last_number + 1);
+            $EPSExists = Category::where('code', $process_last_number)->exists();
+            $last_number++;
+        } while ($EPSExists);
+        Category::create(['code' => $process_last_number,'name' => 'Projects folder','account_id' => $account->id]);
+        $last_Category2 = Category::orderBy('id', 'desc')->first();
 
-        //  ]);
+        $last_number2 = 0;
+        if ($last_Category2 && preg_match('/EPS-(\d+)$/', $last_Category2->code, $matches2)) {
+            $last_number2 = intval($matches2[1]); // Extract the last numeric part safely
+        }
 
-        // if(!$request->active){
-        //     $account->active='0';
-        //     $account->save();
-        // }
-        // $last_Category = Category::orderBy('id', 'desc')->first();
+        do {
+            $process_last_number2 = 'EPS-' . sprintf('%06d', $last_number2 + 1);
+            $EPSExists2 = Category::where('code', $process_last_number2)->exists();
+            $last_number2++;
+        } while ($EPSExists2);
+        Category::create(['code' => $process_last_number2,'name' => 'Archive','account_id' => $account->id]);
+        $last_Category3 = Category::orderBy('id', 'desc')->first();
 
-        // $last_number = 0;
-        // if ($last_Category && preg_match('/EPS-(\d+)$/', $last_Category->code, $matches)) {
-        //     $last_number = intval($matches[1]); // Extract the last numeric part safely
-        // }
+        $last_number3 = 0;
+        if ($last_Category3 && preg_match('/EPS-(\d+)$/', $last_Category3->code, $matches3)) {
+            $last_number3 = intval($matches3[1]); // Extract the last numeric part safely
+        }
 
-        // do {
-        //     $process_last_number = 'EPS-' . sprintf('%06d', $last_number + 1);
-        //     $EPSExists = Category::where('code', $process_last_number)->exists();
-        //     $last_number++;
-        // } while ($EPSExists);
-        // Category::create(['code' => $process_last_number,'name' => 'Projects folder','account_id' => $account->id]);
-        // $last_Category2 = Category::orderBy('id', 'desc')->first();
+        do {
+            $process_last_number3 = 'EPS-' . sprintf('%06d', $last_number3 + 1);
+            $EPSExists3 = Category::where('code', $process_last_number3)->exists();
+            $last_number3++;
+        } while ($EPSExists3);
+        Category::create(['code' => $process_last_number3,'name' => 'Recycle Bin','account_id' => $account->id]);
+        if($request->file('logo')){
+            $logo=getFirstMediaUrl($account,$account->logoCollection);
+            if($logo!= null){
+                deleteMedia($account,$account->logoCollection);
+            }
+            uploadMedia($request->logo,$account->logoCollection,$account);
+        }
 
-        // $last_number2 = 0;
-        // if ($last_Category2 && preg_match('/EPS-(\d+)$/', $last_Category2->code, $matches2)) {
-        //     $last_number2 = intval($matches2[1]); // Extract the last numeric part safely
-        // }
-
-        // do {
-        //     $process_last_number2 = 'EPS-' . sprintf('%06d', $last_number2 + 1);
-        //     $EPSExists2 = Category::where('code', $process_last_number2)->exists();
-        //     $last_number2++;
-        // } while ($EPSExists2);
-        // Category::create(['code' => $process_last_number2,'name' => 'Archive','account_id' => $account->id]);
-        // $last_Category3 = Category::orderBy('id', 'desc')->first();
-
-        // $last_number3 = 0;
-        // if ($last_Category3 && preg_match('/EPS-(\d+)$/', $last_Category3->code, $matches3)) {
-        //     $last_number3 = intval($matches3[1]); // Extract the last numeric part safely
-        // }
-
-        // do {
-        //     $process_last_number3 = 'EPS-' . sprintf('%06d', $last_number3 + 1);
-        //     $EPSExists3 = Category::where('code', $process_last_number3)->exists();
-        //     $last_number3++;
-        // } while ($EPSExists3);
-        // Category::create(['code' => $process_last_number3,'name' => 'Recycle Bin','account_id' => $account->id]);
-        // if($request->file('logo')){
-        //     $logo=getFirstMediaUrl($account,$account->logoCollection);
-        //     if($logo!= null){
-        //         deleteMedia($account,$account->logoCollection);
-        //     }
-        //     uploadMedia($request->logo,$account->logoCollection,$account);
-        // }
-
-        // $all_project_folders=ProjectFolder::where('project_id',null)->where('account_id',null)->get();
-        // foreach($all_project_folders as $folder){
-        //     ProjectFolder::create(['account_id'=>$account->id,'name'=>$folder->name,'order'=>$folder->order,'ladel3'=>$folder->ladel3,
-        //                     'ladel2'=>$folder->ladel2,
-        //                     'ladel1'=>$folder->ladel1,'potential_impact'=>$folder->potential_impact,'shortcut'=>$folder->shortcut]);
-        // }
-        // $all_DocTypes=DocType::where('project_id',null)->where('account_id',null)->get();
-        // foreach($all_DocTypes as $DocType){
-        //     DocType::create(['account_id'=>$account->id,'name'=>$DocType->name,'order'=>$DocType->order,'description'=>$DocType->description]);
-        // }
-        // $all_ContractTags=ContractTag::where('project_id',null)->where('account_id',null)->get();
-        // foreach($all_ContractTags as $ContractTag){
-        //     ContractTag::create(['account_id'=>$account->id,'name'=>$ContractTag->name,'order'=>$ContractTag->order,
-        //                         'description'=>$ContractTag->description,'is_notice'=>$ContractTag->is_notice,
-        //                         'sub_clause'=>$ContractTag->sub_clause,'for_letter'=>$ContractTag->for_letter,'var_process'=>$ContractTag->var_process]);
-        // }
-        // $all_ContractSettings=ContractSetting::where('project_id',null)->where('account_id',null)->get();
-        // foreach($all_ContractSettings as $ContractSetting){
-        //     ContractSetting::create(['account_id'=>$account->id,'name'=>$ContractSetting->name,'order'=>$ContractSetting->order,'type'=>$ContractSetting->type]);
-        // }
+        $all_project_folders=ProjectFolder::where('project_id',null)->where('account_id',null)->get();
+        foreach($all_project_folders as $folder){
+            ProjectFolder::create(['account_id'=>$account->id,'name'=>$folder->name,'order'=>$folder->order,'ladel3'=>$folder->ladel3,
+                            'ladel2'=>$folder->ladel2,
+                            'ladel1'=>$folder->ladel1,'potential_impact'=>$folder->potential_impact,'shortcut'=>$folder->shortcut]);
+        }
+        $all_DocTypes=DocType::where('project_id',null)->where('account_id',null)->get();
+        foreach($all_DocTypes as $DocType){
+            DocType::create(['account_id'=>$account->id,'name'=>$DocType->name,'order'=>$DocType->order,'description'=>$DocType->description]);
+        }
+        $all_ContractTags=ContractTag::where('project_id',null)->where('account_id',null)->get();
+        foreach($all_ContractTags as $ContractTag){
+            ContractTag::create(['account_id'=>$account->id,'name'=>$ContractTag->name,'order'=>$ContractTag->order,
+                                'description'=>$ContractTag->description,'is_notice'=>$ContractTag->is_notice,
+                                'sub_clause'=>$ContractTag->sub_clause,'for_letter'=>$ContractTag->for_letter,'var_process'=>$ContractTag->var_process]);
+        }
+        $all_ContractSettings=ContractSetting::where('project_id',null)->where('account_id',null)->get();
+        foreach($all_ContractSettings as $ContractSetting){
+            ContractSetting::create(['account_id'=>$account->id,'name'=>$ContractSetting->name,'order'=>$ContractSetting->order,'type'=>$ContractSetting->type]);
+        }
         return redirect('/accounts')->with('success', 'Account created successfully.');
 
     }
