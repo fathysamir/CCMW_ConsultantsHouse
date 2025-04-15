@@ -48,6 +48,14 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/accounts', [AccountController::class, 'index'])->name('home');
     Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
     Route::post('/accounts/store', [AccountController::class, 'store'])->name('accounts.store');
+    Route::get('/account/{id}', function ($id) {
+        session(['current_edit_account' => $id]);
+        
+        return redirect()->route('account.edit');
+    });
+    Route::get('/accounts/edit', [AccountController::class, 'edit'])->name('account.edit');
+    Route::post('/accounts/update', [AccountController::class, 'update'])->name('account.update');
+    Route::get('/account/delete/{id}', [AccountController::class, 'delete'])->name('account.delete');
 
     Route::get('/accounts/contract-tags', [ContractTagController::class, 'index'])->name('accounts.contract-tags');
     Route::get('/accounts/contract-tags/create', [ContractTagController::class, 'create'])->name('accounts.contract-tags.create');

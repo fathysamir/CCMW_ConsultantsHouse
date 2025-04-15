@@ -19,7 +19,7 @@ return [
     */
 
     'driver' => env('SESSION_DRIVER', 'file'),
-
+    'remember' => env('SESSION_REMEMBER_DAYS', 365),
     /*
     |--------------------------------------------------------------------------
     | Session Lifetime

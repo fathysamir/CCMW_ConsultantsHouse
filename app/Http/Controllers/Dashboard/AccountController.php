@@ -15,6 +15,7 @@ use App\Models\ContractTag;
 use App\Models\DocType;
 use App\Models\ProjectFolder;
 use App\Models\ContractSetting;
+use App\Models\Project;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -67,11 +68,13 @@ class AccountController extends ApiController
         $account = Account::create([
              'name' => $request->name,
              'email' => $request->email,
-             'phone_no' => $request->country_code . $request->phone,
+             'country_code' => $request->country_code,
+             'phone_no' => $request->phone,
              'security_question' => $request->security_question,
              'security_answer' => $request->security_answer,
              'recovery_email' => $request->recovery_email,
-             'recovery_phone_no' => $request->recovery_country_code . $request->recovery_phone
+             'recovery_country_code' => $request->recovery_country_code,
+             'recovery_phone_no' => $request->recovery_phone
 
          ]);
 
@@ -150,36 +153,50 @@ class AccountController extends ApiController
 
     }
 
-    // public function edit($id){
-    //     $mark=CarMark::where('id',$id)->first();
-    //     return view('dashboard.car_marks.edit',compact('mark'));
-    // }
+    public function edit(){
+        $id=session('current_edit_account');
+        $account=Account::where('id',$id)->first();
+        return view('dashboard.accounts.edit',compact('account'));
+    }
 
-    // public function update(Request $request,$id){
-    //     $validator = Validator::make($request->all(), [
-    //         'en_name' => ['required', 'string', 'max:191'],
-    //         'ar_name' => ['required', 'string', 'max:191'],
+    public function update(Request $request){
+        $id=session('current_edit_account');
+        Account::where('id',$id)->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'country_code' => $request->country_code,
+            'phone_no' => $request->phone,
+            'security_question' => $request->security_question,
+            'security_answer' => $request->security_answer,
+            'recovery_email' => $request->recovery_email,
+            'recovery_country_code' => $request->recovery_country_code,
+            'recovery_phone_no' => $request->recovery_phone
 
-    //     ]);
+        ]);
+        $account=Account::find($id);
+        if($request->file('logo')){
+            $logo=getFirstMediaUrl($account,$account->logoCollection);
+            if($logo!= null){
+                deleteMedia($account,$account->logoCollection);
+            }
+            uploadMedia($request->logo,$account->logoCollection,$account);
+        }
+        return redirect('/accounts')->with('success', 'Account updated successfully.');
 
+    }
 
-    //     if ($validator->fails()) {
-    //         return Redirect::back()->withInput()->withErrors($validator);
-    //     }
+    public function delete($id){                    
+        $account = Account::findOrFail($id);
+        Category::where('account_id',$account->id)->delete();
+        ContractSetting::where('account_id',$account->id)->delete();
+        ContractTag::where('account_id',$account->id)->delete();
+        DocType::where('account_id',$account->id)->delete();
+        Project::where('account_id',$account->id)->delete();
+        ProjectFolder::where('account_id',$account->id)->delete();
 
-    //     CarMark::where('id',$id)->update([ 'en_name' => $request->en_name,
-    //             'ar_name' => $request->ar_name
-    //         ]);
-    //     return redirect('/admin-dashboard/car-marks')->with('success', 'Car Mark updated successfully.');
+        // If no employees are assigned to the department, proceed with deleting the department
+        $account->delete();
 
-    // }
-
-    // public function delete($id){
-    //     $mark = CarMark::findOrFail($id);
-    //     CarModel::where('car_mark_id',$id)->delete();
-    //     // If no employees are assigned to the department, proceed with deleting the department
-    //     $mark->delete();
-
-    //     return redirect('/admin-dashboard/car-marks')->with('success', 'Car Mark deleted successfully.');
-    // }
+        return redirect('/accounts')->with('success', 'Account deleted successfully.');
+    }
 }

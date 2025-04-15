@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email');
+            $table->string('country_code');
             $table->string('phone_no');
             $table->string('security_question');
             $table->string('security_answer');
             $table->string('recovery_email');
+            $table->string('recovery_country_code');
             $table->string('recovery_phone_no');
             $table->enum('active', ['0', '1'])->default('1');
 

@@ -44,7 +44,7 @@
               <div class="card-text my-2">
                 <strong class="card-title my-0">{{$account->name}}</strong>
                 <p class="small text-muted mb-0">{{$account->email}}</p>
-                <p class="small"><span class="badge badge-light text-muted">{{$account->phone_no}}</span></p>
+                <p class="small"><span class="badge badge-light text-muted">{{$account->country_code . $account->phone_no}}</span></p>
               </div>
             </div> <!-- ./card-text -->
           </a>
@@ -61,10 +61,9 @@
                     <span class="text-muted sr-only">Action</span>
                   </button>
                   <div class="dropdown-menu m-2">
-                    <a class="dropdown-item" href="#"><i class="fe fe-meh fe-12 mr-4"></i>Profile</a>
-                    <a class="dropdown-item" href="#"><i class="fe fe-message-circle fe-12 mr-4"></i>Chat</a>
-                    <a class="dropdown-item" href="#"><i class="fe fe-mail fe-12 mr-4"></i>Contact</a>
-                    <a class="dropdown-item" href="#"><i class="fe fe-delete fe-12 mr-4"></i>Delete</a>
+                    <a class="dropdown-item" href="{{ url('/account/'.$account->id) }}"><i class="fe fe-meh fe-12 mr-4"></i>Edit</a>
+                   
+                    <a class="dropdown-item" href="javascript:void(0);"onclick="confirmDelete('{{ route('account.delete', $account->id) }}')"><i class="fe fe-delete fe-12 mr-4"></i>Delete</a>
                   </div>
                 </div>
               </div>
@@ -98,4 +97,11 @@
         }, 4000); // 4 seconds
     });
     </script>
+    <script>
+      function confirmDelete(url) {
+          if (confirm('Are you sure you want to delete this Account? This action cannot be undone.')) {
+              window.location.href = url; // Redirect to delete route
+          }
+      }
+  </script>
 @endpush

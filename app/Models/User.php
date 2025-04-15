@@ -24,7 +24,6 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
-        'account_id',
         'current_account_id',
         'current_project_id',
         'current_folder_id',
@@ -50,11 +49,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    public function account(){
-        return $this->belongsTo(Account::class,'account_id','id')->withTrashed();
-    }
+    
     public function projects()
     {
         return $this->hasMany(Project::class, 'user_id');
+    }
+
+    public function accounts()
+    {
+        return $this->belongsToMany(Account::class,'accounts_users', 'user_id', 'account_id');
     }
 }

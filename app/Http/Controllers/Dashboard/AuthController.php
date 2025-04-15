@@ -33,11 +33,12 @@ class AuthController extends Controller
 
         ]);
         // dd($request->all());
+        $remember=$request->remember? true: false;
         if ($validator->fails()) {
 
             return Redirect::back()->withErrors($validator)->withInput($request->all());
         }
-        if (Auth::attempt(['email' => request('email'),'password' => request('password')])) {
+        if (Auth::attempt(['email' => request('email'),'password' => request('password')],$remember)) {
             
             return redirect('/accounts');
         } else {

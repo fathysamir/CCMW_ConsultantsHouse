@@ -33,25 +33,17 @@
   <body class="light">
     <div class="wrapper vh-100">
       <div id="background-div" class="row align-items-center h-100" style="background-image: url('{{ asset('dashboard/assets/images/bg3.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center;">
-        <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('sign-up') }}" method="POST">
+        <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('sign-up') }}" method="POST" style="background-color: rgba(128, 128, 128, 0.7); border-radius: 0.4rem">
           @csrf
-          <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="">
-            {{-- <svg version="1.1" id="logo" class="navbar-brand-img brand-md" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 120 120" xml:space="preserve">
-              <g>
-                <polygon class="st0" points="78,105 15,105 24,87 87,87 	" />
-                <polygon class="st0" points="96,69 33,69 42,51 105,51 	" />
-                <polygon class="st0" points="78,33 15,33 24,15 87,15 	" />
-              </g>
-            </svg> --}}
-            <img src="{{asset('dashboard/assets/images/logo.png')}}" width="360" style="border-radius: 12px;">
-          </a>
-          <h1 class="h6 mb-3" style="color:aliceblue;font-size:200%">CCMW Sign up</h1>
+          <div class="form-group mt-3">
+            <img src="{{asset('dashboard/assets/images/logo.png')}}" style="border-radius: 12px;width:100%;">
+            </div>
           @if ($errors->any())
                 @if($errors->has('msg'))
                 <p class="alert alert-danger"id="alert" role="alert" style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">{{ $errors->first('msg') }}</p>
                 @endif
           @endif
-          <div class="form-group">
+          <div class="form-group mt-3">
             <label for="inputName" class="sr-only">Name</label>
             <input type="text" id="inputEmail" class="form-control form-control-lg" name="name" placeholder="Name" required autofocus="">
             @if ($errors->has('name'))
@@ -70,7 +62,7 @@
           <div class="form-group">
             <label for="inputPhone" class="sr-only">Phone Number</label>
             <div class="input-group">
-                <div class="input-group-prepend" style="width: 25%;">
+                <div class="input-group-prepend " style="width: 24%;margin-right:1%;">
                     <select name="country_code" class="form-control form-control-lg">
                         <option value="+1">USA (+1)</option>
                         <option value="+44">UK (+44)</option>
@@ -244,7 +236,7 @@
                         <!-- Add more country codes as needed -->
                   
                 </div>
-                <input type="number"id="inputPhone" name="phone" class="form-control form-control-lg" placeholder="Phone Number" value="{{ old('phone') }}">
+                <input type="number"id="inputPhone" name="phone" class="form-control form-control-lg" placeholder="Phone Number" value="{{ old('phone') }}" style="border-top-left-radius: 0.3rem;border-bottom-left-radius: 0.3rem;">
             </div>
             @if ($errors->has('phone'))
                 <p class="text-error more-info-err" style="color: red;">{{ $errors->first('phone') }}</p>
@@ -267,8 +259,8 @@
              @endif
           </div>
          
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
-          <p class="mt-5 mb-3 text-muted">© 2020</p>
+          <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Sign Up</button>
+          
         </form>
       </div>
     </div>

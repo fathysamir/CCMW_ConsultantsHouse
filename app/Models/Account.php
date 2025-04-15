@@ -17,10 +17,12 @@ class Account extends Model
     protected $fillable = [
         'name',
         'email',
+        'country_code',
         'phone_no',
         'security_question',
         'security_answer',
         'recovery_email',
+        'recovery_country_code',
         'recovery_phone_no',
         'active'
         
@@ -34,9 +36,10 @@ class Account extends Model
 
     protected $hidden = ['deleted_at'];
 
+    
     public function users()
     {
-        return $this->hasMany(User::class,'account_id');
+        return $this->belongsToMany(User::class,'accounts_users', 'account_id', 'user_id');
     }
     public function categories()
     {
