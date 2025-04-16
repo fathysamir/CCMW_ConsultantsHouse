@@ -33,9 +33,10 @@ class AccountDashboardController extends ApiController
         $user->current_project_id=null;
         $user->save();
         $account = Account::findOrFail($user->current_account_id);
-        if(auth()->user()->roles->first()->name =='Super Admin' || auth()->user()->roles->first()->name =='Account Admin'){
+        if(auth()->user()->roles->first()->name =='Super Admin'){
             $project_count= Project::where('account_id',$user->current_account_id)->count();
         }else{
+            
             $project_count= 0;
         }
 

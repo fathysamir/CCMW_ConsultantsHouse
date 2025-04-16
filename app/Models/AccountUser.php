@@ -15,7 +15,8 @@ class AccountUser extends Model
 
     protected $fillable = [
         'user_id',
-        'account_id'
+        'account_id',
+        'role'
         
     ];
 

@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->unsignedBigInteger('account_id')->nullable();
-            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('current_account_id')->nullable();
             $table->foreign('current_account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('current_project_id')->nullable();

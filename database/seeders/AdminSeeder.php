@@ -26,16 +26,7 @@ class AdminSeeder extends Seeder
        
 
        
-        $admin1 = User::create([
-            'name' => 'Super Admin 2',
-            'email' => 'superadmin2@ccmw.app',
-            'password' => Hash::make('CMWAdminCMW'),
-           
-        ]);
         
-        
-
-        $admin1->assignRole([$admin_role->id]);
 
 
         

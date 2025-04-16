@@ -181,6 +181,7 @@ class AccountController extends ApiController
             }
             uploadMedia($request->logo,$account->logoCollection,$account);
         }
+        session()->forget('current_edit_account');
         return redirect('/accounts')->with('success', 'Account updated successfully.');
 
     }

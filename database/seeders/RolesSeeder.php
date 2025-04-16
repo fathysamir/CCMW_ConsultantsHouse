@@ -20,7 +20,6 @@ class RolesSeeder extends Seeder
        //create role "Employee" for users
         $roles = [
             'Super Admin',
-            'Account Admin',
             'User'
             
         // Add more roles as needed
@@ -44,9 +43,16 @@ class RolesSeeder extends Seeder
            
         ]);
         
+        $admin2 = User::create([
+            'name' => 'Super Admin 2',
+            'email' => 'superadmin2@ccmw.app',
+            'password' => Hash::make('CMWAdminCMW'),
+           
+        ]);
         
-
+        
         $admin1->assignRole([$admin_role->id]);
+        $admin2->assignRole([$admin_role->id]);
 
 
         
