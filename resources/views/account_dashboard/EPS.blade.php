@@ -376,13 +376,13 @@
         });
 
         document.getElementById('moveDown').addEventListener('click', function() {
-            const menu = document.getElementById('contextMenu');
-            const categoryId = menu.getAttribute('data-category-id');
-            const currentItem = document.getElementById('EPS_' + categoryId);
+            const menu2 = document.getElementById('contextMenu');
+            const categoryId2 = menu2.getAttribute('data-category-id');
+            const currentItem2 = document.getElementById('EPS_' + categoryId2);
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
             var formData = {
                 _token: csrfToken,
-                id: categoryId,
+                id: categoryId2,
                 type: 'down'
 
             };
@@ -397,11 +397,11 @@
                     console.error(error);
                 }
             });
-            if (currentItem && currentItem.nextElementSibling) {
-                currentItem.parentNode.insertBefore(currentItem.nextElementSibling, currentItem);
+            if (currentItem2 && currentItem2.nextElementSibling) {
+                currentItem2.parentNode.insertBefore(currentItem2.nextElementSibling, currentItem2);
             }
 
-            menu.style.display = 'none'; // hide menu after action
+            menu2.style.display = 'none'; // hide menu after action
         });
 
         // Handle 'Create ESP' action
