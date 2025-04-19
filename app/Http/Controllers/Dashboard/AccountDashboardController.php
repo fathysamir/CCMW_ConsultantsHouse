@@ -154,7 +154,7 @@ class AccountDashboardController extends ApiController
         if($request->type == 'up'){
             $before_eps=Category::where('account_id' , $eps->account_id)->where('parent_id' , $eps->parent_id)->where('eps_order','<',$eps->eps_order)->orderBy('id', 'desc')->first();
         }elseif($request->type == 'down'){
-            $before_eps=Category::where('account_id' , $eps->account_id)->where('parent_id' , $eps->parent_id)->where('eps_order','>',$eps->eps_order)->orderBy('id')->first();
+            $before_eps=Category::where('account_id' , $eps->account_id)->where('parent_id' , $eps->parent_id)->where('eps_order','>',$eps->eps_order)->orderBy('id','asc')->first();
         }
         $y=$before_eps->eps_order;
         $before_eps->eps_order=$eps->eps_order;
