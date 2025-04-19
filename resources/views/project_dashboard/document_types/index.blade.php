@@ -18,10 +18,13 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">Document Types</h2>
         </div>
-        <div class="col-auto">
-            <a type="button" href="{{ route('project.document-types.create') }}"
-                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Document Type</a>
-        </div>
+        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                in_array('create_document_type', $Project_Permissions ?? []))
+            <div class="col-auto">
+                <a type="button" href="{{ route('project.document-types.create') }}"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Document Type</a>
+            </div>
+        @endif
     </div>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -55,12 +58,12 @@
                         </thead>
                         <tbody>
                             <?php
-                                $counter=1;    
+                            $counter = 1;
                             ?>
                             @foreach ($document_types as $type)
                                 <tr>
 
-                                    <td>{{$counter}}</td>
+                                    <td>{{ $counter }}</td>
                                     <td>{{ $type->name }}</td>
                                     <td>
                                         @if (strlen($type->description) > 50)
@@ -76,16 +79,21 @@
                                             <span class="text-muted sr-only">Action</span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item"
-                                                href="{{ route('project.document-types.edit', $type->id) }}">Edit</a>
-                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                onclick="confirmDelete('{{ route('accounts.document-types.delete', $type->id) }}')">Remove</a>
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_document_type', $Project_Permissions ?? []))
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.document-types.edit', $type->id) }}">Edit</a>
+                                            @endif
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('delete_document_type', $Project_Permissions ?? []))
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                    onclick="confirmDelete('{{ route('accounts.document-types.delete', $type->id) }}')">Remove</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                                 <?php
-                                $counter++;    
-                            ?>
+                                $counter++;
+                                ?>
                             @endforeach
                         </tbody>
                     </table>

@@ -61,58 +61,58 @@
         /* Ensure consistent column widths */
         .table-container th:nth-child(1),
         .table-container td:nth-child(1) {
-            width: 1%;
+            width: 1% !important; 
         }
 
 
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 10%;
+            width: 10% !important; 
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 13%;
+            width: 13% !important; 
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 37%;
+            width: 35% !important; 
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 7%;
+            width: 8% !important; 
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 10%;
+            width: 10% !important; 
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
-            width: 10%;
+            width: 10% !important; 
         }
 
 
 
         .table-container th:nth-child(8),
         .table-container td:nth-child(8) {
-            width: 5%;
+            width: 5% !important; 
         }
 
         .table-container th:nth-child(9),
         .table-container td:nth-child(9) {
-            width: 2%;
+            width: 3% !important; 
         }
 
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
         }
-    
+
         .table-container tbody::-webkit-scrollbar {
             width: 6px;
         }
@@ -141,8 +141,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                            max-height:650px;
-                                                                                        } */
+                                                                                                    max-height:650px;
+                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -215,7 +215,8 @@
                                         <td>{{ $document->reference }}</td>
                                         <td>{{ $document->subject }}</td>
                                         <td>{{ date('d-M-Y', strtotime($document->start_date)) }}</td>
-                                        <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->narrative : '_' }}</td>
+                                        <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->narrative : '_' }}
+                                        </td>
                                         <td>{{ $document->toStakeHolder ? $document->toStakeHolder->narrative : '_' }}</td>
 
                                         <td>{{ $document->revision }}</td>
@@ -225,18 +226,22 @@
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.edit-document', $document->slug) }}">Edit</a>
-                                                <a id="Change_Owner_btn_{{ $document->id }}"
-                                                    class="dropdown-item change-owner-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}"data-document-owner-id="{{ $document->user_id }}">Change
-                                                    Owner</a>
-                                                <a class="dropdown-item" href="">Analysis Form</a>
-                                                <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}">Assigne To File</a>
-                                                <a class="dropdown-item" href="">Check Assignment</a>
-                                                <a class="dropdown-item text-danger"
-                                                    href="javascript:void(0);"onclick="confirmDelete('{{ route('project.document.delete', $document->id) }}')">Delete</a>
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_documents', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.edit-document', $document->slug) }}">Edit</a>
+                                                    <a id="Change_Owner_btn_{{ $document->id }}"
+                                                        class="dropdown-item change-owner-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}"data-document-owner-id="{{ $document->user_id }}">Change
+                                                        Owner</a>
+                                                    <a class="dropdown-item" href="">Analysis Form</a>
+                                                    <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Assigne To File</a>
+                                                    <a class="dropdown-item" href="">Check Assignment</a>
+                                                @endif
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_documents', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item text-danger"
+                                                        href="javascript:void(0);"onclick="confirmDelete('{{ route('project.document.delete', $document->id) }}')">Delete</a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -471,6 +476,14 @@
             </div>
         </div>
     </div>
+    @php
+        $canEdit =
+            auth()->user()->roles->first()->name == 'Super Admin' ||
+            in_array('edit_documents', $Project_Permissions ?? []);
+        $canDelete =
+            auth()->user()->roles->first()->name == 'Super Admin' ||
+            in_array('delete_documents', $Project_Permissions ?? []);
+    @endphp
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -536,7 +549,7 @@
 
                 $.ajax({
                     url: '/project/folder/get-files/' +
-                    folderId, // Adjust the route to your API endpoint
+                        folderId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let fileDropdown = $('#newFile');
@@ -607,20 +620,28 @@
                     let new_down_list = document.createElement('div');
                     new_down_list.className = "col-sm-12 col-md-4";
                     new_down_list.innerHTML = `
-                                <div class="dropdown" id="Action-DIV">
-                                    <button class="btn btn-sm dropdown-toggle  btn-secondary" type="button"
-                                        id="actionButton" aria-haspopup="true" aria-expanded="false">
-                                        Open Actions
-                                    </button>
-                                    <div class="dropdown-menu " id="actionList" style="position: absolute;left:-50px; ">
-                                        <a class="dropdown-item" id="changeStakeHolderForAllBtn" href="javascript:void(0);">Change Correspondence</a>
-                                        <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Change Owner</a>
-                                        <a class="dropdown-item" id="changeDocTypeForAllBtn" href="javascript:void(0);">Change Document Type</a>
-                                        <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                        <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                    </div>
-                                </div>
-                            `;
+                        <div class="dropdown" id="Action-DIV">
+                            <button class="btn btn-sm dropdown-toggle btn-secondary" type="button"
+                                id="actionButton" aria-haspopup="true" aria-expanded="false">
+                                Open Actions
+                            </button>
+                            <div class="dropdown-menu" id="actionList" style="position: absolute; left: -50px;">
+                                ${`{{ $canEdit
+                                    ? '
+                                                    <a class="dropdown-item" id="changeStakeHolderForAllBtn" href="javascript:void(0);">Change Correspondence</a>
+                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Change Owner</a>
+                                                    <a class="dropdown-item" id="changeDocTypeForAllBtn" href="javascript:void(0);">Change Document Type</a>
+                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                '
+                                    : '' }}`.trim()}
+                                ${`{{ $canDelete
+                                    ? '
+                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                '
+                                    : '' }}`.trim()}
+                            </div>
+                        </div>
+                    `;
 
                     // Append the new dropdown to the row
                     rowDiv.appendChild(new_down_list);
@@ -774,7 +795,7 @@
 
                 $.ajax({
                     url: '/project/folder/get-files/' +
-                    folderId, // Adjust the route to your API endpoint
+                        folderId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let fileDropdown = $('#newfileForAll');
@@ -822,7 +843,9 @@
                     success: function(response) {
                         if (response.success) {
                             $('#assignToForAllModal').modal('hide');
-                            alert('all selected documents assigned to selected file successfully!');
+                            alert(
+                                'all selected documents assigned to selected file successfully!'
+                                );
                             location.reload(); // Reload the page to reflect changes
                         } else {
                             alert('Failed to assigned to file.');

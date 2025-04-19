@@ -16,6 +16,8 @@ use App\Models\DocType;
 use App\Models\ProjectFolder;
 use App\Models\ContractSetting;
 use App\Models\Project;
+use App\Models\ProjectUser;
+use App\Models\AccountUser;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -27,7 +29,11 @@ class AccountController extends ApiController
         $user->current_account_id=null;
         $user->current_project_id=null;
         $user->save();
-        $all_accounts = Account::orderBy('id', 'desc');
+        if(auth()->user()->roles->first()->name =='Super Admin'){
+            $all_accounts = Account::orderBy('id', 'desc');
+        }else{
+            $all_accounts = $user->accounts()->orderBy('id');
+        }
 
 
         if ($request->has('search') && $request->search != null) {
@@ -94,7 +100,7 @@ class AccountController extends ApiController
             $EPSExists = Category::where('code', $process_last_number)->exists();
             $last_number++;
         } while ($EPSExists);
-        Category::create(['code' => $process_last_number,'name' => 'Projects folder','account_id' => $account->id]);
+        Category::create(['code' => $process_last_number,'name' => 'Projects folder','eps_order'=>1,'account_id' => $account->id]);
         $last_Category2 = Category::orderBy('id', 'desc')->first();
 
         $last_number2 = 0;
@@ -107,7 +113,7 @@ class AccountController extends ApiController
             $EPSExists2 = Category::where('code', $process_last_number2)->exists();
             $last_number2++;
         } while ($EPSExists2);
-        Category::create(['code' => $process_last_number2,'name' => 'Archive','account_id' => $account->id]);
+        Category::create(['code' => $process_last_number2,'name' => 'Archive','eps_order'=>2,'account_id' => $account->id]);
         $last_Category3 = Category::orderBy('id', 'desc')->first();
 
         $last_number3 = 0;
@@ -120,7 +126,7 @@ class AccountController extends ApiController
             $EPSExists3 = Category::where('code', $process_last_number3)->exists();
             $last_number3++;
         } while ($EPSExists3);
-        Category::create(['code' => $process_last_number3,'name' => 'Recycle Bin','account_id' => $account->id]);
+        Category::create(['code' => $process_last_number3,'name' => 'Recycle Bin','eps_order'=>3,'account_id' => $account->id]);
         if($request->file('logo')){
             $logo=getFirstMediaUrl($account,$account->logoCollection);
             if($logo!= null){
@@ -194,7 +200,8 @@ class AccountController extends ApiController
         DocType::where('account_id',$account->id)->delete();
         Project::where('account_id',$account->id)->delete();
         ProjectFolder::where('account_id',$account->id)->delete();
-
+        AccountUser::where('account_id',$account->id)->delete();
+        ProjectUser::where('account_id',$account->id)->delete();
         // If no employees are assigned to the department, proceed with deleting the department
         $account->delete();
 

@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Casts\CustomDateTimeCast;
-class AccountUser extends Model
+class ProjectUser extends Model
 {
     use HasFactory;
-    protected $table = 'accounts_users';
+    protected $table = 'projects_users';
     
     
     
@@ -16,9 +16,8 @@ class AccountUser extends Model
     protected $fillable = [
         'user_id',
         'account_id',
-        'role',
+        'project_id',
         'permissions'
-        
     ];
 
     protected $allowedSorts = [

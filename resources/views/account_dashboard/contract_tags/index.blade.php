@@ -18,10 +18,13 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">Contract Tags</h2>
         </div>
-        <div class="col-auto">
-            <a type="button" href="{{ route('account.contract-tags.create') }}"
-                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Tag</a>
-        </div>
+        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                in_array('create_contract_tags', $Account_Permissions ?? []))
+            <div class="col-auto">
+                <a type="button" href="{{ route('account.contract-tags.create') }}"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Tag</a>
+            </div>
+        @endif
     </div>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -76,10 +79,15 @@
                                             <span class="text-muted sr-only">Action</span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item"
-                                                href="{{ route('account.contract-tags.edit', $tag->id) }}">Edit</a>
-                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                onclick="confirmDelete('{{ route('accounts.contract-tags.delete', $tag->id) }}')">Remove</a>
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_contract_tags', $Account_Permissions ?? []))
+                                                <a class="dropdown-item"
+                                                    href="{{ route('account.contract-tags.edit', $tag->id) }}">Edit</a>
+                                            @endif
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('delete_contract_tags', $Account_Permissions ?? []))
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                    onclick="confirmDelete('{{ route('accounts.contract-tags.delete', $tag->id) }}')">Remove</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

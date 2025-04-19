@@ -18,10 +18,13 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">Project Folders</h2>
         </div>
-        <div class="col-auto">
-            <a type="button" href="{{ route('account.project-folders.create') }}"
-                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Folder</a>
-        </div>
+        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                in_array('create_project_folder', $Account_Permissions ?? []))
+            <div class="col-auto">
+                <a type="button" href="{{ route('account.project-folders.create') }}"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Folder</a>
+            </div>
+        @endif
     </div>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -54,14 +57,14 @@
                         </thead>
                         <tbody>
                             <?php
-                                $counter=1;    
+                            $counter = 1;
                             ?>
                             @foreach ($folders as $folder)
                                 <tr>
 
-                                    <td>{{$counter}}</td>
+                                    <td>{{ $counter }}</td>
                                     <td>{{ $folder->name }}</td>
-                                    
+
 
                                     <td>{{ $folder->order }}</td>
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
@@ -69,16 +72,22 @@
                                             <span class="text-muted sr-only">Action</span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item"
-                                                href="{{ route('account.project-folders.edit', $folder->id) }}">Edit</a>
-                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                onclick="confirmDelete('{{ route('accounts.project-folders.delete', $folder->id) }}')">Remove</a>
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('edit_project_folder', $Account_Permissions ?? []))
+                                                <a class="dropdown-item"
+                                                    href="{{ route('account.project-folders.edit', $folder->id) }}">Edit</a>
+                                            @endif
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('delete_project_folder', $Account_Permissions ?? []))
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                    onclick="confirmDelete('{{ route('accounts.project-folders.delete', $folder->id) }}')">Remove</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                                 <?php
-                                $counter++;    
-                            ?>
+                                $counter++;
+                                ?>
                             @endforeach
                         </tbody>
                     </table>

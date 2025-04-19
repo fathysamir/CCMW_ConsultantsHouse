@@ -45,75 +45,140 @@
 
                 </ul>
             </li>
-            <li class="nav-item dropdown">
-                <a href="#Documents" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-file fe-16"></i>
-                    <span class="ml-3 item-text">Documents</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="Documents">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('project.upload_single_doc.create') }}"><span
-                                class="ml-1 item-text">Upload Single Document</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" style="font-size: 0.8rem;" href="{{ route('project.upload-group-documents') }}"><span class="ml-1 item-text">Upload Group of
-                                Documents</span></a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" style="font-size: 0.8rem;" href="{{ route('import_docs_view') }}"><span class="ml-1 item-text">Import Documents from Excel</span></a>
-                    </li>
+            @php
+                if ($Project_Permissions != null) {
+                    $itemsToCheck = ['upload_documents', 'upload_group_documents', 'import_documents'];
 
+                    $found2 = false;
 
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-settings fe-16"></i>
-                    <span class="ml-3 item-text">Settings</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="forms">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('project.contract-tags') }}"><span
-                                class="ml-1 item-text">Contract Tags</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('project.project-folders') }}"><span
-                                class="ml-1 item-text">Project Folders</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('project.document-types') }}"><span
-                                class="ml-1 item-text">Document Types</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#Contract-Settings" data-toggle="collapse" aria-expanded="false"
-                            class="dropdown-toggle nav-link"style="padding-left: 1rem !important;">
+                    foreach ($itemsToCheck as $item) {
+                        if (in_array($item, $Project_Permissions)) {
+                            $found2 = true;
+                            break;
+                        }
+                    }
+                } else {
+                    $found2 = false;
+                }
 
-                            <span class="ml-1 item-text">Contract Settings</span>
-                        </a>
-                        <ul class="collapse list-unstyled pl-4 w-100" id="Contract-Settings">
+            @endphp
+            @if (auth()->user()->roles->first()->name == 'Super Admin' || $found2 == true)
+                <li class="nav-item dropdown">
+                    <a href="#Documents" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                        <i class="fe fe-file fe-16"></i>
+                        <span class="ml-3 item-text">Documents</span>
+                    </a>
+                    <ul class="collapse list-unstyled pl-4 w-100" id="Documents">
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('upload_documents', $Project_Permissions ?? []))
                             <li class="nav-item">
-                                <a class="nav-link pl-3"
-                                    href="{{ route('project.contract-settings', 'contract_provision_category') }}"><span
-                                        class="ml-1 item-text">Contract Provision Categories</span></a>
+                                <a class="nav-link pl-3" href="{{ route('project.upload_single_doc.create') }}"><span
+                                        class="ml-1 item-text">Upload Single Document</span></a>
                             </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                in_array('upload_group_documents', $Project_Permissions ?? []))
                             <li class="nav-item">
-                                <a class="nav-link pl-3"
-                                    href="{{ route('project.contract-settings', 'contract_document') }}"><span
-                                        class="ml-1 item-text">Contract Documents</span></a>
+                                <a class="nav-link pl-3" style="font-size: 0.8rem;"
+                                    href="{{ route('project.upload-group-documents') }}"><span
+                                        class="ml-1 item-text">Upload
+                                        Group of
+                                        Documents</span></a>
                             </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('import_documents', $Project_Permissions ?? []))
                             <li class="nav-item">
-                                <a class="nav-link pl-3"
-                                    href="{{ route('project.contract-settings', 'provision_type') }}"><span
-                                        class="ml-1 item-text">Provision Types</span></a>
+                                <a class="nav-link pl-3" style="font-size: 0.8rem;"
+                                    href="{{ route('import_docs_view') }}"><span class="ml-1 item-text">Import Documents
+                                        from Excel</span></a>
                             </li>
+                        @endif
+
+                    </ul>
+                </li>
+            @endif
+            @php
+                if ($Project_Permissions != null) {
+                    $itemsToCheck = [
+                        'show_contract_tags',
+                        'show_project_folder',
+                        'show_document_type',
+                        'show_contract_settings',
+                    ];
+
+                    $found = false;
+
+                    foreach ($itemsToCheck as $item) {
+                        if (in_array($item, $Project_Permissions)) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                } else {
+                    $found = false;
+                }
+
+            @endphp
+            @if (auth()->user()->roles->first()->name == 'Super Admin' || $found == true)
+                <li class="nav-item dropdown">
+                    <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                        <i class="fe fe-settings fe-16"></i>
+                        <span class="ml-3 item-text">Settings</span>
+                    </a>
+                    <ul class="collapse list-unstyled pl-4 w-100" id="forms">
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_contract_tags', $Project_Permissions ?? []))
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" href="{{ route('project.contract-tags') }}"><span
+                                    class="ml-1 item-text">Contract Tags</span></a>
+                        </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_project_folder', $Project_Permissions ?? []))
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" href="{{ route('project.project-folders') }}"><span
+                                    class="ml-1 item-text">Project Folders</span></a>
+                        </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_document_type', $Project_Permissions ?? []))
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3" href="{{ route('project.document-types') }}"><span
+                                    class="ml-1 item-text">Document Types</span></a>
+                        </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_contract_settings', $Project_Permissions ?? []))
+
+                        <li class="nav-item">
+                            <a href="#Contract-Settings" data-toggle="collapse" aria-expanded="false"
+                                class="dropdown-toggle nav-link"style="padding-left: 1rem !important;">
+
+                                <span class="ml-1 item-text">Contract Settings</span>
+                            </a>
+                            <ul class="collapse list-unstyled pl-4 w-100" id="Contract-Settings">
+                                <li class="nav-item">
+                                    <a class="nav-link pl-3"
+                                        href="{{ route('project.contract-settings', 'contract_provision_category') }}"><span
+                                            class="ml-1 item-text">Contract Provision Categories</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link pl-3"
+                                        href="{{ route('project.contract-settings', 'contract_document') }}"><span
+                                            class="ml-1 item-text">Contract Documents</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link pl-3"
+                                        href="{{ route('project.contract-settings', 'provision_type') }}"><span
+                                            class="ml-1 item-text">Provision Types</span></a>
+                                </li>
 
 
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                        @endif
 
-                </ul>
-            </li>
+                    </ul>
+                </li>
+            @endif
 
 
 

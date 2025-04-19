@@ -89,10 +89,12 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $account->name }} - Projects</h2>
         </div>
+        @if(auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_projects', $Account_Permissions ?? []))
         <div class="col-auto">
             <a href="{{ route('projects.create_project_view') }}"class="btn mb-2 btn-outline-primary"
                 id="btn-outline-primary">Create Project</a>
         </div>
+        @endif
     </div>
     <!-- Create EPS Modal -->
 
@@ -133,18 +135,26 @@
             </div>
         @endforeach
         <ul id="contextMenu" class="custom-context-menu">
+            @if(auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_projects', $Account_Permissions ?? []))
             <li><a href="#" id="editProject"><i class="fe fe-edit"></i> Edit Project</a></li>
+            @endif
+            @if(auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_projects', $Account_Permissions ?? []))
             <li><a href="#" id="archiveProject"><i class="fe fe-archive"></i> Archive Project</a></li>
             <li><a href="#" id="deleteProject"><i class="fe fe-trash"></i> Delete Project</a></li>
+            @endif
         </ul>
         <ul id="contextMenu2" class="custom-context-menu">
+            @if(auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_projects', $Account_Permissions ?? []))
             <li><a href="#" id="restoreProject2"><i class="fe fe-edit"></i> Restore</a></li>
             <li><a href="#" id="deleteProject2"><i class="fe fe-trash"></i> Delete Project</a></li>
+            @endif
         </ul>
         <ul id="contextMenu3" class="custom-context-menu">
+            @if(auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_projects', $Account_Permissions ?? []))
             <li><a href="#" id="restoreProject3"><i class="fe fe-edit"></i> Restore</a></li>
             <li><a href="#" id="archiveProject3"><i class="fe fe-archive"></i> Archive Project</a></li>
             <li><a href="#" id="deleteProject3"><i class="fe fe-trash"></i> Delete Project</a></li>
+            @endif
         </ul>
         <div class="col-md-9">
         </div> <!-- .col -->

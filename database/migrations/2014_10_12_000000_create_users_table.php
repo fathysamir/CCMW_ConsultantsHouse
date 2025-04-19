@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
+            $table->string('code');
             $table->string('email');
             $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->unsignedBigInteger('current_account_id')->nullable();
             $table->foreign('current_account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('current_project_id')->nullable();

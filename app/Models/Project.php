@@ -87,5 +87,10 @@ class Project extends Model
     {
         return $this->hasMany(Document::class,'project_id');
     }
+
+    public function assign_users()
+    {
+        return $this->belongsToMany(User::class, 'projects_users', 'project_id', 'user_id')->withPivot('permissions'); // Optional
+    }
     
 }

@@ -16,12 +16,16 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{ucwords(str_replace('_', ' ', $type))}}</h2>
+            <h2 class="h3 mb-0 page-title">{{ ucwords(str_replace('_', ' ', $type)) }}</h2>
         </div>
-        <div class="col-auto">
-            <a type="button" href="{{ route('project.contract-settings.create',$type) }}"
-                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create {{ucwords(str_replace('_', ' ', $type))}}</a>
-        </div>
+        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                in_array('create_contract_settings', $Project_Permissions ?? []))
+            <div class="col-auto">
+                <a type="button" href="{{ route('project.contract-settings.create', $type) }}"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create
+                    {{ ucwords(str_replace('_', ' ', $type)) }}</a>
+            </div>
+        @endif
     </div>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -48,19 +52,19 @@
 
                                 <th>#</th>
                                 <th>Name</th>
-                                
+
                                 <th>Order</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                                $counter=1;    
+                            $counter = 1;
                             ?>
                             @foreach ($contract_settings as $setting)
                                 <tr>
 
-                                    <td>{{$counter}}</td>
+                                    <td>{{ $counter }}</td>
                                     <td>{{ $setting->name }}</td>
 
                                     <td>{{ $setting->order }}</td>
@@ -69,16 +73,22 @@
                                             <span class="text-muted sr-only">Action</span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item"
-                                                href="{{ route('project.contract-settings.edit', $setting->id) }}">Edit</a>
-                                            <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                onclick="confirmDelete('{{ route('accounts.contract-settings.delete', $setting->id) }}')">Remove</a>
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('edit_contract_settings', $Project_Permissions ?? []))
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.contract-settings.edit', $setting->id) }}">Edit</a>
+                                            @endif
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                    in_array('delete_contract_settings', $Project_Permissions ?? []))
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                    onclick="confirmDelete('{{ route('accounts.contract-settings.delete', $setting->id) }}')">Remove</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                                 <?php
-                                $counter++;    
-                            ?>
+                                $counter++;
+                                ?>
                             @endforeach
                         </tbody>
                     </table>

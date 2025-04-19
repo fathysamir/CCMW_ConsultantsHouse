@@ -19,7 +19,8 @@ class Category extends Model
         'code',
         'name',
         'account_id',
-        'parent_id'
+        'parent_id',
+        'eps_order'
 
     ];
 

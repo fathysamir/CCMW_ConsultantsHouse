@@ -27,12 +27,23 @@ class ProjectController extends ApiController
     {
         $user = auth()->user();
         $account = Account::findOrFail($user->current_account_id);
-        if (auth()->user()->roles->first()->name == 'Super Admin' || auth()->user()->roles->first()->name == 'Account Admin') {
+        if (auth()->user()->roles->first()->name == 'Super Admin') {
             // $project_count= Project::where('account_id',$user->current_account_id)->get();
-            $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
+            $EPS = Category::where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
 
         } else {
-            $project_count = 0;
+            $hasRole = $user->accounts()
+                ->where('accounts.id', $user->current_account_id)
+                ->wherePivot('role', 'Admin Account')
+                ->exists();
+            if($hasRole){
+                $EPS = Category::where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+            }else{
+                $projectsId=$user->assign_projects->pluck('id')->toArray();
+                $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
+                $EPS = Category::whereIn('id',$categoriesId)->where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+            }
+           
         }
         return view('account_dashboard.projects', compact('EPS', 'account'));
 
@@ -51,7 +62,7 @@ class ProjectController extends ApiController
             'Lower-Tier Subcontractor',
             'Other'
         ];
-        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
+        $EPS = Category::whereNotIn('name',['Recycle Bin','Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
         $route = 'projects.store_project';
         return view('account_dashboard.projects.create', compact('roles', 'EPS', 'route'));
     }
@@ -83,7 +94,7 @@ class ProjectController extends ApiController
             'Lower-Tier Subcontractor',
             'Other'
         ];
-        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
+        $EPS = Category::whereNotIn('name',['Recycle Bin','Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
         return view('account_dashboard.projects.edit', compact('roles', 'project', 'EPS'));
 
     }

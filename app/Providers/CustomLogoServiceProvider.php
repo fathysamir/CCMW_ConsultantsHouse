@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Models\ProjectFolder;
+use App\Models\AccountUser;
+use App\Models\ProjectUser;
 class CustomLogoServiceProvider extends ServiceProvider
 {
     public function register()
@@ -14,6 +16,32 @@ class CustomLogoServiceProvider extends ServiceProvider
             $user=auth()->user();
             $Folders=ProjectFolder::where('account_id',$user->current_account_id)->where('project_id',$user->current_project_id);
             return $Folders;
+        });
+
+        $this->app->bind('Account_Permissions', function () {
+            $user=auth()->user();
+            $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
+            if($AccountUser){
+                $permissions=$AccountUser->permissions;
+                $Account_Permissions=json_decode($permissions);
+            }else{
+                $Account_Permissions=null;
+            }
+            
+            return $Account_Permissions;
+        });
+
+        $this->app->bind('Project_Permissions', function () {
+            $user=auth()->user();
+            $ProjectUser=ProjectUser::where('project_id',$user->current_project_id)->where('user_id',$user->id)->first();
+            if($ProjectUser){
+                $permissions=$ProjectUser->permissions;
+                $Project_Permissions=json_decode($permissions);
+            }else{
+                $Project_Permissions=null;
+            }
+            
+            return $Project_Permissions;
         });
     }
 
@@ -34,6 +62,32 @@ class CustomLogoServiceProvider extends ServiceProvider
                 ->get();
             
             $view->with('Folders', $Folders);
+        });
+        view()->composer('account_dashboard.layout.side_menu', function ($view) {
+            $user=auth()->user();
+            $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
+            if($AccountUser){
+                $permissions=$AccountUser->permissions;
+                $Account_Permissions=json_decode($permissions);
+            }else{
+                $Account_Permissions=null;
+            }
+            
+            
+            $view->with('Account_Permissions', $Account_Permissions);
+        });
+        view()->composer('project_dashboard.layout.side_menu', function ($view) {
+            $user=auth()->user();
+            $ProjectUser=ProjectUser::where('project_id',$user->current_project_id)->where('user_id',$user->id)->first();
+            if($ProjectUser){
+                $permissions=$ProjectUser->permissions;
+                $Project_Permissions=json_decode($permissions);
+            }else{
+                $Project_Permissions=null;
+            }
+            
+            
+            $view->with('Project_Permissions', $Project_Permissions);
         });
     }
 }

@@ -100,6 +100,7 @@
         .table-container td:nth-child(8) {
             width: 4%;
         }
+
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
@@ -134,18 +135,20 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                max-height:650px;
-                                                                            } */
+                                                                                    max-height:650px;
+                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{$folder->name}}</h2>
+            <h2 class="h3 mb-0 page-title">{{ $folder->name }}</h2>
         </div>
         <div class="col-auto">
-            @if($folder->name!='Recycle Bin' &&  $folder->name!='Archive')
-            <a type="button" href="{{ route('project.files.create') }}"
-            class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create File</a>
+            @if ($folder->name != 'Recycle Bin' && $folder->name != 'Archive')
+                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_file', $Project_Permissions ?? []))
+                    <a type="button" href="{{ route('project.files.create') }}"
+                        class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create File</a>
+                @endif
             @endif
         </div>
     </div>
@@ -184,9 +187,9 @@
 
                                     <th><b>NO.</b></th>
                                     <th><b>File Name</b></th>
-                                    <th><b>{{$folder->label1}}</b></th>
-                                    <th><b>{{$folder->label2}}</b></th>
-                                    <th><b>{{$folder->label3}}</b></th>
+                                    <th><b>{{ $folder->label1 }}</b></th>
+                                    <th><b>{{ $folder->label2 }}</b></th>
+                                    <th><b>{{ $folder->label3 }}</b></th>
                                     <th><b>File Owner</b></th>
 
                                     <th></th>
@@ -207,29 +210,41 @@
                                         </td>
 
                                         <td>{{ $file->code }}</td>
-                                        <td><a class="l-link"style="color:rgb(80, 78, 78);"style="color:" href="{{ route('project.file-documents.index',$file->slug) }}">{{ $file->name }}</a></td>
+                                        <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
+                                                href="{{ route('project.file-documents.index', $file->slug) }}">{{ $file->name }}</a>
+                                        </td>
                                         <td>{{ $file->against ? $file->against->role : '_' }}</td>
-                                        <td>{{ $file->start_date ? date('d-M-Y', strtotime($file->start_date)) : '_' }}</td>
+                                        <td>{{ $file->start_date ? date('d-M-Y', strtotime($file->start_date)) : '_' }}
+                                        </td>
                                         <td>{{ $file->end_date ? date('d-M-Y', strtotime($file->end_date)) : '_' }}</td>
                                         <td>{{ $file->user ? $file->user->name : '_' }}</td>
 
-                                        
+
                                         <td>
                                             <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.files.edit', $file->slug) }}">Edit</a>
-                                                <a id="Change_Owner_btn_{{ $file->id }}"
-                                                    class="dropdown-item change-owner-btn" href="javascript:void(0);"
-                                                    data-file-id="{{ $file->id }}"data-file-owner-id="{{ $file->user_id }}">Change
-                                                    Owner</a>
-                                                <a class="dropdown-item" href="">Copy</a>
-                                                <a class="dropdown-item" href="">Move</a>
-                                                <a class="dropdown-item" href="javascript:void(0);"onclick="confirmArchive('{{ route('project.files.archive', $file->id) }}')">Archive</a>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);"onclick="confirmDelete('{{ route('project.files.delete', $file->id) }}')">Delete</a>
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_file', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.files.edit', $file->slug) }}">Edit</a>
+
+                                                    <a id="Change_Owner_btn_{{ $file->id }}"
+                                                        class="dropdown-item change-owner-btn" href="javascript:void(0);"
+                                                        data-file-id="{{ $file->id }}"data-file-owner-id="{{ $file->user_id }}">Change
+                                                        Owner</a>
+                                                @endif
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('cope_move_file', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item" href="">Copy</a>
+                                                    <a class="dropdown-item" href="">Move</a>
+                                                @endif
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_file', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item"
+                                                        href="javascript:void(0);"onclick="confirmArchive('{{ route('project.files.archive', $file->id) }}')">Archive</a>
+                                                    <a class="dropdown-item text-danger"
+                                                        href="javascript:void(0);"onclick="confirmDelete('{{ route('project.files.delete', $file->id) }}')">Delete</a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -281,7 +296,7 @@
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
-       
+
 
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
@@ -430,7 +445,7 @@
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
-            },{
+            }, {
                 "targets": 7, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }]
@@ -442,6 +457,7 @@
                 window.location.href = url; // Redirect to delete route
             }
         }
+
         function confirmArchive(url) {
             if (confirm('Are you sure you want to archive this File? This action cannot be undone.')) {
                 window.location.href = url; // Redirect to delete route

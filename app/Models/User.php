@@ -22,6 +22,7 @@ class User extends Authenticatable
     public $avatarCollection = 'avatar-image';
     protected $fillable = [
         'name',
+        'code',
         'email',
         'phone',
         'current_account_id',
@@ -57,6 +58,10 @@ class User extends Authenticatable
 
     public function accounts()
     {
-        return $this->belongsToMany(Account::class,'accounts_users', 'user_id', 'account_id');
+        return $this->belongsToMany(Account::class,'accounts_users', 'user_id', 'account_id')->withPivot('role','permissions');
+    }
+    public function assign_projects()
+    {
+        return $this->belongsToMany(Project::class, 'projects_users', 'user_id', 'project_id')->withPivot('permissions'); // Optional, if your pivot table has timestamps
     }
 }

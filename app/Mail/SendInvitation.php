@@ -9,11 +9,13 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendOTP extends Mailable
+class SendInvitation extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otp;
+    public $code;
+    public $sender_name;
+    public $account_name;
    
 
     /**
@@ -21,9 +23,11 @@ class SendOTP extends Mailable
      *
      * @return void
      */
-    public function __construct($otp)
+    public function __construct($invitation,$sender,$account)
     {
-        $this->otp = $otp;
+        $this->code = $invitation->code;
+        $this->sender_name = $sender;
+        $this->account_name = $account;
       
     }
 
@@ -35,10 +39,12 @@ class SendOTP extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.otp')
-                    ->subject('Lady Driver')
+        return $this->view('emails.invitation')
+                    ->subject('CCMW - Invitation')
                     ->with([
-                        'otp' => $this->otp,
+                        'code' => $this->code,
+                        'sender_name' => $this->sender_name,
+                        'account_name' => $this->account_name,
                        
                     ]);
     }

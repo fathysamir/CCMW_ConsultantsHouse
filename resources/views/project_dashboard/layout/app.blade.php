@@ -148,6 +148,11 @@
             theme: 'bootstrap4',
             tags: true
         });
+        $('.xxx').select2({
+            multiple: true,
+            theme: 'bootstrap4',
+            tags: false
+        });
         $('.drgpicker').daterangepicker({
             singleDatePicker: true,
             timePicker: false,

@@ -29,8 +29,8 @@ class ImportDocumentController extends ApiController
         session()->forget('uploadedPDFFiles');
         session()->forget('selected_file');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         return view('project_dashboard.import_documents.index',compact('folders','users','project','documents_types','stake_holders'));

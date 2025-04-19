@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Account;
-use App\Models\Category;
+use App\Models\ProjectUser;
 use App\Models\Project;
 use App\Models\StakeHolder;
 use App\Models\Milestone;
@@ -22,9 +22,45 @@ class ProjectDashboardController extends ApiController
 
     public function index()
     {
+        
         $user = auth()->user();
+        $account = Account::findOrFail($user->current_account_id); 
+        $users=$account->users;
+       
         $project = Project::findOrFail($user->current_project_id); 
-        return view('project_dashboard.home', compact('project'));
+        $assigned_users=$project->assign_users()->pluck('users.id')->toArray();
+        
+        return view('project_dashboard.home', compact('users','project','assigned_users'));
+
+    }
+
+    public function assign_users(Request $request){
+        $user = auth()->user();
+        // $permissions=['show_contract_tags','create_contract_tags','edit_contract_tags','delete_contract_tags',
+        //                 'show_project_folder','create_project_folder','edit_project_folder','delete_project_folder',
+        //                 'show_document_type','create_document_type','edit_document_type','delete_document_type',
+        //                 'show_contract_settings','create_contract_settings','edit_contract_settings','delete_contract_settings',
+        //                 'upload_documents','upload_group_documents','import_documents','edit_documents','delete_documents',
+        //                 'analysis',
+        //                 'create_file','edit_file','delete_file','cope_move_file'];
+        $permissions=['upload_documents','upload_group_documents','import_documents','edit_documents','delete_documents',
+                        'analysis',
+                        'create_file','edit_file','delete_file'];
+        if($request->assigned_users && count($request->assigned_users)>0){
+            foreach($request->assigned_users as $id){
+                $userExists = ProjectUser::where('user_id',$id)->where('project_id',$user->current_project_id)->exists();
+                if($userExists==false)
+                   ProjectUser::create(['user_id'=>$id,'account_id'=>$user->current_account_id,'project_id'=>$user->current_project_id,'permissions'=>json_encode($permissions)]);
+            }
+            ProjectUser::where('project_id',$user->current_project_id)->whereNotIn('user_id',$request->assigned_users)->delete();
+            return redirect('/project')->with('success', 'Users assigned successfully.');
+
+        }else{
+            ProjectUser::where('project_id',$user->current_project_id)->delete();
+            return redirect('/project')->with('error', 'No user selected.');
+ 
+        }
+
 
     }
 }

@@ -52,7 +52,7 @@ Route::group(['middleware' => ['admin']], function () {
         session(['current_edit_account' => $id]);
         
         return redirect()->route('account.edit');
-    });
+    })->where('id', '[0-9]+');
     Route::get('/accounts/edit', [AccountController::class, 'edit'])->name('account.edit');
     Route::post('/accounts/update', [AccountController::class, 'update'])->name('account.update');
     Route::get('/account/delete/{id}', [AccountController::class, 'delete'])->name('account.delete');
@@ -110,18 +110,24 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/account/project-folders/create', [ProjectFolderController::class, 'create'])->name('account.project-folders.create');
     Route::get('/account/project-folders/edit/{id}', [ProjectFolderController::class, 'edit'])->name('account.project-folders.edit');
 
+    Route::get('/account/users', [AccountDashboardController::class, 'account_users'])->name('account.users');
+    Route::get('/account/user/{id}', [AccountDashboardController::class, 'edit_user'])->name('account.edit-user');
+    Route::post('/account/update-user/{id}', [AccountDashboardController::class, 'update_user'])->name('account.update-user');
+    Route::get('/account/user/delete/{id}', [AccountDashboardController::class, 'delete_user'])->name('account.delete-user');
 
     Route::get('/getChildrenEPS', [AccountDashboardController::class, 'getChildrenEPS'])->name('getChildrenEPS');
     Route::get('/getProjectsEPS', [AccountDashboardController::class, 'getProjectsEPS'])->name('getProjectsEPS');
 
     Route::post('/deleteChildrenEPS', [AccountDashboardController::class, 'deleteChildrenEPS'])->name('deleteChildrenEPS');
     Route::post('/store_EPS', [AccountDashboardController::class, 'store_EPS'])->name('store_EPS');
+    Route::post('/reorder_EPS', [AccountDashboardController::class, 'reorder_EPS'])->name('reorder_EPS');
     Route::post('/rename_EPS', [AccountDashboardController::class, 'rename_EPS'])->name('rename_EPS');
     Route::get('/account/create-project', [AccountDashboardController::class, 'create_project_view'])->name('account.create_project_view');
     Route::post('/account/store-project', [AccountDashboardController::class, 'store_project'])->name('store_project');
     Route::get('/account/projects', [ProjectController::class, 'index'])->name('account.projects');
     Route::get('/account/projects/create-project', [ProjectController::class, 'create_project_view'])->name('projects.create_project_view');
     Route::post('/account/projects/store-project', [ProjectController::class, 'store_project'])->name('projects.store_project');
+    Route::post('/account/send-invitation', [AccountDashboardController::class, 'send_invitation'])->name('send_invitation');
 
     Route::get('/account/edit-project/{id}', [ProjectController::class, 'edit_project_view'])->name('account.edit_project_view');
     Route::post('/account/update-project/{project}', [ProjectController::class, 'update_project'])->name('projects.update_project');
@@ -150,6 +156,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/project-folders', [ProjectFolderController::class, 'index'])->name('project.project-folders');
     Route::get('/project/project-folders/create', [ProjectFolderController::class, 'create'])->name('project.project-folders.create');
     Route::get('/project/project-folders/edit/{id}', [ProjectFolderController::class, 'edit'])->name('project.project-folders.edit');
+    Route::post('/project/assign_users', [ProjectDashboardController::class, 'assign_users'])->name('assign_users');
 
     Route::get('/project/upload-single-doc/create', [DocumentController::class, 'create_single_doc_view'])->name('project.upload_single_doc.create');
     Route::post('/project/upload-single-doc/store', [DocumentController::class, 'store_single_doc'])->name('project.upload_single_doc.store');

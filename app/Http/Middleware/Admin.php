@@ -26,11 +26,12 @@ class Admin
         }
         if(count(auth()->user()->roles)==0)
         {
+            Auth::logout();
             return redirect('/login');
         }
         if(!is_null(auth()->user()->roles))
         {
-            if(auth()->user()->roles->first()->name!='Super Admin')
+            if(auth()->user()->roles->first()->name!='Super Admin' && auth()->user()->roles->first()->name!='User')
             {   
                  Auth::logout();
 

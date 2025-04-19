@@ -20,7 +20,8 @@ use Illuminate\Validation\Rule;
 class FileController extends ApiController
 {
     public function index(){
-        $users = User::all();
+        $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
         $all_files = ProjectFile::where('folder_id',$folder->id)->get(); 
@@ -28,8 +29,8 @@ class FileController extends ApiController
     }
 
     public function create(){
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;
@@ -75,8 +76,8 @@ class FileController extends ApiController
     }
 
     public function edit($id){
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;

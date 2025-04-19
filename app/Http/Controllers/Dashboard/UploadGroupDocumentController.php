@@ -28,8 +28,8 @@ class UploadGroupDocumentController extends ApiController
     public function index(){
         session()->forget('testDocumentsIDs');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         return view('project_dashboard.upload_group_documents.index',compact('folders','users','project','documents_types','stake_holders'));
@@ -126,8 +126,8 @@ class UploadGroupDocumentController extends ApiController
 
 
     public function view_doc($id){
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         $document = TestDocument::where('id', $id)->first();

@@ -12,10 +12,14 @@ use Illuminate\Support\Facades\Redirect;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Project;
-use App\Models\StakeHolder;
-use App\Models\Milestone;
+use App\Models\AccountUser;
+use App\Models\Invitation;
+use App\Models\User;
+use App\Models\ProjectUser;
 use App\Services\ProjectService;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendInvitation;
 
 class AccountDashboardController extends ApiController
 {
@@ -36,9 +40,9 @@ class AccountDashboardController extends ApiController
         if(auth()->user()->roles->first()->name =='Super Admin'){
             $project_count= Project::where('account_id',$user->current_account_id)->count();
         }else{
-            
-            $project_count= 0;
+            $project_count= $user->assign_projects->where('account_id',$user->current_account_id)->count();
         }
+
 
         return view('account_dashboard.home', compact('account','project_count'));
     }
@@ -47,21 +51,68 @@ class AccountDashboardController extends ApiController
     {
 
         $account = Account::findOrFail(auth()->user()->current_account_id);
+        if (auth()->user()->roles->first()->name == 'Super Admin') {
+            // $project_count= Project::where('account_id',$user->current_account_id)->get();
+            $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
 
-        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
+        } else {
+            $hasRole = auth()->user()->accounts()
+                ->where('accounts.id', auth()->user()->current_account_id)
+                ->wherePivot('role', 'Admin Account')
+                ->exists();
+            if($hasRole){
+                $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+            }else{
+                $projectsId=auth()->user()->assign_projects->pluck('id')->toArray();
+                $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
+                $EPS = Category::whereIn('id',$categoriesId)->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+            }
+           
+        }
         //dd($EPS->first()->allChildren->first()->allChildren->first()->allChildren);
         return view('account_dashboard.EPS', compact('EPS', 'account'));
     }
 
     public function getChildrenEPS(Request $request)
     {
-        $EPS = Category::where('parent_id', $request->eps_id)->get();
+        if (auth()->user()->roles->first()->name == 'Super Admin') {
+            // $project_count= Project::where('account_id',$user->current_account_id)->get();
+            $EPS = Category::where('parent_id', $request->eps_id)->orderBy('eps_order')->get();
+
+        } else {
+            $hasRole = auth()->user()->accounts()
+                ->where('accounts.id', auth()->user()->current_account_id)
+                ->wherePivot('role', 'Admin Account')
+                ->exists();
+            if($hasRole){
+                $EPS = Category::where('parent_id', $request->eps_id)->orderBy('eps_order')->get();
+            }else{
+                $projectsId=auth()->user()->assign_projects->pluck('id')->toArray();
+                $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
+                $EPS = Category::whereIn('id',$categoriesId)->where('parent_id', $request->eps_id)->orderBy('eps_order')->get();
+            }
+           
+        }
         return $this->sendResponse($EPS, 'success');
 
     }
     public function getProjectsEPS(Request $request){
-       
-        $projects=Project::where('category_id',$request->eps_id)->get();
+        if (auth()->user()->roles->first()->name == 'Super Admin') {
+            // $project_count= Project::where('account_id',$user->current_account_id)->get();
+            $projects=Project::where('category_id',$request->eps_id)->get();
+        } else {
+            $hasRole = auth()->user()->accounts()
+                ->where('accounts.id', auth()->user()->current_account_id)
+                ->wherePivot('role', 'Admin Account')
+                ->exists();
+            if($hasRole){
+                $projects=Project::where('category_id',$request->eps_id)->get();
+            }else{
+                $projectsId=auth()->user()->assign_projects->pluck('id')->toArray();
+                $projects=Project::whereIn('id',$projectsId)->where('category_id',$request->eps_id)->get();
+            }
+           
+        }
         return $this->sendResponse($projects, 'success');
 
     }
@@ -85,8 +136,32 @@ class AccountDashboardController extends ApiController
             $EPSExists = Category::where('code', $process_last_number)->exists();
             $last_number++;
         } while ($EPSExists);
-        Category::create(['code' => $process_last_number,'name' => $request->epsName,'account_id' => $request->accountID,'parent_id' => $request->selected_category]);
+        $last_eps=Category::where('account_id' , $request->accountID)->where('parent_id' , $request->selected_category)->orderBy('id', 'desc')->first();
+        if($last_eps){
+            $last_eps_order=$last_eps->eps_order;
+            Category::create(['code' => $process_last_number,'name' => $request->epsName,'account_id' => $request->accountID,'eps_order'=>$last_eps_order+1,'parent_id' => $request->selected_category]);
+
+        }else{
+            Category::create(['code' => $process_last_number,'name' => $request->epsName,'account_id' => $request->accountID,'eps_order'=>1,'parent_id' => $request->selected_category]);
+
+        }
+        
         return redirect('/account/EPS')->with('success', 'EPS created successfully.');
+
+    }
+    public function reorder_EPS(Request $request){
+        $eps=Category::findOrFail($request->id);
+        if($request->type == 'up'){
+            $before_eps=Category::where('account_id' , $eps->account_id)->where('parent_id' , $eps->parent_id)->where('eps_order','<',$eps->eps_order)->orderBy('id', 'desc')->first();
+        }elseif($request->type == 'down'){
+            $before_eps=Category::where('account_id' , $eps->account_id)->where('parent_id' , $eps->parent_id)->where('eps_order','>',$eps->eps_order)->orderBy('id', 'desc')->first();
+        }
+        $y=$before_eps->eps_order;
+        $before_eps->eps_order=$eps->eps_order;
+        $before_eps->save();
+        $eps->eps_order=$y;
+        $eps->save();
+        return $this->sendResponse(null, 'success');
 
     }
     public function rename_EPS(Request $request)
@@ -113,7 +188,8 @@ class AccountDashboardController extends ApiController
             'Lower-Tier subcontractor',
             'Other',
         ];
-        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->with('allChildren')->get();
+      
+        $EPS = Category::whereNotIn('name',['Recycle Bin','Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
         $route='store_project';
         return view('account_dashboard.projects.create', compact('roles', 'EPS','route'));
     }
@@ -128,4 +204,98 @@ class AccountDashboardController extends ApiController
 
         return redirect('/account')->with('success', 'Project created successfully.');
     }
+
+    public function send_invitation(Request $request){
+        //dd($request->all());
+        if($request->emails && count($request->emails)>0){
+            foreach($request->emails as $email){
+               
+                $user=User::where('email',$email)->first();
+                do {
+                    $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6);
+                } while (Invitation::where('code', $invitation_code)->exists());
+                // $permissions=['send_invitations',
+                //               'create_projects','edit_projects','delete_projects',
+                //               'show_eps','create_eps','edit_eps','delete_eps',
+                //               'show_contract_tags','create_contract_tags','edit_contract_tags','delete_contract_tags',
+                //               'show_project_folder','create_project_folder','edit_project_folder','delete_project_folder',
+                //               'show_document_type','create_document_type','edit_document_type','delete_document_type',
+                //               'show_contract_settings','create_contract_settings','edit_contract_settings','delete_contract_settings',
+                //               'show_users','assign_users','delete_users','edit_users_permissions'];
+                $permissions=['show_users','edit_projects'];
+                if(!$user){
+                    do {
+                        $code2 = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+                    } while (User::where('code', $code2)->exists());
+                    $user=User::create(['email'=>$email,'code'=>$code2]);
+                    $user_role = Role::where('name','User')->first();
+                    $user->assignRole([$user_role->id]);
+                    $existedUserInAccount=false;
+                }else{
+                    $x=AccountUser::where('user_id',$user->id)->where('account_id',auth()->user()->current_account_id)->first();
+                    if($x){
+                        $existedUserInAccount=true;
+                    }else{
+                        $existedUserInAccount=false;
+                    }
+
+                }
+                if($existedUserInAccount==false){
+
+                    $invitation=Invitation::create(['code'=>$invitation_code,'account_id'=>auth()->user()->current_account_id,'email'=>$email,'user_id'=>$user->id,'sender_id'=>auth()->user()->id]);
+
+                    AccountUser::create(['user_id'=>$user->id,'account_id'=>auth()->user()->current_account_id,'role'=>'User','permissions'=>json_encode($permissions)]);
+                    $account=Account::find(auth()->user()->current_account_id);
+                    Mail::to($email)->send(new SendInvitation($invitation,auth()->user()->name,$account->name));
+                }
+                
+
+            }
+            return redirect('/account')->with('success', 'Invitations sent successfully.');
+        }else{
+            return redirect('/account')->with('error', 'No emails were entered to send invitations.');
+        }
+        
+    }
+    ////////////////////////////
+    public function account_users(){
+        $account=Account::findOrFail(auth()->user()->current_account_id);
+        $users=$account->users;
+        return view('account_dashboard.users.index',compact('users','account'));
+    }
+
+    public function edit_user($id){
+        $user=User::where('code',$id)->first();
+        $account=Account::findOrFail(auth()->user()->current_account_id);
+        return view('account_dashboard.users.edit',compact('user','account'));
+
+    }
+
+    public function update_user(Request $request,$id){
+        //dd($request->all());
+        $user=User::where('code',$id)->first();
+        if($request->account_permissions){
+            AccountUser::where('user_id',$user->id)->where('account_id',auth()->user()->current_account_id)->update(['role'=>$request->role,'permissions'=>json_encode($request->account_permissions)]);
+        }else{
+            AccountUser::where('user_id',$user->id)->where('account_id',auth()->user()->current_account_id)->update(['role'=>$request->role,'permissions'=>json_encode([])]);
+        }
+        $IDs=$user->assign_projects()->where('projects.account_id', auth()->user()->current_account_id)->pluck('projects.id')->toArray();
+        //dd($IDs);
+        foreach($request->projects_permissions as $key => $project_permissions){
+            ProjectUser::where('user_id',$user->id)->where('project_id',$key)->update(['permissions'=>json_encode($project_permissions)]);
+            $IDs = array_values(array_diff($IDs, [$key]));
+        }
+        ProjectUser::where('user_id',$user->id)->whereIn('project_id',$IDs)->update(['permissions'=>json_encode([])]);
+        return redirect('/account/users')->with('success', 'User Permissions Updated successfully.');
+    }
+    public function delete_user($id)
+    {
+        $user=User::where('code',$id)->first();
+        ProjectUser::where('user_id', $user->id)->where('account_id',auth()->user()->id)->delete();
+        AccountUser::where('user_id', $user->id)->where('account_id',auth()->user()->id)->delete();
+        
+        return redirect('/account/users')->with('success', 'User deleted from account successfully.');
+
+    }
+
 }

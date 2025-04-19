@@ -160,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                max-height:650px;
-                                                                                                                            } */
+                                                                                                                                    max-height:650px;
+                                                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -169,7 +169,8 @@
             <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn mb-2 btn-success"onclick="window.location.href='/export-word-claim-docs/<?php echo $file->slug; ?>'">Export</button>
+            <button type="button"
+                class="btn mb-2 btn-success"onclick="window.location.href='/export-word-claim-docs/<?php echo $file->slug; ?>'">Export</button>
         </div>
     </div>
     @if (session('error'))
@@ -221,16 +222,19 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="subjectFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select class="form-control"id="subjectFilterType"style="margin-bottom: 5px;">
+                                            <select class="form-control"id="subjectFilterType" style="margin-bottom: 5px;">
                                                 <option value="contains">Contains</option>
                                                 <option value="equals">Equal</option>
                                                 <option value="not-equals">Not Equal</option>
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control"type="text" id="subjectFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applySubjectFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
-                                            <button id="clearSubjectFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                            <input class="form-control"type="text" id="subjectFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applySubjectFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button
+                                                id="clearSubjectFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th><b>Date </b> <span id="dateFilterIcon"
@@ -240,36 +244,40 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="dateFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select class="form-control"id="dateFilterType"style="margin-bottom: 5px;">
+                                            <select class="form-control"id="dateFilterType" style="margin-bottom: 5px;">
                                                 <option value="equals">Equals</option>
                                                 <option value="not-equals">Not Equals</option>
                                                 <option value="start-from">Start From</option>
                                                 <option value="end-to">End To</option>
 
                                             </select>
-                                            <input class="form-control date"type="date" id="dateFilterInput" placeholder="Enter date"style="margin-bottom: 5px;">
-                                            <button id="applyDateFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <input class="form-control date"type="date" id="dateFilterInput"
+                                                placeholder="Enter date"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyDateFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
                                             <button id="clearDateFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th><b>Return Date </b>
-                                        <span id="returnFilterIcon"
-                                            style="color:rgb(35, 197, 226); cursor: pointer;"
+                                        <span id="returnFilterIcon" style="color:rgb(35, 197, 226); cursor: pointer;"
                                             class="fe fe-23 fe-filter"></span>
 
                                         <!-- Hidden Filter Div -->
-                                        <div  class="form-group"id="returnFilterDiv"
+                                        <div class="form-group"id="returnFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select class="form-control"id="returnFilterType"style="margin-bottom: 5px;">
+                                            <select class="form-control"id="returnFilterType" style="margin-bottom: 5px;">
                                                 <option value="equals">Equals</option>
                                                 <option value="not-equals">Not Equals</option>
                                                 <option value="start-from">Start From</option>
                                                 <option value="end-to">End To</option>
 
                                             </select>
-                                            <input class="form-control date"type="date" id="returnFilterInput" placeholder="Enter date"style="margin-bottom: 5px;">
-                                            <button id="applyReturnFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
-                                            <button id="clearReturnFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                            <input class="form-control date"type="date" id="returnFilterInput"
+                                                placeholder="Enter date"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyReturnFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button
+                                                id="clearReturnFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th><b>Reference </b> <span id="referenceFilterIcon"
@@ -279,16 +287,20 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="referenceFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select id="referenceFilterType"class="form-control"style="margin-bottom: 5px;">
+                                            <select id="referenceFilterType"class="form-control"
+                                                style="margin-bottom: 5px;">
                                                 <option value="contains">Contains</option>
                                                 <option value="equals">Equal</option>
                                                 <option value="not-equals">Not Equal</option>
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control"type="text" id="referenceFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applyReferenceFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
-                                            <button id="clearReferenceFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                            <input class="form-control"type="text" id="referenceFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyReferenceFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button
+                                                id="clearReferenceFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th><b>Rev.</b></th>
@@ -299,15 +311,17 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="fromFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select id="fromFilterType"class="form-control"style="margin-bottom: 5px;">
+                                            <select id="fromFilterType"class="form-control" style="margin-bottom: 5px;">
                                                 <option value="contains">Contains</option>
                                                 <option value="equals">Equal</option>
                                                 <option value="not-equals">Not Equal</option>
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control"type="text" id="fromFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applyFromFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <input class="form-control"type="text" id="fromFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyFromFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
                                             <button id="clearFromFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
@@ -318,15 +332,17 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="toFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select id="toFilterType"class="form-control"style="margin-bottom: 5px;">
+                                            <select id="toFilterType"class="form-control" style="margin-bottom: 5px;">
                                                 <option value="contains">Contains</option>
                                                 <option value="equals">Equal</option>
                                                 <option value="not-equals">Not Equal</option>
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control"type="text" id="toFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applyToFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <input class="form-control"type="text" id="toFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyToFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
                                             <button id="clearToFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
@@ -338,16 +354,19 @@
                                         <!-- Hidden Filter Div -->
                                         <div class="form-group" id="statusFilterDiv"
                                             style="width:150px;display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);">
-                                            <select id="statusFilterType"class="form-control"style="margin-bottom: 5px;">
+                                            <select id="statusFilterType"class="form-control" style="margin-bottom: 5px;">
                                                 <option value="contains">Contains</option>
                                                 <option value="equals">Equal</option>
                                                 <option value="not-equals">Not Equal</option>
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control"type="text" id="statusFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applyStatusFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
-                                            <button id="clearStatusFilter"class="btn mb-2 btn-outline-warning">Clear</button>
+                                            <input class="form-control"type="text" id="statusFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button
+                                                id="applyStatusFilter"class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button
+                                                id="clearStatusFilter"class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th><b>Note </b> <span id="noteFilterIcon"
@@ -364,9 +383,12 @@
                                                 <option value="starts-with">Starts With</option>
                                                 <option value="ends-with">Ends With</option>
                                             </select>
-                                            <input class="form-control" type="text" id="noteFilterInput" placeholder="Enter text"style="margin-bottom: 5px;">
-                                            <button id="applyNoteFilter" class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
-                                            <button id="clearNoteFilter" class="btn mb-2 btn-outline-warning">Clear</button>
+                                            <input class="form-control" type="text" id="noteFilterInput"
+                                                placeholder="Enter text"style="margin-bottom: 5px;">
+                                            <button id="applyNoteFilter"
+                                                class="btn mr-1 mb-2 btn-outline-primary">Apply</button>
+                                            <button id="clearNoteFilter"
+                                                class="btn mb-2 btn-outline-warning">Clear</button>
                                         </div>
                                     </th>
                                     <th></th>
@@ -375,7 +397,7 @@
                             <tbody>
 
                                 @foreach ($documents as $document)
-                                    <tr @if($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
+                                    <tr @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -403,7 +425,7 @@
                                         </td>
 
                                         <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
-                                                href="{{ route('project.file-document-first-analyses',$document->id) }}">
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('analysis', $Project_Permissions ?? [])) href="{{ route('project.file-document-first-analyses', $document->id) }}" @endif>
                                                 {{ $document->document->subject }}</a>
                                         </td>
 
@@ -555,7 +577,7 @@
 
         });
     </script>
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const filters = {
@@ -674,7 +696,7 @@
                 if (!cell || !filter.value) return true;
                 let cellDate = formatTableDate(cell.textContent.trim());
                 let filterDate = filter.value;
-              
+
                 if (!(cellDate) || !(filterDate)) return false; // Invalid date
                 switch (filter.type) {
                     case "equals":
@@ -714,7 +736,7 @@
                 "all_for_timeline"));
 
             function setupFilterUI(field) {
-               
+
                 let filterIcon = document.getElementById(`${field}FilterIcon`);
                 let filterDiv = document.getElementById(`${field}FilterDiv`);
                 let filterType = document.getElementById(`${field}FilterType`);
@@ -788,16 +810,16 @@
             }]
         });
     </script>
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-     <script>
-         document.addEventListener("DOMContentLoaded", function() {
- 
-             flatpickr(".date", {
-                 enableTime: false,
-                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
-             });
- 
-         });
-     </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            flatpickr(".date", {
+                enableTime: false,
+                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+            });
+
+        });
+    </script>
 @endpush

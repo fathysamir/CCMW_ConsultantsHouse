@@ -160,7 +160,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <div class="row"style="margin-left: 50px;"">
+                                <div class="row"style="margin-left: 50px;">
                                                
                                     <div class="custom-control custom-checkbox" style="margin-right: 20px;margin-top: 6.5%;">
                                                    

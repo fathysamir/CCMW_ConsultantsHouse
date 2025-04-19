@@ -89,10 +89,12 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $account->name }} - EPS</h2>
         </div>
-        <div class="col-auto">
-            <button type="button" data-toggle="modal" data-target="#createEPSModal"
-                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create EPS</button>
-        </div>
+        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_eps', $Account_Permissions ?? []))
+            <div class="col-auto">
+                <button type="button" data-toggle="modal" data-target="#createEPSModal"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create EPS</button>
+            </div>
+        @endif
     </div>
     <!-- Create EPS Modal -->
     <div class="modal fade" id="createEPSModal" tabindex="-1" role="dialog" aria-labelledby="createEPSModalLabel"
@@ -112,7 +114,7 @@
 
                         <div class="form-group">
                             <label for="epsName">EPS Name</label>
-                            <input type="text" class="form-control" required id="epsName" name="epsName" required>
+                            <input type="text" class="form-control" required id="epsName" name="epsName">
                         </div>
                         <div class="form-group">
                             <ul id="epsTree">
@@ -213,8 +215,9 @@
                 <div class="card shadow mb-4"style="border-radius:15px;margin-bottom: 0.5rem !important;">
                     <div
                         class="card-body"style="border-radius:15px;box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);padding-top:0.1rem;padding-bottom:0.1rem;">
-                        <div class="card-text my-2" onclick="getEPS('{{ $category->id }}',this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"@if(!in_array($category->name,['Archive','Recycle Bin']))
-                            oncontextmenu="showContextMenu(event, '{{ $category->id }}','{{ $category->name }}')" @endif>
+                        <div class="card-text my-2"
+                            onclick="getEPS('{{ $category->id }}',this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"
+                            @if (!in_array($category->name, ['Archive', 'Recycle Bin'])) oncontextmenu="showContextMenu(event, '{{ $category->id }}','{{ $category->name }}')" @endif>
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <img id="logo" src="{{ asset('dashboard/assets/images/file.png') }}"
@@ -232,9 +235,17 @@
         @endforeach
         <!-- Context Menu -->
         <ul id="contextMenu" class="custom-context-menu">
-            <li><a href="#" id="createESP"><i class="fe fe-plus-circle"></i> Create ESP</a></li>
-            <li><a href="#" id="renameESP"><i class="fe fe-edit"></i> Rename ESP</a></li>
-            <li><a href="#" id="deleteESP"><i class="fe fe-trash"></i> Delete ESP</a></li>
+            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_eps', $Account_Permissions ?? []))
+                <li><a href="#" id="createESP"><i class="fe fe-plus-circle"></i> Create ESP</a></li>
+            @endif
+            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_eps', $Account_Permissions ?? []))
+                <li><a href="#" id="renameESP"><i class="fe fe-edit"></i> Rename ESP</a></li>
+            @endif
+            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_eps', $Account_Permissions ?? []))
+                <li><a href="#" id="deleteESP"><i class="fe fe-trash"></i> Delete ESP</a></li>
+            @endif
+            <li><a href="#" id="moveUp"><i class="fe fe-24 fe-arrow-up"></i> Move Up</a></li>
+            <li><a href="#" id="moveDown"><i class="fe fe-24 fe-arrow-down"></i> Move Down</a></li>
         </ul>
         <div class="col-md-9">
         </div> <!-- .col -->
@@ -294,6 +305,10 @@
             event.preventDefault(); // Prevent the default right-click menu
 
             const menu = document.getElementById('contextMenu');
+            const moveUpBtn = document.getElementById('moveUp');
+            const moveDownBtn = document.getElementById('moveDown');
+            const currentItem = document.getElementById('EPS_' + categoryId);
+
             menu.style.left = `${event.pageX - 270}px`; // Set horizontal position
             menu.style.top = `${event.pageY - 75}px`; // Set vertical position
             menu.style.display = 'block'; // Show the menu
@@ -301,10 +316,93 @@
             // Optionally store the category ID in the context menu for later use
             menu.setAttribute('data-category-id', categoryId);
             menu.setAttribute('data-category-name', categoryName);
+            const previousEPS = getPreviousEPSItem(currentItem);
+            moveUpBtn.parentElement.style.display = previousEPS ? 'block' : 'none';
+            const nextEPS = getNextEPSItem(currentItem);
+            moveDownBtn.parentElement.style.display = nextEPS ? 'block' : 'none';
         }
 
-        // Hide the context menu when clicking anywhere else on the page
+        function getPreviousEPSItem(element) {
+            let prev = element.previousElementSibling;
+            while (prev) {
+                if (prev.id && prev.id.includes('EPS_')) {
+                    return prev;
+                }
+                prev = prev.previousElementSibling;
+            }
+            return null;
+        }
 
+        function getNextEPSItem(element) {
+            let next = element.nextElementSibling;
+            while (next) {
+                if (next.id && next.id.includes('EPS_')) {
+                    return next;
+                }
+                next = next.nextElementSibling;
+            }
+            return null;
+        }
+
+
+        // Hide the context menu when clicking anywhere else on the page
+        document.getElementById('moveUp').addEventListener('click', function() {
+            const menu = document.getElementById('contextMenu');
+            const categoryId = menu.getAttribute('data-category-id');
+            const currentItem = document.getElementById('EPS_' + categoryId);
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var formData = {
+                _token: csrfToken,
+                id: categoryId,
+                type: 'up'
+
+            };
+            $.ajax({
+                url: '/reorder_EPS', // Replace with your actual controller route
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+            if (currentItem && currentItem.previousElementSibling) {
+                currentItem.parentNode.insertBefore(currentItem, currentItem.previousElementSibling);
+            }
+
+            menu.style.display = 'none'; // hide menu after action
+        });
+
+        document.getElementById('moveDown').addEventListener('click', function() {
+            const menu = document.getElementById('contextMenu');
+            const categoryId = menu.getAttribute('data-category-id');
+            const currentItem = document.getElementById('EPS_' + categoryId);
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var formData = {
+                _token: csrfToken,
+                id: categoryId,
+                type: 'down'
+
+            };
+            $.ajax({
+                url: '/reorder_EPS', // Replace with your actual controller route
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+            if (currentItem && currentItem.nextElementSibling) {
+                currentItem.parentNode.insertBefore(currentItem.nextElementSibling, currentItem);
+            }
+
+            menu.style.display = 'none'; // hide menu after action
+        });
 
         // Handle 'Create ESP' action
 
@@ -316,7 +414,7 @@
         });
         document.getElementById('createESP').addEventListener('click', function() {
             const categoryId = document.getElementById('contextMenu').getAttribute('data-category-id');
-            //alert(`Create ESP for Category ID: ${categoryId}`);
+            //alert(`Create ESP for Category ID: ${categoryId}`);   1
             const selectedCategoryInput = document.getElementById('selected_category_input');
 
             if (selectedCategoryInput) {
@@ -384,14 +482,14 @@
 
                                     if (confirm(
                                             `Are you sure you want to remove EPS "${categoryName}"?`
-                                            )) {
+                                        )) {
                                         $.ajax({
                                             url: '/deleteChildrenEPS', // Replace with your actual controller route
                                             type: 'POST',
                                             data: formData,
                                             success: function(response) {
                                                 $('#EPS_' + categoryId)
-                                            .remove();
+                                                    .remove();
                                             },
                                             error: function(xhr, status, error) {
                                                 console.error(error);

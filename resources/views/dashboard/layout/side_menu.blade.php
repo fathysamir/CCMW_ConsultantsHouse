@@ -23,6 +23,7 @@
 
 
             </li>
+            @role('Super Admin')
             <li class="nav-item dropdown">
                 <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-settings fe-16"></i>
@@ -60,6 +61,7 @@
 
                 </ul>
             </li>
+            @endrole
 
 
         </ul>

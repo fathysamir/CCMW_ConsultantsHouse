@@ -36,15 +36,22 @@ class RolesSeeder extends Seeder
         $permissions = Permission::pluck('id', 'id')->all();
 
         $admin_role->syncPermissions($permissions);
+        do {
+            $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        } while (User::where('code', $code)->exists());
         $admin1 = User::create([
             'name' => 'Super Admin',
+            'code'=> $code,
             'email' => 'superadmin@ccmw.app',
             'password' => Hash::make('CMWAdminCMW'),
            
         ]);
-        
+        do {
+            $code2 = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        } while (User::where('code', $code2)->exists());
         $admin2 = User::create([
             'name' => 'Super Admin 2',
+            'code'=> $code2,
             'email' => 'superadmin2@ccmw.app',
             'password' => Hash::make('CMWAdminCMW'),
            

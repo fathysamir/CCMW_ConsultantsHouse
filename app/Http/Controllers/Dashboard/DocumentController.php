@@ -23,8 +23,9 @@ class DocumentController extends ApiController
 {
     public function create_single_doc_view()
     {
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
+       
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');
@@ -129,8 +130,8 @@ class DocumentController extends ApiController
     {
         session()->forget('current_file_doc');
         session()->forget('current_view');
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $all_documents = Document::where('project_id', auth()->user()->current_project_id)->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         $stake_holders = $project->stakeHolders;
@@ -141,8 +142,8 @@ class DocumentController extends ApiController
 
     public function edit_document($id)
     {
-        $users = User::all();
         $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         $document = Document::where('slug', $id)->first();
