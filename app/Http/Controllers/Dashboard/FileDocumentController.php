@@ -26,11 +26,13 @@ class FileDocumentController extends ApiController
     public function index($id){
         $file=ProjectFile::where('slug',$id)->first();
         $documents = FileDocument::with('document')
-        ->where('file_id', $file->id)
-        ->get()
-        ->sortBy(function ($item) {
-            return $item->document->start_date; // nulls go to end
-        })->values();
+    ->where('file_id', $file->id)
+    ->get()
+    ->sortBy([
+        fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
+        fn ($a, $b) => $a->sn <=> $b->sn,
+    ])
+    ->values();
         $specific_file_doc= session('specific_file_doc');
         session()->forget('specific_file_doc');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
@@ -700,5 +702,9 @@ class FileDocumentController extends ApiController
     }
     public function download_doc(){
             
+    }
+
+    public function copy_doc_to_another_file(){
+
     }
 }

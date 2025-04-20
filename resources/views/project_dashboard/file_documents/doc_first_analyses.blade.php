@@ -142,7 +142,7 @@
                                 <div class="form-group mb-3">
                                     <label for="sn">SN.</label>
                                     <input type="number" name="sn" id="sn" class="form-control"
-                                        placeholder="Enter Serial Number" required value="{{ old('sn', $doc->sn) }}">
+                                        placeholder="Enter Serial Number" value="{{ old('sn', $doc->sn) }}">
                                 </div>
                             </div>
 
