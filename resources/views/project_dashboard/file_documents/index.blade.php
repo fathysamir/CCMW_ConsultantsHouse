@@ -397,7 +397,7 @@
                             <tbody>
 
                                 @foreach ($documents as $document)
-                                    <tr @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
+                                    <tr id="dddd_{{ $document->id }}" @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -607,6 +607,9 @@
                         if(response.status == 'error'){
                             alert("⚠️ " + response.message);
                         }else{
+                            if(actionType=='move'){
+                                document.getElementById('dddd_'+documentId)?.remove();
+                            }
                             alert(response.message); // Show success message
 
                         }
