@@ -36,6 +36,9 @@ class UploadGroupDocumentController extends ApiController
     }
     public function upload_multi_files(Request $request){
         $uploadedFiles = [];
+        ini_set('upload_max_filesize', '100M');
+        ini_set('post_max_size', '150M');
+        ini_set('max_file_uploads', '100');
         foreach ($request->file('files') as $file) {
             $name = $file->getClientOriginalName();
             $size = $file->getSize();
