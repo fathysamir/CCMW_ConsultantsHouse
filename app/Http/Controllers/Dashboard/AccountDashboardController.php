@@ -279,13 +279,16 @@ class AccountDashboardController extends ApiController
         }else{
             AccountUser::where('user_id',$user->id)->where('account_id',auth()->user()->current_account_id)->update(['role'=>$request->role,'permissions'=>json_encode([])]);
         }
-        $IDs=$user->assign_projects()->where('projects.account_id', auth()->user()->current_account_id)->pluck('projects.id')->toArray();
-        //dd($IDs);
-        foreach($request->projects_permissions as $key => $project_permissions){
-            ProjectUser::where('user_id',$user->id)->where('project_id',$key)->update(['permissions'=>json_encode($project_permissions)]);
-            $IDs = array_values(array_diff($IDs, [$key]));
+        if(count($request->projects_permissions)>0){
+            $IDs=$user->assign_projects()->where('projects.account_id', auth()->user()->current_account_id)->pluck('projects.id')->toArray();
+            //dd($IDs);
+            foreach($request->projects_permissions as $key => $project_permissions){
+                ProjectUser::where('user_id',$user->id)->where('project_id',$key)->update(['permissions'=>json_encode($project_permissions)]);
+                $IDs = array_values(array_diff($IDs, [$key]));
+            }
+            ProjectUser::where('user_id',$user->id)->whereIn('project_id',$IDs)->update(['permissions'=>json_encode([])]);
         }
-        ProjectUser::where('user_id',$user->id)->whereIn('project_id',$IDs)->update(['permissions'=>json_encode([])]);
+        
         return redirect('/account/users')->with('success', 'User Permissions Updated successfully.');
     }
     public function delete_user($id)

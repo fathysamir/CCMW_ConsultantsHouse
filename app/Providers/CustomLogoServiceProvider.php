@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\ProjectFolder;
 use App\Models\AccountUser;
 use App\Models\ProjectUser;
+use Illuminate\Support\Facades\Route;
 class CustomLogoServiceProvider extends ServiceProvider
 {
     public function register()
@@ -48,7 +49,19 @@ class CustomLogoServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('*', function ($view) {
+            $currentRoute = Route::currentRouteName();
+        
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
+            }
+        
             $user = auth()->user();
+        
+            // Avoid running for guest users
+            if (!$user) {
+                return;
+            }
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)
                 ->where('project_id', $user->current_project_id)
                 ->get();
@@ -57,29 +70,48 @@ class CustomLogoServiceProvider extends ServiceProvider
         });
         
         view()->composer('*', function ($view) {
-            $user=auth()->user();
-            $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
-            if($AccountUser){
-                $permissions=$AccountUser->permissions;
-                $Account_Permissions=json_decode($permissions);
-            }else{
-                $Account_Permissions=null;
+            $currentRoute = Route::currentRouteName();
+        
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
             }
+        
+            $user = auth()->user();
+        
+            // Avoid running for guest users
+            if (!$user) {
+                return;
+            }
+            $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
+            
+            $Account_Permissions = $AccountUser ? json_decode($AccountUser->permissions) : null;
             
             
             $view->with('Account_Permissions', $Account_Permissions);
         });
         view()->composer('*', function ($view) {
-            $user=auth()->user();
-            $ProjectUser=ProjectUser::where('project_id',$user->current_project_id)->where('user_id',$user->id)->first();
-            if($ProjectUser){
-                $permissions=$ProjectUser->permissions;
-                $Project_Permissions=json_decode($permissions);
-            }else{
-                $Project_Permissions=null;
+            // Get current route name
+            $currentRoute = Route::currentRouteName();
+        
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
             }
-            
-            
+        
+            $user = auth()->user();
+        
+            // Avoid running for guest users
+            if (!$user) {
+                return;
+            }
+        
+            $ProjectUser = ProjectUser::where('project_id', $user->current_project_id)
+                ->where('user_id', $user->id)
+                ->first();
+        
+            $Project_Permissions = $ProjectUser ? json_decode($ProjectUser->permissions) : null;
+        
             $view->with('Project_Permissions', $Project_Permissions);
         });
     }
