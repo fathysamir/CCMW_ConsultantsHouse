@@ -25,9 +25,8 @@ class FileController extends ApiController
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
         $all_files = ProjectFile::where('folder_id',$folder->id)->get(); 
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
 
-        return view('project_dashboard.project_files.index', compact('all_files','folders','folder','users'));
+        return view('project_dashboard.project_files.index', compact('all_files','folder','users'));
     }
 
     public function create(){

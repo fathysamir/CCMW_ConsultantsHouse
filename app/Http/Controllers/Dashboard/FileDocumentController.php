@@ -33,7 +33,9 @@ class FileDocumentController extends ApiController
         })->values();
         $specific_file_doc= session('specific_file_doc');
         session()->forget('specific_file_doc');
-        return view('project_dashboard.file_documents.index',compact('documents','file','specific_file_doc'));
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+
+        return view('project_dashboard.file_documents.index',compact('documents','folders','file','specific_file_doc'));
     }
 
     public function exportWordClaimDocs($id){
