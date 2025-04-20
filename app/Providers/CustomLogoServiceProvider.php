@@ -18,7 +18,7 @@ class CustomLogoServiceProvider extends ServiceProvider
             return $Folders;
         });
 
-        $this->app->bind('Account_Permissions', function () {
+        $this->app->bind('Acco_Permissions', function () {
             $user=auth()->user();
             $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
             if($AccountUser){
