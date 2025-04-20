@@ -52,7 +52,7 @@
                         <label for="file">Upload PDF Files <span style="color: red">*</span></label>
                         <div class="card shadow mb-4">
                             <div class="card-header">
-                                <strong>Uppy</strong>
+                                <strong>Upload PDF Files</strong>
                             </div>
                             <div class="card-body">
                                 <div id="drag-drop-area"></div>
@@ -507,8 +507,8 @@
                 var uppy = Uppy.Core({
                     restrictions: {
                         allowedFileTypes: ['application/pdf'],
-                        maxNumberOfFiles: 20, // Optional: limit number of files
-                        maxFileSize: 10 * 1024 * 1024 // Optional: 10MB limit
+                        maxNumberOfFiles: 50, // Optional: limit number of files
+                        // maxFileSize: 50 * 1024 * 1024 // Optional: 10MB limit
                     }
                 }).use(Uppy.Dashboard, {
                     inline: true,
