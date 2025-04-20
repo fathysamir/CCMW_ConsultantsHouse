@@ -51,10 +51,10 @@
                                 </div>
                                 <div class="card-text my-2">
                                     <strong class="card-title my-0">{{ $account->name }}</strong>
-                                    <p class="small text-muted mb-0">{{ $account->email }}</p>
+                                    {{-- <p class="small text-muted mb-0">{{ $account->email }}</p>
                                     <p class="small"><span
                                             class="badge badge-light text-muted">{{ $account->country_code . $account->phone_no }}</span>
-                                    </p>
+                                    </p> --}}
                                 </div>
                             </div> <!-- ./card-text -->
                         </a>
