@@ -160,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                    max-height:650px;
-                                                                                                                                } */
+                                                                                                                                        max-height:650px;
+                                                                                                                                    } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -468,6 +468,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openDocumentPdf(url) {
+            window.open(url, '_blank');
+        }
+    </script>
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
