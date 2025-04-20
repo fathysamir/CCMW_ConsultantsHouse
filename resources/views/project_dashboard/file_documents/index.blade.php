@@ -790,8 +790,8 @@
             autoWidth: true,
             responsive: true,
             "lengthMenu": [
-                [16, 32, 64, -1],
-                [16, 32, 64, "All"]
+                [-1,16, 32, 64],
+                ["All",16, 32, 64]
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
