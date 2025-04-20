@@ -160,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                        max-height:650px;
-                                                                                                                                    } */
+                                                                                                                                            max-height:650px;
+                                                                                                                                        } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -397,7 +397,8 @@
                             <tbody>
 
                                 @foreach ($documents as $document)
-                                    <tr id="dddd_{{ $document->id }}" @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
+                                    <tr id="dddd_{{ $document->id }}"
+                                        @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -451,12 +452,19 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                data-document-id="{{ $document->id }}" data-action-type="copy">Copy To another File</a>
+                                                    data-document-id="{{ $document->id }}" data-action-type="copy">Copy
+                                                    To another File</a>
                                                 <a class="dropdown-item move-to-file-btn" href="javascript:void(0);"
-                                                data-document-id="{{ $document->id }}" data-action-type="move">Move To another File</a>
-                                                <a class="dropdown-item" href="{{ route('download.document', $document->id) }}">
+                                                    data-document-id="{{ $document->id }}" data-action-type="move">Move
+                                                    To another File</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('download.document', $document->id) }}">
                                                     Download Document
                                                 </a>
+                                                <a class="dropdown-item " href="javascript:void(0);"
+                                                    data-document-id="{{ $document->document->slug }}">Check other
+                                                    assignments</a>
+
                                             </div>
                                         </td>
                                     </tr>
@@ -469,45 +477,64 @@
         </div>
     </div>
     <div class="modal fade" id="copyToModal" tabindex="-1" role="dialog" aria-labelledby="copyToModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="copyToModalLabel">Copy Document To another File</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="assigneToForm">
-                    @csrf
-                    <input type="hidden" id="documentId_" name="document_id">
-                    <input type="hidden" id="action_type" name="action_type">
-                    <div class="form-group">
-                        <label for="folder_id">Select Folder</label>
-                        <select class="form-control" id="folder_id" required>
-                            <option value="" disabled selected>Select Folder</option>
-                            @foreach ($folders as $key => $name)
-                                <option value="{{ $key }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group d-none">
-                        <label for="newFile">Select File</label>
-                        <select class="form-control" id="newFile" name="file_id">
-                            <option value="" disabled selected>Select File</option>
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="copyToModalLabel">Copy Document To another File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assigneToForm">
+                        @csrf
+                        <input type="hidden" id="documentId_" name="document_id">
+                        <input type="hidden" id="action_type" name="action_type">
+                        <div class="form-group">
+                            <label for="folder_id">Select Folder</label>
+                            <select class="form-control" id="folder_id" required>
+                                <option value="" disabled selected>Select Folder</option>
+                                @foreach ($folders as $key => $name)
+                                    <option value="{{ $key }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group d-none">
+                            <label for="newFile">Select File</label>
+                            <select class="form-control" id="newFile" name="file_id">
+                                <option value="" disabled selected>Select File</option>
 
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveCopyDoc">Save</button>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveCopyDoc">Save</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <div class="modal fade" id="CheckOtherAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="CheckOtherAssignmentsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="CheckOtherAssignmentModalLabel">Copy Document To another File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -604,14 +631,14 @@
                         _token: $('input[name="_token"]').val(), // CSRF token
                         document_id: documentId,
                         file_id: fileId,
-                        actionType:actionType
+                        actionType: actionType
                     },
                     success: function(response) {
-                        if(response.status == 'error'){
+                        if (response.status == 'error') {
                             alert("⚠️ " + response.message);
-                        }else{
-                            if(actionType=='move'){
-                                document.getElementById('dddd_'+documentId)?.remove();
+                        } else {
+                            if (actionType == 'move') {
+                                document.getElementById('dddd_' + documentId)?.remove();
                             }
                             alert(response.message); // Show success message
 
@@ -930,8 +957,8 @@
             autoWidth: true,
             responsive: true,
             "lengthMenu": [
-                [-1,16, 32, 64],
-                ["All",16, 32, 64]
+                [-1, 16, 32, 64],
+                ["All", 16, 32, 64]
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
