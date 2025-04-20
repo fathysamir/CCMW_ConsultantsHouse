@@ -42,9 +42,12 @@ class ProjectController extends ApiController
                 $projectsId=$user->assign_projects()->pluck('projects.id')->toArray();
                 
                 $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
-                $parentCategoryIds = collect($categoriesId)->map(function ($cat) {
+                $subCategories = Category::whereIn('id', $categoriesId)->get();
+
+                // Get top-level parents
+                $parentCategoryIds = $subCategories->map(function ($cat) {
                     return $cat->getRootCategory()->id;
-                })->unique()->values()->toArray();
+                })->unique()->toArray();
                 $EPS = Category::whereIn('id',$parentCategoryIds)->where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
             }
            
