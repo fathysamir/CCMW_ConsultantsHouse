@@ -47,7 +47,7 @@ class CustomLogoServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        view()->composer('project_dashboard.layout.side_menu', function ($view) {
+        view()->composer('*', function ($view) {
             $user = auth()->user();
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)
                 ->where('project_id', $user->current_project_id)
@@ -55,15 +55,8 @@ class CustomLogoServiceProvider extends ServiceProvider
             
             $view->with('Folders', $Folders);
         });
-        view()->composer('project_dashboard.layout.header', function ($view) {
-            $user = auth()->user();
-            $Folders = ProjectFolder::where('account_id', $user->current_account_id)
-                ->where('project_id', $user->current_project_id)
-                ->get();
-            
-            $view->with('Folders', $Folders);
-        });
-        view()->composer('account_dashboard.layout.side_menu', function ($view) {
+        
+        view()->composer('*', function ($view) {
             $user=auth()->user();
             $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
             if($AccountUser){
@@ -76,7 +69,7 @@ class CustomLogoServiceProvider extends ServiceProvider
             
             $view->with('Account_Permissions', $Account_Permissions);
         });
-        view()->composer('project_dashboard.layout.side_menu', function ($view) {
+        view()->composer('*', function ($view) {
             $user=auth()->user();
             $ProjectUser=ProjectUser::where('project_id',$user->current_project_id)->where('user_id',$user->id)->first();
             if($ProjectUser){
