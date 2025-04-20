@@ -265,7 +265,7 @@
                 <div class="form-group">
                     <label for="inputPassword" class="sr-only">Password</label>
                    
-                    <input pattern="[A-Za-z0-9]{5,50}" type="password" id="inputPassword" name="password"
+                    <input pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{5,50}" type="password" id="inputPassword" name="password"
                         class="form-control form-control-lg" placeholder="Password" minlength="5" maxlength="50"
                         required>
                     @if ($errors->has('password'))
@@ -275,7 +275,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
-                    <input pattern="[A-Za-z0-9]{5,50}" type="password" id="inputConfirmPassword"
+                    <input pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{5,50}" type="password" id="inputConfirmPassword"
                         name="password_confirmation" class="form-control form-control-lg"
                         placeholder="Confirm Password" minlength="5" maxlength="50" required>
                     @if ($errors->has('password_confirmation'))
