@@ -45,7 +45,7 @@
                             <div class="card-body text-center">
                                 <div class="avatar avatar-lg mt-4">
 
-                                    <img @if (getFirstMediaUrl($account, $account->logoCollection) != null) class="avatar-img " style="width: 100% !important; height:64px !important;" src="{{ getFirstMediaUrl($account, $account->logoCollection) }}" @else src="{{ asset('dashboard/assets/images/images.png') }}" class="avatar-img rounded-circle" style="width: 78px !important; height:65px !important;" @endif
+                                    <img @if (getFirstMediaUrl($account, $account->logoCollection) != null) class="avatar-img " style="width: 100% !important; height:85px !important;" src="{{ getFirstMediaUrl($account, $account->logoCollection) }}" @else src="{{ asset('dashboard/assets/images/images.png') }}" class="avatar-img rounded-circle" style="width: 78px !important; height:65px !important;" @endif
                                         alt="..." > 
                                         {{-- rounded-circle --}}
 
@@ -66,7 +66,7 @@
                                     <small>
                                         <span
                                             class="dot dot-lg @if ($account->active == '1') bg-success @else bg-secondary @endif mr-1"></span>
-                                        Activation </small>
+                                        Active </small>
                                 </div>
                                 @role('Super Admin')
                                     <div class="col-auto">
