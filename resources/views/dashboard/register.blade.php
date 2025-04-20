@@ -265,7 +265,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputPassword" class="sr-only">Password</label>
-                    <input pattern="[A-Za-z0-9]{8}" title="Password must be exactly 8 digits" type="password"
+                    <input pattern="[A-Za-z0-9]{50}" title="Password must be exactly 8 digits" type="password"
                         id="inputPassword" name="password" class="form-control form-control-lg"
                         placeholder="Password" required>
                     @if ($errors->has('password'))
@@ -275,7 +275,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
-                    <input pattern="[A-Za-z0-9]{8}" type="password" id="inputConfirmPassword"
+                    <input pattern="[A-Za-z0-9]{50}" type="password" id="inputConfirmPassword"
                         name="password_confirmation" class="form-control form-control-lg"
                         placeholder="Confirm Password" required>
                     @if ($errors->has('password_confirmation'))
