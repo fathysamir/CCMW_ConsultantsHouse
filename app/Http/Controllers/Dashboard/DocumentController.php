@@ -378,4 +378,17 @@ class DocumentController extends ApiController
         return response()->json(['success' => true]);
     }
 
+    public function downloadDocument($id)
+    {
+        $document = FileDocument::findOrFail($id); // or however you get your document
+        $filePath = public_path($document->document->storageFile->path);
+        $fileName = $document->document->subject . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $fileName);
+        }
+
+        return redirect()->back()->with('error', 'File not found.');
+    }
+
 }

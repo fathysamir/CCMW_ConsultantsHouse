@@ -454,8 +454,9 @@
                                                 data-document-id="{{ $document->id }}" data-action-type="copy">Copy To another File</a>
                                                 <a class="dropdown-item move-to-file-btn" href="javascript:void(0);"
                                                 data-document-id="{{ $document->id }}" data-action-type="move">Move To another File</a>
-                                                <a class="dropdown-item" href="{{ asset($document->document->storageFile->path) }}" download
-                                                >Download Document</a>
+                                                <a class="dropdown-item" href="{{ route('download.document', $document->id) }}">
+                                                    Download Document
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
