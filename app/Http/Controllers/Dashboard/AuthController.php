@@ -90,7 +90,7 @@ class AuthController extends Controller
                 'max:255'
                 
             ],
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:5|confirmed',
             'phone' => [
                 'nullable',
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
