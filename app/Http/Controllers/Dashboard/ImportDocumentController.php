@@ -17,6 +17,7 @@ use App\Models\StorageFile;
 use App\Models\Project;
 use App\Models\StakeHolder;
 use App\Models\FileDocument;
+use DateTime;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -199,7 +200,20 @@ class ImportDocumentController extends ApiController
             
         ]);
     }
+    public function formate_date($date , $formate='d.M.Y'){
+       
+        $date = $date;
+        $cleanedDate = preg_replace('/[^a-zA-Z0-9]/', '.', $date); // Replace any non-alphanumeric character with space
+        // Create DateTime object from the original format (y/m/d)
+        $dateTime = DateTime::createFromFormat($formate, $cleanedDate);
 
+        if ($dateTime) {
+            $formattedDate2 = $dateTime->format('Y-m-d');
+            return $formattedDate2;
+        } else {
+            return null;
+        }
+    }
     public function start_import(Request $request){
        
         $sheets=session('extractedDataExcelFile');
@@ -271,7 +285,8 @@ class ImportDocumentController extends ApiController
                     $unImportedRows['Row '. $index+2][]='"' . $request->start_date . '" is Empty';
                     $success=false;
                 }else{
-                    $start_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->start_date][$index]));
+                    //$start_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->start_date][$index]));
+                    $start_date=$this->formate_date($sheets[$request->sheet][$request->start_date][$index],'d.M.Y');
                 }
             }
             
@@ -351,7 +366,9 @@ class ImportDocumentController extends ApiController
                     if($sheets[$request->sheet][$request->end_date][$index]==null){
                         $importedRows['Row '. $index+2][]='"' . $request->end_date . '" is Empty';
                     }else{
-                        $return_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->end_date][$index]));
+                       // $return_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->end_date][$index]));
+                        $return_date=$this->formate_date($sheets[$request->sheet][$request->end_date][$index],'d.M.Y');
+
                     }
                 }
                
