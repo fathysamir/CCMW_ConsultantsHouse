@@ -279,7 +279,7 @@ class AccountDashboardController extends ApiController
         }else{
             AccountUser::where('user_id',$user->id)->where('account_id',auth()->user()->current_account_id)->update(['role'=>$request->role,'permissions'=>json_encode([])]);
         }
-        if(count($request->projects_permissions)>0){
+        if($request->projects_permissions && count($request->projects_permissions)>0){
             $IDs=$user->assign_projects()->where('projects.account_id', auth()->user()->current_account_id)->pluck('projects.id')->toArray();
             //dd($IDs);
             foreach($request->projects_permissions as $key => $project_permissions){
