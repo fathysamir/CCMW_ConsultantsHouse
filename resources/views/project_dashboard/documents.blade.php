@@ -213,7 +213,7 @@
 
                                         <td>{{ $document->docType->name }}</td>
                                         <td ondblclick="openDocumentPdf('{{ asset($document->storageFile->path) }}')"
-                                            style="cursor: pointer;>{{ $document->reference }}</td>
+                                            style="cursor: pointer;">{{ $document->reference }}</td>
                                         <td>{{ $document->subject }}</td>
                                         <td>{{ date('d-M-Y', strtotime($document->start_date)) }}</td>
                                         <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->narrative : '_' }}
