@@ -45,8 +45,9 @@
                             <div class="card-body text-center">
                                 <div class="avatar avatar-lg mt-4">
 
-                                    <img @if (getFirstMediaUrl($account, $account->logoCollection) != null) style="width: 120px !important; height:64px !important;" src="{{ getFirstMediaUrl($account, $account->logoCollection) }}" @else src="{{ asset('dashboard/assets/images/images.png') }}" style="width: 78px !important; height:65px !important;" @endif
-                                        alt="..." class="avatar-img rounded-circle">
+                                    <img @if (getFirstMediaUrl($account, $account->logoCollection) != null) class="avatar-img " style="width: 200px !important; height:64px !important;" src="{{ getFirstMediaUrl($account, $account->logoCollection) }}" @else src="{{ asset('dashboard/assets/images/images.png') }}" class="avatar-img rounded-circle" style="width: 78px !important; height:65px !important;" @endif
+                                        alt="..." > 
+                                        {{-- rounded-circle --}}
 
                                 </div>
                                 <div class="card-text my-2">
