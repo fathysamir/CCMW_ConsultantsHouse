@@ -451,7 +451,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                data-document-id="{{ $document->id }}">Copy To Another File</a>
+                                                data-document-id="{{ $document->id }}">Copy To another File</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -463,7 +463,45 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="copyToModal" tabindex="-1" role="dialog" aria-labelledby="copyToModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyToModalLabel">Copy Document To another File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="assigneToForm">
+                    @csrf
+                    <input type="hidden" id="documentId_" name="document_id">
+                    <div class="form-group">
+                        <label for="folder_id">Select Folder</label>
+                        <select class="form-control" id="folder_id" required>
+                            <option value="" disabled selected>Select Folder</option>
+                            @foreach ($folders as $key => $name)
+                                <option value="{{ $key }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group d-none">
+                        <label for="newFile">Select File</label>
+                        <select class="form-control" id="newFile" name="file_id">
+                            <option value="" disabled selected>Select File</option>
 
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveCopyDoc">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -484,6 +522,78 @@
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
             $("#check").removeClass("sorting_asc");
+
+            $('.copy-to-file-btn').on('click', function() {
+                var documentId_ = $(this).data('document-id');
+                $('#documentId_').val(documentId_);
+                $('#folder_id').val('');
+                let fileDropdown = $('#newFile');
+                fileDropdown.closest('.form-group').addClass(
+                    'd-none');
+                $('#copyToModal').modal('show'); // Show the modal
+            });
+
+            $('#folder_id').change(function() {
+                let folderId = $(this).val();
+
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                        folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.form-group').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.form-group').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
+
+            $('#saveCopyDoc').click(function() {
+                let documentId = $('#documentId_').val();
+                let fileId = $('#newFile').val();
+
+                if (!fileId) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                // $.ajax({
+                //     url: '/project/document/assign-document', // Adjust the route to your API endpoint
+                //     type: 'POST',
+                //     data: {
+                //         _token: $('input[name="_token"]').val(), // CSRF token
+                //         document_id: documentId,
+                //         file_id: fileId
+                //     },
+                //     success: function(response) {
+                //         alert(response.message); // Show success message
+                //         $('#assigneToModal').modal('hide'); // Hide modal
+                //     },
+                //     error: function() {
+                //         alert('Failed to assign document. Please try again.');
+                //     }
+                // });
+            });
+
             const parentDiv = document.getElementById('dataTable-1_wrapper');
 
             if (parentDiv) {
