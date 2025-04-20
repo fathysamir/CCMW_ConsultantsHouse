@@ -269,7 +269,7 @@
                     <input type="password" id="inputPassword" name="password" class="form-control form-control-lg"
                         placeholder="Password" minlength="5" maxlength="50"
                         title="Password must be 5-50 characters long and can include letters, numbers, and symbols."
-                        required pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{5,50}">
+                        required pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]{5,50}">
                     @if ($errors->has('password'))
                         <p class="text-error more-info-err" style="color: red;">
                             {{ $errors->first('password') }}</p>
@@ -281,7 +281,7 @@
                         class="form-control form-control-lg" placeholder="Confirm Password" minlength="5"
                         maxlength="50"
                         title="Password must be 5-50 characters long and can include letters, numbers, and symbols."
-                        required pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]{5,50}">
+                        required pattern="[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]{5,50}">
                     @if ($errors->has('password_confirmation'))
                         <p class="text-error more-info-err" style="color: red;">
                             {{ $errors->first('password_confirmation') }}</p>
