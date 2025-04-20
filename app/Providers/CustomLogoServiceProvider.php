@@ -23,12 +23,12 @@ class CustomLogoServiceProvider extends ServiceProvider
             $AccountUser=AccountUser::where('account_id',$user->current_account_id)->where('user_id',$user->id)->first();
             if($AccountUser){
                 $permissions=$AccountUser->permissions;
-                $Account_Permissions=json_decode($permissions);
+                $Acco_Permissions=json_decode($permissions);
             }else{
-                $Account_Permissions=null;
+                $Acco_Permissions=null;
             }
             
-            return $Account_Permissions;
+            return $Acco_Permissions;
         });
 
         $this->app->bind('Project_Permissions', function () {
@@ -36,12 +36,12 @@ class CustomLogoServiceProvider extends ServiceProvider
             $ProjectUser=ProjectUser::where('project_id',$user->current_project_id)->where('user_id',$user->id)->first();
             if($ProjectUser){
                 $permissions=$ProjectUser->permissions;
-                $Project_Permissions=json_decode($permissions);
+                $Pro_Permissions=json_decode($permissions);
             }else{
-                $Project_Permissions=null;
+                $Pro_Permissions=null;
             }
             
-            return $Project_Permissions;
+            return $Pro_Permissions;
         });
     }
 

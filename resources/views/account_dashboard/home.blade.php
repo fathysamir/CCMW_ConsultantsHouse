@@ -25,13 +25,13 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $account->name }}</h2>
         </div>
-        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('send_invitations', $Account_Permissions ?? []))
+        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('send_invitations', $Acco_Permissions ?? []))
             <div class="col-auto" style="padding-right: 0px;">
                 <button type="button" data-toggle="modal" data-target="#sendInvitationModal"
                     class="btn mb-2 btn-outline-warning"id="btn-outline-warning">Send Invitation</button>
             </div>
         @endif
-        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_projects', $Account_Permissions ?? []))
+        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('create_projects', $Acco_Permissions ?? []))
             <div class="col-auto">
                 <a type="button" href="{{ route('account.create_project_view') }}"
                     class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Project</a>
@@ -66,7 +66,7 @@
                 </div>
             </div>
         </a>
-        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_users', $Account_Permissions ?? []))
+        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_users', $Acco_Permissions ?? []))
         <a href="{{ route('account.users') }}"class="col-md-3" style="text-decoration: none;">
             <div class="col-md-12">
                 <div class="card shadow mb-4"style="border-radius:15px;height: 80%;">
@@ -82,7 +82,7 @@
             </div>
         </a>
         @endif
-        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_eps', $Account_Permissions ?? []))
+        @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_eps', $Acco_Permissions ?? []))
             <a href="{{ route('account.EPS') }}"class="col-md-3" style="text-decoration: none;">
                 <div class="col-md-12">
                     <div class="card shadow mb-4"style="border-radius:15px;height: 80%;">
