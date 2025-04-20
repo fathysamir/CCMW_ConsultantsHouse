@@ -39,7 +39,7 @@ class ProjectController extends ApiController
             if($hasRole){
                 $EPS = Category::where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
             }else{
-                $projectsId=$user->assign_projects->pluck('id')->toArray();
+                $projectsId=$user->assign_projects()->pluck('projects.id')->toArray();
                 $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
                 $EPS = Category::whereIn('id',$categoriesId)->where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
             }
