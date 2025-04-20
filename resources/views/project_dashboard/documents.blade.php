@@ -212,7 +212,8 @@
                                         </td>
 
                                         <td>{{ $document->docType->name }}</td>
-                                        <td>{{ $document->reference }}</td>
+                                        <td ondblclick="openDocumentPdf('{{ asset($document->storageFile->path) }}')"
+                                            style="cursor: pointer;>{{ $document->reference }}</td>
                                         <td>{{ $document->subject }}</td>
                                         <td>{{ date('d-M-Y', strtotime($document->start_date)) }}</td>
                                         <td>{{ $document->fromStakeHolder ? $document->fromStakeHolder->narrative : '_' }}
@@ -489,6 +490,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openDocumentPdf(url) {
+            window.open(url, '_blank');
+        }
+    </script>
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
