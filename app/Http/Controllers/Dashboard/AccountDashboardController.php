@@ -294,8 +294,8 @@ class AccountDashboardController extends ApiController
     public function delete_user($id)
     {
         $user=User::where('code',$id)->first();
-        ProjectUser::where('user_id', $user->id)->where('account_id',auth()->user()->id)->delete();
-        AccountUser::where('user_id', $user->id)->where('account_id',auth()->user()->id)->delete();
+        ProjectUser::where('user_id', $user->id)->where('account_id',auth()->user()->current_account_id)->delete();
+        AccountUser::where('user_id', $user->id)->where('account_id',auth()->user()->current_account_id)->delete();
         
         return redirect('/account/users')->with('success', 'User deleted from account successfully.');
 
