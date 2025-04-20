@@ -704,7 +704,52 @@ class FileDocumentController extends ApiController
             
     }
 
-    public function copy_doc_to_another_file(){
+    public function copy_move_doc_to_another_file(Request $request){
+        $file_doc=FileDocument::findOrFail($request->document_id);
+        if($request->actionType=='copy'){
+            $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+            if (!$fileDoc) {
+                $doc=FileDocument::create(['user_id' => auth()->user()->id,
+                                      'file_id' => $request->file_id,
+                                      'narrative'  => $file_doc->narrative,
+                                      'notes1'     => $file_doc->notes1,
+                                      'notes2'     => $file_doc->notes2,
+                                      'sn'         => $file_doc->sn,
+                                      'forClaim'   => $file_doc->forClaim ,
+                                      'forChart'   => $file_doc->forChart ,
+                                      'forLetter'  => $file_doc->forLetter ,
+                                      'document_id' => $file_doc->document_id]);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Document copied To Selected File Successfully.',
+                   // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+                ]);
+            }else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Document is existed in selected file.',
+                   // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+                ]);
+            }
+        }elseif($request->actionType=='move'){
+            $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+            $currentFile=$file_doc->file->slug;
+            if (!$fileDoc) {
+                $file_doc->file_id=$request->file_id;
+                $file_doc->save();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Document Moved To Selected File Successfully.',
+                    //'redirect' => url('/project/file/' . $currentFile . '/documents')
+                ]);
 
+            }else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Document is existed in selected file.',
+                    //'redirect' => url('/project/file/' . $currentFile . '/documents')
+                ]);
+            }
+        }
     }
 }

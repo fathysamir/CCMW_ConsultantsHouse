@@ -451,7 +451,9 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                data-document-id="{{ $document->id }}">Copy To another File</a>
+                                                data-document-id="{{ $document->id }}" data-action-type="copy">Copy To another File</a>
+                                                <a class="dropdown-item move-to-file-btn" href="javascript:void(0);"
+                                                data-document-id="{{ $document->id }}" data-action-type="move">Move To another File</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -477,6 +479,7 @@
                 <form id="assigneToForm">
                     @csrf
                     <input type="hidden" id="documentId_" name="document_id">
+                    <input type="hidden" id="action_type" name="action_type">
                     <div class="form-group">
                         <label for="folder_id">Select Folder</label>
                         <select class="form-control" id="folder_id" required>
@@ -525,7 +528,21 @@
 
             $('.copy-to-file-btn').on('click', function() {
                 var documentId_ = $(this).data('document-id');
+                var action_type = $(this).data('action-type');
                 $('#documentId_').val(documentId_);
+                $('#action_type').val(action_type);
+                $('#folder_id').val('');
+                let fileDropdown = $('#newFile');
+                fileDropdown.closest('.form-group').addClass(
+                    'd-none');
+                $('#copyToModal').modal('show'); // Show the modal
+            });
+
+            $('.move-to-file-btn').on('click', function() {
+                var documentId_ = $(this).data('document-id');
+                var action_type = $(this).data('action-type');
+                $('#documentId_').val(documentId_);
+                $('#action_type').val(action_type);
                 $('#folder_id').val('');
                 let fileDropdown = $('#newFile');
                 fileDropdown.closest('.form-group').addClass(
@@ -570,28 +587,35 @@
             $('#saveCopyDoc').click(function() {
                 let documentId = $('#documentId_').val();
                 let fileId = $('#newFile').val();
+                let actionType = $('#action_type').val();
 
                 if (!fileId) {
                     alert('Please select a file.');
                     return;
                 }
 
-                // $.ajax({
-                //     url: '/project/document/assign-document', // Adjust the route to your API endpoint
-                //     type: 'POST',
-                //     data: {
-                //         _token: $('input[name="_token"]').val(), // CSRF token
-                //         document_id: documentId,
-                //         file_id: fileId
-                //     },
-                //     success: function(response) {
-                //         alert(response.message); // Show success message
-                //         $('#assigneToModal').modal('hide'); // Hide modal
-                //     },
-                //     error: function() {
-                //         alert('Failed to assign document. Please try again.');
-                //     }
-                // });
+                $.ajax({
+                    url: '/project/copy_move_doc_to_another_file', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_id: documentId,
+                        file_id: fileId,
+                        actionType:actionType
+                    },
+                    success: function(response) {
+                        if(response.status == 'error'){
+                            alert("⚠️ " + response.message);
+                        }else{
+                            alert(response.message); // Show success message
+
+                        }
+                        $('#copyToModal').modal('hide');
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
             });
 
             const parentDiv = document.getElementById('dataTable-1_wrapper');

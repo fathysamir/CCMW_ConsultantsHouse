@@ -202,6 +202,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/file-document-first-analyses/store/{id}', [FileDocumentController::class, 'store_file_document_first_analyses'])->name('project.file-document-first-analyses.store');
     Route::post('/project/upload-editor-image', [FileDocumentController::class, 'upload_editor_image'])->name('upload_editor_image');
     Route::get('/export-word-claim-docs/{id}', [FileDocumentController::class, 'exportWordClaimDocs']);
+    Route::post('/project/copy_move_doc_to_another_file', [FileDocumentController::class, 'copy_move_doc_to_another_file'])->name('copy_move_doc_to_another_file');
+
 
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');
