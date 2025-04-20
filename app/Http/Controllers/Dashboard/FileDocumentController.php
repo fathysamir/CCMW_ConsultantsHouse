@@ -687,6 +687,11 @@ class FileDocumentController extends ApiController
         }else{
             return redirect('/project/file/' . $doc->file->slug . '/documents')->with('success', 'analyses for "' . $doc->document->subject .'" document saved successfully.');
         }
+
         
+        
+    }
+    public function download_doc(){
+            
     }
 }

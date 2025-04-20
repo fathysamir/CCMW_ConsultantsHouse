@@ -433,7 +433,8 @@
                                         </td>
                                         <td>{{ $document->document->end_date ? date('d.M.y', strtotime($document->document->end_date)) : '_' }}
                                         </td>
-                                        <td>{{ $document->document->reference }}</td>
+                                        <td ondblclick="openDocumentPdf('{{ asset($document->document->storageFile->path) }}')"
+                                            style="cursor: pointer;">{{ $document->document->reference }}</td>
                                         <td>{{ $document->document->revision }}</td>
                                         <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative : '_' }}
                                         </td>
