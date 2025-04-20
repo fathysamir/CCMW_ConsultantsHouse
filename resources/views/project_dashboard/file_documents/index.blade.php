@@ -450,7 +450,8 @@
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-
+                                                <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
+                                                data-document-id="{{ $document->id }}">Copy To Another File</a>
                                             </div>
                                         </td>
                                     </tr>

@@ -25,7 +25,12 @@ class FileDocumentController extends ApiController
 {
     public function index($id){
         $file=ProjectFile::where('slug',$id)->first();
-        $documents=FileDocument::where('file_id',$file->id)->orderBy('sn','asc')->get();
+        $documents = FileDocument::with('document')
+        ->where('file_id', $file->id)
+        ->get()
+        ->sortBy(function ($item) {
+            return $item->document->start_date; // nulls go to end
+        })->values();
         $specific_file_doc= session('specific_file_doc');
         session()->forget('specific_file_doc');
         return view('project_dashboard.file_documents.index',compact('documents','file','specific_file_doc'));
