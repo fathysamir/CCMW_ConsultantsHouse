@@ -60,7 +60,7 @@
                                     <option value="Admin Account"@if($user
                                     ->accounts()
                                     ->where('account_id', auth()->user()->current_account_id)
-                                    ->first()->pivot->role == 'Admin Account') selected @endif>Admin Account</option>
+                                    ->first()->pivot->role == 'Admin Account') selected @endif>Account Admin</option>
 
                                 </select>
                         </div>

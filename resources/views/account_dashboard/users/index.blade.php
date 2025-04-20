@@ -172,7 +172,7 @@
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
                                         <td>{{ $user->phone }}</td>
-                                        <td>{{ $user->accounts()->where('account_id', auth()->user()->current_account_id)->first()->pivot->role }}</td>
+                                        <td>{{ $user->accounts()->where('account_id', auth()->user()->current_account_id)->first()->pivot->role == 'Admin Account'? 'AccounT Admin' : $user->accounts()->where('account_id', auth()->user()->current_account_id)->first()->pivot->role }}</td>
                                         <td>
                                             <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
