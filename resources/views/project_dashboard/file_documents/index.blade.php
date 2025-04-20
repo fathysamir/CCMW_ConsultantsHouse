@@ -435,9 +435,9 @@
                                         </td>
                                         <td>{{ $document->document->reference }}</td>
                                         <td>{{ $document->document->revision }}</td>
-                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->role : '_' }}
+                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative : '_' }}
                                         </td>
-                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->role : '_' }}
+                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->narrative : '_' }}
                                         </td>
                                         <td>{{ $document->sn }}</td>
                                         <td>{{ $document->document->status }}</td>
