@@ -173,6 +173,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/change-doc-type-for-all', [DocumentController::class, 'changeDocTypeForAll'])->name('project.document.change-doc-type-for-all');
     Route::post('/project/delete-selected-docs', [DocumentController::class, 'deleteSelectedDocs'])->name('project.document.delete-selected-docs');
     Route::post('/project/assign-to-file-for-all', [DocumentController::class, 'assignToFileForAll'])->name('project.document.assign-to-file-for-all');
+    Route::get('/document/get-files/{id}', [DocumentController::class, 'get_assigned_files'])->name('get_assigned_files');
 
     Route::get('/download-document/{id}', [DocumentController::class, 'downloadDocument'])->name('download.document');
     Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc,$id) {

@@ -65,7 +65,15 @@ class AccountDashboardController extends ApiController
             }else{
                 $projectsId=auth()->user()->assign_projects->pluck('id')->toArray();
                 $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
-                $EPS = Category::whereIn('id',$categoriesId)->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+                $subCategories = Category::whereIn('id', $categoriesId)->get();
+
+                // Get top-level parents
+                $parentCategoryIds = $subCategories->map(function ($cat) {
+                    return $cat->getRootCategory()->id;
+                })->unique()->toArray();
+                $EPS = Category::whereIn('id',$parentCategoryIds)->where('account_id',  auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+
+                //$EPS = Category::whereIn('id',$categoriesId)->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
             }
            
         }

@@ -25,6 +25,6 @@
     php_value post_max_size 250M
     php_value max_file_uploads 100
     php_value memory_limit 256M
-    php_value max_execution_time 400
-    php_value max_input_time 400
+    php_value max_execution_time 500
+    php_value max_input_time 500
 </IfModule>

@@ -391,4 +391,13 @@ class DocumentController extends ApiController
         return redirect()->back()->with('error', 'File not found.');
     }
 
+    public function get_assigned_files($id){
+        $doc=Document::where('slug',$id)->first();
+        $file_ids = FileDocument::where('document_id',$doc->id)->pluck('file_id')->toArray();
+        $files=ProjectFile::whereIn('id',$file_ids)->with('folder')->get();
+        return response()->json(['files' => $files]);
+
+
+    }
+
 }
