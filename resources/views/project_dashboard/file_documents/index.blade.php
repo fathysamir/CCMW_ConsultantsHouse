@@ -563,7 +563,7 @@
                     type: 'GET',
                     success: function(response) {
                         let container = $('#container');
-                        console.log(response.files)
+                        container.empty()
                         $.each(response.files, function(index, file) {
                             container.append(
                                     `<p><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">${file.name}</span></p>`
