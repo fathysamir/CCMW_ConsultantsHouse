@@ -36,10 +36,20 @@ class Category extends Model
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
-    public function getRootCategory()
-    {
-        return $this->parent ? $this->parent->getRootCategory() : $this;
+    public function getRootCategory($stopAtParentId = null)
+{
+    $category = $this;
+
+    while ($category->parent && $category->parent_id != $stopAtParentId) {
+        $category = $category->parent;
     }
+
+    return $category;
+}
+    // public function getRootCategory()
+    // {
+    //     return $this->parent ? $this->parent->getRootCategory() : $this;
+    // }
     /**
      * Get the child accounts.
      */
