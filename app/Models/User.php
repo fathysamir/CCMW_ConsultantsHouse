@@ -28,7 +28,8 @@ class User extends Authenticatable
         'current_account_id',
         'current_project_id',
         'current_folder_id',
-        'password'
+        'password',
+        'sideBarTheme'
     ];
 
     /**

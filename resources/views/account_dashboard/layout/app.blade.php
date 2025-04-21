@@ -85,7 +85,7 @@
     </style>
 </head>
 
-<body class="vertical  light  ">
+<body class="vertical  light   @if($sideBarTheme == '0') collapsed @endif">
     <div class="wrapper">
         @include('account_dashboard.layout.header')
         @include('account_dashboard.layout.side_menu')
@@ -500,10 +500,41 @@
             const currentWidth = parseInt(logo.getAttribute('width'));
 
             if (currentWidth === 100) {
-                logo.setAttribute('width', '50'); // Decrease width
+                logo.setAttribute('width', '50');
+                $.ajax({
+                    url: '/change-sideBarTheme', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        sideBarTheme: '0',
+
+                    },
+                    success: function(response) {
+
+                    },
+                    error: function() {
+
+                    }
+                });
             } else {
                 logo.setAttribute('width', '100'); // Increase width
+                $.ajax({
+                    url: '/change-sideBarTheme', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        sideBarTheme: '1',
+
+                    },
+                    success: function(response) {
+
+                    },
+                    error: function() {
+
+                    }
+                });
             }
+
         }
     </script>
      @stack('scripts')

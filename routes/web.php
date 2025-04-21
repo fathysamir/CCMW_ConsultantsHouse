@@ -183,6 +183,13 @@ Route::group(['middleware' => ['admin']], function () {
         return redirect()->route('project.edit-document',$id);
     });
 
+    Route::get('/project/files_file/{fil}/doc/{doc}/edit/{id}', function ($fil,$doc,$id) {
+        session(['current_view' => 'file']);
+        session(['current_file2' => $fil]);
+        session(['specific_file_doc' => $doc]);
+        return redirect()->route('project.edit-document',$id);
+    });
+
     Route::get('/switch-folder/{id}', function ($id) {
         //session(['current_account_id' => $id]);
         $user=auth()->user();
@@ -222,6 +229,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/group-documents/check_test_documents', [UploadGroupDocumentController::class, 'check_test_documents'])->name('group-documents.check_test_documents');
     Route::get('/group-documents/import_group_documents', [UploadGroupDocumentController::class, 'import_group_documents'])->name('group-documents.import_group_documents');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    Route::post('/change-sideBarTheme', [AuthController::class, 'change_sideBarTheme'])->name('change_sideBarTheme');
 
     
         Route::any('/users', [UserController::class, 'index'])->name('users'); 

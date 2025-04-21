@@ -68,6 +68,24 @@ class CustomLogoServiceProvider extends ServiceProvider
             
             $view->with('Folders', $Folders);
         });
+        view()->composer('*', function ($view) {
+            $currentRoute = Route::currentRouteName();
+        
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
+            }
+        
+            $user = auth()->user();
+        
+            // Avoid running for guest users
+            if (!$user) {
+                return;
+            }
+            $sideBarTheme = $user->sideBarTheme;
+            
+            $view->with('sideBarTheme', $sideBarTheme);
+        });
         
         view()->composer('*', function ($view) {
             $currentRoute = Route::currentRouteName();

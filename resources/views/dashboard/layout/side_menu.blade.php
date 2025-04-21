@@ -6,7 +6,7 @@
         <!-- nav bar -->
         <div class="w-100 mb-4 d-flex">
             <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{{ asset(url('/')) }}">
-                <img id="logo" src="{{ asset('dashboard/assets/images/logo.png') }}" width="100"
+                <img id="logo" src="{{ asset('dashboard/assets/images/logo.png') }}" @if($sideBarTheme == '0') width="50" @else width="100" @endif
                     style="border-radius: 5px;">
 
             </a>

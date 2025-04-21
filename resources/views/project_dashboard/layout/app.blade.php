@@ -89,7 +89,7 @@
     </style>
 </head>
 
-<body class="vertical  light  ">
+<body class="vertical  light  @if ($sideBarTheme == '0') collapsed @endif">
     <div class="wrapper">
         @include('project_dashboard.layout.header')
         @include('project_dashboard.layout.side_menu')
@@ -428,7 +428,7 @@
             }, false);
         })();
     </script>
-    
+
     <script src="{{ asset('dashboard/js/apps.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -498,21 +498,41 @@
 
             if (currentWidth === 100) {
                 logo.setAttribute('width', '50');
-                //     const tableHeader = document.querySelector('.table-container thead');
-                //     const tablebody = document.querySelector('.table-container tbody');
-                // if (tableHeader) {
-                //     tableHeader.style.width = '100%';
-                //     tablebody.style.width = '100%'; // Set the header width to 100%
-                // } // Decrease width
+                $.ajax({
+                    url: '/change-sideBarTheme', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        sideBarTheme: '0',
+
+                    },
+                    success: function(response) {
+
+                    },
+                    error: function() {
+
+                    }
+                });
             } else {
-                //     const tableHeader = document.querySelector('.table-container thead');
-                //     const tablebody = document.querySelector('.table-container tbody');
-                // if (tableHeader) {
-                //     tableHeader.style.width = ''; // Set the header width to 100%
-                //     tablebody.style.width = ''; 
-                // } // 
                 logo.setAttribute('width', '100'); // Increase width
+                $.ajax({
+                    url: '/change-sideBarTheme', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        sideBarTheme: '1',
+
+                    },
+                    success: function(response) {
+
+                    },
+                    error: function() {
+
+                    }
+                });
             }
+
+
         }
     </script>
     @stack('scripts')

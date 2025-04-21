@@ -141,6 +141,14 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
+    public function change_sideBarTheme(Request $request){
+        $user=auth()->user();
+        $user->sideBarTheme=$request->sideBarTheme;
+        $user->save();
+        return response()->json(['success' => true]);
+
+    }
+
    
 
 }

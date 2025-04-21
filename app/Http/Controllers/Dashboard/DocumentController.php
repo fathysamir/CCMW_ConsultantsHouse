@@ -195,8 +195,18 @@ class DocumentController extends ApiController
             }
         }
         
-       
-        if(session()->has('current_view') && session('current_view')=='file_doc'){
+        if(session()->has('current_view') && session('current_view')=='file'){
+            if($request->action=='save'){ 
+                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
+            }else{
+                $current_file = session('current_file2');
+                
+                session()->forget('current_file2');
+                session()->forget('current_view');
+
+                return redirect(route('project.file-documents.index', $current_file) )->with('success', 'Document Updated successfully.');
+            }
+        }elseif(session()->has('current_view') && session('current_view')=='file_doc'){
             if($request->action=='save'){ 
                 return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
             }else{

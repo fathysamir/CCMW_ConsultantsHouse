@@ -160,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                            max-height:650px;
-                                                                                                                                        } */
+                                                                                                                                                max-height:650px;
+                                                                                                                                            } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -451,6 +451,10 @@
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
+                                                <a class="dropdown-item"
+                                                    href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/'.$document->document->slug) }}">
+                                                    Edit Document
+                                                </a>
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}" data-action-type="copy">Copy
                                                     To another File</a>
@@ -461,7 +465,8 @@
                                                     href="{{ route('download.document', $document->id) }}">
                                                     Download Document
                                                 </a>
-                                                <a class="dropdown-item Check-other-assignments-btn" href="javascript:void(0);"
+                                                <a class="dropdown-item Check-other-assignments-btn"
+                                                    href="javascript:void(0);"
                                                     data-document-id="{{ $document->document->slug }}">Check other
                                                     assignments</a>
 
@@ -516,18 +521,19 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="CheckOtherAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="CheckOtherAssignmentsModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="CheckOtherAssignmentModal" tabindex="-1" role="dialog"
+        aria-labelledby="CheckOtherAssignmentsModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="CheckOtherAssignmentModalLabel">Files to which the document is assigned</h5>
+                    <h5 class="modal-title" id="CheckOtherAssignmentModalLabel">Files to which the document is assigned
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" id="container">
-                   
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -559,22 +565,22 @@
                 var documentId = $(this).data('document-id');
                 $.ajax({
                     url: '/document/get-files/' +
-                    documentId, // Adjust the route to your API endpoint
+                        documentId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let container = $('#container');
                         container.empty()
                         $.each(response.files, function(index, file) {
                             container.append(
-                                    `<p><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">${file.name}</span></p>`
-                                );
-                            });
+                                `<p><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">${file.name}</span></p>`
+                            );
+                        });
                     },
                     error: function() {
                         alert('Failed to fetch files. Please try again.');
                     }
                 });
-                
+
                 $('#CheckOtherAssignmentModal').modal('show'); // Show the modal
             });
 

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('current_account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('current_project_id')->nullable();
             $table->unsignedBigInteger('current_folder_id')->nullable();
+            $table->enum('sideBarTheme',['1','0']);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
