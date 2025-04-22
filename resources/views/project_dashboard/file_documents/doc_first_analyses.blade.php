@@ -178,7 +178,7 @@
 
                                         <input type="checkbox" class="custom-control-input" name="forChart"id="forChart"
                                             @if ($doc->forChart == '1') checked @endif>
-                                        <label class="custom-control-label" for="forChart">For Timeline (T)</label>
+                                        <label class="custom-control-label" for="forChart">For Gantt Chart (G)</label>
                                     </div>
 
                                 </div>

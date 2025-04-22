@@ -160,8 +160,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                max-height:650px;
-                                                                                                                                            } */
+                                                                                                                                                    max-height:650px;
+                                                                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -213,7 +213,7 @@
                                         <label id="all_for_notice"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
                                         <label id="all_for_timeline"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>T</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>G</span></label>
                                     </th>
                                     <th><b>Subject </b>
                                         <span id="subjectFilterIcon" style="color:rgb(35, 197, 226); cursor: pointer;"
@@ -398,7 +398,7 @@
 
                                 @foreach ($documents as $document)
                                     <tr id="dddd_{{ $document->id }}"
-                                        @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" @endif>
+                                        @if ($specific_file_doc == $document->id) style="background-color: #AFEEEE" class="specific_file_doc" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -452,7 +452,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item"
-                                                    href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/'.$document->document->slug) }}">
+                                                    href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->document->slug) }}">
                                                     Edit Document
                                                 </a>
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
@@ -550,6 +550,17 @@
         function openDocumentPdf(url) {
             window.open(url, '_blank');
         }
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const targetRow = document.querySelector('tr.specific_file_doc');
+            if (targetRow) {
+                targetRow.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
     </script>
     <script>
         $(document).ready(function() {

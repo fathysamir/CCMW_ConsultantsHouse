@@ -24,7 +24,7 @@ class FileController extends ApiController
         $users = $project->assign_users;
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
-        $all_files = ProjectFile::where('folder_id',$folder->id)->get(); 
+        $all_files = ProjectFile::where('folder_id',$folder->id)->orderBy('code', 'asc')->get(); 
 
         return view('project_dashboard.project_files.index', compact('all_files','folder','users'));
     }
