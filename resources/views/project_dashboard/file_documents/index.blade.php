@@ -555,10 +555,7 @@
         window.addEventListener('DOMContentLoaded', function() {
             const targetRow = document.querySelector('tr.specific_file_doc');
             if (targetRow) {
-                targetRow.scrollIntoView({
-                    behavior: 'smooth'
-                    
-                });
+                targetRow.scrollIntoView();
             }
         });
     </script>
