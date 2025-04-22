@@ -164,8 +164,7 @@
                                                
                                     <div class="custom-control custom-checkbox" style="margin-right: 20px;margin-top: 6.5%;">
                                                    
-                                                    <input type="checkbox" class="custom-control-input" name="forClaim"id="
-                                        forClaim"@if ($doc->forClaim == '1') checked @endif>
+                                                    <input type="checkbox" class="custom-control-input" name="forClaim" id="forClaim" @if ($doc->forClaim == '1') checked @endif>
                                         <label class="custom-control-label" for="forClaim">For Claim (c)</label>
                                     </div>
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
