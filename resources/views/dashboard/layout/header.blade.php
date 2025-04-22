@@ -1,12 +1,12 @@
-<nav class="topnav navbar navbar-light">
+<nav class="topnav navbar navbar-light mb-2" style="background-color: gray;">
   <button onclick="toggleWidth()" type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
-    <i class="fe fe-menu navbar-toggler-icon"></i>
+    <i style="color:white" class="fe fe-menu navbar-toggler-icon"></i>
   </button>
  
   <ul class="nav">
     <li class="nav-item">
       <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
-        <i class="fe fe-sun fe-16"></i>
+        <i style="color:white" class="fe fe-sun fe-16"></i>
       </a>
     </li>
     {{-- <li class="nav-item">
@@ -21,8 +21,8 @@
       </a>
     </li> --}}
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="avatar avatar-sm mt-2">
+      <a  style="color:white" class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span style="color:white" class="avatar avatar-sm mt-2">
           <img @if(getFirstMediaUrl(auth()->user(),auth()->user()->avatarCollection)!=null) src="{{getFirstMediaUrl(auth()->user(),auth()->user()->avatarCollection)}}" @else src="{{asset('dashboard/assets/avatars/user_avatar.png')}}" @endif alt="..." class="avatar-img rounded-circle">
         </span>
       </a>
