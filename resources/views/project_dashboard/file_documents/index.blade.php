@@ -418,7 +418,7 @@
                                             <label class="for_notice @if ($document->forLetter == '1') active @endif"
                                                 style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
                                             <label class="for_timeline @if ($document->forChart == '1') active @endif"
-                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>T</span></label>
+                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>G</span></label>
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
