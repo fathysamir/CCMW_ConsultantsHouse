@@ -552,12 +552,16 @@
         }
     </script>
     <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            const targetRow = document.querySelector('tr.specific_file_doc');
-            if (targetRow) {
-                targetRow.scrollIntoView();
-            }
-        });
+       window.addEventListener('DOMContentLoaded', function () {
+        const targetRow = document.querySelector('.specific_file_doc');
+        const container = document.querySelector('.table-container tbody');
+
+        if (targetRow && container) {
+            const headerHeight = 0; // في حالتك الهيدر sticky فوق الجدول مش جواه، فمش لازم نطرح ارتفاعه
+            const offsetTop = targetRow.offsetTop - headerHeight;
+            container.scrollTop = offsetTop;
+        }
+    });
     </script>
     <script>
         $(document).ready(function() {
