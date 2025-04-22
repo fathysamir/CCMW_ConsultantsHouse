@@ -397,12 +397,12 @@ class DocumentController extends ApiController
             $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
             $date = date('y_m_d', strtotime($document->document->start_date));
             $date2 = date('d-M-y', strtotime($document->document->start_date));
-            $fileName = $date . ' - ' .  $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            $fileName = preg_replace('_', '-', $date) . ' - ' .  $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
         } else {
             $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
             $sanitizedFilename = trim($sanitizedFilename, '-');
             $date = date('y_m_d', strtotime($document->document->start_date));
-            $fileName = $date . ' - ' .  $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            $fileName = preg_replace('_', '-', $date) . ' - ' .  $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
         }
 
         if (file_exists($filePath)) {
