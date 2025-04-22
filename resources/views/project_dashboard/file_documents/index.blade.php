@@ -552,24 +552,15 @@
         }
     </script>
     <script>
-       window.addEventListener('DOMContentLoaded', function () {
-        const targetRow = document.querySelector('tr.specific_file_doc');
-        if (targetRow) {
-            const tableContainer = document.querySelector('.dataTables_scrollBody'); // لو بتستخدم DataTables
-
-            if (tableContainer) {
-                const headerHeight = document.querySelector('.dataTables_scrollHead').offsetHeight || 60; // تقدير ارتفاع الهيدر
-                const targetPosition = targetRow.offsetTop - headerHeight;
-
-                tableContainer.scrollTop = targetPosition;
-            } else {
-                // fallback إذا مفيش div scroll خاص بالجدول
-                const headerHeight = 60; // تقدير ارتفاع الهيدر
-                const y = targetRow.getBoundingClientRect().top + window.scrollY - headerHeight;
-                window.scrollTo({ top: y, behavior: 'smooth' });
+        window.addEventListener('DOMContentLoaded', function() {
+            const targetRow = document.querySelector('tr.specific_file_doc');
+            if (targetRow) {
+                targetRow.scrollIntoView({
+                    behavior: 'smooth'
+                    
+                });
             }
-        }
-    });
+        });
     </script>
     <script>
         $(document).ready(function() {
