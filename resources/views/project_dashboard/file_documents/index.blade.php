@@ -559,7 +559,7 @@
         if (targetRow && container) {
             const headerHeight = 0; // في حالتك الهيدر sticky فوق الجدول مش جواه، فمش لازم نطرح ارتفاعه
             const offsetTop = targetRow.offsetTop - headerHeight;
-            container.scrollTop = offsetTop;
+            container.scrollTop = offsetTop-2;
         }
     });
     </script>
