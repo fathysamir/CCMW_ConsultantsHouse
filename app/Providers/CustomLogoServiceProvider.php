@@ -63,7 +63,7 @@ class CustomLogoServiceProvider extends ServiceProvider
                 return;
             }
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)
-                ->where('project_id', $user->current_project_id)
+                ->where('project_id', $user->current_project_id)->orderBy('order')
                 ->get();
             
             $view->with('Folders', $Folders);
