@@ -1,4 +1,4 @@
-<nav class="topnav navbar navbar-light mb-2" style="background-color: gray;">
+<nav class="topnav navbar navbar-light mb-2" style="background-color: #1b68ff;">
   <button onclick="toggleWidth()" type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
     <i style="color:white" class="fe fe-menu navbar-toggler-icon"></i>
   </button>

@@ -393,16 +393,16 @@ class DocumentController extends ApiController
         $document = FileDocument::findOrFail($id);
         $filePath = public_path($document->document->storageFile->path);
 
-        if($document->document->docType->name=='e-mail' || $document->document->docType->description=='e-mail'){
+        if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.-<>|{}\[\]`]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.-<>|{}\[\]`]/', '', $document->document->docType->description)),'email')){
             $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
-            $date = date('y_m_d', strtotime($document->document->start_date));
+            //$date = date('y_m_d', strtotime($document->document->start_date));
             $date2 = date('d-M-y', strtotime($document->document->start_date));
-            $fileName = preg_replace('/_/', '', $date) . ' - ' .  $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            $fileName = $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
         } else {
             $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
             $sanitizedFilename = trim($sanitizedFilename, '-');
-            $date = date('y_m_d', strtotime($document->document->start_date));
-            $fileName = preg_replace('/_/', '', $date) . ' - ' .  $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            //$date = date('y_m_d', strtotime($document->document->start_date));
+            $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
         }
 
         if (file_exists($filePath)) {

@@ -1,18 +1,18 @@
-<nav class="topnav navbar navbar-light mb-2" style="background-color: gray;">
+<nav class="topnav navbar navbar-light mb-2" style="background-color: #1b68ff">
     <button onclick="toggleWidth()" type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
         <i style="color:white" class="fe fe-menu navbar-toggler-icon"></i>
     </button>
     <div class="row">
         <ul class="nav">
             <li class=" row nav-item dropdown mr-3">
-                <a class="nav-link pl-3 pr-0 l-link" style="color:white" href="{{ route('switch.folder', $Folders->first()->id) }}">
+                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white; font-size:1.2rem;" href="{{ route('switch.folder', $Folders->first()->id) }}">
                     <span class="item-text"><b>Files</b></span>
                 </a>
 
                 <!-- Dropdown arrow -->
-                <a class="nav-link dropdown-toggle pr-0 l-link" href="#" id="navbarDropdownMenuLink2"
+                <a class="nav-link dropdown-toggle pr-0 vibrate-hover" href="#" id="navbarDropdownMenuLink2"
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                    style="color:white; padding-left: 0.25rem;">
+                    style="color:white; padding-left: 0.25rem;font-size:1.2rem;">
                 </a>
 
                 <!-- Dropdown menu -->
@@ -32,7 +32,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link pl-3 nav-item l-link" style="color:white"
+                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;"
                     href="{{ route('project.all_documents.index') }}"><span
                         class="ml-1 item-text"><b>Documents</b></span></a>
             </li>

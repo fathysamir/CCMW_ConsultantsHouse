@@ -86,6 +86,35 @@
         .l-link:hover {
             color: #1b68ff !important;
         }
+
+        @keyframes tilt-shaking {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(7deg);
+            }
+
+            50% {
+                transform: rotate(0deg);
+            }
+
+            75% {
+                transform: rotate(-7deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .vibrate-hover:hover {
+            /* animation: vibrate-up-down-left-right 1s ease; */
+            animation: tilt-shaking 0.1s;
+
+
+        }
     </style>
 </head>
 
@@ -502,14 +531,14 @@
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
                     data: {
-                         // CSRF token
+                        // CSRF token
                         sideBarTheme: '0',
 
                     },
                     headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            },
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
                     success: function(response) {
 
                     },
@@ -526,10 +555,11 @@
                         // _token: $('input[name="_token"]').val(), // CSRF token
                         sideBarTheme: '1',
 
-                    }, headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            },
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
                     success: function(response) {
 
                     },
