@@ -506,10 +506,13 @@
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
                     data: {
-                        _token: $('input[name="_token"]').val(), // CSRF token
+                        // _token: $('input[name="_token"]').val(), // CSRF token
                         sideBarTheme: '0',
 
-                    },
+                    }, headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
                     success: function(response) {
 
                     },
@@ -523,10 +526,13 @@
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
                     data: {
-                        _token: $('input[name="_token"]').val(), // CSRF token
+                        // _token: $('input[name="_token"]').val(), // CSRF token
                         sideBarTheme: '1',
 
-                    },
+                    }, headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
                     success: function(response) {
 
                     },
