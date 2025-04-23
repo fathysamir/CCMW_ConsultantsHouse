@@ -1,6 +1,11 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Upload Single Document')
 @section('content')
+<style>
+    .date{
+        background-color:#fff !important;
+    }
+</style>
     <h2 class="page-title">Upload a New Document</h2>
 
     <div class="card shadow mb-4">
@@ -320,6 +325,8 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
             const withReturnCheckbox = document.getElementById("With-Return");
             const endDateDiv = document.getElementById("end_date").closest(".col-md-6");

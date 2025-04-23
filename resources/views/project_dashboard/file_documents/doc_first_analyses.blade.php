@@ -1,6 +1,11 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - First Analyses')
 @section('content')
+<style>
+    .date{
+        background-color:#fff !important;
+    }
+</style>
     <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon" class="fe fe-24 fe-chevrons-right"></span>Details of
         "{{ $doc->document->subject }}"</h2>
     @if (session('error'))
@@ -273,6 +278,8 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
 
         });

@@ -21,6 +21,11 @@
         }
     </style>
     <style>
+        .date{
+            background-color:#fff !important;
+        }
+    </style>
+    <style>
         .table-container {
             position: relative;
             max-height: 750px;
@@ -1032,6 +1037,8 @@ console.log(targetRow.offsetTop);
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
 
         });

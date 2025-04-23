@@ -1,6 +1,11 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Check Document')
 @section('content')
+<style>
+    .date{
+        background-color:#fff !important;
+    }
+</style>
     <h2 class="page-title">Edit "{{ $document->reference }}" Document</h2>
 
     <div class="card shadow mb-4">
@@ -363,6 +368,8 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
             const form = document.getElementById('updateTestDocumentForm');
 

@@ -1,7 +1,13 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Upload Group of Documents')
 @section('content')
+
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
+    <style>
+        .date{
+            background-color:#fff !important;
+        }
+    </style>
     <style>
         .uppy-Dashboard-inner {
             width: 100%;
@@ -1213,6 +1219,8 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
 
         });

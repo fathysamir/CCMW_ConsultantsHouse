@@ -1,6 +1,11 @@
 @extends('account_dashboard.layout.app')
 @section('title', 'Update Project')
 @section('content')
+<style>
+    .date{
+        background-color:#fff !important;
+    }
+</style>
     <style>
         #epsTree {
             list-style-type: none;
@@ -327,6 +332,8 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
             });
 
             document.querySelectorAll("#epsTree li").forEach(li => {
@@ -449,6 +456,8 @@
                 flatpickr(".date", {
                     enableTime: false,
                     dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                    altInput: true,
+                    altFormat: "d.M.Y",
                 });
             });
 
