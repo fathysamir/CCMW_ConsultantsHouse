@@ -522,7 +522,7 @@
                     theme: 'dark',
                     width: 770,
                     height: 210,
-                    note: 'PDF files only (max 10MB each)',
+                    note: 'PDF files only (max 50MB each)',
                     restrictions: {
                         allowedFileTypes: ['application/pdf']
                     },

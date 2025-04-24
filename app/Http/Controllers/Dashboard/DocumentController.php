@@ -81,7 +81,7 @@ class DocumentController extends ApiController
     {
 
         $request->validate([
-            'file' => 'required|file|max:51200' // 10MB max
+            'file' => 'required|file|max:512000' // 10MB max
         ]);
 
         $file = $request->file('file');
@@ -324,9 +324,10 @@ class DocumentController extends ApiController
         // Update the owner for all selected documents
         foreach ($request->document_ids as $id) {
             $doc = Document::where('id', $id)->first();
+            FileDocument::where('document_id',$id)->delete();
             $docs = Document::where('storage_file_id', $doc->storage_file_id)->where('id', '!=', $id)->get();
             if (count($docs) == 0) {
-                $path = public_path('projects/1/documents/1740495513_iSchool 2025 - Company Profile.pdf');
+                $path = public_path($doc->storageFile->path);
 
                 if (file_exists($path)) {
                     unlink($path);

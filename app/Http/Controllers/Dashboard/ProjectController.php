@@ -87,7 +87,7 @@ class ProjectController extends ApiController
 
     public function edit_project_view($id)
     {
-        $project = Project::findOrFail($id);
+        $project = Project::where('slug',$id)->first();
         $project->logo = getFirstMediaUrl($project, $project->logoCollection);
         $roles = [
             'Employer',
@@ -113,8 +113,11 @@ class ProjectController extends ApiController
         if (!$result['success']) {
             return redirect()->back()->withInput()->withErrors($result['errors']);
         }
-
-        return redirect('/account/projects')->with('success', 'Project updated successfully.');
+        if(auth()->user()->current_project_id){
+            return redirect('/project')->with('success', 'Project updated successfully.');
+        }else{
+            return redirect('/account/projects')->with('success', 'Project updated successfully.');
+        }
     }
 
     public function archiveProject(Request $request){

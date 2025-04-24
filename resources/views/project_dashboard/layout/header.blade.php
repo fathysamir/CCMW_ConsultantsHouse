@@ -5,14 +5,14 @@
     <div class="row">
         <ul class="nav">
             <li class=" row nav-item dropdown mr-3">
-                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white; font-size:1.2rem;" href="{{ route('switch.folder', $Folders->first()->id) }}">
+                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white; font-size:1.2rem; padding-top:0px !important;padding-bottom:0px !important;" href="{{ route('switch.folder', $Folders->first()->id) }}">
                     <span class="item-text"><b>Files</b></span>
                 </a>
 
                 <!-- Dropdown arrow -->
                 <a class="nav-link dropdown-toggle pr-0 vibrate-hover" href="#" id="navbarDropdownMenuLink2"
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                    style="color:white; padding-left: 0.25rem;font-size:1.2rem;">
+                    style="color:white; padding-left: 0.25rem;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;">
                 </a>
 
                 <!-- Dropdown menu -->
@@ -32,9 +32,17 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;"
+                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('project.all_documents.index') }}"><span
                         class="ml-1 item-text"><b>Documents</b></span></a>
+            </li>
+@php
+    $project=\App\Models\Project::findOrFail(auth()->user()->current_project_id);
+@endphp
+            <li class="nav-item">
+                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
+                    href="{{ route('account.edit_project_view',$project->slug) }}"><span
+                        class="ml-1 item-text"><b>Project Card</b></span></a>
             </li>
             {{-- <li class="nav-item">
           <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
@@ -53,7 +61,7 @@
     </div>
     <ul class="nav">
         <li class="nav-item">
-            <a class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light">
+            <a class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light" style="padding-top:0px !important;padding-bottom:0px !important;">
                 <i style="color:white" class="fe fe-sun fe-16"></i>
             </a>
         </li>
@@ -69,7 +77,7 @@
         </a>
         </li> --}}
         <li class="nav-item dropdown">
-            <a style="color:white" class="nav-link dropdown-toggle text-muted pr-0" href="#"
+            <a style="color:white;padding-top:0px !important;padding-bottom:0px !important;" class="nav-link dropdown-toggle text-muted pr-0" href="#"
                 id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 <span style="color:white" class="avatar avatar-sm mt-2">

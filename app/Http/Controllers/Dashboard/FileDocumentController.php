@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\StorageFile;
-use App\Models\User;
+use App\Models\Document;
 use App\Models\ProjectFolder;
 use App\Models\ProjectFile;
 use App\Models\ContractTag;
@@ -751,5 +751,44 @@ class FileDocumentController extends ApiController
                 ]);
             }
         }
+    }
+
+    public function unassign_doc(Request $request){
+        FileDocument::whereIn('id',$request->document_ids)->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => count($request->document_ids)>1 ? 'Selected documents is unassigned from file.' : 'Document is unassigned from file.',
+            //'redirect' => url('/project/file/' . $currentFile . '/documents')
+        ]);
+    }
+
+    public function delete_doc_from_cmw_entirely(Request $request){
+        foreach($request->document_ids as $doc_id){
+            $doc=FileDocument::findOrFail($doc_id);
+            $document=Document::find($doc->document_id);
+            FileDocument::where('document_id',$document->id)->delete();
+            $docs = Document::where('storage_file_id', $document->storage_file_id)->where('id', '!=', $document->id)->get();
+            if (count($docs) == 0) {
+                $path = public_path($document->storageFile->path);
+
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
+            $document->delete();
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => count($request->document_ids)>1 ? 'Selected documents is deleted from CMW entirely.' : 'Document is deleted from CMW entirely.',
+            //'redirect' => url('/project/file/' . $currentFile . '/documents')
+        ]);
+        
+    }
+
+    public function change_for_claimOrNoticeOrChart(Request $request){
+        FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>'1']);
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

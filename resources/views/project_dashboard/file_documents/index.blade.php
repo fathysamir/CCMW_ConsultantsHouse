@@ -21,8 +21,8 @@
         }
     </style>
     <style>
-        .date{
-            background-color:#fff !important;
+        .date {
+            background-color: #fff !important;
         }
     </style>
     <style>
@@ -165,17 +165,39 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                    max-height:650px;
-                                                                                                                                                } */
+                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                            } */
     </style>
-
+    <div id="hintBox"
+        style="
+        display:none;
+        position: fixed;
+        top: 65px;
+        right: 42%;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 9999;
+        font-size: 0.9rem;
+        ">
+    </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
-            <button type="button"
-                class="btn mb-2 btn-success"onclick="window.location.href='/export-word-claim-docs/<?php echo $file->slug; ?>'">Export</button>
+            <button type="button" class="btn mb-2 dropdown-toggle btn-success"data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">File
+                Action</button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="{{ url('/export-word-claim-docs/' . $file->slug) }}">
+                    Export
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}"
+                    id="download-allDoc">Download Documents</a>
+            </div>
         </div>
     </div>
     @if (session('error'))
@@ -460,6 +482,9 @@
                                                     href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->document->slug) }}">
                                                     Edit Document
                                                 </a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.file-document-first-analyses', $document->id) }}"
+                                                    data-action-type="copy">Chronology</a>
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}" data-action-type="copy">Copy
                                                     To another File</a>
@@ -470,11 +495,23 @@
                                                     href="{{ route('download.document', $document->id) }}">
                                                     Download Document
                                                 </a>
+                                                <a class="dropdown-item unassign-doc-btn" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->id }}">Unassign Document</a>
                                                 <a class="dropdown-item Check-other-assignments-btn"
                                                     href="javascript:void(0);"
                                                     data-document-id="{{ $document->document->slug }}">Check other
                                                     assignments</a>
-
+                                                <a class="dropdown-item Delete-from-CMW-btn" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->id }}"
+                                                    data-action-type="forClaim">For Claim</a>
+                                                <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->id }}"
+                                                    data-action-type="forLetter">For Notice</a>
+                                                <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->id }}"
+                                                    data-action-type="forChart">For Gantt Chart</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -546,6 +583,60 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="downloadAllDocsModal" tabindex="-1" role="dialog"
+        aria-labelledby="downloadAllDocsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="downloadAllDocsModalLabel">How do you want to name the files
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assigneToForm">
+                        @csrf
+                        <input type="hidden" id="file_id_" name="file_id_">
+                        <div class="form-group">
+                            <label for="folder_id">Select document naming format</label>
+                            
+                                               
+                                {{-- <div class="custom-control custom-checkbox" style="margin-right: 20px;margin-top: 6.5%;">
+                                               
+                                                <input type="radio" class="custom-control-input" value="reference" id="reference_only" >
+                                    <label class="custom-control-label" for="forClaim">For Claim (c)</label>
+                                </div>
+                                <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
+
+                                    <input type="checkbox" class="custom-control-input" name="forLetter"id="forLetter"
+                                        @if ($doc->forLetter == '1') checked @endif>
+                                    <label class="custom-control-label" for="forLetter">For Notice (N)</label>
+                                </div>
+                                <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
+
+                                    <input type="checkbox" class="custom-control-input" name="forChart"id="forChart"
+                                        @if ($doc->forChart == '1') checked @endif>
+                                    <label class="custom-control-label" for="forChart">For Gantt Chart (G)</label>
+                                </div> --}}
+
+                            
+                        </div>
+                        <div class="form-group d-none">
+                            <label for="newFile">Select File</label>
+                            <select class="form-control" id="newFile" name="file_id">
+                                <option value="" disabled selected>Select File</option>
+
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="downloadalldocs">Save</button>                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -557,16 +648,16 @@
         }
     </script>
     <script>
-       window.addEventListener('DOMContentLoaded', function () {
-        const targetRow = document.querySelector('.specific_file_doc');
-        const container = document.querySelector('.table-container tbody');
-console.log(targetRow.offsetTop);
-        if (targetRow && container) {
-            const headerHeight = 0; // في حالتك الهيدر sticky فوق الجدول مش جواه، فمش لازم نطرح ارتفاعه
-            const offsetTop = targetRow.offsetTop - headerHeight;
-            container.scrollTop = offsetTop-58;
-        }
-    });
+        window.addEventListener('DOMContentLoaded', function() {
+            const targetRow = document.querySelector('.specific_file_doc');
+            const container = document.querySelector('.table-container tbody');
+            console.log(targetRow.offsetTop);
+            if (targetRow && container) {
+                const headerHeight = 0; // في حالتك الهيدر sticky فوق الجدول مش جواه، فمش لازم نطرح ارتفاعه
+                const offsetTop = targetRow.offsetTop - headerHeight;
+                container.scrollTop = offsetTop - 58;
+            }
+        });
     </script>
     <script>
         $(document).ready(function() {
@@ -600,6 +691,138 @@ console.log(targetRow.offsetTop);
 
                 $('#CheckOtherAssignmentModal').modal('show'); // Show the modal
             });
+
+            $('.unassign-doc-btn').on('click', function() {
+                var documentIds = [];
+                documentIds.push($(this).data('document-id'));
+
+
+                if (confirm(
+
+                        'Are you sure you want to unassign this document from this file? This action cannot be undone.'
+                    )) {
+                    $.ajax({
+                        url: '/project/unassign-doc',
+                        type: 'POST',
+                        data: {
+                            _token: $('input[name="_token"]').val(), // CSRF token
+                            document_ids: documentIds, // Pass the array here
+                        },
+                        success: function(response) {
+                            // Loop through IDs and remove each corresponding row
+                            documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+
+                            showHint(response.message); // Show success message
+                        },
+                        error: function() {
+                            alert('Failed to unassign documents. Please try again.');
+                        }
+                    });
+                }
+            })
+            $('.Delete-from-CMW-btn').on('click', function() {
+                var documentIds = [];
+                documentIds.push($(this).data('document-id'));
+                if (confirm(
+                        'Are you sure you want to delete this document from CMW entirely? This action cannot be undone.'
+                    )) {
+                    $.ajax({
+                        url: '/project/delete-doc-from-cmw-entirely', // Adjust the route to your API endpoint
+                        type: 'POST',
+                        data: {
+                            _token: $('input[name="_token"]').val(), // CSRF token
+                            document_ids: documentIds,
+                        },
+                        success: function(response) {
+                            documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+                            showHint(response.message); // Show success message
+                        },
+                        error: function() {
+                            alert('Failed to assign document. Please try again.');
+                        }
+                    });
+                }
+            })
+            $('#download-allDoc').on('click',function(){
+                var fileId = $(this).data('file-id');
+                $('#file_id_').val=fileId;
+                $('#downloadAllDocsModal').modal('show'); // Show the modal
+
+            })
+
+            ////////////////////////////////////////////////
+            $('.for-claim-btn').on('click', function() {
+                var documentIds = [];
+                var type = $(this).data('action-type')
+                documentIds.push($(this).data('document-id'));
+
+                $.ajax({
+                    url: '/project/doc/make-for-claim', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        action_type: type
+                    },
+                    success: function(response) {
+                        documentIds.forEach(function(id) {
+                            let tr = document.getElementById('dddd_' + id);
+                            if (tr) {
+                                if (type == 'forClaim') {
+                                    const forClaimLabel = tr.querySelector(
+                                        'label.for_claim');
+                                    if (forClaimLabel && !forClaimLabel.classList
+                                        .contains('active')) {
+                                        forClaimLabel.classList.add('active');
+                                        forClaimLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                } else if (type == 'forLetter') {
+                                    const forNoticeLabel = tr.querySelector(
+                                        'label.for_notice');
+                                    if (forNoticeLabel && !forNoticeLabel.classList
+                                        .contains('active')) {
+                                        forNoticeLabel.classList.add('active');
+                                        forNoticeLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                } else if (type == 'forChart') {
+                                    const forChartLabel = tr.querySelector(
+                                        'label.for_timeline');
+                                    if (forChartLabel && !forChartLabel.classList
+                                        .contains('active')) {
+                                        forChartLabel.classList.add('active');
+                                        forChartLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                }
+
+                            }
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+
+            })
+            ///////////////////////////////////////////////
+
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
+
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
 
             $('.copy-to-file-btn').on('click', function() {
                 var documentId_ = $(this).data('document-id');

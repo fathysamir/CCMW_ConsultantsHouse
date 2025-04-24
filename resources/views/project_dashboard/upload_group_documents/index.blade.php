@@ -868,8 +868,8 @@
                 var uppy = Uppy.Core({
                     restrictions: {
                         allowedFileTypes: ['application/pdf'],
-                        maxNumberOfFiles: 20, // Optional: limit number of files
-                        maxFileSize: 10 * 1024 * 1024 // Optional: 10MB limit
+                        maxNumberOfFiles: 100, // Optional: limit number of files
+                        // maxFileSize: 10 * 1024 * 1024 // Optional: 10MB limit
                     }
                 }).use(Uppy.Dashboard, {
                     inline: true,
@@ -878,7 +878,7 @@
                     theme: 'dark',
                     width: 770,
                     height: 210,
-                    note: 'PDF files only (max 10MB each)',
+                    note: 'PDF files only (max 50MB each)',
                     restrictions: {
                         allowedFileTypes: ['application/pdf']
                     },

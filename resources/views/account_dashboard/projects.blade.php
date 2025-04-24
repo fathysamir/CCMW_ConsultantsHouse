@@ -187,7 +187,7 @@
     </script>
     <script>
         // Function to show the context menu at the mouse pointer location
-        function showContextMenu(event, projectId, projectName) {
+        function showContextMenu(event,projectSlug ,projectId, projectName) {
             event.preventDefault(); // Prevent the default right-click menu
 
             const menu = document.getElementById('contextMenu');
@@ -199,7 +199,7 @@
             menu.setAttribute('data-project-id', projectId);
             menu.setAttribute('data-project-name', projectName);
             const editProjectLink = document.getElementById('editProject');
-            editProjectLink.href = `{{ route('account.edit_project_view', ':id') }}`.replace(':id', projectId);
+            editProjectLink.href = `{{ route('account.edit_project_view', ':id') }}`.replace(':id', projectSlug);
         }
 
         function showContextMenu2(event, projectId, projectName) {
@@ -527,7 +527,7 @@
                                                         <div class="card shadow mb-4" style="border-radius:15px;margin-bottom: 0.5rem !important;">
                                                             <div class="card-body" style="border-radius:15px; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); padding-top:0.1rem; padding-bottom:0.1rem;">
                                                                 <div class="card-text my-2" style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;"
-                                                                    oncontextmenu="showContextMenu(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')">
+                                                                    oncontextmenu="showContextMenu(event, '${project.slug}' ,'${project.id}', '${project.name.replace(/'/g, "\\'")}')">
                                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                                         <div style="display: flex; align-items: center; gap: 10px;">
                                                                             <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
@@ -603,7 +603,7 @@
                                                     `oncontextmenu="showContextMenu3(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
                                             } else {
                                                 div +=
-                                                    `oncontextmenu="showContextMenu(event, '${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
+                                                    `oncontextmenu="showContextMenu(event,'${project.slug}' ,'${project.id}', '${project.name.replace(/'/g, "\\'")}')"`;
                                             }
                                             div += `>
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
