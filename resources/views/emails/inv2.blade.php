@@ -39,10 +39,10 @@
                     <img src="https://ccmw.app/dashboard/assets/images/image_111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">Team
                 </p>
 
-                <div style="margin-top: 0px;">
-                    <div style="text-align: center">
+                <div style="margin-top: 0px;max-width: 200px;">
+                    <div style="text-align: center;">
                         <img src="https://ccmw.app/dashboard/assets/images/image_112.png" alt="CMW Full Logo" style="max-width: 200px;">
-                        <p><a href="https://www.ccmw.app" style="color: #007bff; text-decoration: underline;margin-top:-10px">www.ccmw.app</a></p>
+                        <p style="margin-top: 0px;"><a href="https://www.ccmw.app" style="color: #007bff; text-decoration: underline;margin-top:-10px">www.ccmw.app</a></p>
                     </div>
                     
                 </div>
