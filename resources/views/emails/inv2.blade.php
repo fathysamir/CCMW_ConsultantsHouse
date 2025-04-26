@@ -44,8 +44,8 @@
                     Team
                 </p>
 
-                <div style="text-align: center; margin-top: 20px;">
-                    <img src="https://ccmw.app/dashboard/assets/images/image_112.png" alt="CMW Full Logo" style="max-width: 200px; margin-bottom: 10px;">
+                <div style="margin-top: 20px;">
+                    <img src="https://ccmw.app/dashboard/assets/images/image_112.png" alt="CMW Full Logo" style="max-width: 200px;">
                     <p><a href="https://www.ccmw.app" style="color: #007bff; text-decoration: underline;">www.ccmw.app</a></p>
                 </div>
             </td>
