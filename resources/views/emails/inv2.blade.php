@@ -11,7 +11,7 @@
                 <p>Dear : {{ $email }},</p>
 
                 <p>
-                    Please follow the link below to sign in to the<img src="https://ccmw.app/dashboard/assets/images/image_111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">application
+                    Please follow the link below to sign in to the<img src="https://ccmw.app/dashboard/assets/images/image_1111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">application
                 </p>
 
                 <p>
@@ -30,13 +30,13 @@
                     <a href="mailto:customercare@ccmw.app" style="color: #007bff; text-decoration: underline;">customercare@ccmw.app</a>.
                 </p>
 
-                <p>Welcome to<img src="https://ccmw.app/dashboard/assets/images/image_111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">— we hope you enjoy using our platform!
+                <p>Welcome to<img src="https://ccmw.app/dashboard/assets/images/image_1111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">— we hope you enjoy using our platform!
                 </p>
 
                 <p>Best Regards,</p>
 
                 <p style="font-weight: bold;">
-                    <img src="https://ccmw.app/dashboard/assets/images/image_111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">Team
+                    <img src="https://ccmw.app/dashboard/assets/images/image_1111.png" alt="CMW Logo" style="height: 20px; vertical-align: middle;">Team
                 </p>
 
                 <div style="margin-top: 0px;max-width: 200px;">
