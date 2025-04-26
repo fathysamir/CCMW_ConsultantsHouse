@@ -5,7 +5,7 @@
     <title>Welcome to CMW</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px; color: #333;">
-    <table style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+    <table style="max-width: 1000px; margin: auto; border: 1px solid #eee; padding: 20px;">
         <tr>
             <td>
                 <p>Dear : {{ $email }},</p>
