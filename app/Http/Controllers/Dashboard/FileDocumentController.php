@@ -854,6 +854,11 @@ class FileDocumentController extends ApiController
         $file=ProjectFile::where('slug',$request->file_id_)->first();
         $fileDocuments=FileDocument::where('file_id',$file->id)->get();
         if(count($fileDocuments)>0){
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
             $zip = new ZipArchive();
            
             $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
