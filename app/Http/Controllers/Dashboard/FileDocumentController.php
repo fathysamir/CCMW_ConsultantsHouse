@@ -851,6 +851,14 @@ class FileDocumentController extends ApiController
 
     public function download_documents(Request $request){
         //dd($request->all());
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $file=ProjectFile::where('slug',$request->file_id_)->first();
         $fileDocuments=FileDocument::where('file_id',$file->id)->get();
         if(count($fileDocuments)>0){
