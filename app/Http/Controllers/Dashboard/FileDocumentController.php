@@ -882,7 +882,8 @@ class FileDocumentController extends ApiController
                     $date = date('y_m_d', strtotime($document->document->start_date));
                     $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
                 }elseif($request->formate_type=='formate'){
-    
+                    $prefix=$request->prefix;
+                    $sn=$request->sn;
                 }
                 if (file_exists($filePath)) {
                     $zip->addFile($filePath, $fileName);

@@ -61,51 +61,51 @@
         /* Ensure consistent column widths */
         .table-container th:nth-child(1),
         .table-container td:nth-child(1) {
-            width: 1% !important; 
+            width: 1% !important;
         }
 
 
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 10% !important; 
+            width: 10% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 13% !important; 
+            width: 13% !important;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 35% !important; 
+            width: 35% !important;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 8% !important; 
+            width: 8% !important;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 10% !important; 
+            width: 10% !important;
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
-            width: 10% !important; 
+            width: 10% !important;
         }
 
 
 
         .table-container th:nth-child(8),
         .table-container td:nth-child(8) {
-            width: 5% !important; 
+            width: 5% !important;
         }
 
         .table-container th:nth-child(9),
         .table-container td:nth-child(9) {
-            width: 3% !important; 
+            width: 3% !important;
         }
 
         /* Maintain styles from your original table */
@@ -141,8 +141,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                    max-height:650px;
-                                                                                                } */
+                                                                                                        max-height:650px;
+                                                                                                    } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -625,6 +625,21 @@
                     // Create a new dropdown element
                     let new_down_list = document.createElement('div');
                     new_down_list.className = "col-sm-12 col-md-4";
+                    var actionsHtml = {!! json_encode(
+                        ($canEdit
+                            ? '
+                                <a class="dropdown-item" id="changeStakeHolderForAllBtn" href="javascript:void(0);">Change Correspondence</a>
+                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Change Owner</a>
+                                <a class="dropdown-item" id="changeDocTypeForAllBtn" href="javascript:void(0);">Change Document Type</a>
+                                <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                            '
+                            : '') .
+                            ($canDelete
+                                ? '
+                                <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                            '
+                                : ''),
+                    ) !!};
                     new_down_list.innerHTML = `
                         <div class="dropdown" id="Action-DIV">
                             <button class="btn btn-sm dropdown-toggle btn-secondary" type="button"
@@ -632,19 +647,7 @@
                                 Open Actions
                             </button>
                             <div class="dropdown-menu" id="actionList" style="position: absolute; left: -50px;">
-                                ${`{{ $canEdit
-                                    ? '
-                                                    <a class="dropdown-item" id="changeStakeHolderForAllBtn" href="javascript:void(0);">Change Correspondence</a>
-                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Change Owner</a>
-                                                    <a class="dropdown-item" id="changeDocTypeForAllBtn" href="javascript:void(0);">Change Document Type</a>
-                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                '
-                                    : '' }}`.trim()}
-                                ${`{{ $canDelete
-                                    ? '
-                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                '
-                                    : '' }}`.trim()}
+                                ${actionsHtml}
                             </div>
                         </div>
                     `;
@@ -851,7 +854,7 @@
                             $('#assignToForAllModal').modal('hide');
                             alert(
                                 'all selected documents assigned to selected file successfully!'
-                                );
+                            );
                             location.reload(); // Reload the page to reflect changes
                         } else {
                             alert('Failed to assigned to file.');
@@ -1045,8 +1048,8 @@
             autoWidth: true,
             responsive: true,
             "lengthMenu": [
-                [-1,16, 32, 64],
-                ["All",16, 32, 64]
+                [-1, 16, 32, 64],
+                ["All", 16, 32, 64]
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
