@@ -44,7 +44,6 @@
                         <img src="https://ccmw.app/dashboard/assets/images/image_112.png" alt="CMW Full Logo" style="max-width: 200px;">
                         <p style="margin-top: 0px;"><a href="https://www.ccmw.app" style="color: #007bff; text-decoration: underline;margin-top:-10px">www.ccmw.app</a></p>
                     </div>
-                    
                 </div>
             </td>
         </tr>
