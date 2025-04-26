@@ -20,6 +20,14 @@ use Illuminate\Validation\Rule;
 class FileController extends ApiController
 {
     public function index(){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
         $user = auth()->user();

@@ -165,8 +165,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -595,45 +595,78 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="assigneToForm">
+                    <form id="downloadAllDocsForm">
                         @csrf
                         <input type="hidden" id="file_id_" name="file_id_">
                         <div class="form-group">
                             <label for="folder_id">Select document naming format</label>
-                            
-                                               
-                                {{-- <div class="custom-control custom-checkbox" style="margin-right: 20px;margin-top: 6.5%;">
-                                               
-                                                <input type="radio" class="custom-control-input" value="reference" id="reference_only" >
-                                    <label class="custom-control-label" for="forClaim">For Claim (c)</label>
+                            <div>
+
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="reference_only" name="formate_type" value="reference"
+                                        class="custom-control-input" required>
+                                    <label class="custom-control-label" for="reference_only">Reference</label>
                                 </div>
-                                <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
-
-                                    <input type="checkbox" class="custom-control-input" name="forLetter"id="forLetter"
-                                        @if ($doc->forLetter == '1') checked @endif>
-                                    <label class="custom-control-label" for="forLetter">For Notice (N)</label>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="dateAndReference" name="formate_type"
+                                        class="custom-control-input" value="dateAndReference"required>
+                                    <label class="custom-control-label" for="dateAndReference">YYMMDD – Reference</label>
                                 </div>
-                                <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="formate_type" value="formate" id="formate"
+                                        class="custom-control-input"required>
+                                    <label class="custom-control-label" for="formate"><span
+                                            style="background-color: #4dff00"><b>Prefix</b></span> – <span
+                                            style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
+                                        [Ref] - dated [Date]</label>
+                                </div>
+                            </div>
 
-                                    <input type="checkbox" class="custom-control-input" name="forChart"id="forChart"
-                                        @if ($doc->forChart == '1') checked @endif>
-                                    <label class="custom-control-label" for="forChart">For Gantt Chart (G)</label>
-                                </div> --}}
-
-                            
                         </div>
-                        <div class="form-group d-none">
-                            <label for="newFile">Select File</label>
-                            <select class="form-control" id="newFile" name="file_id">
-                                <option value="" disabled selected>Select File</option>
+                        <div id="extraOptions" class="row d-none">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-11">
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Prefix">Prefix : </label>
+                                    <input type="text" name="prefix" id="Prefix" class="form-control"
+                                        placeholder="Perfix" value="" style="width: 85%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="sn">SN Number : </label>
+                                    <input type="number" name="sn" id="sn" class="form-control"
+                                        placeholder="SN" value="" style="width: 77%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-0">
+                                    <label for="sn">In case of e-mails : </label>
+                                    <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
 
-                            </select>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option1" name="ref_part" value="option1"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option1">Omit Ref part</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option2" name="ref_part"
+                                                class="custom-control-input" value="option2">
+                                            <label class="custom-control-label" for="option2">Keep Ref part, but replace
+                                                word “Ref” with “from”</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" name="ref_part" value="option3" id="option3"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option3">Keep as other types</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="downloadalldocs">Save</button>                </div>
+                    <button type="button" class="btn btn-primary" id="downloadalldocs">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -659,6 +692,69 @@
             }
         });
     </script>
+    <script>
+        $(document).ready(function() {
+
+            // When "Download All" button is clicked
+            $('#download-allDoc').on('click', function() {
+                const fileId = $(this).data('file-id');
+                $('#file_id_').val(fileId);
+                $('#downloadAllDocsModal').modal('show');
+            });
+
+            // When radio changes for format selection
+            $('input[name="formate_type"]').on('change', function() {
+                if ($('#formate').is(':checked')) {
+                    $('#extraOptions').removeClass('d-none');
+                    $('#Prefix').attr('required', true);
+                    $('#sn').attr('required', true);
+                    $('input[name="ref_part"]').attr('required', true);
+                } else {
+                    $('#extraOptions').addClass('d-none');
+
+                    // Clear all inputs inside extraOptions
+                    $('#extraOptions').find('input').val('');
+                    $('#extraOptions').find('input[type="radio"]').prop('checked', false);
+
+                    // Remove required attributes
+                    $('#Prefix').removeAttr('required');
+                    $('#sn').removeAttr('required');
+                    $('input[name="ref_part"]').removeAttr('required');
+                }
+            });
+
+            // When user clicks "Save" (download)
+            $('#downloadalldocs').on('click', function() {
+                const form = $('#downloadAllDocsForm');
+
+                // Optional client-side check before AJAX send
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: '/download-all-documents', // Replace with real route
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#downloadAllDocsModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
@@ -747,12 +843,7 @@
                     });
                 }
             })
-            $('#download-allDoc').on('click',function(){
-                var fileId = $(this).data('file-id');
-                $('#file_id_').val=fileId;
-                $('#downloadAllDocsModal').modal('show'); // Show the modal
 
-            })
 
             ////////////////////////////////////////////////
             $('.for-claim-btn').on('click', function() {

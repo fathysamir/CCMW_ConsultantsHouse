@@ -128,6 +128,15 @@ class DocumentController extends ApiController
 
     public function all_documents()
     {
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        
         session()->forget('current_file_doc');
         session()->forget('current_view');
         $project = Project::findOrFail(auth()->user()->current_project_id);
@@ -142,6 +151,14 @@ class DocumentController extends ApiController
 
     public function edit_document($id)
     {
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();

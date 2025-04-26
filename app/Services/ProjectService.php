@@ -97,9 +97,13 @@ class ProjectService
 
     private function storeProject(Request $request)
     {
+        do {
+            $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        } while (Project::where('slug', $slug)->exists());
         return Project::create([
             'name' => $request->name,
             'code' => $request->code,
+            'slug'=> $slug,
             'account_id' => auth()->user()->current_account_id,
             'category_id' => intval($request->selected_category),
             'contract_date' => $request->contract_date,

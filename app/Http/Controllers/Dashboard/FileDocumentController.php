@@ -20,19 +20,28 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Shared\Html;
 use Illuminate\Http\Response;
 use SebastianBergmann\Type\FalseType;
+use ZipArchive;
 
 class FileDocumentController extends ApiController
 {
     public function index($id){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $file=ProjectFile::where('slug',$id)->first();
         $documents = FileDocument::with('document')
-    ->where('file_id', $file->id)
-    ->get()
-    ->sortBy([
-        fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
-        fn ($a, $b) => $a->sn <=> $b->sn,
-    ])
-    ->values();
+            ->where('file_id', $file->id)
+            ->get()
+            ->sortBy([
+                fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
+                fn ($a, $b) => $a->sn <=> $b->sn,
+            ])
+            ->values();
         $specific_file_doc= session('specific_file_doc');
         session()->forget('specific_file_doc');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
@@ -41,6 +50,14 @@ class FileDocumentController extends ApiController
     }
 
     public function exportWordClaimDocs($id){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         
@@ -670,6 +687,14 @@ class FileDocumentController extends ApiController
         return !empty($text);
     }
     public function store_file_document_first_analyses(Request $request,$id){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         if ($this->hasContent($request->narrative)) {
             $narrative=$request->narrative;
         } else {
@@ -705,6 +730,14 @@ class FileDocumentController extends ApiController
     }
 
     public function copy_move_doc_to_another_file(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         $file_doc=FileDocument::findOrFail($request->document_id);
         if($request->actionType=='copy'){
             $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
@@ -754,6 +787,14 @@ class FileDocumentController extends ApiController
     }
 
     public function unassign_doc(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         FileDocument::whereIn('id',$request->document_ids)->delete();
         return response()->json([
             'status' => 'success',
@@ -763,6 +804,14 @@ class FileDocumentController extends ApiController
     }
 
     public function delete_doc_from_cmw_entirely(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         foreach($request->document_ids as $doc_id){
             $doc=FileDocument::findOrFail($doc_id);
             $document=Document::find($doc->document_id);
@@ -786,9 +835,70 @@ class FileDocumentController extends ApiController
     }
 
     public function change_for_claimOrNoticeOrChart(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            session()->forget('zip_file');
+        }
         FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>'1']);
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    public function download_documents(Request $request){
+        //dd($request->all());
+        $file=ProjectFile::where('slug',$request->file_id_)->first();
+        $fileDocuments=FileDocument::where('file_id',$file->id)->get();
+        if(count($fileDocuments)>0){
+            $zip = new ZipArchive();
+           
+            $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $zipFileName = $code . '_' .$file->name ."'s_documents_" . date('d-M-y') . '.zip';
+            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zipFileName;
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+                
+                return redirect()->back()->with('error', 'Could not create ZIP file');
+            }
+           
+            foreach($fileDocuments as $document){
+                $filePath = public_path($document->document->storageFile->path);
+                if($request->formate_type=='reference'){
+                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    //$date = date('y_m_d', strtotime($document->document->start_date));
+                    $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                }elseif($request->formate_type=='dateAndReference'){
+                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    $date = date('y_m_d', strtotime($document->document->start_date));
+                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                }elseif($request->formate_type=='formate'){
+    
+                }
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $fileName);
+                }
+            }
+            
+            $zip->close();
+
+            // Return the zip file as a download
+            if (file_exists($zipFilePath)) {
+                session(['zip_file' => $zipFileName]);
+                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $zipFileName;
+                return response()->json(['download_url' => asset($relativePath)]);
+                // return response()->download($zipFilePath,null, [
+                //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                //     'Pragma' => 'no-cache',
+                //     'Expires' => '0',
+                // ]);
+            }
+        }
+        return redirect()->back()->with('error', 'No files found to download.');
+        
     }
 }
