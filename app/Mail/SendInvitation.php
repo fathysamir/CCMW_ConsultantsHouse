@@ -14,8 +14,7 @@ class SendInvitation extends Mailable
     use Queueable, SerializesModels;
 
     public $code;
-    public $sender_name;
-    public $account_name;
+    public $re_email;
    
 
     /**
@@ -23,11 +22,10 @@ class SendInvitation extends Mailable
      *
      * @return void
      */
-    public function __construct($invitation,$sender,$account)
+    public function __construct($invitation,$re_email)
     {
         $this->code = $invitation->code;
-        $this->sender_name = $sender;
-        $this->account_name = $account;
+        $this->re_email = $re_email;
       
     }
 
@@ -39,12 +37,11 @@ class SendInvitation extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.invitation')
-                    ->subject('CCMW - Invitation')
+        return $this->view('emails.inv2')
+                    ->subject('Welcome to CCMW - Sign-In Instructions')
                     ->with([
                         'code' => $this->code,
-                        'sender_name' => $this->sender_name,
-                        'account_name' => $this->account_name,
+                        'email' => $this->re_email,
                        
                     ]);
     }

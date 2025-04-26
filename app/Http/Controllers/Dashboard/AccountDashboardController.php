@@ -261,7 +261,7 @@ class AccountDashboardController extends ApiController
 
                     AccountUser::create(['user_id'=>$user->id,'account_id'=>auth()->user()->current_account_id,'role'=>'User','permissions'=>json_encode($permissions)]);
                     $account=Account::find(auth()->user()->current_account_id);
-                    Mail::to($email)->send(new SendInvitation($invitation,auth()->user()->name,$account->name));
+                    Mail::to($email)->send(new SendInvitation($invitation,$email));
                 }
                 
 
