@@ -884,7 +884,30 @@ class FileDocumentController extends ApiController
                 }elseif($request->formate_type=='formate'){
                     $prefix=$request->prefix;
                     $sn=$request->sn;
+                    
+                    $date=date('d-M-y', strtotime($document->document->start_date));
+                    $from=$document->document->fromStakeHolder->narrative;
+                    $type=$document->document->docType->name;
+                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    $fileName = $prefix . ' - ' . $sn . ' - ' . $from . "'s " . $type . ' ' ;
+                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
+                        $ref_part=$request->ref_part;
+                        if($ref_part == 'option1'){
+                            $fileName .= '- ';
+                        }elseif($ref_part == 'option2'){
+                           
+                            $fileName .= 'From- ' . $sanitizedFilename . ' - ';
+                        }elseif($ref_part == 'option3'){
+                            $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                        }
+                    }else{
+                        $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                    }
+                    $fileName .= 'dated ' . $date . '.' . pathinfo($filePath, PATHINFO_EXTENSION);;
+
                 }
+                
                 if (file_exists($filePath)) {
                     $zip->addFile($filePath, $fileName);
                 }

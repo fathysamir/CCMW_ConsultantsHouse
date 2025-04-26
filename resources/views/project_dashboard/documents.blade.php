@@ -652,6 +652,7 @@
                         </div>
                     `;
 
+                    
                     // Append the new dropdown to the row
                     rowDiv.appendChild(new_down_list);
 

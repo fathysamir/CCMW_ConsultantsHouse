@@ -411,7 +411,7 @@ class DocumentController extends ApiController
         $document = FileDocument::findOrFail($id);
         $filePath = public_path($document->document->storageFile->path);
 
-        if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.-<>|{}\[\]`]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.-<>|{}\[\]`]/', '', $document->document->docType->description)),'email')){
+        if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
             $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
             //$date = date('y_m_d', strtotime($document->document->start_date));
             $date2 = date('d-M-y', strtotime($document->document->start_date));
