@@ -506,7 +506,7 @@
                                                     assignments</a>
                                                 <a class="dropdown-item Delete-from-CMW-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}">Delete from CMW</a>
-                                                <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
+                                                {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
                                                     data-action-type="forClaim">For Claim</a>
                                                 <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
@@ -514,7 +514,7 @@
                                                     data-action-type="forLetter">For Notice</a>
                                                 <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
-                                                    data-action-type="forChart">For Gantt Chart</a>
+                                                    data-action-type="forChart">For Gantt Chart</a> --}}
                                             </div>
                                         </td>
                                     </tr>
@@ -711,6 +711,46 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="downloadalldocs">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editDocInfoModal" tabindex="-1" role="dialog" aria-labelledby="editDocInfoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDocInfoModalLabel">Edit Basic Information of Selected Documents</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assigneToForm">
+                        @csrf
+                        <input type="hidden" id="documentId_" name="document_id">
+                        <input type="hidden" id="action_type" name="action_type">
+                        <div class="form-group">
+                            <label for="folder_id">Select Folder</label>
+                            <select class="form-control" id="folder_id" required>
+                                <option value="" disabled selected>Select Folder</option>
+                                @foreach ($folders as $key => $name)
+                                    <option value="{{ $key }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group d-none">
+                            <label for="newFile">Select File</label>
+                            <select class="form-control" id="newFile" name="file_id">
+                                <option value="" disabled selected>Select File</option>
+
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editDocInfo">Save</button>
                 </div>
             </div>
         </div>
