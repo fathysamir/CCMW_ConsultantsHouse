@@ -313,7 +313,7 @@ class FileDocumentController extends ApiController
             $date=date("d F Y", strtotime($paragraph->document->start_date)); 
            
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
-            $listNumber = "$chapter.$sectionNumber." . ($index + 1);
+            $listNumber = $chapter.$sectionNumber . ($index + 1);
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
 
            
@@ -325,26 +325,26 @@ class FileDocumentController extends ApiController
             $existedList=false;
             // Add the date with a footnote
             $listItemRun->addText($date,$GetStandardStylesP);
-            // $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-            // $Exhibit=true;
-            // $dated=true;
-            // $senderAndDocType=true;
-            // $hint='';
-            // if($Exhibit){
-            //     $hint="Exhibits " . $listNumber . ": ";
-            // }
-            // if($senderAndDocType){
-            //     if($paragraph->document->from_id!=null){
-            //         $hint .=$paragraph->document->fromStakeHolder->name . "'s ";
-            //     }
-            //     $hint .=$paragraph->document->docType->name . " ";
+            $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
+            $Exhibit=true;
+            $dated=true;
+            $senderAndDocType=true;
+            $hint='';
+            if($Exhibit){
+                $hint="Exhibits " . $listNumber . ": ";
+            }
+            if($senderAndDocType){
+                if($paragraph->document->from_id!=null){
+                    $hint .=$paragraph->document->fromStakeHolder->name . "'s ";
+                }
+                $hint .=$paragraph->document->docType->name . " ";
                 
-            // }
-            // $hint .="Ref: " . $paragraph->document->reference . ", ";
-            // if($dated){
-            //     $hint .="dated: " . $date . ".";
-            // }
-            // $footnote->addText($hint,$GetStandardStylesFootNotes);
+            }
+            $hint .="Ref: " . $paragraph->document->reference . ", ";
+            if($dated){
+                $hint .="dated: " . $date . ".";
+            }
+            $footnote->addText($hint,$GetStandardStylesFootNotes);
             $listItemRun->addText(", ",$GetStandardStylesP);
             if($paragraph->narrative==null){
                 $listItemRun->addText("____________.");
