@@ -267,6 +267,7 @@ class FileDocumentController extends ApiController
         $file=ProjectFile::where('slug',$id)->first();
         // Header (Level 1 Outline)
         $header = $file->name;
+        $header = str_replace('&', '&amp;', $header);
         $section->addTitle($header,2);
 
         //$section->addListItem($header, 0, ['size' => 16,'bold' => true,], 'multilevel');
