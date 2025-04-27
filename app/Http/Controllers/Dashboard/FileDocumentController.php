@@ -313,7 +313,7 @@ class FileDocumentController extends ApiController
             $date=date("d F Y", strtotime($paragraph->document->start_date)); 
            
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
-            $listNumber = $chapter.$sectionNumber . ($index + 1);
+            $listNumber = "$chapter.$sectionNumber." . ($index + 1);
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
 
            
@@ -335,7 +335,7 @@ class FileDocumentController extends ApiController
             }
             if($senderAndDocType){
                 if($paragraph->document->from_id!=null){
-                    $hint .=$paragraph->document->fromStakeHolder->name . "'s ";
+                    $hint .=$paragraph->document->fromStakeHolder->narrative . "'s ";
                 }
                 $hint .=$paragraph->document->docType->name . " ";
                 
