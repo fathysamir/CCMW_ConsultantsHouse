@@ -441,13 +441,13 @@
                                                     class="fe fe-23 fe-volume-2"
                                                     style="@if (count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
                                             <label class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
-                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
                                                 data-action-type="forClaim"><span>C</span></label>
                                             <label class="for_notice for-claim-btn222 @if ($document->forLetter == '1') active @endif"
-                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
                                                 data-action-type="forLetter"><span>N</span></label>
                                             <label class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
-                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
                                                 data-action-type="forChart"><span>G</span></label>
                                             <br>
                                             <span
