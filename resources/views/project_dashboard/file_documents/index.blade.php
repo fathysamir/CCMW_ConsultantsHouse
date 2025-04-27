@@ -236,11 +236,11 @@
                                     <th><label id="all_with_tags"><span class="fe fe-23 fe-volume-2"
                                                 style="color: rgb(169, 169, 169);"></span></label>
                                         <label id="all_for_claim"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>C</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>C</span></label>
                                         <label id="all_for_notice"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>N</span></label>
                                         <label id="all_for_timeline"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;"><span>G</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>G</span></label>
                                     </th>
                                     <th><b>Subject </b>
                                         <span id="subjectFilterIcon" style="color:rgb(35, 197, 226); cursor: pointer;"
