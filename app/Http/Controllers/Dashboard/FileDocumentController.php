@@ -348,203 +348,207 @@ class FileDocumentController extends ApiController
             $listItemRun->addText(", ",$GetStandardStylesP);
             if($paragraph->narrative==null){
                 $listItemRun->addText("____________.");
-            }
-            // else{
-            //     if (!$containsHtml) {
-            //         $listItemRun->addText($paragraph->narrative . ".");
-            //     }else{
+            }else{
+                if (!$containsHtml) {
+                    $listItemRun->addText($paragraph->narrative . ".");
+                }else{
                    
-            //         $paragraph_=$this->fixParagraphsWithImages($paragraph->narrative);
+                    $paragraph_=$this->fixParagraphsWithImages($paragraph->narrative);
+                    
+                    // preg_match('/<ol>.*?<\/ol>/s', $paragraph_, $olMatches);
+                    // $olContent = $olMatches[0] ?? ''; // Get the <ol> content if it exists
+                    // preg_match('/<ul>.*?<\/ul>/s', $paragraph_, $ulMatches);
+                    // $ulContent = $ulMatches[0] ?? ''; // Get the <ol> content if it exists
+    
+                    // Step 2: Remove the <ol> content from the main paragraph
+                    // $paragraphWithoutOl = preg_replace('/<ol>.*?<\/ol>/s', '', $paragraph);
+                    // $paragraphWithoutOlUl = preg_replace('/<ul>.*?<\/ul>/s', '', $paragraphWithoutOl);
+                    $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
                    
-            //         // preg_match('/<ol>.*?<\/ol>/s', $paragraph_, $olMatches);
-            //         // $olContent = $olMatches[0] ?? ''; // Get the <ol> content if it exists
-            //         // preg_match('/<ul>.*?<\/ul>/s', $paragraph_, $ulMatches);
-            //         // $ulContent = $ulMatches[0] ?? ''; // Get the <ol> content if it exists
+                    // Step 2: Remove empty <p></p> tags
+                    $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
+                  
+                    $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
+                   
+                    // Step 3: Split into an array of <p> tags
+                    //$paragraphsArray = preg_split('/(?=<p>)|(?<=<\/p>)/', $paragraphWithoutEmptyParagraphs);
     
-            //         // Step 2: Remove the <ol> content from the main paragraph
-            //         // $paragraphWithoutOl = preg_replace('/<ol>.*?<\/ol>/s', '', $paragraph);
-            //         // $paragraphWithoutOlUl = preg_replace('/<ul>.*?<\/ul>/s', '', $paragraphWithoutOl);
-            //         $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
-    
-            //         // Step 2: Remove empty <p></p> tags
-            //         $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
-            //         $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
-    
-            //         // Step 3: Split into an array of <p> tags
-            //         //$paragraphsArray = preg_split('/(?=<p>)|(?<=<\/p>)/', $paragraphWithoutEmptyParagraphs);
-    
-            //         // Step 4: Filter out empty elements
-            //         $paragraphsArray = array_filter($paragraphsArray, function($item) {
-            //             return !empty(trim($item));
-            //         });
+                    // Step 4: Filter out empty elements
+                    $paragraphsArray = array_filter($paragraphsArray, function($item) {
+                        return !empty(trim($item));
+                    });
+                   
                     
-                    
-            //         // Step 5: Add each <p> tag to the document with a newline after it
-            //         foreach ($paragraphsArray as $index => $pTag) {
-            //             //dd($paragraphsArray);
-            //             if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
+                    // Step 5: Add each <p> tag to the document with a newline after it
+                    foreach ($paragraphsArray as $index => $pTag) {
+                        //dd($paragraphsArray);
+                        if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
                             
-            //                 $imgPath = $matches[1]; // Extract image path
-            //                 $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
-            //                 $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                            $imgPath = $matches[1]; // Extract image path
+                            $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
+                            $fullImagePath = public_path($imgPath); // Convert relative path to absolute
                         
-            //                 if ($existedList) {
-            //                     if (file_exists($fullImagePath)) {
-            //                         $textRun = $section->addTextRun([
-            //                             'spaceBefore' => 0,
-            //                             'spaceAfter' => 240,
-            //                             'lineHeight' => 0.9,
-            //                             'lineSpacing'=>'single',
-            //                             'indentation' => [
-            //                                 'left' => 1071.6 
-            //                             ],
-            //                         ]);
+                            if ($existedList) {
+                                if (file_exists($fullImagePath)) {
+                                    $textRun = $section->addTextRun([
+                                        'spaceBefore' => 0,
+                                        'spaceAfter' => 240,
+                                        'lineHeight' => 0.9,
+                                        'lineSpacing'=>'single',
+                                        'indentation' => [
+                                            'left' => 1071.6 
+                                        ],
+                                    ]);
                         
-            //                         // Add Image
-            //                         $shape =$textRun->addImage($fullImagePath, [
-            //                             'width' => 100,
-            //                             'height' => 80,
-            //                             'alignment' => 'left'
-            //                         ]);
+                                    // Add Image
+                                    $shape =$textRun->addImage($fullImagePath, [
+                                        'width' => 100,
+                                        'height' => 80,
+                                        'alignment' => 'left'
+                                    ]);
                                    
-            //                         // Add Caption (Alt text)
-            //                         if (!empty($altText)) {
-            //                             $textRun->addTextBreak(); // New line
-            //                             $textRun->addText($altText . ".", [ 'name'=>'Calibri',
-            //                             'alignment' => 'left', // Options: left, center, right, justify
-            //                             'size' => 9,
-            //                             'bold' => false,
-            //                             'italic' => true,
-            //                             'underline'=>false]); // Add caption in italics
-            //                         }
-            //                     }
-            //                 } else {
-            //                     if (file_exists($fullImagePath)) {
-            //                         // Add Image
-            //                         $listItemRun->addImage($fullImagePath, [
-            //                             'width' => 100,
-            //                             'height' => 80,
-            //                             'alignment' => 'left'
-            //                         ]);
+                                    // Add Caption (Alt text)
+                                    if (!empty($altText)) {
+                                        $textRun->addTextBreak(); // New line
+                                        $textRun->addText($altText . ".", [ 'name'=>'Calibri',
+                                        'alignment' => 'left', // Options: left, center, right, justify
+                                        'size' => 9,
+                                        'bold' => false,
+                                        'italic' => true,
+                                        'underline'=>false]); // Add caption in italics
+                                    }
+                                }
+                            } else {
+                                if (file_exists($fullImagePath)) {
+                                    // Add Image
+                                    $listItemRun->addImage($fullImagePath, [
+                                        'width' => 100,
+                                        'height' => 80,
+                                        'alignment' => 'left'
+                                    ]);
                         
-            //                         // Add Caption (Alt text)
-            //                         if (!empty($altText)) {
-            //                             $listItemRun->addTextBreak(); // New line
-            //                             $listItemRun->addText($altText . ".", ['name'=>'Calibri',
-            //                             'alignment' => 'left', // Options: left, center, right, justify
-            //                             'size' => 9,
-            //                             'bold' => false,
-            //                             'italic' => true,
-            //                             'underline'=>false]); // Add caption in italics
-            //                         }
-            //                     }
-            //                 }
-            //             }elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
+                                    // Add Caption (Alt text)
+                                    if (!empty($altText)) {
+                                        $listItemRun->addTextBreak(); // New line
+                                        $listItemRun->addText($altText . ".", ['name'=>'Calibri',
+                                        'alignment' => 'left', // Options: left, center, right, justify
+                                        'size' => 9,
+                                        'bold' => false,
+                                        'italic' => true,
+                                        'underline'=>false]); // Add caption in italics
+                                    }
+                                }
+                            }
+                        }elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
                             
-            //                 $imgPath = $matches[1]; // Extract image path
+                            $imgPath = $matches[1]; // Extract image path
                             
-            //                 $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                            $fullImagePath = public_path($imgPath); // Convert relative path to absolute
                         
-            //                 if ($existedList) {
-            //                     if (file_exists($fullImagePath)) {
-            //                         $textRun = $section->addTextRun([
-            //                             'spaceBefore' => 0,
-            //                             'spaceAfter' => 240,
-            //                             'lineHeight' => 1.5,
-            //                             'indentation' => [
-            //                                 'left' => 1071.6 
-            //                             ],
-            //                         ]);
+                            if ($existedList) {
+                                if (file_exists($fullImagePath)) {
+                                    $textRun = $section->addTextRun([
+                                        'spaceBefore' => 0,
+                                        'spaceAfter' => 240,
+                                        'lineHeight' => 1.5,
+                                        'indentation' => [
+                                            'left' => 1071.6 
+                                        ],
+                                    ]);
                         
-            //                         // Add Image
-            //                         $textRun->addImage($fullImagePath, [
-            //                             'width' => 100,
-            //                             'height' => 80,
-            //                             'alignment' => 'left'
-            //                         ]);
+                                    // Add Image
+                                    $textRun->addImage($fullImagePath, [
+                                        'width' => 100,
+                                        'height' => 80,
+                                        'alignment' => 'left'
+                                    ]);
                         
                                    
-            //                     }
-            //                 } else {
-            //                     if (file_exists($fullImagePath)) {
-            //                         // Add Image
-            //                         $listItemRun->addImage($fullImagePath, [
-            //                             'width' => 100,
-            //                             'height' => 80,
-            //                             'alignment' => 'left'
-            //                         ]);
+                                }
+                            } else {
+                                if (file_exists($fullImagePath)) {
+                                    // Add Image
+                                    $listItemRun->addImage($fullImagePath, [
+                                        'width' => 100,
+                                        'height' => 80,
+                                        'alignment' => 'left'
+                                    ]);
                         
                                 
-            //                     }
-            //                 }
-            //             }elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
-            //                 if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
-            //                     $listItems = $liMatches[1] ?? [];
+                                }
+                            }
+                        }elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
+                            if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
+                                $listItems = $liMatches[1] ?? [];
                     
-            //                     // Add each list item as a nested list item
-            //                     foreach ($listItems as $item) {
-            //                         // Add a nested list item
-            //                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel2','listParagraphStyle2'); // Use a numbering style
-            //                         $nestedListItemRun->addText($item);
-            //                     }
-            //                 }
-            //                 $existedList=true;
-            //             }elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
-            //                 if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
-            //                     $listItems = $liMatches[1] ?? [];
+                                // Add each list item as a nested list item
+                                foreach ($listItems as $item) {
+                                    // Add a nested list item
+                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel2','listParagraphStyle2'); // Use a numbering style
+                                    $nestedListItemRun->addText($item);
+                                }
+                            }
+                            $existedList=true;
+                        }elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
+                            if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
+                                $listItems = $liMatches[1] ?? [];
                     
-            //                     // Add each list item as a nested list item
-            //                     foreach ($listItems as $item) {
-            //                         // Add a nested list item
-            //                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered','listParagraphStyle2'); // Use a numbering style
-            //                         $unNestedListItemRun->addText($item);
-            //                     }
-            //                 }
-            //                 $existedList=true;
-            //             }else {
-            //                 // If the paragraph contains only text (including <span>, <strong>, etc.)
-            //                 try {
-            //                     if($existedList){
+                                // Add each list item as a nested list item
+                                foreach ($listItems as $item) {
+                                    // Add a nested list item
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered','listParagraphStyle2'); // Use a numbering style
+                                    $unNestedListItemRun->addText($item);
+                                }
+                            }
+                            $existedList=true;
+                        }else {
+                           
+                            // If the paragraph contains only text (including <span>, <strong>, etc.)
+                            try {
+                                if($existedList){
                                    
-            //                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-            //                             'spaceBefore'=> 0,
-            //                             'spaceAfter' => 240,
-            //                             'lineHeight' => '1.5',
-            //                             'indentation' =>[
-            //                                 'left'=>1071.6,
+                                    $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                        'spaceBefore'=> 0,
+                                        'spaceAfter' => 240,
+                                        'lineHeight' => '1.5',
+                                        'indentation' =>[
+                                            'left'=>1071.6,
                                            
                                             
-            //                             ],
-            //                             'contextualSpacing' => false,
-            //                             'next' => true,
-            //                             'keepNext' => true,
-            //                             'widowControl' => true,
-            //                             'keepLines' => true,          
-            //                             'hyphenation' => false ,
-            //                             'pageBreakBefore'=>false
-            //                         ]);
-            //                         Html::addHtml($listItemRun2, $pTag, false, false);
-            //                     }else{
-            //                         Html::addHtml($listItemRun, $pTag, false, false);
-            //                     }
+                                        ],
+                                        'contextualSpacing' => false,
+                                        'next' => true,
+                                        'keepNext' => true,
+                                        'widowControl' => true,
+                                        'keepLines' => true,          
+                                        'hyphenation' => false ,
+                                        'pageBreakBefore'=>false
+                                    ]);
+                                    Html::addHtml($listItemRun2, $pTag, false, false);
+                                }else{
+                                    //$pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+                                    $pTag = str_replace('&', '&amp;', $pTag);
+                                    Html::addHtml($listItemRun, $pTag, false, false);
+                                }
                                 
-            //                 } catch (\Exception $e) {
-            //                     error_log("Error adding HTML: " . $e->getMessage());
-            //                 }
-            //             }
+                            } catch (\Exception $e) {
+                                error_log("Error adding HTML: " . $e->getMessage());
+                            }
+                        }
                     
-            //             // Add a paragraph break after each element to separate them
-            //             if ($index < count($paragraphsArray) - 1) {
-            //                 if($existedList==false){
-            //                     $listItemRun->addTextBreak();
-            //                 }
+                        // Add a paragraph break after each element to separate them
+                        if ($index < count($paragraphsArray) - 1) {
+                            if($existedList==false){
+                                $listItemRun->addTextBreak();
+                            }
                                 
-            //             }
-            //         }
+                        }
+                        
+                    }
                     
                    
-            //     }
-            // }
+                }
+            }
             
 
         }
@@ -559,7 +563,7 @@ class FileDocumentController extends ApiController
         // Define file path in public folder
         $fileName = 'projects/' . auth()->user()->current_project_id . '/exports/' . auth()->user()->id . '_' . time() . '_Claim_Report.docx';
         $filePath = public_path($fileName);
-
+       
         // Save document to public folder
         $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($filePath);
