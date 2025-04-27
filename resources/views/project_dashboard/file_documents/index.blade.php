@@ -677,9 +677,9 @@
                                         placeholder="Perfix" value="" style="width: 85%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
-                                    <label class="mt-1" for="sn">SN Number : </label>
+                                    <label class="mt-1" for="sn">Number Of Digits : </label>
                                     <input type="number" name="sn" id="sn" class="form-control"
-                                        placeholder="SN" value="" style="width: 77%;margin-left:2%;">
+                                        placeholder="SN" value="" style="width: 30%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn">In case of e-mails : </label>
