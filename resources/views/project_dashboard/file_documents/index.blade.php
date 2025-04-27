@@ -234,7 +234,7 @@
                                     </th>
 
                                     <th><label id="all_with_tags"><span class="fe fe-23 fe-volume-2"
-                                                style="color: rgb(169, 169, 169);"></span></label>
+                                                style="color: rgb(169, 169, 169);cursor: pointer;"></span></label>
                                         <label id="all_for_claim"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>C</span></label>
                                         <label id="all_for_notice"
