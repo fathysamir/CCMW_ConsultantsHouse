@@ -3,6 +3,7 @@
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> 
     <style>
         #btn-outline-primary {
             color: blue;
@@ -66,69 +67,69 @@
         /* Ensure consistent column widths */
         .table-container th:nth-child(1),
         .table-container td:nth-child(1) {
-            width: 1%;
+            width: 1% !important;
         }
 
 
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 9%;
+            width: 12% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 19%;
+            width: 16% !important;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 6.5%;
+            width: 6.5% !important;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 7.7%;
+            width: 7.7% !important;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 10.6%;
+            width: 10.6% !important;
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
-            width: 4%;
+            width: 4% !important;
         }
 
         .table-container th:nth-child(8),
         .table-container td:nth-child(8) {
-            width: 8.8%;
+            width: 8.8% !important;
         }
 
         .table-container th:nth-child(9),
         .table-container td:nth-child(9) {
-            width: 8.8%;
+            width: 8.8% !important;
         }
 
         .table-container th:nth-child(10),
         .table-container td:nth-child(10) {
-            width: 3%;
+            width: 3% !important;
         }
 
         .table-container th:nth-child(11),
         .table-container td:nth-child(11) {
-            width: 6.8%;
+            width: 6.8% !important;
         }
 
         .table-container th:nth-child(12),
         .table-container td:nth-child(12) {
-            width: 13.8%;
+            width: 13.8% !important;
         }
 
         .table-container th:nth-child(13),
         .table-container td:nth-child(13) {
-            width: 3%;
+            width: 3% !important;
         }
 
         /* Maintain styles from your original table */
@@ -165,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -440,19 +441,29 @@
                                             <label class="with_tag @if (count($document->tags) != 0) active @endif"><span
                                                     class="fe fe-23 fe-volume-2"
                                                     style="@if (count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
-                                            <label class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
-                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
+                                            <label
+                                                class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
+                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
+                                                data-document-id="{{ $document->id }}"
                                                 data-action-type="forClaim"><span>C</span></label>
-                                            <label class="for_notice for-claim-btn222 @if ($document->forLetter == '1') active @endif"
-                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
+                                            <label
+                                                class="for_notice for-claim-btn222 @if ($document->forLetter == '1') active @endif"
+                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
+                                                data-document-id="{{ $document->id }}"
                                                 data-action-type="forLetter"><span>N</span></label>
-                                            <label class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
-                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;" data-document-id="{{ $document->id }}"
+                                            <label
+                                                class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
+                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
+                                                data-document-id="{{ $document->id }}"
                                                 data-action-type="forChart"><span>G</span></label>
+                                                <i class="fa-solid fa-flag fa-beat-fade" style="color: #0008ff;margin-left:0.6rem;margin-right:0.2rem"></i>
+                                                <i class="fa-solid fa-flag fa-beat-fade" style="color: #ff0000;"></i>
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
                                             <label>{{ $document->document->docType->name }}</label>
+
+                                            
                                         </td>
 
                                         <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
@@ -531,7 +542,9 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="copyToModalLabel"><spam id="type">Copy</spam> Document To another File</h5>
+                    <h5 class="modal-title" id="copyToModalLabel">
+                        <spam id="type">Copy</spam> Document To another File
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -728,22 +741,45 @@
                 <div class="modal-body">
                     <form id="assigneToForm">
                         @csrf
-                        <input type="hidden" id="documentId_" name="document_id">
-                        <input type="hidden" id="action_type" name="action_type">
+                        <input type="hidden" id="documentIdds" name="documentIdds">
+                      
                         <div class="form-group">
-                            <label for="folder_id">Select Folder</label>
-                            <select class="form-control" id="folder_id" required>
-                                <option value="" disabled selected>Select Folder</option>
-                                @foreach ($folders as $key => $name)
-                                    <option value="{{ $key }}">{{ $name }}</option>
+                            <label for="newDocTypeForAll">Select New Document Type</label>
+                            <select class="form-control" id="newDocTypeForAll" name="new_doc_type_id">
+                                <option value="" disabled selected>Select Document Type</option>
+                                @foreach ($documents_types as $documents_type)
+                                    <option value="{{ $documents_type->id }}">{{ $documents_type->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group d-none">
-                            <label for="newFile">Select File</label>
-                            <select class="form-control" id="newFile" name="file_id">
-                                <option value="" disabled selected>Select File</option>
 
+                       <div class="form-group">
+                            <label for="newFromStakeHolderForAll">From</label>
+                            <select class="form-control" id="newFromStakeHolderForAll" name="new_from_id">
+                                <option value="" disabled selected>Select Stake Holder</option>
+                                @foreach ($stake_holders as $stake_holder)
+                                    <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
+                                        {{ $stake_holder->role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newToStakeHolderForAll">To</label>
+                            <select class="form-control" id="newToStakeHolderForAll" name="new_to_id">
+                                <option value="" disabled selected>Select Stake Holder</option>
+                                @foreach ($stake_holders as $stake_holder)
+                                    <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
+                                        {{ $stake_holder->role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newOwnerForAll">Select New Owner</label>
+                            <select class="form-control" id="newOwnerForAll" name="new_owner_id">
+                                <option value="" disabled selected>Select Owner</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </form>
@@ -992,11 +1028,11 @@
                 var documentIds = [];
                 var type = $(this).data('action-type')
                 documentIds.push($(this).data('document-id'));
-              
-                let value=''
-                if(this.classList.contains('active')){
+
+                let value = ''
+                if (this.classList.contains('active')) {
                     value = '0';
-                }else{
+                } else {
                     value = '1';
                 }
 
@@ -1013,7 +1049,7 @@
                         documentIds.forEach(function(id) {
                             let tr = document.getElementById('dddd_' + id);
                             if (tr) {
-                                
+
                                 if (type == 'forClaim') {
                                     const forClaimLabel = tr.querySelector(
                                         'label.for_claim');
@@ -1022,7 +1058,7 @@
                                         forClaimLabel.classList.add('active');
                                         forClaimLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
-                                    }else{
+                                    } else {
                                         forClaimLabel.classList.remove('active');
                                         forClaimLabel.style.backgroundColor =
                                             'rgb(169, 169, 169)';
@@ -1035,8 +1071,8 @@
                                         forNoticeLabel.classList.add('active');
                                         forNoticeLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
-                                    }else{
-                                        console.log('lll')
+                                    } else {
+
                                         forNoticeLabel.classList.remove('active');
                                         forNoticeLabel.style.backgroundColor =
                                             'rgb(169, 169, 169)';
@@ -1049,7 +1085,7 @@
                                         forChartLabel.classList.add('active');
                                         forChartLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
-                                    }else{
+                                    } else {
                                         forChartLabel.classList.remove('active');
                                         forChartLabel.style.backgroundColor =
                                             'rgb(169, 169, 169)';
@@ -1089,12 +1125,13 @@
                 let fileDropdown = $('#newFile');
                 fileDropdown.closest('.form-group').addClass(
                     'd-none');
-                document.getElementById('type').innerText =  action_type.charAt(0).toUpperCase() + action_type.slice(1).toLowerCase();
+                document.getElementById('type').innerText = action_type.charAt(0).toUpperCase() +
+                    action_type.slice(1).toLowerCase();
 
                 $('#copyToModal').modal('show'); // Show the modal
             });
 
-            
+
 
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
@@ -1131,7 +1168,7 @@
             });
 
             $('#saveCopyDoc').click(function() {
-                let documentIds=[];
+                let documentIds = [];
                 documentIds.push($('#documentId_').val());
                 //let documentId = $('#documentId_').val();
                 let fileId = $('#newFile').val();
@@ -1157,10 +1194,10 @@
                         } else {
                             if (actionType == 'move') {
                                 documentIds.forEach(function(id) {
-                                document.getElementById('dddd_' + id)?.remove();
-                            });
+                                    document.getElementById('dddd_' + id)?.remove();
+                                });
 
-                            
+
                             }
                             showHint(response.message); // Show success message
 
@@ -1333,7 +1370,7 @@
             });
             $('.copyForAllBtn').on('click', function() {
                 // Get all checked checkboxes
-                
+
                 const checkedCheckboxes = document.querySelectorAll(
                     'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
 
@@ -1357,13 +1394,14 @@
                 let fileDropdown = $('#newFile2');
                 fileDropdown.closest('.form-group').addClass(
                     'd-none');
-                document.getElementById('type2').innerText =  action_type2.charAt(0).toUpperCase() + action_type2.slice(1).toLowerCase();
+                document.getElementById('type2').innerText = action_type2.charAt(0).toUpperCase() +
+                    action_type2.slice(1).toLowerCase();
                 $('#copyToForAllModal').modal('show');
             });
 
             $('#saveCopyDocs').click(function() {
-                let documentIds=$('#documentIdss').val().split(','); 
-                
+                let documentIds = $('#documentIdss').val().split(',');
+
                 //let documentId = $('#documentId_').val();
                 let fileId = $('#newFile2').val();
                 let actionType = $('#action_type2').val();
@@ -1388,10 +1426,10 @@
                         } else {
                             if (actionType == 'move') {
                                 documentIds.forEach(function(id) {
-                                document.getElementById('dddd_' + id)?.remove();
-                            });
+                                    document.getElementById('dddd_' + id)?.remove();
+                                });
 
-                            
+
                             }
                             showHint(response.message); // Show success message
 
@@ -1455,7 +1493,7 @@
                     documentIds.push(checkbox.value);
                 });
                 var type = $(this).data('action-type')
-                
+
 
                 $.ajax({
                     url: '/project/doc/make-for-claim', // Adjust the route to your API endpoint
@@ -1473,29 +1511,53 @@
                                 if (type == 'forClaim') {
                                     const forClaimLabel = tr.querySelector(
                                         'label.for_claim');
-                                    if (forClaimLabel && !forClaimLabel.classList
+                                    if (response.value == '1' && forClaimLabel && !
+                                        forClaimLabel.classList
                                         .contains('active')) {
                                         forClaimLabel.classList.add('active');
                                         forClaimLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
+                                    } else if (response.value == '0' && forClaimLabel &&
+                                        forClaimLabel.classList
+                                        .contains('active')) {
+
+                                        forClaimLabel.classList.remove('active');
+                                        forClaimLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
                                     }
                                 } else if (type == 'forLetter') {
                                     const forNoticeLabel = tr.querySelector(
                                         'label.for_notice');
-                                    if (forNoticeLabel && !forNoticeLabel.classList
+                                    if (response.value == '1' && forNoticeLabel && !
+                                        forNoticeLabel.classList
                                         .contains('active')) {
                                         forNoticeLabel.classList.add('active');
                                         forNoticeLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
+                                    } else if (response.value == '0' &&
+                                        forNoticeLabel && forNoticeLabel.classList
+                                        .contains('active')) {
+
+                                        forNoticeLabel.classList.remove('active');
+                                        forNoticeLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
                                     }
                                 } else if (type == 'forChart') {
                                     const forChartLabel = tr.querySelector(
                                         'label.for_timeline');
-                                    if (forChartLabel && !forChartLabel.classList
+                                    if (response.value == '1' && forChartLabel && !
+                                        forChartLabel.classList
                                         .contains('active')) {
                                         forChartLabel.classList.add('active');
                                         forChartLabel.style.backgroundColor =
                                             'rgb(45, 209, 45)';
+                                    } else if (response.value == '0' && forChartLabel &&
+                                        forChartLabel.classList
+                                        .contains('active')) {
+
+                                        forChartLabel.classList.remove('active');
+                                        forChartLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
                                     }
                                 }
 
@@ -1540,7 +1602,7 @@
                             documentIds.forEach(function(id) {
                                 document.getElementById('dddd_' + id)?.remove();
                             });
-                            document.getElementById('Action-DIV').style.display='none';
+                            document.getElementById('actionList').style.display = 'none';
                             showHint(response.message); // Show success message
                         },
                         error: function() {
@@ -1549,6 +1611,107 @@
                     });
                 }
             })
+
+            $('#editDocsForAllBtn').on('click', function() {
+                // Get all checked checkboxes
+
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+                // Set the document IDs in a hidden input (optional)
+                $('#documentIdds').val(documentIds.join(','));
+               
+                
+                //$('#folder_id2').val('');
+                //let fileDropdown = $('#newFile2');
+            
+               
+                $('#editDocInfoModal').modal('show');
+            });
+            $('#editDocInfo').click(function() {
+                $.ajax({
+                    url: '/project/edit-docs-info', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: $('#documentIdds').val().split(','),
+                        doc_type: $('#newDocTypeForAll').val(),
+                        from: $('#newFromStakeHolderForAll').val(),
+                        to : $('#newToStakeHolderForAll').val(),
+                        owner : $('#newOwnerForAll').val()
+                    },
+                    success: function(response) {
+                        if (response.status == 'error') {
+                            alert("⚠️ " + response.message);
+                        } else {
+                             // Show success message
+                            location.reload();
+
+                        }
+                        $('#copyToForAllModal').modal('hide');4
+                        //showHint(response.message);
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+
+            $('#downloadForAllBtn').on('click', function() {
+                // Get all checked checkboxes
+
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+                // Set the document IDs in a hidden input (optional)
+                
+                $.ajax({
+                    url: '/download-specific-documents', // Replace with real route
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        file_id:$('#download-allDoc').data('file-id')
+                     
+                    },
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        document.getElementById('actionList').style.display = 'none';
+                        showHint(response.message);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+             
+            });
+
         })
     </script>
     <script>

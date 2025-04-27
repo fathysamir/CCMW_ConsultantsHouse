@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\StorageFile;
 use App\Models\Document;
+use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\ProjectFile;
+use App\Models\DocType;
 use App\Models\ContractTag;
 use App\Models\FileDocument;
 use Illuminate\Validation\Rule;
@@ -20,6 +22,7 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Shared\Html;
 use Illuminate\Http\Response;
 use SebastianBergmann\Type\FalseType;
+use Illuminate\Support\Facades\File;
 use ZipArchive;
 
 class FileDocumentController extends ApiController
@@ -27,9 +30,9 @@ class FileDocumentController extends ApiController
     public function index($id){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -45,16 +48,20 @@ class FileDocumentController extends ApiController
         $specific_file_doc= session('specific_file_doc');
         session()->forget('specific_file_doc');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-
-        return view('project_dashboard.file_documents.index',compact('documents','folders','file','specific_file_doc'));
+        $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
+       
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $stake_holders = $project->stakeHolders;
+        return view('project_dashboard.file_documents.index',compact('documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
     }
 
     public function exportWordClaimDocs($id){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -689,9 +696,9 @@ class FileDocumentController extends ApiController
     public function store_file_document_first_analyses(Request $request,$id){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -732,9 +739,9 @@ class FileDocumentController extends ApiController
     public function copy_move_doc_to_another_file(Request $request){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -788,9 +795,9 @@ class FileDocumentController extends ApiController
     public function unassign_doc(Request $request){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -805,9 +812,9 @@ class FileDocumentController extends ApiController
     public function delete_doc_from_cmw_entirely(Request $request){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -836,25 +843,41 @@ class FileDocumentController extends ApiController
     public function change_for_claimOrNoticeOrChart(Request $request){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
-        return response()->json([
-            'status' => 'success',
-        ]);
+        if(count($request->document_ids)>1){
+            $do=FileDocument::findOrFail($request->document_ids[0]);
+            $ac=$request->action_type;
+            if($do->$ac =='1'){
+                $va='0';
+            }else{
+                $va='1';
+            }
+            FileDocument::whereIn('id',$request->document_ids)->update([$ac=>$va]);
+            return response()->json([
+                'status' => 'success',
+                'value' => $va
+            ]);
+        }else{
+            FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
+            return response()->json([
+                'status' => 'success',
+            ]);
+        }
+        
     }
 
     public function download_documents(Request $request){
         //dd($request->all());
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -869,13 +892,18 @@ class FileDocumentController extends ApiController
             $zip = new ZipArchive();
            
             $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            $zipFileName = $code . '_' .$file->name ."'s_documents_" . date('d-M-y') . '.zip';
-            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zipFileName;
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $zipFileName = $file->code . '-' . $file->name . '.zip';
+            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
             if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
                 
                 return redirect()->back()->with('error', 'Could not create ZIP file');
             }
-           
+            $counter = 1;
             foreach($fileDocuments as $document){
                 $filePath = public_path($document->document->storageFile->path);
                 if($request->formate_type=='reference'){
@@ -889,6 +917,7 @@ class FileDocumentController extends ApiController
                     $date = date('y_m_d', strtotime($document->document->start_date));
                     $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
                 }elseif($request->formate_type=='formate'){
+                    
                     $prefix=$request->prefix;
                     $sn=$request->sn;
                     
@@ -897,7 +926,8 @@ class FileDocumentController extends ApiController
                     $type=$document->document->docType->name;
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
-                    $fileName = $prefix . ' - ' . $sn . ' - ' . $from . "'s " . $type . ' ' ;
+                    $number_prefix = str_pad($counter, $sn, '0', STR_PAD_LEFT);
+                    $fileName = $prefix . ' - ' . $number_prefix . ' - ' . $from . "'s " . $type . ' ' ;
                     if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
                         $ref_part=$request->ref_part;
                         if($ref_part == 'option1'){
@@ -912,7 +942,7 @@ class FileDocumentController extends ApiController
                         $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
                     }
                     $fileName .= 'dated ' . $date . '.' . pathinfo($filePath, PATHINFO_EXTENSION);;
-
+                    $counter++;
                 }
                 
                 if (file_exists($filePath)) {
@@ -924,8 +954,8 @@ class FileDocumentController extends ApiController
 
             // Return the zip file as a download
             if (file_exists($zipFilePath)) {
-                session(['zip_file' => $zipFileName]);
-                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $zipFileName;
+                session(['zip_file' => $code]);
+                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
                 return response()->json(['download_url' => asset($relativePath)]);
                 // return response()->download($zipFilePath,null, [
                 //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
@@ -936,5 +966,98 @@ class FileDocumentController extends ApiController
         }
         return redirect()->back()->with('error', 'No files found to download.');
         
+    }
+
+    public function download_specific_documents(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        $file=ProjectFile::where('slug',$request->file_id)->first();
+        $fileDocuments=FileDocument::whereIn('id',$request->document_ids)->get();
+        if(count($fileDocuments)>0){
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $zip = new ZipArchive();
+           
+            $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $zipFileName = $file->code . '-' . $file->name . ' - selected documents ' . '.zip';
+            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+                
+                return redirect()->back()->with('error', 'Could not create ZIP file');
+            }
+           
+            foreach($fileDocuments as $document){
+                $filePath = public_path($document->document->storageFile->path);
+                if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
+                    $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
+                    $date = date('y_m_d', strtotime($document->document->start_date));
+                    $date2 = date('d-M-y', strtotime($document->document->start_date));
+                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                } else {
+                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    $date = date('y_m_d', strtotime($document->document->start_date));
+                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                }
+        
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $fileName);
+                }
+            }
+
+            $zip->close();
+
+            // Return the zip file as a download
+            if (file_exists($zipFilePath)) {
+                session(['zip_file' => $code]);
+                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
+                return response()->json(['message'=>'Selected Documnets Downloaded successfully','download_url' => asset($relativePath)]);
+                // return response()->download($zipFilePath,null, [
+                //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                //     'Pragma' => 'no-cache',
+                //     'Expires' => '0',
+                // ]);
+            }
+
+        }
+        return redirect()->back()->with('error', 'No files found to download.');
+
+    }
+
+    public function edit_docs_info(Request $request){
+        foreach($request->document_ids as $id){
+            $file_doc=FileDocument::findOrFail($id);
+            $doc=$file_doc->document;
+            if($request->doc_type){
+                $doc->doc_type_id=$request->doc_type;
+            }
+            if($request->from){
+                $doc->from_id=$request->from;
+            }
+            if($request->to){
+                $doc->to_id=$request->to;
+            }
+            if($request->owner){
+                $doc->user_id=$request->owner;
+            }
+            $doc->save();
+        }
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

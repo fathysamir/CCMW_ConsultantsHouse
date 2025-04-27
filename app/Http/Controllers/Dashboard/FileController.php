@@ -15,6 +15,7 @@ use App\Models\ProjectFolder;
 use App\Models\ProjectFile;
 use App\Models\StorageFile;
 use App\Models\Project;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class FileController extends ApiController
@@ -22,9 +23,9 @@ class FileController extends ApiController
     public function index(){
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }

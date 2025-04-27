@@ -216,7 +216,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/delete-doc-from-cmw-entirely', [FileDocumentController::class, 'delete_doc_from_cmw_entirely'])->name('project.delete_doc_from_cmw_entirely');
     Route::post('/project/doc/make-for-claim', [FileDocumentController::class, 'change_for_claimOrNoticeOrChart'])->name('project.change_for_claimOrNoticeOrChart');
     Route::post('/download-all-documents', [FileDocumentController::class, 'download_documents'])->name('download.all-documents');
-
+    Route::post('/download-specific-documents', [FileDocumentController::class, 'download_specific_documents'])->name('download.download_specific_documents');
+    Route::post('/project/edit-docs-info', [FileDocumentController::class, 'edit_docs_info'])->name('download.edit_docs_info');
 
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');

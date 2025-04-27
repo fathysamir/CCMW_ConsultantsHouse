@@ -17,6 +17,7 @@ use App\Models\StorageFile;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\FileDocument;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class DocumentController extends ApiController
@@ -130,9 +131,9 @@ class DocumentController extends ApiController
     {
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
@@ -153,9 +154,9 @@ class DocumentController extends ApiController
     {
         $zip_file= session('zip_file');
         if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/') . $zip_file;
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
