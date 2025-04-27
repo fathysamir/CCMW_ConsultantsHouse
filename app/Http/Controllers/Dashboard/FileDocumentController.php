@@ -738,51 +738,50 @@ class FileDocumentController extends ApiController
             }
             session()->forget('zip_file');
         }
-        $file_doc=FileDocument::findOrFail($request->document_id);
-        if($request->actionType=='copy'){
-            $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-            if (!$fileDoc) {
-                $doc=FileDocument::create(['user_id' => auth()->user()->id,
-                                      'file_id' => $request->file_id,
-                                      'narrative'  => $file_doc->narrative,
-                                      'notes1'     => $file_doc->notes1,
-                                      'notes2'     => $file_doc->notes2,
-                                      'sn'         => $file_doc->sn,
-                                      'forClaim'   => $file_doc->forClaim ,
-                                      'forChart'   => $file_doc->forChart ,
-                                      'forLetter'  => $file_doc->forLetter ,
-                                      'document_id' => $file_doc->document_id]);
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Document copied To Selected File Successfully.',
-                   // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
-                ]);
-            }else{
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Document is existed in selected file.',
-                   // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
-                ]);
-            }
-        }elseif($request->actionType=='move'){
-            $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-            $currentFile=$file_doc->file->slug;
-            if (!$fileDoc) {
-                $file_doc->file_id=$request->file_id;
-                $file_doc->save();
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Document Moved To Selected File Successfully.',
-                    //'redirect' => url('/project/file/' . $currentFile . '/documents')
-                ]);
 
-            }else{
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Document is existed in selected file.',
-                    //'redirect' => url('/project/file/' . $currentFile . '/documents')
-                ]);
+        
+        if($request->actionType=='copy'){
+            foreach($request->document_ids as $doc_id){
+                $file_doc=FileDocument::findOrFail($doc_id);
+                $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+                if (!$fileDoc) {
+                    $doc=FileDocument::create(['user_id' => auth()->user()->id,
+                                        'file_id' => $request->file_id,
+                                        'narrative'  => $file_doc->narrative,
+                                        'notes1'     => $file_doc->notes1,
+                                        'notes2'     => $file_doc->notes2,
+                                        'sn'         => $file_doc->sn,
+                                        'forClaim'   => $file_doc->forClaim ,
+                                        'forChart'   => $file_doc->forChart ,
+                                        'forLetter'  => $file_doc->forLetter ,
+                                        'document_id' => $file_doc->document_id]);
+                    
+                }
             }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => count($request->document_ids)>1 ? 'Selected Documents Copied To Selected File Successfully.' : 'Document Copied To Selected File Successfully.',
+
+            // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+            ]);
+        }elseif($request->actionType=='move'){
+            foreach($request->document_ids as $doc_id){
+                $file_doc=FileDocument::findOrFail($doc_id);
+                $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+            
+                if (!$fileDoc) {
+                    $file_doc->file_id=$request->file_id;
+                    $file_doc->save();
+                    
+
+                }
+            }
+            return response()->json([
+                'status' => 'success',
+                'message' => count($request->document_ids)>1 ? 'Selected Documents Moved To Selected File Successfully.' : 'Document Moved To Selected File Successfully.',
+                //'redirect' => url('/project/file/' . $currentFile . '/documents')
+            ]);
         }
     }
 
@@ -843,7 +842,7 @@ class FileDocumentController extends ApiController
             }
             session()->forget('zip_file');
         }
-        FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>'1']);
+        FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
         return response()->json([
             'status' => 'success',
         ]);
@@ -880,12 +879,12 @@ class FileDocumentController extends ApiController
             foreach($fileDocuments as $document){
                 $filePath = public_path($document->document->storageFile->path);
                 if($request->formate_type=='reference'){
-                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     //$date = date('y_m_d', strtotime($document->document->start_date));
                     $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
                 }elseif($request->formate_type=='dateAndReference'){
-                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $date = date('y_m_d', strtotime($document->document->start_date));
                     $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
@@ -896,7 +895,7 @@ class FileDocumentController extends ApiController
                     $date=date('d-M-y', strtotime($document->document->start_date));
                     $from=$document->document->fromStakeHolder->narrative;
                     $type=$document->document->docType->name;
-                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $fileName = $prefix . ' - ' . $sn . ' - ' . $from . "'s " . $type . ' ' ;
                     if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){

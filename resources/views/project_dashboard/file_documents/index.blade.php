@@ -165,8 +165,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -440,12 +440,15 @@
                                             <label class="with_tag @if (count($document->tags) != 0) active @endif"><span
                                                     class="fe fe-23 fe-volume-2"
                                                     style="@if (count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
-                                            <label class="for_claim @if ($document->forClaim == '1') active @endif"
-                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>C</span></label>
-                                            <label class="for_notice @if ($document->forLetter == '1') active @endif"
-                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>N</span></label>
-                                            <label class="for_timeline @if ($document->forChart == '1') active @endif"
-                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;"><span>G</span></label>
+                                            <label class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
+                                                style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                data-action-type="forClaim"><span>C</span></label>
+                                            <label class="for_notice for-claim-btn222 @if ($document->forLetter == '1') active @endif"
+                                                style="@if ($document->forLetter == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                data-action-type="forLetter"><span>N</span></label>
+                                            <label class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
+                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;" data-document-id="{{ $document->id }}"
+                                                data-action-type="forChart"><span>G</span></label>
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
@@ -488,7 +491,7 @@
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}" data-action-type="copy">Copy
                                                     To another File</a>
-                                                <a class="dropdown-item move-to-file-btn" href="javascript:void(0);"
+                                                <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}" data-action-type="move">Move
                                                     To another File</a>
                                                 <a class="dropdown-item"
@@ -528,7 +531,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="copyToModalLabel">Copy Document To another File</h5>
+                    <h5 class="modal-title" id="copyToModalLabel"><spam id="type">Copy</spam> Document To another File</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -559,6 +562,48 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="saveCopyDoc">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="copyToForAllModal" tabindex="-1" role="dialog"
+        aria-labelledby="copyToForAllModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="copyToForAllModalLabel">
+                        <spam id="type2">Copy</spam> Selected Documents To another File
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="copyToForAllForm">
+                        @csrf
+                        <input type="hidden" id="documentIdss" name="document_idss">
+                        <input type="hidden" id="action_type2" name="action_type2">
+                        <div class="form-group">
+                            <label for="folder_id2">Select Folder</label>
+                            <select class="form-control" id="folder_id2" required>
+                                <option value="" disabled selected>Select Folder</option>
+                                @foreach ($folders as $key => $name)
+                                    <option value="{{ $key }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group d-none">
+                            <label for="newFile2">Select File</label>
+                            <select class="form-control" id="newFile2" name="file_id2">
+                                <option value="" disabled selected>Select File</option>
+
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveCopyDocs">Save</button>
                 </div>
             </div>
         </div>
@@ -857,7 +902,8 @@
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
                         document_ids: documentIds,
-                        action_type: type
+                        action_type: type,
+                        val: '1'
                     },
                     success: function(response) {
                         documentIds.forEach(function(id) {
@@ -901,6 +947,84 @@
                 });
 
             })
+
+            $('.for-claim-btn222').on('click', function() {
+                var documentIds = [];
+                var type = $(this).data('action-type')
+                documentIds.push($(this).data('document-id'));
+              
+                let value=''
+                if(this.classList.contains('active')){
+                    value = '0';
+                }else{
+                    value = '1';
+                }
+
+                $.ajax({
+                    url: '/project/doc/make-for-claim', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        action_type: type,
+                        val: value
+                    },
+                    success: function(response) {
+                        documentIds.forEach(function(id) {
+                            let tr = document.getElementById('dddd_' + id);
+                            if (tr) {
+                                
+                                if (type == 'forClaim') {
+                                    const forClaimLabel = tr.querySelector(
+                                        'label.for_claim');
+                                    if (forClaimLabel && !forClaimLabel.classList
+                                        .contains('active')) {
+                                        forClaimLabel.classList.add('active');
+                                        forClaimLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }else{
+                                        forClaimLabel.classList.remove('active');
+                                        forClaimLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
+                                    }
+                                } else if (type == 'forLetter') {
+                                    const forNoticeLabel = tr.querySelector(
+                                        'label.for_notice');
+                                    if (forNoticeLabel && !forNoticeLabel.classList
+                                        .contains('active')) {
+                                        forNoticeLabel.classList.add('active');
+                                        forNoticeLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }else{
+                                        console.log('lll')
+                                        forNoticeLabel.classList.remove('active');
+                                        forNoticeLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
+                                    }
+                                } else if (type == 'forChart') {
+                                    const forChartLabel = tr.querySelector(
+                                        'label.for_timeline');
+                                    if (forChartLabel && !forChartLabel.classList
+                                        .contains('active')) {
+                                        forChartLabel.classList.add('active');
+                                        forChartLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }else{
+                                        forChartLabel.classList.remove('active');
+                                        forChartLabel.style.backgroundColor =
+                                            'rgb(169, 169, 169)';
+                                    }
+                                }
+
+                            }
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+
+            })
             ///////////////////////////////////////////////
 
             function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
@@ -918,26 +1042,19 @@
             $('.copy-to-file-btn').on('click', function() {
                 var documentId_ = $(this).data('document-id');
                 var action_type = $(this).data('action-type');
+                console.log(action_type)
                 $('#documentId_').val(documentId_);
                 $('#action_type').val(action_type);
                 $('#folder_id').val('');
                 let fileDropdown = $('#newFile');
                 fileDropdown.closest('.form-group').addClass(
                     'd-none');
+                document.getElementById('type').innerText =  action_type.charAt(0).toUpperCase() + action_type.slice(1).toLowerCase();
+
                 $('#copyToModal').modal('show'); // Show the modal
             });
 
-            $('.move-to-file-btn').on('click', function() {
-                var documentId_ = $(this).data('document-id');
-                var action_type = $(this).data('action-type');
-                $('#documentId_').val(documentId_);
-                $('#action_type').val(action_type);
-                $('#folder_id').val('');
-                let fileDropdown = $('#newFile');
-                fileDropdown.closest('.form-group').addClass(
-                    'd-none');
-                $('#copyToModal').modal('show'); // Show the modal
-            });
+            
 
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
@@ -974,7 +1091,9 @@
             });
 
             $('#saveCopyDoc').click(function() {
-                let documentId = $('#documentId_').val();
+                let documentIds=[];
+                documentIds.push($('#documentId_').val());
+                //let documentId = $('#documentId_').val();
                 let fileId = $('#newFile').val();
                 let actionType = $('#action_type').val();
 
@@ -988,7 +1107,7 @@
                     type: 'POST',
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
-                        document_id: documentId,
+                        document_ids: documentIds,
                         file_id: fileId,
                         actionType: actionType
                     },
@@ -997,9 +1116,13 @@
                             alert("⚠️ " + response.message);
                         } else {
                             if (actionType == 'move') {
-                                document.getElementById('dddd_' + documentId)?.remove();
+                                documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+
+                            
                             }
-                            alert(response.message); // Show success message
+                            showHint(response.message); // Show success message
 
                         }
                         $('#copyToModal').modal('hide');
@@ -1027,13 +1150,23 @@
                     let new_down_list = document.createElement('div');
                     new_down_list.className = "col-sm-12 col-md-4";
                     new_down_list.innerHTML = `
-                                <div class="dropdown" id="Action-DIV">
+                                <div class="dropdown" id="Action-DIV" style="text-align:center">
                                     <button class="btn btn-sm dropdown-toggle  btn-secondary" type="button"
                                         id="actionButton" aria-haspopup="true" aria-expanded="false">
                                         Open Actions
                                     </button>
-                                    <div class="dropdown-menu " id="actionList" style="position: absolute;left:-50px; ">
-                                        
+                                    <div class="dropdown-menu " id="actionList" style="position: absolute;right:10px; ">
+                                         <a class="dropdown-item" id="editDocsForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                         <a class="dropdown-item" id="downloadForAllBtn" href="javascript:void(0);">Download Documents</a>
+                                         <a class="dropdown-item copyForAllBtn" id="copyForAllBtn" href="javascript:void(0);"data-action-type2="copy">Copy All Documents To Another File</a>
+                                         <a class="dropdown-item copyForAllBtn" id="moveForAllBtn" href="javascript:void(0);"data-action-type2="move">Move All Documents To Another File</a>
+                                         <a class="dropdown-item" id="unassignForAllBtn" href="javascript:void(0);">Unassign Documents</a>
+                                         <a class="dropdown-item" id="removeForAllBtn" href="javascript:void(0);">Delete Documents From CMW</a>
+                                         <a class="dropdown-item for-claim-btn-for-all" data-action-type="forClaim" id="forClaimForAllBtn" href="javascript:void(0);">For Claim</a>
+                                         <a class="dropdown-item for-claim-btn-for-all" data-action-type="forLetter" id="forNoticeForAllBtn" href="javascript:void(0);">For Notice</a>
+                                         <a class="dropdown-item for-claim-btn-for-all" data-action-type="forChart" id="forChartForAllBtn" href="javascript:void(0);">For Gantt Chart</a>
+
+
                                     </div>
                                 </div>
                             `;
@@ -1077,7 +1210,8 @@
             checkboxes.forEach(function(checkbox) {
                 checkbox.addEventListener('change', function() {
                     // Get the number of checkboxes that are checked
-                    const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+                    const checkedCheckboxes = document.querySelectorAll(
+                        'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
 
                     // If more than one checkbox is checked, display the Action-DIV, else hide it
                     if (checkedCheckboxes.length > 1) {
@@ -1110,7 +1244,273 @@
 
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
 
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
+
+            $('#folder_id2').change(function() {
+                let folderId = $(this).val();
+
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                        folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile2');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.form-group').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.form-group').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
+            $('.copyForAllBtn').on('click', function() {
+                // Get all checked checkboxes
+                
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+                // Set the document IDs in a hidden input (optional)
+                $('#documentIdss').val(documentIds.join(','));
+                var action_type2 = $(this).data('action-type2');
+                $('#action_type2').val(action_type2);
+                // Open the modal
+                $('#folder_id2').val('');
+                let fileDropdown = $('#newFile2');
+                fileDropdown.closest('.form-group').addClass(
+                    'd-none');
+                document.getElementById('type2').innerText =  action_type2.charAt(0).toUpperCase() + action_type2.slice(1).toLowerCase();
+                $('#copyToForAllModal').modal('show');
+            });
+
+            $('#saveCopyDocs').click(function() {
+                let documentIds=$('#documentIdss').val().split(','); 
+                
+                //let documentId = $('#documentId_').val();
+                let fileId = $('#newFile2').val();
+                let actionType = $('#action_type2').val();
+
+                if (!fileId) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/project/copy_move_doc_to_another_file', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        file_id: fileId,
+                        actionType: actionType
+                    },
+                    success: function(response) {
+                        if (response.status == 'error') {
+                            alert("⚠️ " + response.message);
+                        } else {
+                            if (actionType == 'move') {
+                                documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+
+                            
+                            }
+                            showHint(response.message); // Show success message
+
+                        }
+                        $('#copyToForAllModal').modal('hide');
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+            $('#removeForAllBtn').on('click', function() {
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+                if (confirm(
+                        'Are you sure you want to delete these documents from CMW entirely? This action cannot be undone.'
+                    )) {
+                    $.ajax({
+                        url: '/project/delete-doc-from-cmw-entirely', // Adjust the route to your API endpoint
+                        type: 'POST',
+                        data: {
+                            _token: $('input[name="_token"]').val(), // CSRF token
+                            document_ids: documentIds,
+                        },
+                        success: function(response) {
+                            documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+                            showHint(response.message); // Show success message
+                        },
+                        error: function() {
+                            alert('Failed to assign document. Please try again.');
+                        }
+                    });
+                }
+            });
+            $('.for-claim-btn-for-all').on('click', function() {
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+                var type = $(this).data('action-type')
+                
+
+                $.ajax({
+                    url: '/project/doc/make-for-claim', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        action_type: type,
+                        val: '1'
+                    },
+                    success: function(response) {
+                        documentIds.forEach(function(id) {
+                            let tr = document.getElementById('dddd_' + id);
+                            if (tr) {
+                                if (type == 'forClaim') {
+                                    const forClaimLabel = tr.querySelector(
+                                        'label.for_claim');
+                                    if (forClaimLabel && !forClaimLabel.classList
+                                        .contains('active')) {
+                                        forClaimLabel.classList.add('active');
+                                        forClaimLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                } else if (type == 'forLetter') {
+                                    const forNoticeLabel = tr.querySelector(
+                                        'label.for_notice');
+                                    if (forNoticeLabel && !forNoticeLabel.classList
+                                        .contains('active')) {
+                                        forNoticeLabel.classList.add('active');
+                                        forNoticeLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                } else if (type == 'forChart') {
+                                    const forChartLabel = tr.querySelector(
+                                        'label.for_timeline');
+                                    if (forChartLabel && !forChartLabel.classList
+                                        .contains('active')) {
+                                        forChartLabel.classList.add('active');
+                                        forChartLabel.style.backgroundColor =
+                                            'rgb(45, 209, 45)';
+                                    }
+                                }
+
+                            }
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+
+            })
+            $('#unassignForAllBtn').on('click', function() {
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+
+                if (confirm(
+
+                        'Are you sure you want to unassign these documents from this file? This action cannot be undone.'
+                    )) {
+                    $.ajax({
+                        url: '/project/unassign-doc',
+                        type: 'POST',
+                        data: {
+                            _token: $('input[name="_token"]').val(), // CSRF token
+                            document_ids: documentIds, // Pass the array here
+                        },
+                        success: function(response) {
+                            // Loop through IDs and remove each corresponding row
+                            documentIds.forEach(function(id) {
+                                document.getElementById('dddd_' + id)?.remove();
+                            });
+                            document.getElementById('Action-DIV').style.display='none';
+                            showHint(response.message); // Show success message
+                        },
+                        error: function() {
+                            alert('Failed to unassign documents. Please try again.');
+                        }
+                    });
+                }
+            })
+        })
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const filters = {
