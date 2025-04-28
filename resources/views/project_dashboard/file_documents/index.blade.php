@@ -1818,7 +1818,7 @@
                         doc_type: $('#newDocTypeForAll').val(),
                         from: $('#newFromStakeHolderForAll').val(),
                         to: $('#newToStakeHolderForAll').val(),
-                        owner: $('#newOwnerForAll').val()
+                        owner: $('#newOwnerForAll').val(),
                     },
                     success: function(response) {
                         if (response.status == 'error') {
@@ -1829,7 +1829,7 @@
 
                         }
                         $('#copyToForAllModal').modal('hide');
-                        4
+                        
                         //showHint(response.message);
                     },
                     error: function() {

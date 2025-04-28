@@ -359,14 +359,25 @@ class DocumentController extends ApiController
 
     public function changeOwnerForAll(Request $request)
     {
-        $request->validate([
-            'document_ids' => 'required|array',
-            'new_owner_id' => 'required|exists:users,id',
-        ]);
-
-        // Update the owner for all selected documents
-        Document::whereIn('id', $request->document_ids)
-                ->update(['user_id' => $request->new_owner_id]);
+                // Update the owner for all selected documents
+       
+        foreach($request->document_ids as $id){
+            $doc=Document::findOrFail($id);
+            
+            if($request->doc_type){
+                $doc->doc_type_id=$request->doc_type;
+            }
+            if($request->from){
+                $doc->from_id=$request->from;
+            }
+            if($request->to){
+                $doc->to_id=$request->to;
+            }
+            if($request->owner){
+                $doc->user_id=$request->owner;
+            }
+            $doc->save();
+        }
 
         return response()->json(['success' => true]);
     }

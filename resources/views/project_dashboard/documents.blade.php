@@ -341,8 +341,38 @@
                         @csrf
                         <input type="hidden" id="documentIdsForAll" name="document_ids">
                         <div class="form-group">
-                            <label for="newOwnerForAll">Select New Owner</label>
-                            <select class="form-control" id="newOwnerForAll" name="new_owner_id" required>
+                            <label for="newDocTypeForAll">New Document Type</label>
+                            <select class="form-control" id="newDocTypeForAll" name="new_doc_type_id">
+                                <option value="" disabled selected>Select Type</option>
+                                @foreach ($documents_types as $documents_type)
+                                    <option value="{{ $documents_type->id }}">{{ $documents_type->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newFromStakeHolderForAll">From</label>
+                            <select class="form-control" id="newFromStakeHolderForAll" name="new_from_id">
+                                <option value="" disabled selected>Select Stake Holder</option>
+                                @foreach ($stake_holders as $stake_holder)
+                                    <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
+                                        {{ $stake_holder->role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newToStakeHolderForAll">To</label>
+                            <select class="form-control" id="newToStakeHolderForAll" name="new_to_id">
+                                <option value="" disabled selected>Select Stake Holder</option>
+                                @foreach ($stake_holders as $stake_holder)
+                                    <option value="{{ $stake_holder->id }}">{{ $stake_holder->narrative }} -
+                                        {{ $stake_holder->role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newOwnerForAll">New Owner</label>
+                            <select class="form-control" id="newOwnerForAll" name="new_owner_id">
                                 <option value="" disabled selected>Select Owner</option>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -399,7 +429,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="changeStakeHolderForAllModal" tabindex="-1" role="dialog"
+    {{-- <div class="modal fade" id="changeStakeHolderForAllModal" tabindex="-1" role="dialog"
         aria-labelledby="changeStakeHolderForAllModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -476,7 +506,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     @php
         $canEdit =
             auth()->user()->roles->first()->name == 'Super Admin' ||
@@ -628,9 +658,7 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                <a class="dropdown-item" id="changeStakeHolderForAllBtn" href="javascript:void(0);">Change Correspondence</a>
-                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Change Owner</a>
-                                <a class="dropdown-item" id="changeDocTypeForAllBtn" href="javascript:void(0);">Change Document Type</a>
+                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
                                 <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
                             '
                             : '') .
@@ -742,27 +770,22 @@
             });
             // Handle the form submission via AJAX
             $('#saveOwnerChangeForAll').on('click', function() {
-                const newOwnerId = $('#newOwnerForAll').val(); // Get the new owner ID
-                const documentIds = $('#documentIdsForAll').val().split(','); // Get the document IDs
-
-                if (!newOwnerId || documentIds.length === 0) {
-                    alert('Invalid input.');
-                    return;
-                }
-
                 // Send an AJAX request to update the owner for all selected documents
                 $.ajax({
                     url: "{{ route('project.document.change-owner-for-all') }}", // Route for changing owner for all
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        document_ids: documentIds,
-                        new_owner_id: newOwnerId
+                        new_owner_id: newOwnerId,
+                        document_ids: $('#documentIdsForAll').val().split(','),
+                        doc_type: $('#newDocTypeForAll').val(),
+                        from: $('#newFromStakeHolderForAll').val(),
+                        to: $('#newToStakeHolderForAll').val(),
+                        owner: $('#newOwnerForAll').val(),
                     },
                     success: function(response) {
                         if (response.success) {
                             $('#changeOwnerForAllModal').modal('hide');
-                            alert('Owner changed successfully for all selected documents!');
                             location.reload(); // Reload the page to reflect changes
                         } else {
                             alert('Failed to change owner.');
@@ -870,127 +893,127 @@
 
 
 
-            $('#changeStakeHolderForAllBtn').on('click', function() {
-                // Get all checked checkboxes
-                const checkedCheckboxes2 = document.querySelectorAll('.row-checkbox:checked');
+            // $('#changeStakeHolderForAllBtn').on('click', function() {
+            //     // Get all checked checkboxes
+            //     const checkedCheckboxes2 = document.querySelectorAll('.row-checkbox:checked');
 
-                if (checkedCheckboxes2.length === 0) {
-                    alert('Please select at least one document.');
-                    return;
-                }
+            //     if (checkedCheckboxes2.length === 0) {
+            //         alert('Please select at least one document.');
+            //         return;
+            //     }
 
-                // Collect the IDs of all checked checkboxes
-                const documentIds2 = [];
-                checkedCheckboxes2.forEach(function(checkbox) {
-                    documentIds2.push(checkbox.value);
-                });
+            //     // Collect the IDs of all checked checkboxes
+            //     const documentIds2 = [];
+            //     checkedCheckboxes2.forEach(function(checkbox) {
+            //         documentIds2.push(checkbox.value);
+            //     });
 
-                // Set the document IDs in a hidden input (optional)
-                $('#documentIdsForAll2').val(documentIds2.join(','));
+            //     // Set the document IDs in a hidden input (optional)
+            //     $('#documentIdsForAll2').val(documentIds2.join(','));
 
-                // Open the modal
-                $('#changeStakeHolderForAllModal').modal('show');
-            });
-            // Handle the form submission via AJAX
-            $('#saveStakeHolderChangeForAll').on('click', function() {
-                const newFromStakeHolderId = $('#newFromStakeHolderForAll').val(); // Get the new owner ID
-                const newToStakeHolderId = $('#newToStakeHolderForAll').val(); // Get the new owner ID
+            //     // Open the modal
+            //     $('#changeStakeHolderForAllModal').modal('show');
+            // });
+            // // Handle the form submission via AJAX
+            // $('#saveStakeHolderChangeForAll').on('click', function() {
+            //     const newFromStakeHolderId = $('#newFromStakeHolderForAll').val(); // Get the new owner ID
+            //     const newToStakeHolderId = $('#newToStakeHolderForAll').val(); // Get the new owner ID
 
-                const documentIds2 = $('#documentIdsForAll2').val().split(','); // Get the document IDs
+            //     const documentIds2 = $('#documentIdsForAll2').val().split(','); // Get the document IDs
 
-                if ((!newFromStakeHolderId && !newToStakeHolderId) || documentIds2.length === 0) {
-                    alert('Invalid input.');
-                    return;
-                }
+            //     if ((!newFromStakeHolderId && !newToStakeHolderId) || documentIds2.length === 0) {
+            //         alert('Invalid input.');
+            //         return;
+            //     }
 
-                // Send an AJAX request to update the owner for all selected documents
-                $.ajax({
-                    url: "{{ route('project.document.change-stake-holders-for-all') }}", // Route for changing owner for all
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        document_ids: documentIds2,
-                        newFromStakeHolderId: newFromStakeHolderId,
-                        newToStakeHolderId: newToStakeHolderId
+            //     // Send an AJAX request to update the owner for all selected documents
+            //     $.ajax({
+            //         url: "{{ route('project.document.change-stake-holders-for-all') }}", // Route for changing owner for all
+            //         type: "POST",
+            //         data: {
+            //             _token: "{{ csrf_token() }}",
+            //             document_ids: documentIds2,
+            //             newFromStakeHolderId: newFromStakeHolderId,
+            //             newToStakeHolderId: newToStakeHolderId
 
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#changeStakeHolderForAllModal').modal('hide');
-                            alert(
-                                'Stake Holders changed successfully for all selected documents!'
-                            );
-                            location.reload(); // Reload the page to reflect changes
-                        } else {
-                            alert('Failed to change Stake Holders.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('An error occurred. Please try again.');
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
+            //         },
+            //         success: function(response) {
+            //             if (response.success) {
+            //                 $('#changeStakeHolderForAllModal').modal('hide');
+            //                 alert(
+            //                     'Stake Holders changed successfully for all selected documents!'
+            //                 );
+            //                 location.reload(); // Reload the page to reflect changes
+            //             } else {
+            //                 alert('Failed to change Stake Holders.');
+            //             }
+            //         },
+            //         error: function(xhr, status, error) {
+            //             alert('An error occurred. Please try again.');
+            //             console.error(xhr.responseText);
+            //         }
+            //     });
+            // });
 
 
-            $('#changeDocTypeForAllBtn').on('click', function() {
-                // Get all checked checkboxes
-                const checkedCheckboxes3 = document.querySelectorAll('.row-checkbox:checked');
+            // $('#changeDocTypeForAllBtn').on('click', function() {
+            //     // Get all checked checkboxes
+            //     const checkedCheckboxes3 = document.querySelectorAll('.row-checkbox:checked');
 
-                if (checkedCheckboxes3.length === 0) {
-                    alert('Please select at least one document.');
-                    return;
-                }
+            //     if (checkedCheckboxes3.length === 0) {
+            //         alert('Please select at least one document.');
+            //         return;
+            //     }
 
-                // Collect the IDs of all checked checkboxes
-                const documentIds3 = [];
-                checkedCheckboxes3.forEach(function(checkbox) {
-                    documentIds3.push(checkbox.value);
-                });
+            //     // Collect the IDs of all checked checkboxes
+            //     const documentIds3 = [];
+            //     checkedCheckboxes3.forEach(function(checkbox) {
+            //         documentIds3.push(checkbox.value);
+            //     });
 
-                // Set the document IDs in a hidden input (optional)
-                $('#documentIdsForAll3').val(documentIds3.join(','));
+            //     // Set the document IDs in a hidden input (optional)
+            //     $('#documentIdsForAll3').val(documentIds3.join(','));
 
-                // Open the modal
-                $('#changeDocTypeForAllModal').modal('show');
-            });
+            //     // Open the modal
+            //     $('#changeDocTypeForAllModal').modal('show');
+            // });
 
-            // Handle the form submission via AJAX
-            $('#saveDocTypeChangeForAll').on('click', function() {
-                const newDocTypeId = $('#newDocTypeForAll').val(); // Get the new owner ID
-                const documentIds3 = $('#documentIdsForAll3').val().split(','); // Get the document IDs
+            // // Handle the form submission via AJAX
+            // $('#saveDocTypeChangeForAll').on('click', function() {
+            //     const newDocTypeId = $('#newDocTypeForAll').val(); // Get the new owner ID
+            //     const documentIds3 = $('#documentIdsForAll3').val().split(','); // Get the document IDs
 
-                if (!newDocTypeId || documentIds3.length === 0) {
-                    alert('Invalid input.');
-                    return;
-                }
+            //     if (!newDocTypeId || documentIds3.length === 0) {
+            //         alert('Invalid input.');
+            //         return;
+            //     }
 
-                // Send an AJAX request to update the owner for all selected documents
-                $.ajax({
-                    url: "{{ route('project.document.change-doc-type-for-all') }}", // Route for changing owner for all
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        document_ids: documentIds3,
-                        doc_type_id: newDocTypeId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#changeDocTypeForAllModal').modal('hide');
-                            alert(
-                                'Document Type changed successfully for all selected documents!'
-                            );
-                            location.reload(); // Reload the page to reflect changes
-                        } else {
-                            alert('Failed to change document type.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('An error occurred. Please try again.');
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
+            //     // Send an AJAX request to update the owner for all selected documents
+            //     $.ajax({
+            //         url: "{{ route('project.document.change-doc-type-for-all') }}", // Route for changing owner for all
+            //         type: "POST",
+            //         data: {
+            //             _token: "{{ csrf_token() }}",
+            //             document_ids: documentIds3,
+            //             doc_type_id: newDocTypeId
+            //         },
+            //         success: function(response) {
+            //             if (response.success) {
+            //                 $('#changeDocTypeForAllModal').modal('hide');
+            //                 alert(
+            //                     'Document Type changed successfully for all selected documents!'
+            //                 );
+            //                 location.reload(); // Reload the page to reflect changes
+            //             } else {
+            //                 alert('Failed to change document type.');
+            //             }
+            //         },
+            //         error: function(xhr, status, error) {
+            //             alert('An error occurred. Please try again.');
+            //             console.error(xhr.responseText);
+            //         }
+            //     });
+            // });
 
 
             $('#deleteForAllBtn').on('click', function() {
