@@ -776,7 +776,7 @@
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
-                        new_owner_id: newOwnerId,
+                     
                         document_ids: $('#documentIdsForAll').val().split(','),
                         doc_type: $('#newDocTypeForAll').val(),
                         from: $('#newFromStakeHolderForAll').val(),
