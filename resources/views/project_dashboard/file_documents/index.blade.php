@@ -3,7 +3,7 @@
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         #btn-outline-primary {
             color: blue;
@@ -166,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -193,7 +193,7 @@
                 aria-expanded="false">File
                 Action</button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="{{ url('/export-word-claim-docs/' . $file->slug) }}">
+                <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-allDoc">
                     Export
                 </a>
                 <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}"
@@ -456,14 +456,15 @@
                                                 style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
                                                 data-document-id="{{ $document->id }}"
                                                 data-action-type="forChart"><span>G</span></label>
-                                                <i class="fa-solid fa-flag fa-beat-fade" style="color: #0008ff;margin-left:0.6rem;margin-right:0.2rem"></i>
-                                                <i class="fa-solid fa-flag fa-beat-fade" style="color: #ff0000;"></i>
+                                            <i class="fa-solid fa-flag fa-beat-fade"
+                                                style="color: #0008ff;margin-left:0.6rem;margin-right:0.2rem"></i>
+                                            <i class="fa-solid fa-flag fa-beat-fade" style="color: #ff0000;"></i>
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
                                             <label>{{ $document->document->docType->name }}</label>
 
-                                            
+
                                         </td>
 
                                         <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
@@ -646,7 +647,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="downloadAllDocsModalLabel">How do you want to name the files
+                    <h5 class="modal-title" id="downloadAllDocsModalLabel">How do you want to name the documents
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -742,7 +743,7 @@
                     <form id="assigneToForm">
                         @csrf
                         <input type="hidden" id="documentIdds" name="documentIdds">
-                      
+
                         <div class="form-group">
                             <label for="newDocTypeForAll">Select New Document Type</label>
                             <select class="form-control" id="newDocTypeForAll" name="new_doc_type_id">
@@ -753,7 +754,7 @@
                             </select>
                         </div>
 
-                       <div class="form-group">
+                        <div class="form-group">
                             <label for="newFromStakeHolderForAll">From</label>
                             <select class="form-control" id="newFromStakeHolderForAll" name="new_from_id">
                                 <option value="" disabled selected>Select Stake Holder</option>
@@ -791,6 +792,106 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Settings To Export Documents
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        @csrf
+                        <input type="hidden" id="file_id111" name="file_id111">
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Chapter Number</label>
+                            <input type="Number" required name="Chapter" class="form-control" placeholder="Chapter" id="Chapter">
+                        </div>
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Section Number</label>
+                            <input type="Number" required name="Section" class="form-control" placeholder="Section" id="Section">
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs" name="forclaimdocs">
+                            <label class="custom-control-label" for="forclaimdocs" >For Claim Documents</label>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label for="folder_id">Select Footnote format</label>
+                            <div>
+
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="reference_only2" name="formate_type2" value="reference"
+                                        class="custom-control-input" required>
+                                    <label class="custom-control-label" for="reference_only2">Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="dateAndReference2" name="formate_type2"
+                                        class="custom-control-input" value="dateAndReference"required>
+                                    <label class="custom-control-label" for="dateAndReference2">YYMMDD – Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="formate_type2" value="formate" id="formate2"
+                                        class="custom-control-input"required>
+                                    <label class="custom-control-label" for="formate2"><span
+                                            style="background-color: #4dff00"><b>Prefix</b></span> – <span
+                                            style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
+                                        [Ref] - dated [Date]</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="extraOptions2" class="row d-none">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-11">
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Prefix2">Prefix : </label>
+                                    <input type="text" name="prefix2" id="Prefix2" class="form-control"
+                                        placeholder="Perfix" value="" style="width: 85%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="sn2">Number Of Digits : </label>
+                                    <input type="number" name="sn2" id="sn2" class="form-control"
+                                        placeholder="SN" value="" style="width: 30%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-0">
+                                    <label for="sn2">In case of e-mails : </label>
+                                    <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
+
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option12" name="ref_part2" value="option1"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option12">Omit Ref part</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option22" name="ref_part2"
+                                                class="custom-control-input" value="option2">
+                                            <label class="custom-control-label" for="option22">Keep Ref part, but replace
+                                                word “Ref” with “from”</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" name="ref_part2" value="option3" id="option32"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option32">Keep as other types</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="export">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -801,6 +902,7 @@
             window.open(url, '_blank');
         }
     </script>
+
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             const targetRow = document.querySelector('.specific_file_doc');
@@ -811,6 +913,68 @@
                 const offsetTop = targetRow.offsetTop - headerHeight;
                 container.scrollTop = offsetTop - 58;
             }
+        });
+    </script>
+     <script>
+        $(document).ready(function() {
+
+            // When "Download All" button is clicked
+            $('#export-allDoc').on('click', function() {
+                const fileId = $(this).data('file-id');
+                $('#file_id111').val(fileId);
+                $('#exportModal').modal('show');
+            });
+
+            // When radio changes for format selection
+            $('input[name="formate_type2"]').on('change', function() {
+                if ($('#formate2').is(':checked')) {
+                    $('#extraOptions2').removeClass('d-none');
+                    $('#Prefix2').attr('required', true);
+                    $('#sn2').attr('required', true);
+                    $('input[name="ref_part2"]').attr('required', true);
+                } else {
+                    $('#extraOptions2').addClass('d-none');
+
+                    // Clear all inputs inside extraOptions
+                    $('#extraOptions2').find('input[type="text"], input[type="number"]').val('');
+                    $('#extraOptions2').find('input[type="radio"]').prop('checked', false);
+
+                    // Remove required attributes
+                    $('#Prefix2').removeAttr('required');
+                    $('#sn2').removeAttr('required');
+                    $('input[name="ref_part2"]').removeAttr('required');
+                }
+            });
+
+            // When user clicks "Save" (download)
+            $('#export').on('click', function() {
+                const form = $('#exportForm');
+
+                // Optional client-side check before AJAX send
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: '/export-word-claim-docs', // Replace with real route
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#exportModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+            });
         });
     </script>
     <script>
@@ -1631,12 +1795,12 @@
 
                 // Set the document IDs in a hidden input (optional)
                 $('#documentIdds').val(documentIds.join(','));
-               
-                
+
+
                 //$('#folder_id2').val('');
                 //let fileDropdown = $('#newFile2');
-            
-               
+
+
                 $('#editDocInfoModal').modal('show');
             });
             $('#editDocInfo').click(function() {
@@ -1648,18 +1812,19 @@
                         document_ids: $('#documentIdds').val().split(','),
                         doc_type: $('#newDocTypeForAll').val(),
                         from: $('#newFromStakeHolderForAll').val(),
-                        to : $('#newToStakeHolderForAll').val(),
-                        owner : $('#newOwnerForAll').val()
+                        to: $('#newToStakeHolderForAll').val(),
+                        owner: $('#newOwnerForAll').val()
                     },
                     success: function(response) {
                         if (response.status == 'error') {
                             alert("⚠️ " + response.message);
                         } else {
-                             // Show success message
+                            // Show success message
                             location.reload();
 
                         }
-                        $('#copyToForAllModal').modal('hide');4
+                        $('#copyToForAllModal').modal('hide');
+                        4
                         //showHint(response.message);
                     },
                     error: function() {
@@ -1686,15 +1851,15 @@
                 });
 
                 // Set the document IDs in a hidden input (optional)
-                
+
                 $.ajax({
                     url: '/download-specific-documents', // Replace with real route
                     type: 'POST',
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
                         document_ids: documentIds,
-                        file_id:$('#download-allDoc').data('file-id')
-                     
+                        file_id: $('#download-allDoc').data('file-id')
+
                     },
                     success: function(response) {
                         // showHint(response.message || 'Download started!');
@@ -1709,7 +1874,7 @@
                         alert('Failed to process. Please try again.');
                     }
                 });
-             
+
             });
 
         })

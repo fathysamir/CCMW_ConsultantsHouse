@@ -210,7 +210,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/file-document-first-analyses/{id}', [FileDocumentController::class, 'file_document_first_analyses'])->name('project.file-document-first-analyses');
     Route::post('/project/file-document-first-analyses/store/{id}', [FileDocumentController::class, 'store_file_document_first_analyses'])->name('project.file-document-first-analyses.store');
     Route::post('/project/upload-editor-image', [FileDocumentController::class, 'upload_editor_image'])->name('upload_editor_image');
-    Route::get('/export-word-claim-docs/{id}', [FileDocumentController::class, 'exportWordClaimDocs']);
+    Route::post('/export-word-claim-docs', [FileDocumentController::class, 'exportWordClaimDocs']);
     Route::post('/project/copy_move_doc_to_another_file', [FileDocumentController::class, 'copy_move_doc_to_another_file'])->name('copy_move_doc_to_another_file');
     Route::post('/project/unassign-doc', [FileDocumentController::class, 'unassign_doc'])->name('project.unassign_doc');
     Route::post('/project/delete-doc-from-cmw-entirely', [FileDocumentController::class, 'delete_doc_from_cmw_entirely'])->name('project.delete_doc_from_cmw_entirely');

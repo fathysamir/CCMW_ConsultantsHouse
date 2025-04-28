@@ -56,7 +56,8 @@ class FileDocumentController extends ApiController
         return view('project_dashboard.file_documents.index',compact('documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
     }
 
-    public function exportWordClaimDocs($id){
+    public function exportWordClaimDocs(Request $request){
+        
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -68,8 +69,8 @@ class FileDocumentController extends ApiController
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         
-        $chapter = '4'; // Dynamic chapter number
-        $sectionNumber = '2'; // Dynamic section number
+        $chapter = $request->Chapter; // Dynamic chapter number
+        $sectionNumber = $request->Section; // Dynamic section number
         $phpWord->addNumberingStyle(
             'multilevel',
             [
@@ -264,7 +265,7 @@ class FileDocumentController extends ApiController
         $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 1]));
         $phpWord->addTitleStyle(3, $GetStandardStylesH3,$GetParagraphStyleH3);
 
-        $file=ProjectFile::where('slug',$id)->first();
+        $file=ProjectFile::where('slug',$request->file_id111)->first();
         // Header (Level 1 Outline)
         $header = $file->name;
         $header = str_replace('&', '&amp;', $header);
@@ -279,16 +280,19 @@ class FileDocumentController extends ApiController
         // Paragraphs
         //$paragraphs=FileDocument::where('file_id',$file->id)->where('forClaim','1')->orderBy()->get();
         $paragraphs = FileDocument::with('document')
-            ->where('file_id', $file->id)
-            ->where('forClaim','1')
-            ->get()
+            ->where('file_id', $file->id);
+        if($request->forclaimdocs){
+            $paragraphs->where('forClaim','1');
+        }
+            
+        $paragraphs=$paragraphs->get()
             ->sortBy([
                 fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
                 fn ($a, $b) => $a->sn <=> $b->sn,
             ])
             ->values();
        
-        
+       
         
         $GetStandardStylesFootNotes = [
             'name'=>'Calibri',
@@ -314,7 +318,6 @@ class FileDocumentController extends ApiController
             $date=date("d F Y", strtotime($paragraph->document->start_date)); 
            
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
-            $listNumber = "$chapter.$sectionNumber." . ($index + 1);
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
 
            
@@ -331,20 +334,50 @@ class FileDocumentController extends ApiController
             $dated=true;
             $senderAndDocType=true;
             $hint='';
-            if($Exhibit){
-                $hint="Exhibits " . $listNumber . ": ";
-            }
-            if($senderAndDocType){
-                if($paragraph->document->from_id!=null){
-                    $hint .=$paragraph->document->fromStakeHolder->narrative . "'s ";
+            if($request->formate_type2=='reference'){
+                $hint=$paragraph->document->reference . ".";
+            }elseif($request->formate_type2=='dateAndReference'){
+               
+                $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
+                $hint = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
+            }elseif($request->formate_type2=='formate'){
+                $sn=$request->sn2;
+                $prefix=$request->prefix2;
+                $listNumber = "$prefix." . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
+                $hint=$listNumber . ": ";
+                $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s" : '';
+                $type=$paragraph->document->docType->name;
+                $hint .=$from . $type . " ";
+                if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
+                    $ref_part=$request->ref_part2;
+                    if($ref_part == 'option1'){
+                        $hint .= ', ';
+                    }elseif($ref_part == 'option2'){
+                       
+                        $hint .= 'From: ' . $paragraph->document->reference . ', ';
+                    }elseif($ref_part == 'option3'){
+                        $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                    }
+                }else{
+                    $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
                 }
-                $hint .=$paragraph->document->docType->name . " ";
+                $hint .= 'dated: ' . $date . '.';
+
+            }
+            // if($Exhibit){
+            //     $hint="Exhibits " . $listNumber . ": ";
+            // }
+            // if($senderAndDocType){
+            //     if($paragraph->document->from_id!=null){
+            //         $hint .=$paragraph->document->fromStakeHolder->narrative . "'s ";
+            //     }
+            //     $hint .=$paragraph->document->docType->name . " ";
                 
-            }
-            $hint .="Ref: " . $paragraph->document->reference . ", ";
-            if($dated){
-                $hint .="dated: " . $date . ".";
-            }
+            // }
+            // $hint .="Ref: " . $paragraph->document->reference . ", ";
+            // if($dated){
+            //     $hint .="dated: " . $date . ".";
+            // }
             $footnote->addText($hint,$GetStandardStylesFootNotes);
             $listItemRun->addText(", ",$GetStandardStylesP);
             if($paragraph->narrative==null){
@@ -554,23 +587,30 @@ class FileDocumentController extends ApiController
 
         }
         
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/exports';
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
         $path = public_path($projectFolder);
         if (!file_exists($path)) {
            
             mkdir($path, 0755, true);
         }
+        $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true); // true = create nested directories
+        }
         // Save document
         // Define file path in public folder
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/exports/' . auth()->user()->id . '_' . time() . '_Claim_Report.docx';
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . auth()->user()->id . '_' . time() . '_Claim_Report.docx';
         $filePath = public_path($fileName);
        
         // Save document to public folder
         $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($filePath);
-
+        session(['zip_file' => $code]);
+        return response()->json(['download_url' => asset($fileName)]);
         // Return file as a response and delete after download
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        //return response()->download($filePath)->deleteFileAfterSend(true);
     }
     public function splitHtmlToArray($html)
     {
@@ -938,12 +978,12 @@ class FileDocumentController extends ApiController
                     $sn=$request->sn;
                     
                     $date=date('d-M-y', strtotime($document->document->start_date));
-                    $from=$document->document->fromStakeHolder->narrative;
+                    $from=$document->document->fromStakeHolder? $document->document->fromStakeHolder->narrative . "'s " : '';
                     $type=$document->document->docType->name;
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $number_prefix = str_pad($counter, $sn, '0', STR_PAD_LEFT);
-                    $fileName = $prefix . ' - ' . $number_prefix . ' - ' . $from . "'s " . $type . ' ' ;
+                    $fileName = $prefix . ' - ' . $number_prefix . ' - ' . $from . $type . ' ' ;
                     if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
                         $ref_part=$request->ref_part;
                         if($ref_part == 'option1'){
