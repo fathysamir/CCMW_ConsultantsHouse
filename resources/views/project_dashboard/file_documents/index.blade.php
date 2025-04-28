@@ -856,7 +856,7 @@
                                 <div class="row form-group mb-3">
                                     <label class="mt-1" for="sn2">Number Of Digits : </label>
                                     <input type="number" name="sn2" id="sn2" class="form-control"
-                                        placeholder="SN" value="" style="width: 30%;margin-left:2%;">
+                                        placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>

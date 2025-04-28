@@ -345,7 +345,7 @@ class FileDocumentController extends ApiController
                 $prefix=$request->prefix2;
                 $listNumber = "$prefix." . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
                 $hint=$listNumber . ": ";
-                $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s" : '';
+                $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
                 $type=$paragraph->document->docType->name;
                 $hint .=$from . $type . " ";
                 if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
