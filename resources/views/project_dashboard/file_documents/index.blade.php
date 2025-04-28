@@ -808,12 +808,12 @@
                         @csrf
                         <input type="hidden" id="file_id111" name="file_id111">
                         <div class="form-group">
-                            <label for="newDocTypeForAll">Chapter Number</label>
-                            <input type="Number" required name="Chapter" class="form-control" placeholder="Chapter" id="Chapter">
+                            <label for="newDocTypeForAll">Heading 1 Number</label>
+                            <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1" id="Chapter">
                         </div>
                         <div class="form-group">
-                            <label for="newDocTypeForAll">Section Number</label>
-                            <input type="Number" required name="Section" class="form-control" placeholder="Section" id="Section">
+                            <label for="newDocTypeForAll">Heading 2 Number</label>
+                            <input type="Number" required name="Section" class="form-control" placeholder="Heading 2" id="Section">
                         </div>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"checked id="forclaimdocs" name="forclaimdocs">
