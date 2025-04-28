@@ -661,6 +661,7 @@
                             <input type="checkbox" class="custom-control-input"checked id="forclaimdocs2" name="forclaimdocs2">
                             <label class="custom-control-label" for="forclaimdocs2" >For Claim Documents</label>
                         </div>
+                        <hr>
                         <div class="form-group">
                             <label for="folder_id">Select document naming format</label>
                             <div>
@@ -749,9 +750,9 @@
                         <input type="hidden" id="documentIdds" name="documentIdds">
 
                         <div class="form-group">
-                            <label for="newDocTypeForAll">Select New Document Type</label>
+                            <label for="newDocTypeForAll">New Document Type</label>
                             <select class="form-control" id="newDocTypeForAll" name="new_doc_type_id">
-                                <option value="" disabled selected>Select Document Type</option>
+                                <option value="" disabled selected>Select Type</option>
                                 @foreach ($documents_types as $documents_type)
                                     <option value="{{ $documents_type->id }}">{{ $documents_type->name }}</option>
                                 @endforeach
@@ -779,7 +780,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="newOwnerForAll">Select New Owner</label>
+                            <label for="newOwnerForAll">New Owner</label>
                             <select class="form-control" id="newOwnerForAll" name="new_owner_id">
                                 <option value="" disabled selected>Select Owner</option>
                                 @foreach ($users as $user)
