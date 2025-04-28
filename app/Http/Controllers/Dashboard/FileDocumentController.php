@@ -938,7 +938,11 @@ class FileDocumentController extends ApiController
             session()->forget('zip_file');
         }
         $file=ProjectFile::where('slug',$request->file_id_)->first();
-        $fileDocuments=FileDocument::where('file_id',$file->id)->get();
+        $fileDocuments=FileDocument::where('file_id',$file->id);
+        if($request->forclaimdocs2){
+            $fileDocuments->where('forClaim','1');
+        }
+        $fileDocuments=$fileDocuments->get();
         if(count($fileDocuments)>0){
             $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
 

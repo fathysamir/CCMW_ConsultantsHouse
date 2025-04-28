@@ -657,6 +657,10 @@
                     <form id="downloadAllDocsForm">
                         @csrf
                         <input type="hidden" id="file_id_" name="file_id_">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs2" name="forclaimdocs2">
+                            <label class="custom-control-label" for="forclaimdocs2" >For Claim Documents</label>
+                        </div>
                         <div class="form-group">
                             <label for="folder_id">Select document naming format</label>
                             <div>
