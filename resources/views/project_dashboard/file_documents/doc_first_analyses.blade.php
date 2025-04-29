@@ -1,6 +1,8 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - First Analyses')
 @section('content')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 <style>
     .date{
         background-color:#fff !important;
@@ -129,8 +131,7 @@
                         <div class="form-group mb-3">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label for="owner">Narrative</label>
-                                <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <span class="fe fe-24 fe-eye" id="viewPdf" title="View PDF"
-                                    style="cursor: pointer;"></span></a>
+                                <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i class="fa-regular fa-eye" style="font-size: 24px;"title="View PDF"></i></a>
                                
                             </div>
                             
