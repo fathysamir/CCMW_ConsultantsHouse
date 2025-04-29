@@ -888,7 +888,7 @@
                                         placeholder="Perfix" value="Exhibits 1.1." style="width: 85%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
-                                    <label class="mt-1" for="sn2">Number Of Digits : </label>
+                                    <label class="mt-1" for="sn2">SN - Number of <del></del>igits : </label>
                                     <input type="number" name="sn2" id="sn2" class="form-control"
                                         placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
                                 </div>
