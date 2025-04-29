@@ -845,7 +845,7 @@
                         <div class="form-group">
                             <label for="newDocTypeForAll">Heading 2 Number</label>
                             <input type="Number" required name="Section" class="form-control" placeholder="Heading 2"
-                                id="Section" value="2" min="0"
+                                id="Section" value="0" min="0"
                                 oninput="this.value = Math.max(0, this.value)">
                         </div>
                         <div class="custom-control custom-checkbox">
