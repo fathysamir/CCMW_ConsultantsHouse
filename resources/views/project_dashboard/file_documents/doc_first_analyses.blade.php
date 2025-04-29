@@ -127,7 +127,13 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-3">
-                            <label for="owner">Narrative</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label for="owner">Narrative</label>
+                                <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <span class="fe fe-24 fe-eye" id="viewPdf" title="View PDF"
+                                    style="cursor: pointer;"></span></a>
+                               
+                            </div>
+                            
                             <div id="editor" style="min-height:250px;">
                                 {!! $doc->narrative !!}
                             </div>

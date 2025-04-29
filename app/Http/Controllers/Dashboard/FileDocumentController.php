@@ -347,7 +347,7 @@ class FileDocumentController extends ApiController
             }elseif($request->formate_type2=='formate'){
                 $sn=$request->sn2;
                 $prefix=$request->prefix2;
-                $listNumber = "$prefix." . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
+                $listNumber = "$prefix" . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
                 $hint=$listNumber . ": ";
                 $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
                 $type=$paragraph->document->docType->name;

@@ -166,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -241,7 +241,7 @@
                                         <label id="all_for_notice"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>N</span></label>
                                         <label id="all_for_timeline"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;margin-right:0.65rem;"><span>G</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>G</span></label>
                                         <label id="all_blue_flag" style="margin-right:0.2rem">
                                             <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
                                         </label>
@@ -459,7 +459,7 @@
                                                 data-action-type="forLetter"><span>N</span></label>
                                             <label
                                                 class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
-                                                style="margin-right:0.6rem; @if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
+                                                style=" @if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
                                                 data-document-id="{{ $document->id }}"
                                                 data-action-type="forChart"><span>G</span></label>
                                             <label
@@ -839,12 +839,14 @@
                         <div class="form-group">
                             <label for="newDocTypeForAll">Heading 1 Number</label>
                             <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1"
-                                id="Chapter">
+                                id="Chapter" value="1" min="1"
+                                oninput="this.value = Math.max(1, this.value)">
                         </div>
                         <div class="form-group">
                             <label for="newDocTypeForAll">Heading 2 Number</label>
                             <input type="Number" required name="Section" class="form-control" placeholder="Heading 2"
-                                id="Section">
+                                id="Section" value="2" min="0"
+                                oninput="this.value = Math.max(0, this.value)">
                         </div>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"checked id="forclaimdocs"
@@ -858,7 +860,7 @@
 
                                 <div class="custom-control custom-radio">
                                     <input type="radio" id="reference_only2" name="formate_type2" value="reference"
-                                        class="custom-control-input" required>
+                                        class="custom-control-input" required checked>
                                     <label class="custom-control-label" for="reference_only2">Reference</label>
                                 </div>
                                 <div class="custom-control custom-radio">
@@ -870,7 +872,7 @@
                                     <input type="radio" name="formate_type2" value="formate" id="formate2"
                                         class="custom-control-input"required>
                                     <label class="custom-control-label" for="formate2"><span
-                                            style="background-color: #4dff00"><b>Prefix</b></span> – <span
+                                            style="background-color: #4dff00"><b>Prefix </b></span> <span
                                             style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
                                         [Ref] - dated [Date]</label>
                                 </div>
@@ -883,7 +885,7 @@
                                 <div class="row form-group mb-3">
                                     <label class="mt-1" for="Prefix2">Prefix : </label>
                                     <input type="text" name="prefix2" id="Prefix2" class="form-control"
-                                        placeholder="Perfix" value="Exhibits 1.1" style="width: 85%;margin-left:2%;">
+                                        placeholder="Perfix" value="Exhibits 1.1." style="width: 85%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
                                     <label class="mt-1" for="sn2">Number Of Digits : </label>
@@ -896,7 +898,7 @@
 
                                         <div class="custom-control custom-radio">
                                             <input type="radio" id="option12" name="ref_part2" value="option1"
-                                                class="custom-control-input">
+                                                class="custom-control-input" checked>
                                             <label class="custom-control-label" for="option12">Omit Ref part</label>
                                         </div>
                                         <div class="custom-control custom-radio">
@@ -919,7 +921,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="export">Save</button>
+                    <button type="button" class="btn btn-primary" id="export">Export</button>
                 </div>
             </div>
         </div>
@@ -934,7 +936,20 @@
             window.open(url, '_blank');
         }
     </script>
+    <script>
+        function updatePrefix() {
+            const h1 = document.getElementById('Chapter').value;
+            const h2 = document.getElementById('Section').value;
+            document.getElementById('Prefix2').value = `Exhibits ${h1}.${h2}.`;
+        }
 
+        // Listen to changes on both inputs
+        document.getElementById('Chapter').addEventListener('input', updatePrefix);
+        document.getElementById('Section').addEventListener('input', updatePrefix);
+
+        // Initial run in case values are preset
+        updatePrefix();
+    </script>
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             const targetRow = document.querySelector('.specific_file_doc');
@@ -1237,17 +1252,17 @@
                             $button.removeClass('active');
                             $button.html(
                                 `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`
-                                );
+                            );
                         } else {
                             $button.addClass('active');
                             if (type == 'red') {
                                 $button.html(
                                     `<i class="fa-solid fa-flag" style="color: #ff0000;"></i>`
-                                    );
+                                );
                             } else {
                                 $button.html(
                                     `<i class="fa-solid fa-flag" style="color: #0000ff;"></i>`
-                                    );
+                                );
                             }
                         }
                     },
