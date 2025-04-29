@@ -242,10 +242,10 @@
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>N</span></label>
                                         <label id="all_for_timeline"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>G</span></label>
-                                        <label id="all_blue_flag" style="margin-right:0.02rem;cursor: pointer;">
+                                        <label id="all_blue_flag" style="margin-right:0.02rem;cursor: pointer;" title="Blue Flags">
                                             <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
                                         </label>
-                                        <label id="all_red_flag" style="cursor: pointer;">
+                                        <label id="all_red_flag" style="cursor: pointer;" title="Blue Flags">
                                             <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
                                         </label>
                                     </th>
@@ -465,7 +465,7 @@
                                             <label
                                                 class="blue_flag change-flag @if (in_array($document->id, $array_blue_flags ?? [])) active @endif"
                                                 style="margin-right:0.02rem;cursor: pointer;"data-document-id="{{ $document->id }}"
-                                                data-flag="blue">
+                                                data-flag="blue" title="Blue Flag">
                                                 @if (in_array($document->id, $array_blue_flags ?? []))
                                                     <i class="fa-solid fa-flag" style="color: #0000ff;"></i>
                                                 @else
@@ -475,7 +475,7 @@
                                             </label>
                                             <label
                                                 class="red_flag change-flag @if (in_array($document->id, $array_red_flags ?? [])) active @endif"
-                                                data-document-id="{{ $document->id }}" data-flag="red" style="cursor: pointer;">
+                                                data-document-id="{{ $document->id }}" data-flag="red" style="cursor: pointer;" title="Red Flag">
                                                 @if (in_array($document->id, $array_red_flags ?? []))
                                                     <i class="fa-solid fa-flag"style="color: #ff0000;"></i>
                                                 @else
