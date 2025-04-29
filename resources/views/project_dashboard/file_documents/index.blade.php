@@ -166,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -242,11 +242,12 @@
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>N</span></label>
                                         <label id="all_for_timeline"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>G</span></label>
-                                        <label id="all_blue_flag" style="margin-right:0.02rem;cursor: pointer;" title="Blue Flags">
-                                            <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                        <label id="all_blue_flag" style="margin-right:0.02rem;cursor: pointer;"
+                                            title="Blue Flags">
+                                            <i class="fa-regular fa-flag"></i>
                                         </label>
                                         <label id="all_red_flag" style="cursor: pointer;" title="Blue Flags">
-                                            <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                            <i class="fa-regular fa-flag"></i>
                                         </label>
                                     </th>
                                     <th><b>Subject </b>
@@ -469,17 +470,18 @@
                                                 @if (in_array($document->id, $array_blue_flags ?? []))
                                                     <i class="fa-solid fa-flag" style="color: #0000ff;"></i>
                                                 @else
-                                                    <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                                    <i class="fa-regular fa-flag"></i>
                                                 @endif
 
                                             </label>
                                             <label
                                                 class="red_flag change-flag @if (in_array($document->id, $array_red_flags ?? [])) active @endif"
-                                                data-document-id="{{ $document->id }}" data-flag="red" style="cursor: pointer;" title="Red Flag">
+                                                data-document-id="{{ $document->id }}" data-flag="red"
+                                                style="cursor: pointer;" title="Red Flag">
                                                 @if (in_array($document->id, $array_red_flags ?? []))
                                                     <i class="fa-solid fa-flag"style="color: #ff0000;"></i>
                                                 @else
-                                                    <span class="fe fe-24 fe-flag" style="font-size:13px"></span>
+                                                    <i class="fa-regular fa-flag"></i>
                                                 @endif
                                             </label>
                                             <br>
@@ -1251,7 +1253,7 @@
                         if (response.success == false) {
                             $button.removeClass('active');
                             $button.html(
-                                `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`
+                                `<i class="fa-regular fa-flag"></i>`
                             );
                         } else {
                             $button.addClass('active');
@@ -2111,10 +2113,10 @@
                         "rgb(169, 169, 169)";
                 } else if (id === 'all_red_flag') {
                     label.innerHTML = filters[id] ? `<i class="fa-solid fa-flag"style="color: #ff0000;"></i>` :
-                        `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`;
+                        `<i class="fa-regular fa-flag"></i>`;
                 } else if (id === 'all_blue_flag') {
                     label.innerHTML = filters[id] ? `<i class="fa-solid fa-flag"style="color: #0000ff;"></i>` :
-                        `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`;
+                        `<i class="fa-regular fa-flag"></i>`;
                 } else {
                     label.style.backgroundColor = filters[id] ? "rgb(45, 209, 45)" : "rgb(169, 169, 169)";
                 }
