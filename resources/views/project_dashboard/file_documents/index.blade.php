@@ -166,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -241,7 +241,13 @@
                                         <label id="all_for_notice"
                                             style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>N</span></label>
                                         <label id="all_for_timeline"
-                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"><span>G</span></label>
+                                            style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;margin-right:0.65rem;"><span>G</span></label>
+                                        <label id="all_blue_flag" style="margin-right:0.2rem">
+                                            <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                        </label>
+                                        <label id="all_red_flag">
+                                            <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                        </label>
                                     </th>
                                     <th><b>Subject </b>
                                         <span id="subjectFilterIcon" style="color:rgb(35, 197, 226); cursor: pointer;"
@@ -453,12 +459,29 @@
                                                 data-action-type="forLetter"><span>N</span></label>
                                             <label
                                                 class="for_timeline for-claim-btn222 @if ($document->forChart == '1') active @endif"
-                                                style="@if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
+                                                style="margin-right:0.6rem; @if ($document->forChart == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
                                                 data-document-id="{{ $document->id }}"
                                                 data-action-type="forChart"><span>G</span></label>
-                                            <i class="fa-solid fa-flag fa-beat-fade"
-                                                style="color: #0008ff;margin-left:0.6rem;margin-right:0.2rem"></i>
-                                            <i class="fa-solid fa-flag fa-beat-fade" style="color: #ff0000;"></i>
+                                            <label
+                                                class="blue_flag change-flag @if (in_array($document->id, $array_blue_flags ?? [])) active @endif"
+                                                style="margin-right:0.2rem"data-document-id="{{ $document->id }}"
+                                                data-flag="blue">
+                                                @if (in_array($document->id, $array_blue_flags ?? []))
+                                                    <i class="fa-solid fa-flag" style="color: #0000ff;"></i>
+                                                @else
+                                                    <span class="fe fe-24 fe-flag"style="font-size:13px"></span>
+                                                @endif
+
+                                            </label>
+                                            <label
+                                                class="red_flag change-flag @if (in_array($document->id, $array_red_flags ?? [])) active @endif"
+                                                data-document-id="{{ $document->id }}" data-flag="red">
+                                                @if (in_array($document->id, $array_red_flags ?? []))
+                                                    <i class="fa-solid fa-flag"style="color: #ff0000;"></i>
+                                                @else
+                                                    <span class="fe fe-24 fe-flag" style="font-size:13px"></span>
+                                                @endif
+                                            </label>
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
@@ -658,8 +681,9 @@
                         @csrf
                         <input type="hidden" id="file_id_" name="file_id_">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs2" name="forclaimdocs2">
-                            <label class="custom-control-label" for="forclaimdocs2" >For Claim Documents</label>
+                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs2"
+                                name="forclaimdocs2">
+                            <label class="custom-control-label" for="forclaimdocs2">For Claim Documents</label>
                         </div>
                         <hr>
                         <div class="form-group">
@@ -814,15 +838,18 @@
                         <input type="hidden" id="file_id111" name="file_id111">
                         <div class="form-group">
                             <label for="newDocTypeForAll">Heading 1 Number</label>
-                            <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1" id="Chapter">
+                            <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1"
+                                id="Chapter">
                         </div>
                         <div class="form-group">
                             <label for="newDocTypeForAll">Heading 2 Number</label>
-                            <input type="Number" required name="Section" class="form-control" placeholder="Heading 2" id="Section">
+                            <input type="Number" required name="Section" class="form-control" placeholder="Heading 2"
+                                id="Section">
                         </div>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs" name="forclaimdocs">
-                            <label class="custom-control-label" for="forclaimdocs" >For Claim Documents</label>
+                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs"
+                                name="forclaimdocs">
+                            <label class="custom-control-label" for="forclaimdocs">For Claim Documents</label>
                         </div>
                         <hr>
                         <div class="form-group">
@@ -920,7 +947,7 @@
             }
         });
     </script>
-     <script>
+    <script>
         $(document).ready(function() {
 
             // When "Download All" button is clicked
@@ -1192,7 +1219,43 @@
                 });
 
             })
+            $('.change-flag').on('click', function() {
+                var type = $(this).data('flag')
+                var docId = $(this).data('document-id');
+                var $button = $(this);
 
+                $.ajax({
+                    url: '/project/change-flag', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        docId: docId,
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.success == false) {
+                            $button.removeClass('active');
+                            $button.html(
+                                `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`
+                                );
+                        } else {
+                            $button.addClass('active');
+                            if (type == 'red') {
+                                $button.html(
+                                    `<i class="fa-solid fa-flag" style="color: #ff0000;"></i>`
+                                    );
+                            } else {
+                                $button.html(
+                                    `<i class="fa-solid fa-flag" style="color: #0000ff;"></i>`
+                                    );
+                            }
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
             $('.for-claim-btn222').on('click', function() {
                 var documentIds = [];
                 var type = $(this).data('action-type')
@@ -1829,7 +1892,7 @@
 
                         }
                         $('#copyToForAllModal').modal('hide');
-                        
+
                         //showHint(response.message);
                     },
                     error: function() {
@@ -1891,6 +1954,8 @@
                 all_for_claim: false,
                 all_for_notice: false,
                 all_for_timeline: false,
+                all_blue_flag: false,
+                all_red_flag: false,
                 subject: {
                     type: "",
                     value: ""
@@ -1934,6 +1999,8 @@
                     if (filters.all_for_claim) show = show && row.querySelector(".for_claim.active");
                     if (filters.all_for_notice) show = show && row.querySelector(".for_notice.active");
                     if (filters.all_for_timeline) show = show && row.querySelector(".for_timeline.active");
+                    if (filters.all_red_flag) show = show && row.querySelector(".red_flag.active");
+                    if (filters.all_blue_flag) show = show && row.querySelector(".blue_flag.active");
 
                     // 🔹 General Column Filtering (Subject, Reference, From, To, Status, Note)
                     show = show && applyTextFilter(row.cells[2], filters.subject); // Subject
@@ -2027,9 +2094,16 @@
                 if (id === "all_with_tags") {
                     label.querySelector("span").style.color = filters[id] ? "rgb(45, 209, 45)" :
                         "rgb(169, 169, 169)";
+                } else if (id === 'all_red_flag') {
+                    label.innerHTML = filters[id] ? `<i class="fa-solid fa-flag"style="color: #ff0000;"></i>` :
+                        `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`;
+                } else if (id === 'all_blue_flag') {
+                    label.innerHTML = filters[id] ? `<i class="fa-solid fa-flag"style="color: #0000ff;"></i>` :
+                        `<span class="fe fe-24 fe-flag" style="font-size:13px"></span>`;
                 } else {
                     label.style.backgroundColor = filters[id] ? "rgb(45, 209, 45)" : "rgb(169, 169, 169)";
                 }
+
 
                 applyFilters();
             }
@@ -2040,6 +2114,10 @@
                 "all_for_notice"));
             document.getElementById("all_for_timeline").addEventListener("click", () => toggleFilter(
                 "all_for_timeline"));
+            document.getElementById("all_red_flag").addEventListener("click", () => toggleFilter(
+                "all_red_flag"));
+            document.getElementById("all_blue_flag").addEventListener("click", () => toggleFilter(
+                "all_blue_flag"));
 
             function setupFilterUI(field) {
 

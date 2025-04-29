@@ -16,6 +16,7 @@ use App\Models\ProjectFile;
 use App\Models\DocType;
 use App\Models\ContractTag;
 use App\Models\FileDocument;
+use App\Models\FileDocumentFlags;
 use Illuminate\Validation\Rule;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
@@ -53,7 +54,10 @@ class FileDocumentController extends ApiController
        
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
-        return view('project_dashboard.file_documents.index',compact('documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
+
+        $array_red_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','red')->pluck('file_document_id')->toArray();
+        $array_blue_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','blue')->pluck('file_document_id')->toArray();
+        return view('project_dashboard.file_documents.index',compact('array_red_flags','array_blue_flags','documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
     }
 
     public function exportWordClaimDocs(Request $request){
@@ -1119,5 +1123,23 @@ class FileDocumentController extends ApiController
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    public function change_flag(Request $request){
+        $docId=$request->docId;
+        $type=$request->type;
+        
+        $record=FileDocumentFlags::where('user_id',auth()->user()->id)->where('file_document_id',$docId)->where('flag',$type)->first();
+        if($record){
+            $record->delete();
+            return response()->json([
+                'success' => false,
+            ]);
+        }else{
+            FileDocumentFlags::create(['user_id'=>auth()->user()->id,'file_document_id'=>$docId,'flag'=>$type]);
+            return response()->json([
+                'success' => true,
+            ]);
+        }
     }
 }

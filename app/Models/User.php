@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class, 'projects_users', 'user_id', 'project_id')->withPivot('permissions'); // Optional, if your pivot table has timestamps
     }
+
+    // public function flags()
+    // {
+    //     return $this->belongsToMany(FileDocument::class,'flags', 'user_id', 'file_document_id')->withPivot('flag');
+    // }
 }
