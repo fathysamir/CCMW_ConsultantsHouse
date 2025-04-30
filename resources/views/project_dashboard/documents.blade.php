@@ -107,6 +107,7 @@
         .table-container td:nth-child(9) {
             width: 3% !important;
         }
+       
 
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
@@ -141,8 +142,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                        max-height:650px;
-                                                                                                    } */
+                                                                                                            max-height:650px;
+                                                                                                        } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -195,6 +196,7 @@
 
                                     <th><b>Rev.</b></th>
                                     <th></th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,6 +247,7 @@
                                                 @endif
                                             </div>
                                         </td>
+                                       
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -651,39 +654,45 @@
                         colDivs[0].classList.remove('col-md-6');
                         colDivs[0].classList.add('col-md-2');
                     }
-
+                    let new_div = document.createElement('div');
+                    new_div.className = "col-sm-12 col-md-2";
+                    new_div.innerHTML =`<button class="btn btn-sm btn-secondary" type="button"
+                                id="threadFilter" style="width: 100%;">
+                                Filter By Threads
+                            </button>`;
+                    rowDiv.appendChild(new_div);
                     // Create a new dropdown element
                     let new_down_list = document.createElement('div');
-                    new_down_list.className = "col-sm-12 col-md-4";
+                    new_down_list.className = "col-sm-12 col-md-2";
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                            '
+                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                '
                             : '') .
                             ($canDelete
                                 ? '
-                                <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                            '
+                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
                         <div class="dropdown" id="Action-DIV">
                             <button class="btn btn-sm dropdown-toggle btn-secondary" type="button"
-                                id="actionButton" aria-haspopup="true" aria-expanded="false">
+                                id="actionButton" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
                                 Open Actions
                             </button>
-                            <div class="dropdown-menu" id="actionList" style="position: absolute; left: -50px;">
+                            <div class="dropdown-menu" id="actionList" style="position: absolute;width: 100%; ">
                                 ${actionsHtml}
                             </div>
                         </div>
                     `;
 
-                    
+
                     // Append the new dropdown to the row
                     rowDiv.appendChild(new_down_list);
-
+                    
                     // Get the button and dropdown menu
                     const actionButton = new_down_list.querySelector('#actionButton');
                     const actionList = new_down_list.querySelector('#actionList');
@@ -776,7 +785,7 @@
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
-                     
+
                         document_ids: $('#documentIdsForAll').val().split(','),
                         doc_type: $('#newDocTypeForAll').val(),
                         from: $('#newFromStakeHolderForAll').val(),

@@ -523,7 +523,8 @@ class FileDocumentController extends ApiController
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
                                     $nestedListItemRun = $section->addListItemRun(0, 'multilevel2','listParagraphStyle2'); // Use a numbering style
-                                    $nestedListItemRun->addText($item);
+                                    // $nestedListItemRun->addText($item);
+                                    Html::addHtml($nestedListItemRun, $item, false, false);
                                 }
                             }
                             $existedList=true;
@@ -535,9 +536,11 @@ class FileDocumentController extends ApiController
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
                                     $unNestedListItemRun = $section->addListItemRun(0, 'unordered','listParagraphStyle2'); // Use a numbering style
-                                    $unNestedListItemRun->addText($item);
+                                   // $unNestedListItemRun->addText($item);
+                                    Html::addHtml($unNestedListItemRun, $item, false, false);
                                 }
                             }
+                           
                             $existedList=true;
                         }else {
                            
