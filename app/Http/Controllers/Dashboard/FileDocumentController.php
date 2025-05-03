@@ -416,7 +416,6 @@ class FileDocumentController extends ApiController
                         return !empty(trim($item));
                     });
                    
-                    
                     // Step 5: Add each <p> tag to the document with a newline after it
                     foreach ($paragraphsArray as $index2 => $pTag) {
                         //dd($paragraphsArray);
@@ -455,6 +454,16 @@ class FileDocumentController extends ApiController
                                         'italic' => true,
                                         'underline'=>false]); // Add caption in italics
                                     }
+                                    
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $textRun->addTextBreak();
+                                        }
+                                        
+                                            
+                                    }
                                 }
                             } else {
                                 if (file_exists($fullImagePath)) {
@@ -474,6 +483,16 @@ class FileDocumentController extends ApiController
                                         'bold' => false,
                                         'italic' => true,
                                         'underline'=>false]); // Add caption in italics
+                                    }
+                                    
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $listItemRun->addTextBreak();
+                                        }
+                                        
+                                            
                                     }
                                 }
                             }
@@ -502,6 +521,15 @@ class FileDocumentController extends ApiController
                                     ]);
                         
                                    
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $textRun->addTextBreak();
+                                        }
+                                        
+                                            
+                                    }
                                 }
                             } else {
                                 if (file_exists($fullImagePath)) {
@@ -511,20 +539,27 @@ class FileDocumentController extends ApiController
                                         'height' => 80,
                                         'alignment' => 'left'
                                     ]);
-                        
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $listItemRun->addTextBreak();
+                                        }
+                                        
+                                            
+                                    }
                                 
                                 }
                             }
                         }elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                             $phpWord->addNumberingStyle(
-                                'multilevel_1'.$index2,
+                                'multilevel_1'.$index.$index2,
                                 [
                                     'type' => 'multilevel',
                                     'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
                                     'levels' => [
-                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
-                                        ['Heading6', 'format' => 'decimal', 'text' => '%1.%2.'],
-                                        ['Heading7', 'format' => 'decimal', 'text' => '%1.%2.%3.'],
+                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.']
+                                        
                                           
                                        
                                         // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
@@ -538,7 +573,7 @@ class FileDocumentController extends ApiController
                                 // Add each list item as a nested list item
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
-                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index2,'listParagraphStyle2'); // Use a numbering style
+                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2,'listParagraphStyle2'); // Use a numbering style
                                     // $nestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
                                     Html::addHtml($nestedListItemRun, $item, false, false);
@@ -586,11 +621,30 @@ class FileDocumentController extends ApiController
                                     ]);
                                     $pTag=$this->lowercaseFirstCharOnly($pTag);
                                     Html::addHtml($listItemRun2, $pTag, false, false);
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $listItemRun2->addTextBreak();
+                                        }
+                                        
+                                            
+                                    }
                                 }else{
                                     //$pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                     $pTag=$this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun, $pTag, false, false);
+                                    
+                                    if ($index2 < count($paragraphsArray) - 1) {
+                            
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                                           
+                                            $listItemRun->addTextBreak();
+                                        }
+                                        
+                                            
+                                    }
                                 }
                                 
                             } catch (\Exception $e) {
@@ -599,14 +653,15 @@ class FileDocumentController extends ApiController
                         }
                     
                         // Add a paragraph break after each element to separate them
-                        if ($index2 < count($paragraphsArray) - 1) {
-                           
-                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                $listItemRun->addTextBreak();
-                            }
+                        // if ($index2 < count($paragraphsArray) - 1) {
+                            
+                        //     if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
+                               
+                        //         $listItemRun->addTextBreak();
+                        //     }
                             
                                 
-                        }
+                        // }
                         
                     }
                     
