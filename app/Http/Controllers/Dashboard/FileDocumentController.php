@@ -418,7 +418,7 @@ class FileDocumentController extends ApiController
                    
                     
                     // Step 5: Add each <p> tag to the document with a newline after it
-                    foreach ($paragraphsArray as $index => $pTag) {
+                    foreach ($paragraphsArray as $index2 => $pTag) {
                         //dd($paragraphsArray);
                         if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
                             
@@ -516,14 +516,31 @@ class FileDocumentController extends ApiController
                                 }
                             }
                         }elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
+                            $phpWord->addNumberingStyle(
+                                'multilevel_1'.$index2,
+                                [
+                                    'type' => 'multilevel',
+                                    'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
+                                    'levels' => [
+                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
+                                        ['Heading6', 'format' => 'decimal', 'text' => '%1.%2.'],
+                                        ['Heading7', 'format' => 'decimal', 'text' => '%1.%2.%3.'],
+                                          
+                                       
+                                        // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
+                                        // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
+                                    ],
+                                ]
+                            );
                             if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
                                 $listItems = $liMatches[1] ?? [];
-                    
+                                
                                 // Add each list item as a nested list item
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
-                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel2','listParagraphStyle2'); // Use a numbering style
+                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index2,'listParagraphStyle2'); // Use a numbering style
                                     // $nestedListItemRun->addText($item);
+                                    $item = str_replace('&', '&amp;', $item);
                                     Html::addHtml($nestedListItemRun, $item, false, false);
                                 }
                             }
@@ -531,12 +548,14 @@ class FileDocumentController extends ApiController
                         }elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
                             if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
                                 $listItems = $liMatches[1] ?? [];
-                    
+                              
                                 // Add each list item as a nested list item
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
+                                    //dd($listItems);
                                     $unNestedListItemRun = $section->addListItemRun(0, 'unordered','listParagraphStyle2'); // Use a numbering style
-                                   // $unNestedListItemRun->addText($item);
+                                    // $unNestedListItemRun->addText($item);
+                                    $item = str_replace('&', '&amp;', $item);
                                     Html::addHtml($unNestedListItemRun, $item, false, false);
                                 }
                             }
@@ -565,9 +584,11 @@ class FileDocumentController extends ApiController
                                         'hyphenation' => false ,
                                         'pageBreakBefore'=>false
                                     ]);
+                                    $pTag=$this->lowercaseFirstCharOnly($pTag);
                                     Html::addHtml($listItemRun2, $pTag, false, false);
                                 }else{
                                     //$pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+                                    $pTag=$this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun, $pTag, false, false);
                                 }
@@ -578,10 +599,12 @@ class FileDocumentController extends ApiController
                         }
                     
                         // Add a paragraph break after each element to separate them
-                        if ($index < count($paragraphsArray) - 1) {
-                            if($existedList==false){
+                        if ($index2 < count($paragraphsArray) - 1) {
+                           
+                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
                                 $listItemRun->addTextBreak();
                             }
+                            
                                 
                         }
                         
@@ -618,6 +641,17 @@ class FileDocumentController extends ApiController
         return response()->json(['download_url' => asset($fileName)]);
         // Return file as a response and delete after download
         //return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function lowercaseFirstCharOnly($html) {
+        return preg_replace_callback(
+            '/(?:^|>)([^<>\s])/',
+            function ($matches) {
+                return str_replace($matches[1], mb_strtolower($matches[1]), $matches[0]);
+            },
+            $html,
+            1 // only first match
+        );
     }
     public function splitHtmlToArray($html)
     {
