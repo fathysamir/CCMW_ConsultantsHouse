@@ -127,7 +127,7 @@ class DocumentController extends ApiController
         ]);
     }
 
-    public function all_documents()
+    public function all_documents(Request $request)
     {
         $zip_file= session('zip_file');
         if($zip_file){
@@ -143,7 +143,19 @@ class DocumentController extends ApiController
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
-        $all_documents = Document::where('project_id', auth()->user()->current_project_id)->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
+        $all_documents = Document::where('project_id', auth()->user()->current_project_id);
+        if ($request->threads) {
+            $threadValues = array_filter(array_map('trim', explode(',', $request->threads)));
+        
+            $all_documents->where(function ($query) use ($threadValues) {
+                foreach ($threadValues as $thread) {
+                    
+                    $query->orWhere('threads', 'like', '%'.$thread.'%');
+                }
+            });
+        }        
+        $all_documents= $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
+        //dd($all_documents);
         $stake_holders = $project->stakeHolders;
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
         return view('project_dashboard.documents', compact('all_documents', 'users', 'stake_holders', 'documents_types', 'folders'));

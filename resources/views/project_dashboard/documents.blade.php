@@ -107,7 +107,7 @@
         .table-container td:nth-child(9) {
             width: 3% !important;
         }
-       
+
 
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
@@ -142,8 +142,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                            max-height:650px;
-                                                                                                        } */
+                                                                                                                    max-height:650px;
+                                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -196,7 +196,7 @@
 
                                     <th><b>Rev.</b></th>
                                     <th></th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -247,7 +247,7 @@
                                                 @endif
                                             </div>
                                         </td>
-                                       
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -431,7 +431,36 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="searchThreadsModal" tabindex="-1" role="dialog"
+        aria-labelledby="searchThreadsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchThreadsModalLabel">Search In Documents With Threads</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="searchThreadsForm">
+                        @csrf
 
+                        <div class="form-group">
+                            <label for="folder_id2">Enter Threads separated by ","</label>
+                            <input type="text"class="form-control" id="search_threads" required>
+
+
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="searchThreads">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- <div class="modal fade" id="changeStakeHolderForAllModal" tabindex="-1" role="dialog"
         aria-labelledby="changeStakeHolderForAllModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -523,6 +552,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         function openDocumentPdf(url) {
             window.open(url, '_blank');
@@ -656,7 +686,7 @@
                     }
                     let new_div = document.createElement('div');
                     new_div.className = "col-sm-12 col-md-2";
-                    new_div.innerHTML =`<button class="btn btn-sm btn-secondary" type="button"
+                    new_div.innerHTML = `<button class="btn btn-sm btn-secondary" type="button"
                                 id="threadFilter" style="width: 100%;">
                                 Filter By Threads
                             </button>`;
@@ -667,14 +697,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                '
+                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                        '
                             : '') .
                             ($canDelete
                                 ? '
-                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                '
+                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                        '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
@@ -692,7 +722,7 @@
 
                     // Append the new dropdown to the row
                     rowDiv.appendChild(new_down_list);
-                    
+
                     // Get the button and dropdown menu
                     const actionButton = new_down_list.querySelector('#actionButton');
                     const actionList = new_down_list.querySelector('#actionList');
@@ -1071,6 +1101,26 @@
                     });
                 }
                 // Open the modal
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#threadFilter').on('click', function() {
+
+                $('#searchThreadsModal').modal('show'); // Show the modal
+            });
+            $('#searchThreads').on('click', function() {
+                let threads = $('#search_threads').val().trim();
+
+                if (threads) {
+                    // Build the new URL with the threads query parameter
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('threads', threads);
+
+                    // Redirect to the updated URL
+                    window.location.href = url.toString();
+                }
             });
         });
     </script>
