@@ -16,6 +16,8 @@ use App\Http\Controllers\Dashboard\FileController;
 use App\Http\Controllers\Dashboard\FileDocumentController;
 use App\Http\Controllers\Dashboard\ImportDocumentController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
+use App\Models\ProjectFile;
+use App\Models\FileDocument;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -174,6 +176,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/delete-selected-docs', [DocumentController::class, 'deleteSelectedDocs'])->name('project.document.delete-selected-docs');
     Route::post('/project/assign-to-file-for-all', [DocumentController::class, 'assignToFileForAll'])->name('project.document.assign-to-file-for-all');
     Route::get('/document/get-files/{id}', [DocumentController::class, 'get_assigned_files'])->name('get_assigned_files');
+    Route::post('/get-documents-by-thread', [DocumentController::class, 'getDocsByReference']);
+    Route::get('go-to-fileDocument/{docId}/{fileId}',function($doc,$file){
+       
+        $document=FileDocument::where('file_id',$file)->where('document_id',$doc)->first();
+        $file=ProjectFile::findOrFail($file);
+        session(['specific_file_doc' => $document->id]);
+        return redirect()->route('project.file-documents.index',$file->slug);
+    })->name('goToDocFile');
+    Route::post('/get-files-by-document', [DocumentController::class, 'getFilesByDoc']);
 
     Route::get('/download-document/{id}', [DocumentController::class, 'downloadDocument'])->name('download.document');
     Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc,$id) {

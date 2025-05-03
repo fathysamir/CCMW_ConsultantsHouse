@@ -153,6 +153,9 @@ class DocumentController extends ApiController
                     $query->orWhere('threads', 'like', '%'.$thread.'%');
                 }
             });
+        }
+        if ($request->slug) {
+            $all_documents->where('slug',$request->slug);
         }        
         $all_documents= $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         //dd($all_documents);
@@ -467,5 +470,15 @@ class DocumentController extends ApiController
 
 
     }
+
+    public function getDocsByReference(Request $request){
+        
+        $reference = $request->reference;
+
+        $documents = Document::where('project_id', auth()->user()->current_project_id)->where('reference', 'like', '%' . $reference . '%')->with('storageFile')->get();
+        return response()->json(['documents' => $documents]);
+    }
+
+    
 
 }

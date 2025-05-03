@@ -2,8 +2,28 @@
 @section('title', 'Project Home - Documents')
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        .custom-fieldset {
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+
+            width: 100%;
+            background-color: #fefefe;
+            position: relative;
+        }
+
+        .custom-legend {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0 10px;
+            color: #333;
+            width: auto;
+            max-width: 100%;
+        }
+
         #btn-outline-primary {
             color: blue;
         }
@@ -18,6 +38,58 @@
         #btn-outline-primary:hover {
             color: white;
             /* Change text color to white on hover */
+        }
+
+        .custom-context-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 8px 0;
+            width: 180px;
+            list-style: none;
+            z-index: 1000;
+        }
+
+
+        .custom-context-menu li {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s ease-in-out;
+        }
+
+
+        .custom-context-menu li:hover {
+            background: #f5f5f5;
+        }
+
+
+        .custom-context-menu li i {
+            font-size: 16px;
+            color: #007bff;
+            margin-bottom: 5px;
+            margin-right: 5px;
+        }
+
+
+        .custom-context-menu li a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            width: 100%;
+
+        }
+
+        .custom-context-menu li a:hover {
+            text-decoration: none;
         }
     </style>
     <style>
@@ -142,8 +214,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                    max-height:650px;
-                                                                                                                } */
+                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -237,6 +309,18 @@
                                                         data-document-id="{{ $document->id }}"data-document-owner-id="{{ $document->user_id }}">Change
                                                         Owner</a>
                                                     <a class="dropdown-item" href="">Analysis Form</a>
+                                                    @php
+                                                        $threads = $document->threads
+                                                            ? json_decode($document->threads, true)
+                                                            : [];
+                                                        $escapedThreads = array_map(function ($item) {
+                                                            return str_replace("'", "\'", $item);
+                                                        }, $threads);
+                                                    @endphp
+                                                    <a class="dropdown-item threadsBtn"
+                                                        href="javascript:void(0);"data-document-ref="{{ $document->reference }}"
+                                                        data-document-threads="{{ json_encode($escapedThreads) }}"
+                                                        data-document-sub="{{ $document->subject }}">Threads</a>
                                                     <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Assigne To File</a>
                                                     <a class="dropdown-item" href="">Check Assignment</a>
@@ -461,6 +545,58 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="ThreadsModal" tabindex="-1" role="dialog" aria-labelledby="ThreadsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ThreadsModalLabel">Threads</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="searchThreadsForm">
+                        @csrf
+
+                        <div class="form-group">
+                            <label for="folder_id2">Reference</label>
+                            <input type="text"class="form-control" disabled id="ref">
+                        </div>
+                        <div class="form-group">
+                            <label for="folder_id2">Subject</label>
+                            <input type="text"class="form-control" disabled id="sub">
+                        </div>
+                        <div class="form-group">
+                            <label for="folder_id2">Threads</label>
+                            <div id="threadsContainer"></div>
+                        </div>
+                        <div class="form-group d-none" id="docs">
+                            <fieldset class="custom-fieldset">
+                                <legend class="custom-legend"style="margin-bottom: 0px;">Documents</legend>
+                                <div id="documentsResult">
+
+                                </div>
+                                <div class="d-none" id="docAssignments">
+
+                                </div>
+                            </fieldset>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="searchThreads">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul id="contextMenu" class="custom-context-menu" style="position:absolute; z-index:9999;">
+        <li><a href="#" id="Preview-Document"><i class="fe fe-arrow-right"></i> Preview Document</a></li>
+        <li><a href="#" id="Jump"><i class="fe fe-arrow-right"></i> Jump</a></li>
+        <li><a href="#" id="Assign-To-File"><i class="fe fe-arrow-right"></i> Assign To File</a></li>
+
+    </ul>
     {{-- <div class="modal fade" id="changeStakeHolderForAllModal" tabindex="-1" role="dialog"
         aria-labelledby="changeStakeHolderForAllModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -697,14 +833,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                        '
                             : '') .
                             ($canDelete
                                 ? '
-                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                        '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
@@ -742,6 +878,8 @@
                         if (!event.target.closest('.dropdown')) {
                             actionList.style.display = 'none';
                         }
+                        const menu = document.getElementById('contextMenu');
+                        if (menu) menu.style.display = 'none';
                     });
                 }
             }
@@ -1104,8 +1242,10 @@
             });
         });
     </script>
+
     <script>
         $(document).ready(function() {
+
             $('#threadFilter').on('click', function() {
 
                 $('#searchThreadsModal').modal('show'); // Show the modal
@@ -1122,8 +1262,135 @@
                     window.location.href = url.toString();
                 }
             });
+            $('.threadsBtn').on('click', function() {
+                const threads = $(this).data('document-threads') || [];
+                var documentSub = $(this).data('document-sub');
+                var documentRef = $(this).data('document-ref');
+                $('#ref').val(documentRef);
+                $('#sub').val(documentSub);
+                console.log(threads); // Always an array, even if empty
+                const container = $('#threadsContainer');
+                container.empty(); // Clear previous content
+
+                // Loop through threads and create a radio button for each
+                threads.forEach((thread, index) => {
+                    const radioHtml = `
+                            
+
+                            <div class="custom-control custom-radio">
+                                    <input type="radio" id="thread${index}" name="threadOption" value="${thread.replace(/\\/g, '')}"
+                                        class="custom-control-input thread-radio">
+                                    <label class="custom-control-label" for="thread${index}">${thread.replace(/\\/g, '')}</label>
+                                </div>
+                        `;
+                    container.append(radioHtml);
+                });
+                const docs = $('#docs');
+                docs.addClass('d-none');
+                $('#ThreadsModal').modal('show');
+
+            });
+
+
+            $(document).on('change', '.thread-radio', function() {
+                const selectedThread = $(this).val();
+                $('#docAssignments').addClass('d-none');
+                // Send AJAX request to get documents based on reference
+                $.ajax({
+                    url: '/get-documents-by-thread', // Replace with your actual route
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                        reference: selectedThread
+                    },
+                    success: function(response) {
+                        const resultDiv = $('#documentsResult');
+                        const docs = $('#docs'); // Your target div
+                        resultDiv.empty(); // Clear previous labels
+
+                        if (response.documents && response.documents.length > 0) {
+                            docs.removeClass('d-none');
+
+                            response.documents.forEach((doc, index) => {
+
+                                const label =
+                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
+                                resultDiv.append(label);
+                            });
+
+                        } else {
+                            docs.addClass('d-none');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch documents.');
+                    }
+                });
+            });
+
+            const docFileRouteBase = "{{ route('goToDocFile', ['docId' => '__DOC__', 'fileId' => '__FILE__']) }}";
+            $('#documentsResult').on('click', '.doc-label', function() {
+                let docSlug = $(this).data('doc-slug');
+                let docId = $(this).data('doc-id');
+                let docRef = $(this).data('doc-ref');
+
+                $.ajax({
+                    url: '/document/get-files/' + docSlug, // Your actual route
+                    type: 'GET',
+
+                    success: function(response) {
+
+                        const fileDiv = $('#docAssignments');
+                        fileDiv.empty();
+                        fileDiv.append(`<hr>`);
+                        fileDiv.append(
+                            `<div style="text-align:center;"><p>Assignments of "${docRef}"</p></div>`
+                        );
+                        if (response.files && response.files.length > 0) {
+                            // response.files.forEach(file => {
+                            //     fileDiv.append(`<div>📎 ${file.name}</div>`);
+                            // });
+                            $.each(response.files, function(index, file) {
+                                const fileUrl = docFileRouteBase
+                                    .replace('__DOC__', docId)
+                                    .replace('__FILE__', file.id);
+                                fileDiv.append(
+                                    `<p><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">📎${file.name}</span></a></p>`
+                                );
+                            });
+                            fileDiv.removeClass('d-none');
+                        } else {
+                            fileDiv.html('<div>No files found for this document.</div>')
+                                .removeClass('d-none');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files.');
+                    }
+                });
+            });
+
         });
+        window.showContextMenu = function(event, url, docSlug) {
+            event.preventDefault(); // Stop default right-click menu
+
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${event.pageX - 270}px`;
+            menu.style.top = `${event.pageY - 60}px`;
+            menu.style.display = 'block';
+
+            const previewLink = document.getElementById('Preview-Document');
+            previewLink.href ='/'+ url;
+            previewLink.target = '_blank';
+            const JUMPLink = document.getElementById('Jump');
+            JUMPLink.href =`{{ url('/project/all-documents?slug=${docSlug}') }}`;
+            JUMPLink.target = '_blank';
+        };
     </script>
+    <script>
+        // Global function accessible from inline HTML
+    </script>
+
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/dataTables.bootstrap4.min.js') }}"></script>
     <script>
