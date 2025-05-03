@@ -456,7 +456,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="searchThreads">Save</button>
+                    <button type="button" class="btn btn-primary" id="searchThreads">Search</button>
                 </div>
             </div>
         </div>
