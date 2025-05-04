@@ -561,10 +561,10 @@
     </div>
     <div class="modal fade" id="ThreadsModal" tabindex="-1" role="dialog" aria-labelledby="ThreadsModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ThreadsModalLabel">Threads</h5>
+                    <h5 class="modal-title" id="ThreadsModalLabel">Thread</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1403,7 +1403,7 @@
                                     .replace('__DOC__', docId)
                                     .replace('__FILE__', file.id);
                                 fileDiv.append(
-                                    `<p><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">📎${file.name}</span></a></p>`
+                                    `<p style="font-size:1rem;"><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span>${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif;">&#x2192;</span>  <span >📎${file.name}</span></a></p>`
                                 );
                             });
                             fileDiv.removeClass('d-none');
