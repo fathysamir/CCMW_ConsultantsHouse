@@ -869,7 +869,7 @@
                     new_div.className = "col-sm-12 col-md-2";
                     new_div.innerHTML = `<button class="btn btn-sm btn-secondary" type="button"
                                 id="threadFilter" style="width: 100%;">
-                                Filter By Threads
+                                Filter by Thread
                             </button>`;
                     rowDiv.appendChild(new_div);
                     // Create a new dropdown element
