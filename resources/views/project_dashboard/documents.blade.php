@@ -534,7 +534,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="searchThreadsModalLabel">Search In Documents With Threads</h5>
+                    <h5 class="modal-title" id="searchThreadsModalLabel">Filter by thread</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -869,7 +869,7 @@
                     new_div.className = "col-sm-12 col-md-2";
                     new_div.innerHTML = `<button class="btn btn-sm btn-secondary" type="button"
                                 id="threadFilter" style="width: 100%;">
-                                Filter by Thread
+                                Filter by thread
                             </button>`;
                     rowDiv.appendChild(new_div);
                     // Create a new dropdown element
