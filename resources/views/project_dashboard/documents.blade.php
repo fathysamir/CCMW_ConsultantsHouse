@@ -214,10 +214,24 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                } */
+                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                    } */
     </style>
-
+    <div id="hintBox"
+        style="
+        display:none;
+        position: fixed;
+        top: 65px;
+        right: 42%;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 9999;
+        font-size: 0.9rem;
+        ">
+    </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">Documents</h2>
@@ -580,13 +594,44 @@
                                 <div class="d-none" id="docAssignments">
 
                                 </div>
+                                <div class="d-none" id="assigneToFile">
+                                    <hr>
+                                    <div style="text-align:center;">
+                                        <p>Assign "<spam id="file_ref_"></spam>" To File</p>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="assigneToForm2">
+                                            @csrf
+                                            <input type="hidden" id="document_id_2" name="document_id_2">
+                                            <div class="form-group">
+                                                <label for="folder_id_2">Select Folder</label>
+                                                <select class="form-control" id="folder_id_2" required>
+                                                    <option value="" disabled selected>Select Folder</option>
+                                                    @foreach ($folders as $key => $name)
+                                                        <option value="{{ $key }}">{{ $name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group d-none">
+                                                <label for="newFile_2">Select File</label>
+                                                <select class="form-control" id="newFile_2" name="file_id_2">
+                                                    <option value="" disabled selected>Select File</option>
+
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveAssigne2">Save</button>
+                                    </div>
+                                </div>
                             </fieldset>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="searchThreads">Search</button>
+
                 </div>
             </div>
         </div>
@@ -833,14 +878,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
                             : '') .
                             ($canDelete
                                 ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
@@ -1268,7 +1313,7 @@
                 var documentRef = $(this).data('document-ref');
                 $('#ref').val(documentRef);
                 $('#sub').val(documentSub);
-                console.log(threads); // Always an array, even if empty
+
                 const container = $('#threadsContainer');
                 container.empty(); // Clear previous content
 
@@ -1295,6 +1340,7 @@
             $(document).on('change', '.thread-radio', function() {
                 const selectedThread = $(this).val();
                 $('#docAssignments').addClass('d-none');
+                $('#assigneToFile').addClass('d-none');
                 // Send AJAX request to get documents based on reference
                 $.ajax({
                     url: '/get-documents-by-thread', // Replace with your actual route
@@ -1312,9 +1358,9 @@
                             docs.removeClass('d-none');
 
                             response.documents.forEach((doc, index) => {
-
+                                let x = doc.reference;
                                 const label =
-                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
+                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
                                 resultDiv.append(label);
                             });
 
@@ -1341,6 +1387,8 @@
                     success: function(response) {
 
                         const fileDiv = $('#docAssignments');
+                        const fileDiv2 = $('#assigneToFile');
+
                         fileDiv.empty();
                         fileDiv.append(`<hr>`);
                         fileDiv.append(
@@ -1363,6 +1411,7 @@
                             fileDiv.html('<div>No files found for this document.</div>')
                                 .removeClass('d-none');
                         }
+                        fileDiv2.addClass('d-none');
                     },
                     error: function() {
                         alert('Failed to fetch files.');
@@ -1370,8 +1419,114 @@
                 });
             });
 
+            // $('#Assign-To-File').on('click', function() {
+            //     var documentSlug = $(this).data('document-slug');
+            //     var documentRef = $(this).data('document-ref');
+            //     console.log(documentSlug,documentRef);
+            //     $('#document_id_2').val(documentSlug);
+            //     $('#file_ref_').text(documentRef);
+            //     const fileDiv = $('#docAssignments');
+            //     const fileDiv2 = $('#assigneToFile');
+            //     fileDiv.addClass('d-none');
+            //     fileDiv2.removeClass('d-none');
+
+            // });
+            $('#folder_id_2').change(function() {
+                let folderId = $(this).val();
+
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                        folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile_2');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.form-group').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.form-group').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
+
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
+
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
+            $('#saveAssigne2').click(function() {
+                let documentId = $('#document_id_2').val();
+                let fileId = $('#newFile_2').val();
+
+                if (!fileId) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/project/document/assign-document-bySlug', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        slug: documentId,
+                        file_id: fileId
+                    },
+                    success: function(response) {
+                        let fileDropdown = $('#newFile_2');
+                        fileDropdown.closest('.form-group').addClass(
+                            'd-none');
+                        $('#folder_id_2').val('');
+                        showHint(response.message);
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+
         });
-        window.showContextMenu = function(event, url, docSlug) {
+
+        $(document).on('click', '#Assign-To-File', function() {
+            const documentSlug = window.currentDocSlug;
+            const documentRef = window.currentDocRef;
+
+            $('#document_id_2').val(documentSlug);
+            $('#file_ref_').text(documentRef);
+
+
+            let fileDropdown = $('#newFile_2');
+            fileDropdown.closest('.form-group').addClass(
+                'd-none');
+            $('#folder_id_2').val('');
+            const fileDiv = $('#docAssignments');
+            const fileDiv2 = $('#assigneToFile');
+            fileDiv.addClass('d-none');
+            fileDiv2.removeClass('d-none');
+        });
+
+        window.showContextMenu = function(event, url, docSlug, reference) {
             event.preventDefault(); // Stop default right-click menu
 
             const menu = document.getElementById('contextMenu');
@@ -1380,11 +1535,14 @@
             menu.style.display = 'block';
 
             const previewLink = document.getElementById('Preview-Document');
-            previewLink.href ='/'+ url;
+            previewLink.href = '/' + url;
             previewLink.target = '_blank';
             const JUMPLink = document.getElementById('Jump');
-            JUMPLink.href =`{{ url('/project/all-documents?slug=${docSlug}') }}`;
+            JUMPLink.href = `{{ url('/project/all-documents?slug=${docSlug}') }}`;
             JUMPLink.target = '_blank';
+            assignBtn = document.getElementById('Assign-To-File');
+            window.currentDocSlug = docSlug;
+            window.currentDocRef = reference;
         };
     </script>
     <script>

@@ -478,7 +478,21 @@ class DocumentController extends ApiController
         $documents = Document::where('project_id', auth()->user()->current_project_id)->where('reference', 'like', '%' . $reference . '%')->with('storageFile')->get();
         return response()->json(['documents' => $documents]);
     }
+    public function assignDocumentbyslug(Request $request)
+    {
+       
+        $doc=Document::where('slug',$request->slug)->first();
+        $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $doc->id)->first();
+        if (!$fileDoc) {
+            FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+            return response()->json(['message' => 'Document assigned successfully']);
 
+        } else {
+            return response()->json(['message' => 'This Document Is Existed In Selected File']);
+
+        }
+
+    }
     
 
 }

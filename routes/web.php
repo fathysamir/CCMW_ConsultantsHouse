@@ -177,6 +177,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/assign-to-file-for-all', [DocumentController::class, 'assignToFileForAll'])->name('project.document.assign-to-file-for-all');
     Route::get('/document/get-files/{id}', [DocumentController::class, 'get_assigned_files'])->name('get_assigned_files');
     Route::post('/get-documents-by-thread', [DocumentController::class, 'getDocsByReference']);
+    Route::post('/project/document/assign-document-bySlug', [DocumentController::class, 'assignDocumentbyslug'])->name('project.document.assign-document-slug');
+
     Route::get('go-to-fileDocument/{docId}/{fileId}',function($doc,$file){
        
         $document=FileDocument::where('file_id',$file)->where('document_id',$doc)->first();
