@@ -942,7 +942,7 @@
         function updatePrefix() {
             const h1 = document.getElementById('Chapter').value;
             const h2 = document.getElementById('Section').value;
-            document.getElementById('Prefix2').value = `Exhibits ${h1}.${h2}.`;
+            document.getElementById('Prefix2').value = `Exhibit ${h1}.${h2}.`;
         }
 
         // Listen to changes on both inputs
