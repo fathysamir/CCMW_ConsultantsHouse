@@ -1403,7 +1403,7 @@
                                     .replace('__DOC__', docId)
                                     .replace('__FILE__', file.id);
                                 fileDiv.append(
-                                    `<p style="font-size:1rem;"><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span>${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif;">&#x2192;</span>  <span >📎${file.name}</span></a></p>`
+                                    `<p style="font-size:1rem;"><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span>${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif;">&#x2192;</span>  <span>${file.name}</span></a></p>`
                                 );
                             });
                             fileDiv.removeClass('d-none');
