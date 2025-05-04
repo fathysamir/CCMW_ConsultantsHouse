@@ -686,7 +686,7 @@ class FileDocumentController extends ApiController
         }
         // Save document
         // Define file path in public folder
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . auth()->user()->id . '_' . time() . '_Claim_Report.docx';
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
         $filePath = public_path($fileName);
        
         // Save document to public folder
