@@ -334,7 +334,7 @@
                                                     <a class="dropdown-item threadsBtn"
                                                         href="javascript:void(0);"data-document-ref="{{ $document->reference }}"
                                                         data-document-threads="{{ json_encode($escapedThreads) }}"
-                                                        data-document-sub="{{ $document->subject }}">Threads</a>
+                                                        data-document-sub="{{ $document->subject }}">Thread</a>
                                                     <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Assigne To File</a>
                                                     <a class="dropdown-item" href="">Check Assignment</a>
