@@ -166,8 +166,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -541,6 +541,18 @@
                                                     href="javascript:void(0);"
                                                     data-document-id="{{ $document->document->slug }}">Check other
                                                     assignments</a>
+                                                @php
+                                                    $threads = $document->document->threads
+                                                        ? json_decode($document->document->threads, true)
+                                                        : [];
+                                                    $escapedThreads = array_map(function ($item) {
+                                                        return str_replace("'", "\'", $item);
+                                                    }, $threads);
+                                                @endphp
+                                                <a class="dropdown-item threadsBtn"
+                                                    href="javascript:void(0);"data-document-ref="{{ $document->document->reference }}"
+                                                    data-document-threads="{{ json_encode($escapedThreads) }}"
+                                                    data-document-sub="{{ $document->document->subject }}">Thread</a>
                                                 <a class="dropdown-item Delete-from-CMW-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}">Delete from CMW</a>
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
@@ -928,6 +940,89 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="ThreadsModal" tabindex="-1" role="dialog" aria-labelledby="ThreadsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ThreadsModalLabel">Thread</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="searchThreadsForm">
+                        @csrf
+
+                        <div class="form-group">
+                            <label for="folder_id2">Reference</label>
+                            <input type="text"class="form-control" disabled id="ref">
+                        </div>
+                        <div class="form-group">
+                            <label for="folder_id2">Subject</label>
+                            <input type="text"class="form-control" disabled id="sub">
+                        </div>
+                        <div class="form-group">
+                            <label for="folder_id2">Threads</label>
+                            <div id="threadsContainer"></div>
+                        </div>
+                        <div class="form-group d-none" id="docs">
+                            <fieldset class="custom-fieldset">
+                                <legend class="custom-legend"style="margin-bottom: 0px;">Documents</legend>
+                                <div id="documentsResult">
+
+                                </div>
+                                <div class="d-none" id="docAssignments">
+
+                                </div>
+                                <div class="d-none" id="assigneToFile">
+                                    <hr>
+                                    <div style="text-align:center;">
+                                        <p>Assign "<spam id="file_ref_"></spam>" To File</p>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="assigneToForm2">
+                                            @csrf
+                                            <input type="hidden" id="document_id_2" name="document_id_2">
+                                            <div class="form-group">
+                                                <label for="folder_id_2">Select Folder</label>
+                                                <select class="form-control" id="folder_id_2" required>
+                                                    <option value="" disabled selected>Select Folder</option>
+                                                    @foreach ($folders as $key => $name)
+                                                        <option value="{{ $key }}">{{ $name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="form-group d-none">
+                                                <label for="newFile_2">Select File</label>
+                                                <select class="form-control" id="newFile_2" name="file_id_2">
+                                                    <option value="" disabled selected>Select File</option>
+
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveAssigne2">Save</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul id="contextMenu" class="custom-context-menu" style="position:absolute; z-index:9999;">
+        <li><a href="#" id="Preview-Document"><i class="fe fe-arrow-right"></i> Preview Document</a></li>
+        <li><a href="#" id="Jump"><i class="fe fe-arrow-right"></i> Jump</a></li>
+        <li><a href="#" id="Assign-To-File"><i class="fe fe-arrow-right"></i> Assign To File</a></li>
+
+    </ul>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

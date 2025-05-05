@@ -1084,7 +1084,7 @@ class FileDocumentController extends ApiController
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $number_prefix = str_pad($counter, $sn, '0', STR_PAD_LEFT);
-                    $fileName = $prefix . ' - ' . $number_prefix . ' - ' . $from . $type . ' ' ;
+                    $fileName = $prefix  . $number_prefix . ' - ' . $from . $type . ' ' ;
                     if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
                         $ref_part=$request->ref_part;
                         if($ref_part == 'option1'){
