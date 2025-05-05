@@ -214,8 +214,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                    } */
+                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -337,7 +337,9 @@
                                                         data-document-sub="{{ $document->subject }}">Thread</a>
                                                     <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Assigne To File</a>
-                                                    <a class="dropdown-item" href="">Check Assignment</a>
+                                                    <a class="dropdown-item check_assignment" href="javascript:void(0);"
+                                                    data-document-id="{{ $document->slug }}">Check
+                                                        Assignment</a>
                                                 @endif
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_documents', $Project_Permissions ?? []))
                                                     <a class="dropdown-item text-danger"
@@ -351,6 +353,26 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="CheckOtherAssignmentModal" tabindex="-1" role="dialog"
+        aria-labelledby="CheckOtherAssignmentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="CheckOtherAssignmentModalLabel">Files to which the document is assigned
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="container">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -878,14 +900,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '
                             : '') .
                             ($canDelete
                                 ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
@@ -1290,7 +1312,28 @@
 
     <script>
         $(document).ready(function() {
+            $('.check_assignment').on('click', function() {
+                var documentId = $(this).data('document-id');
+                $.ajax({
+                    url: '/document/get-files/' +
+                        documentId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let container = $('#container');
+                        container.empty()
+                        $.each(response.files, function(index, file) {
+                            container.append(
+                                `<p><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">${file.name}</span></p>`
+                            );
+                        });
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
 
+                $('#CheckOtherAssignmentModal').modal('show'); // Show the modal
+            });
             $('#threadFilter').on('click', function() {
 
                 $('#searchThreadsModal').modal('show'); // Show the modal
