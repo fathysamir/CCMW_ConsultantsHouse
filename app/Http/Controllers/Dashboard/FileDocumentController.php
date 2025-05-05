@@ -620,6 +620,7 @@ class FileDocumentController extends ApiController
                                         'pageBreakBefore'=>false
                                     ]);
                                     $pTag=$this->lowercaseFirstCharOnly($pTag);
+                                    $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun2, $pTag, false, false);
                                     if ($index2 < count($paragraphsArray) - 1) {
                             
