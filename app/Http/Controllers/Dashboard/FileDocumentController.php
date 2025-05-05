@@ -1035,11 +1035,25 @@ class FileDocumentController extends ApiController
             session()->forget('zip_file');
         }
         $file=ProjectFile::where('slug',$request->file_id_)->first();
-        $fileDocuments=FileDocument::where('file_id',$file->id);
+        // $fileDocuments=FileDocument::where('file_id',$file->id);
+        // if($request->forclaimdocs2){
+        //     $fileDocuments->where('forClaim','1');
+        // }
+        
+        // $fileDocuments=$fileDocuments->get();
+
+        $fileDocuments = FileDocument::with('document')
+            ->where('file_id', $file->id);
         if($request->forclaimdocs2){
             $fileDocuments->where('forClaim','1');
         }
-        $fileDocuments=$fileDocuments->get();
+            
+        $fileDocuments=$fileDocuments->get()
+            ->sortBy([
+                fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
+                fn ($a, $b) => $a->sn <=> $b->sn,
+            ])
+            ->values();
         if(count($fileDocuments)>0){
             $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
 
