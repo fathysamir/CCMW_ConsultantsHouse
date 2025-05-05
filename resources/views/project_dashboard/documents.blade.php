@@ -1588,9 +1588,6 @@
             window.currentDocRef = reference;
         };
     </script>
-    <script>
-        // Global function accessible from inline HTML
-    </script>
 
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/dataTables.bootstrap4.min.js') }}"></script>

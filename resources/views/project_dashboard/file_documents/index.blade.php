@@ -5,6 +5,80 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        .custom-fieldset {
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+
+            width: 100%;
+            background-color: #fefefe;
+            position: relative;
+        }
+
+        .custom-legend {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0 10px;
+            color: #333;
+            width: auto;
+            max-width: 100%;
+        }
+
+        
+
+        .custom-context-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 8px 0;
+            width: 180px;
+            list-style: none;
+            z-index: 1000;
+        }
+
+
+        .custom-context-menu li {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s ease-in-out;
+        }
+
+
+        .custom-context-menu li:hover {
+            background: #f5f5f5;
+        }
+
+
+        .custom-context-menu li i {
+            font-size: 16px;
+            color: #007bff;
+            margin-bottom: 5px;
+            margin-right: 5px;
+        }
+
+
+        .custom-context-menu li a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            width: 100%;
+
+        }
+
+        .custom-context-menu li a:hover {
+            text-decoration: none;
+        }
+    </style>
+    <style>
         #btn-outline-primary {
             color: blue;
         }
@@ -1614,6 +1688,8 @@
                         if (!event.target.closest('.dropdown')) {
                             actionList.style.display = 'none';
                         }
+                        const menu = document.getElementById('contextMenu');
+                        if (menu) menu.style.display = 'none';
                     });
                 }
             }
@@ -2271,6 +2347,246 @@
             // Setup filters for all fields
             ["subject", "reference", "from", "to", "status", "note", "date", "return"].forEach(setupFilterUI);
         });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.threadsBtn').on('click', function() {
+                const threads = $(this).data('document-threads') || [];
+                var documentSub = $(this).data('document-sub');
+                var documentRef = $(this).data('document-ref');
+                $('#ref').val(documentRef);
+                $('#sub').val(documentSub);
+
+                const container = $('#threadsContainer');
+                container.empty(); // Clear previous content
+
+                // Loop through threads and create a radio button for each
+                threads.forEach((thread, index) => {
+                    const radioHtml = `
+                            
+
+                            <div class="custom-control custom-radio">
+                                    <input type="radio" id="thread${index}" name="threadOption" value="${thread.replace(/\\/g, '')}"
+                                        class="custom-control-input thread-radio">
+                                    <label class="custom-control-label" for="thread${index}">${thread.replace(/\\/g, '')}</label>
+                                </div>
+                        `;
+                    container.append(radioHtml);
+                });
+                const docs = $('#docs');
+                docs.addClass('d-none');
+                $('#ThreadsModal').modal('show');
+
+            });
+
+
+            $(document).on('change', '.thread-radio', function() {
+                const selectedThread = $(this).val();
+                $('#docAssignments').addClass('d-none');
+                $('#assigneToFile').addClass('d-none');
+                // Send AJAX request to get documents based on reference
+                $.ajax({
+                    url: '/get-documents-by-thread', // Replace with your actual route
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                        reference: selectedThread
+                    },
+                    success: function(response) {
+                        const resultDiv = $('#documentsResult');
+                        const docs = $('#docs'); // Your target div
+                        resultDiv.empty(); // Clear previous labels
+
+                        if (response.documents && response.documents.length > 0) {
+                            docs.removeClass('d-none');
+
+                            response.documents.forEach((doc, index) => {
+                                let x = doc.reference;
+                                const label =
+                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
+                                resultDiv.append(label);
+                            });
+
+                        } else {
+                            docs.addClass('d-none');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch documents.');
+                    }
+                });
+            });
+
+            const docFileRouteBase = "{{ route('goToDocFile', ['docId' => '__DOC__', 'fileId' => '__FILE__']) }}";
+            $('#documentsResult').on('click', '.doc-label', function() {
+                let docSlug = $(this).data('doc-slug');
+                let docId = $(this).data('doc-id');
+                let docRef = $(this).data('doc-ref');
+
+                $.ajax({
+                    url: '/document/get-files/' + docSlug, // Your actual route
+                    type: 'GET',
+
+                    success: function(response) {
+
+                        const fileDiv = $('#docAssignments');
+                        const fileDiv2 = $('#assigneToFile');
+
+                        fileDiv.empty();
+                        fileDiv.append(`<hr>`);
+                        fileDiv.append(
+                            `<div style="text-align:center;"><p>Assignments of "${docRef}"</p></div>`
+                        );
+                        if (response.files && response.files.length > 0) {
+                            // response.files.forEach(file => {
+                            //     fileDiv.append(`<div>📎 ${file.name}</div>`);
+                            // });
+                            $.each(response.files, function(index, file) {
+                                const fileUrl = docFileRouteBase
+                                    .replace('__DOC__', docId)
+                                    .replace('__FILE__', file.id);
+                                fileDiv.append(
+                                    `<p style="font-size:1rem;"><a href="${fileUrl}" target="_blank"><span class="fa fa-star"></span> <span>${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif;">&#x2192;</span>  <span>${file.name}</span></a></p>`
+                                );
+                            });
+                            fileDiv.removeClass('d-none');
+                        } else {
+                            fileDiv.html('<div>No files found for this document.</div>')
+                                .removeClass('d-none');
+                        }
+                        fileDiv2.addClass('d-none');
+                    },
+                    error: function() {
+                        alert('Failed to fetch files.');
+                    }
+                });
+            });
+
+            // $('#Assign-To-File').on('click', function() {
+            //     var documentSlug = $(this).data('document-slug');
+            //     var documentRef = $(this).data('document-ref');
+            //     console.log(documentSlug,documentRef);
+            //     $('#document_id_2').val(documentSlug);
+            //     $('#file_ref_').text(documentRef);
+            //     const fileDiv = $('#docAssignments');
+            //     const fileDiv2 = $('#assigneToFile');
+            //     fileDiv.addClass('d-none');
+            //     fileDiv2.removeClass('d-none');
+
+            // });
+            $('#folder_id_2').change(function() {
+                let folderId = $(this).val();
+
+                if (!folderId) return; // Stop if no folder is selected
+
+                $.ajax({
+                    url: '/project/folder/get-files/' +
+                        folderId, // Adjust the route to your API endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        let fileDropdown = $('#newFile_2');
+                        fileDropdown.empty().append(
+                            '<option value="" disabled selected>Select File</option>');
+
+                        if (response.files.length > 0) {
+                            $.each(response.files, function(index, file) {
+                                fileDropdown.append(
+                                    `<option value="${file.id}">${file.name}</option>`
+                                );
+                            });
+
+                            fileDropdown.closest('.form-group').removeClass(
+                                'd-none'); // Show file dropdown
+                        } else {
+                            fileDropdown.closest('.form-group').addClass(
+                                'd-none'); // Hide if no files
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch files. Please try again.');
+                    }
+                });
+            });
+
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
+
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
+            $('#saveAssigne2').click(function() {
+                let documentId = $('#document_id_2').val();
+                let fileId = $('#newFile_2').val();
+
+                if (!fileId) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/project/document/assign-document-bySlug', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        slug: documentId,
+                        file_id: fileId
+                    },
+                    success: function(response) {
+                        let fileDropdown = $('#newFile_2');
+                        fileDropdown.closest('.form-group').addClass(
+                            'd-none');
+                        $('#folder_id_2').val('');
+                        showHint(response.message);
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+
+        });
+
+        $(document).on('click', '#Assign-To-File', function() {
+            const documentSlug = window.currentDocSlug;
+            const documentRef = window.currentDocRef;
+
+            $('#document_id_2').val(documentSlug);
+            $('#file_ref_').text(documentRef);
+
+
+            let fileDropdown = $('#newFile_2');
+            fileDropdown.closest('.form-group').addClass(
+                'd-none');
+            $('#folder_id_2').val('');
+            const fileDiv = $('#docAssignments');
+            const fileDiv2 = $('#assigneToFile');
+            fileDiv.addClass('d-none');
+            fileDiv2.removeClass('d-none');
+        });
+
+        window.showContextMenu = function(event, url, docSlug, reference) {
+            event.preventDefault(); // Stop default right-click menu
+
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${event.pageX - 270}px`;
+            menu.style.top = `${event.pageY - 60}px`;
+            menu.style.display = 'block';
+
+            const previewLink = document.getElementById('Preview-Document');
+            previewLink.href = '/' + url;
+            previewLink.target = '_blank';
+            const JUMPLink = document.getElementById('Jump');
+            JUMPLink.href = `{{ url('/project/all-documents?slug=${docSlug}') }}`;
+            JUMPLink.target = '_blank';
+            assignBtn = document.getElementById('Assign-To-File');
+            window.currentDocSlug = docSlug;
+            window.currentDocRef = reference;
+        };
     </script>
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/dataTables.bootstrap4.min.js') }}"></script>
