@@ -9,7 +9,7 @@
     }
 </style>
     <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon" class="fe fe-24 fe-chevrons-right"></span>Details of
-        "{{ $doc->document->subject }}"</h2>
+        "{{ $doc->document ? $doc->document->subject :  $doc->note->subject}}"</h2>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
             style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">
@@ -26,6 +26,7 @@
     <div class="card shadow mb-4 d-none"id="detailsCard">
         <div class="card-body">
             <div class="row">
+                @if($doc->document)
                 <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-3">
@@ -114,6 +115,57 @@
                         </div>
                     </div>
                 </div>
+                @else
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label for="Type">Type</label>
+                                <input type="text" id="Type" class="form-control"
+                                    placeholder="Type" disabled value="Note/Activity">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group mb-3">
+                                <label for="Subject">Subject</label>
+                                <input type="text"id="Subject" class="form-control"
+                                    placeholder="Subject" disabled value="{{ $doc->note->subject }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label for="Date">Date</label>
+                                <input type="text" id="Date" class="form-control"
+                                    placeholder="Date" disabled value="{{$doc->note->start_date? date('d-M-Y', strtotime( $doc->note->start_date)):'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label for="Return_Date">Return Date</label>
+                                <input type="text"id="Return_Date" class="form-control"
+                                    placeholder="Return Date" disabled value="{{ $doc->note->end_date? date('d-M-Y', strtotime( $doc->note->end_date)):'' }}">
+                            </div>
+                        </div>
+                    
+                    </div>
+                   
+                    <div class="row">
+                        <div class="col-md-11">
+                            <div class="form-group mb-3">
+                                <label for="Note">Note</label>
+                                <input type="text" id="Note" class="form-control"
+                                    placeholder="Note" disabled value="{{$doc->note->notes}}">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group mb-3">
+                                <button type="button" class="btn mt-4 btn-success"
+                                onclick="window.location.href='/project/file-notes/<?php echo $doc->id; ?>/doc/<?php echo $doc->note->slug; ?>/edit'">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -131,7 +183,9 @@
                         <div class="form-group mb-3">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label for="owner">Narrative</label>
+                                @if($doc->document)
                                 <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i class="fa-regular fa-eye" style="font-size: 24px;"title="View PDF"></i></a>
+                                @endif
                                
                             </div>
                             
@@ -162,7 +216,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="Revision">Tags</label>
-                                    <select class="form-control select2-multi" id="multi-select2" name="tags[]"multiple>
+                                    <select class="form-control select2-multi" id="multi-select2" name="tags[]"multiple @if($doc->document_id==null) disabled @endif>
                                         @foreach ($tags as $tag)
                                             <option
                                                 value="{{ $tag->id }}"{{ count($doc->tags) != 0 && in_array($tag->id, $doc->tags->pluck('id')->toArray()) ? 'selected' : '' }}>
@@ -182,7 +236,7 @@
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
 
                                         <input type="checkbox" class="custom-control-input" name="forLetter"id="forLetter"
-                                            @if ($doc->forLetter == '1') checked @endif>
+                                            @if ($doc->forLetter == '1') checked @endif @if($doc->document_id==null) disabled @endif>
                                         <label class="custom-control-label" for="forLetter">For Notice (N)</label>
                                     </div>
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">

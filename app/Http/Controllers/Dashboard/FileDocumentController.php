@@ -21,6 +21,7 @@ use Illuminate\Validation\Rule;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Shared\Html;
+use App\Models\Note;
 use Illuminate\Http\Response;
 use SebastianBergmann\Type\FalseType;
 use Illuminate\Support\Facades\File;
@@ -38,11 +39,12 @@ class FileDocumentController extends ApiController
             session()->forget('zip_file');
         }
         $file=ProjectFile::where('slug',$id)->first();
-        $documents = FileDocument::with('document')
+        $documents = FileDocument::with(['document', 'note'])
             ->where('file_id', $file->id)
             ->get()
             ->sortBy([
-                fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
+                fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                            <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
                 fn ($a, $b) => $a->sn <=> $b->sn,
             ])
             ->values();
@@ -283,19 +285,23 @@ class FileDocumentController extends ApiController
 
         // Paragraphs
         //$paragraphs=FileDocument::where('file_id',$file->id)->where('forClaim','1')->orderBy()->get();
-        $paragraphs = FileDocument::with('document')
+        $paragraphs = FileDocument::with(['document', 'note'])
             ->where('file_id', $file->id);
         if($request->forclaimdocs){
             $paragraphs->where('forClaim','1');
         }
             
         $paragraphs=$paragraphs->get()
-            ->sortBy([
-                fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
-                fn ($a, $b) => $a->sn <=> $b->sn,
-            ])
-            ->values();
-       
+                        ->sortBy([
+                            fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                                        <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                            fn ($a, $b) => $a->sn <=> $b->sn,
+                        ])
+                        ->values();
+           
+           
+           
+            
        
         
         $GetStandardStylesFootNotes = [
@@ -319,71 +325,59 @@ class FileDocumentController extends ApiController
         ];
         foreach ($paragraphs as $index => $paragraph) {
             //dd($paragraphs);
-            $date=date("d F Y", strtotime($paragraph->document->start_date)); 
-           
+            $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
+            $existedList=false;
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
+            if($paragraph->document){
+                $date=date("d F Y", strtotime($paragraph->document->start_date)); 
 
-           
-            // Create a List Item Run (allows inline text styling + footnotes inside list items)
-            $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
-
-            // Add the main sentence
-            $listItemRun->addText("On ",$GetStandardStylesP);
-            $existedList=false;
-            // Add the date with a footnote
-            $listItemRun->addText($date,$GetStandardStylesP);
-            $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-            $Exhibit=true;
-            $dated=true;
-            $senderAndDocType=true;
-            $hint='';
-            if($request->formate_type2=='reference'){
-                $hint=$paragraph->document->reference . ".";
-            }elseif($request->formate_type2=='dateAndReference'){
-               
-                $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
-                $hint = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
-            }elseif($request->formate_type2=='formate'){
-                $sn=$request->sn2;
-                $prefix=$request->prefix2;
-                $listNumber = "$prefix" . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
-                $hint=$listNumber . ": ";
-                $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                $type=$paragraph->document->docType->name;
-                $hint .=$from . $type . " ";
-                if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
-                    $ref_part=$request->ref_part2;
-                    if($ref_part == 'option1'){
-                        $hint .= ', ';
-                    }elseif($ref_part == 'option2'){
-                       
-                        $hint .= 'From: ' . $paragraph->document->reference . ', ';
-                    }elseif($ref_part == 'option3'){
+                // Add the main sentence
+                $listItemRun->addText("On ",$GetStandardStylesP);
+                
+                // Add the date with a footnote
+                $listItemRun->addText($date,$GetStandardStylesP);
+                $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
+                $Exhibit=true;
+                $dated=true;
+                $senderAndDocType=true;
+                $hint='';
+                if($request->formate_type2=='reference'){
+                    $hint=$paragraph->document->reference . ".";
+                }elseif($request->formate_type2=='dateAndReference'){
+                   
+                    $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
+                    $hint = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
+                }elseif($request->formate_type2=='formate'){
+                    $sn=$request->sn2;
+                    $prefix=$request->prefix2;
+                    $listNumber = "$prefix" . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
+                    $hint=$listNumber . ": ";
+                    $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                    $type=$paragraph->document->docType->name;
+                    $hint .=$from . $type . " ";
+                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
+                        $ref_part=$request->ref_part2;
+                        if($ref_part == 'option1'){
+                            $hint .= ', ';
+                        }elseif($ref_part == 'option2'){
+                           
+                            $hint .= 'From: ' . $paragraph->document->reference . ', ';
+                        }elseif($ref_part == 'option3'){
+                            $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                        }
+                    }else{
                         $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
                     }
-                }else{
-                    $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                    $hint .= 'dated: ' . $date . '.';
+    
                 }
-                $hint .= 'dated: ' . $date . '.';
-
+                $footnote->addText($hint,$GetStandardStylesFootNotes);
+                $listItemRun->addText(", ",$GetStandardStylesP);
+            }else{
+                $listItemRun->addText("Note/Activity : ",$GetStandardStylesP);
             }
-            // if($Exhibit){
-            //     $hint="Exhibits " . $listNumber . ": ";
-            // }
-            // if($senderAndDocType){
-            //     if($paragraph->document->from_id!=null){
-            //         $hint .=$paragraph->document->fromStakeHolder->narrative . "'s ";
-            //     }
-            //     $hint .=$paragraph->document->docType->name . " ";
-                
-            // }
-            // $hint .="Ref: " . $paragraph->document->reference . ", ";
-            // if($dated){
-            //     $hint .="dated: " . $date . ".";
-            // }
-            $footnote->addText($hint,$GetStandardStylesFootNotes);
-            $listItemRun->addText(", ",$GetStandardStylesP);
+            
             if($paragraph->narrative==null){
                 $listItemRun->addText("____________.");
             }else{
@@ -877,16 +871,13 @@ class FileDocumentController extends ApiController
             $doc->tags()->sync($request->tags); // Sync tags
         }
         if($request->action=='save'){
-            return redirect('/project/file-document-first-analyses/'. $doc->id)->with('success', 'analyses for "' . $doc->document->subject .'" document saved successfully.');
+            return redirect('/project/file-document-first-analyses/'. $doc->id)->with('success', $doc->document? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
         }else{
-            return redirect('/project/file/' . $doc->file->slug . '/documents')->with('success', 'analyses for "' . $doc->document->subject .'" document saved successfully.');
+            return redirect('/project/file/' . $doc->file->slug . '/documents')->with('success', $doc->document ? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
         }
 
         
         
-    }
-    public function download_doc(){
-            
     }
 
     public function copy_move_doc_to_another_file(Request $request){
@@ -1042,7 +1033,7 @@ class FileDocumentController extends ApiController
         
         // $fileDocuments=$fileDocuments->get();
 
-        $fileDocuments = FileDocument::with('document')
+        $fileDocuments = FileDocument::where('note_id',null)->with('document')
             ->where('file_id', $file->id);
         if($request->forclaimdocs2){
             $fileDocuments->where('forClaim','1');
@@ -1248,5 +1239,23 @@ class FileDocumentController extends ApiController
                 'success' => true,
             ]);
         }
+    }
+
+    public function create_note(Request $request){
+      
+        do {
+            $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        } while (Note::where('slug', $slug)->exists());
+
+        $file=ProjectFile::where('slug',$request->file_slug)->first();
+        $note=Note::create(['slug'=>$slug,'user_id'=>auth()->user()->id,
+                            'project_id'=>auth()->user()->current_project_id,
+                            'start_date'=>$request->start_date,
+                            'subject'=>$request->subject]);
+        $fileDoc=FileDocument::create(['file_id'=>$file->id,'note_id'=>$note->id,'user_id'=>auth()->user()->id,'forClaim'=>'1','forChart'=>'1']);
+        session(['specific_file_doc' => $fileDoc->id]);
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

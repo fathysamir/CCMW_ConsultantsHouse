@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->enum('analysis_complete', ['0', '1'])->default('1');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

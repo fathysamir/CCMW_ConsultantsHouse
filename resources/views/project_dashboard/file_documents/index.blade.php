@@ -24,7 +24,7 @@
             max-width: 100%;
         }
 
-        
+
 
         .custom-context-menu {
             display: none;
@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -272,6 +272,9 @@
                 </a>
                 <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}"
                     id="download-allDoc">Download Documents</a>
+                <a class="dropdown-item" href="javascript:void(0);" id="addNote">
+                    Add Note/Activity
+                </a>
             </div>
         </div>
     </div>
@@ -511,7 +514,7 @@
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
-                                                    class="custom-control-input row-checkbox"data-file-id="{{ $document->id }}"
+                                                    class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
                                                     id="checkbox-{{ $document->id }}" value="{{ $document->id }}">
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
@@ -519,9 +522,9 @@
                                         </td>
                                         <td>
 
-                                            <label class="with_tag @if (count($document->tags) != 0) active @endif"><span
+                                            <label class="with_tag @if ($document->note_id == null && count($document->tags) != 0) active @endif"><span
                                                     class="fe fe-23 fe-volume-2"
-                                                    style="@if (count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
+                                                    style="@if ($document->note_id == null && count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
                                             <label
                                                 class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
                                                 style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
@@ -561,29 +564,50 @@
                                             <br>
                                             <span
                                                 class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
-                                            <label>{{ $document->document->docType->name }}</label>
+                                            <label>{{ $document->note_id == null ? $document->document->docType->name : 'Note/Activity' }}</label>
 
 
                                         </td>
 
                                         <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('analysis', $Project_Permissions ?? [])) href="{{ route('project.file-document-first-analyses', $document->id) }}" @endif>
-                                                {{ $document->document->subject }}</a>
+                                                {{ $document->document ? $document->document->subject : $document->note->subject }}</a>
                                         </td>
 
-                                        <td>{{ $document->document->start_date ? date('d.M.y', strtotime($document->document->start_date)) : '_' }}
+                                        <td>
+                                            @if ($document->document)
+                                                {{ $document->document->start_date ? date('d.M.y', strtotime($document->document->start_date)) : '_' }}
+                                            @else
+                                                {{ $document->note->start_date ? date('d.M.y', strtotime($document->note->start_date)) : '_' }}
+                                            @endif
                                         </td>
-                                        <td>{{ $document->document->end_date ? date('d.M.y', strtotime($document->document->end_date)) : '_' }}
+                                        <td>
+                                            @if ($document->document)
+                                                {{ $document->document->end_date ? date('d.M.y', strtotime($document->document->end_date)) : '_' }}
+                                            @else
+                                                {{ $document->note->end_date ? date('d.M.y', strtotime($document->note->end_date)) : '_' }}
+                                            @endif
                                         </td>
-                                        <td ondblclick="openDocumentPdf('{{ asset($document->document->storageFile->path) }}')"
-                                            style="cursor: pointer;">{{ $document->document->reference }}</td>
-                                        <td>{{ $document->document->revision }}</td>
-                                        <td>{{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative : '_' }}
+                                        <td @if ($document->document) ondblclick="openDocumentPdf('{{ asset($document->document->storageFile->path) }}')" @endif
+                                            style="cursor: pointer;">
+                                            {{ $document->document ? $document->document->reference : '_' }}</td>
+                                        <td>{{ $document->document ? $document->document->revision : '_' }}</td>
+                                        <td>
+                                            @if ($document->document)
+                                                {{ $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative : '_' }}
+                                            @else
+                                                _
+                                            @endif
                                         </td>
-                                        <td>{{ $document->document->toStakeHolder ? $document->document->toStakeHolder->narrative : '_' }}
+                                        <td>
+                                            @if ($document->document)
+                                                {{ $document->document->toStakeHolder ? $document->document->toStakeHolder->narrative : '_' }}
+                                            @else
+                                                _
+                                            @endif
                                         </td>
                                         <td>{{ $document->sn }}</td>
-                                        <td>{{ $document->document->status }}</td>
+                                        <td>{{ $document->document ? $document->document->status : '_' }}</td>
                                         <td>{{ $document->notes1 }}
                                         </td>
                                         <td>
@@ -592,43 +616,48 @@
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item"
-                                                    href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->document->slug) }}">
-                                                    Edit Document
-                                                </a>
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.file-document-first-analyses', $document->id) }}"
-                                                    data-action-type="copy">Chronology</a>
-                                                <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}" data-action-type="copy">Copy
-                                                    To another File</a>
-                                                <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}" data-action-type="move">Move
-                                                    To another File</a>
-                                                <a class="dropdown-item"
-                                                    href="{{ route('download.document', $document->id) }}">
-                                                    Download Document
-                                                </a>
-                                                <a class="dropdown-item unassign-doc-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}">Unassign Document</a>
-                                                <a class="dropdown-item Check-other-assignments-btn"
-                                                    href="javascript:void(0);"
-                                                    data-document-id="{{ $document->document->slug }}">Check other
-                                                    assignments</a>
-                                                @php
-                                                    $threads = $document->document->threads
-                                                        ? json_decode($document->document->threads, true)
-                                                        : [];
-                                                    $escapedThreads = array_map(function ($item) {
-                                                        return str_replace("'", "\'", $item);
-                                                    }, $threads);
-                                                @endphp
-                                                <a class="dropdown-item threadsBtn"
-                                                    href="javascript:void(0);"data-document-ref="{{ $document->document->reference }}"
-                                                    data-document-threads="{{ json_encode($escapedThreads) }}"
-                                                    data-document-sub="{{ $document->document->subject }}">Thread</a>
-                                                <a class="dropdown-item Delete-from-CMW-btn" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                @if ($document->document)
+                                                    <a class="dropdown-item"
+                                                        href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->document->slug) }}">
+                                                        Edit Document
+                                                    </a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.file-document-first-analyses', $document->id) }}"
+                                                        data-action-type="copy">Chronology</a>
+                                                    <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}"
+                                                        data-action-type="copy">Copy
+                                                        To another File</a>
+                                                    <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}"
+                                                        data-action-type="move">Move
+                                                        To another File</a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('download.document', $document->id) }}">
+                                                        Download Document
+                                                    </a>
+                                                    <a class="dropdown-item unassign-doc-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Unassign Document</a>
+                                                    <a class="dropdown-item Check-other-assignments-btn"
+                                                        href="javascript:void(0);"
+                                                        data-document-id="{{ $document->document->slug }}">Check other
+                                                        assignments</a>
+                                                    @php
+                                                        $threads = $document->document->threads
+                                                            ? json_decode($document->document->threads, true)
+                                                            : [];
+                                                        $escapedThreads = array_map(function ($item) {
+                                                            return str_replace("'", "\'", $item);
+                                                        }, $threads);
+                                                    @endphp
+                                                    <a class="dropdown-item threadsBtn"
+                                                        href="javascript:void(0);"data-document-ref="{{ $document->document->reference }}"
+                                                        data-document-threads="{{ json_encode($escapedThreads) }}"
+                                                        data-document-sub="{{ $document->document->subject }}">Thread</a>
+                                                    <a class="dropdown-item Delete-from-CMW-btn"
+                                                        href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
                                                     data-action-type="forClaim">For Claim</a>
@@ -1091,6 +1120,42 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="addNoteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addNoteModalLabel">
+                        Create New Note/Activity
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addNoteForm">
+                        @csrf
+
+                        <input type="hidden" id="file__slug" name="file_slug" value={{ $file->slug }}>
+                        <div class="form-group">
+                            <label for="folder_id2">subject</label>
+                            <input class="form-control" id="subject" type="text" name="subject" required>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="newFile2">Date</label>
+                            <input required type="date"style="background-color:#fff;" name="start_date"
+                                id="start_date" class="form-control date" placeholder="Start Date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveNote">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <ul id="contextMenu" class="custom-context-menu" style="position:absolute; z-index:9999;">
         <li><a href="#" id="Preview-Document"><i class="fe fe-arrow-right"></i> Preview Document</a></li>
         <li><a href="#" id="Jump"><i class="fe fe-arrow-right"></i> Jump</a></li>
@@ -1135,6 +1200,40 @@
     </script>
     <script>
         $(document).ready(function() {
+            $('#addNote').on('click', function() {
+
+                $('#subject').val('');
+                $('#start_date').val('');
+                $('#addNoteModal').modal('show');
+            });
+            $('#saveNote').on('click', function() {
+                const form2 = $('#addNoteForm');
+
+                // Optional client-side check before AJAX send
+                if (!form2[0].checkValidity()) {
+                    form2[0].reportValidity();
+                    return;
+                }
+
+                const formData2 = form2.serialize();
+
+                $.ajax({
+                    url: '/project/create-new-note', // Replace with real route
+                    type: 'POST',
+                    data: formData2,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+
+                        $('#addNoteModal').modal('hide');
+                        window.location.reload();
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+
+            });
 
             // When "Download All" button is clicked
             $('#export-allDoc').on('click', function() {

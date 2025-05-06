@@ -17,8 +17,10 @@ return new class extends Migration
             $table->foreign('file_id')->references('id')->on('project_files')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('document_id');
+            $table->unsignedBigInteger('document_id')->nullable();
             $table->foreign('document_id')->references('id')->on('documents')->onDelete('cascade');
+            $table->unsignedBigInteger('note_id')->nullable();
+            $table->foreign('note_id')->references('id')->on('notes')->onDelete('cascade');
             $table->integer('sn')->nullable();
             $table->longText('narrative')->nullable();
             $table->longText('notes1')->nullable();

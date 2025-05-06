@@ -14,6 +14,7 @@ class FileDocument extends Model
     protected $fillable = [
         'file_id',
         'document_id',
+        'note_id',
         'user_id',
         'sn',
         'narrative',
@@ -36,6 +37,10 @@ class FileDocument extends Model
     public function document()
     {
         return $this->belongsTo(Document::class, 'document_id','id')->withTrashed();
+    }
+    public function note()
+    {
+        return $this->belongsTo(Note::class, 'note_id','id')->withTrashed();
     }
 
     public function user()
