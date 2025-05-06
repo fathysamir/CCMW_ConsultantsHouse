@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -515,7 +515,8 @@
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
                                                     class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
-                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}" @if ($document->document_id == null) disabled @endif>
+                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}"
+                                                    @if ($document->document_id == null) disabled @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
@@ -622,8 +623,7 @@
                                                         Edit Document
                                                     </a>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('project.file-document-first-analyses', $document->id) }}"
-                                                        data-action-type="copy">Chronology</a>
+                                                        href="{{ route('project.file-document-first-analyses', $document->id) }}">Chronology</a>
                                                     <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"
                                                         data-action-type="copy">Copy
@@ -658,6 +658,8 @@
                                                         href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Delete from CMW</a>
                                                 @else
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.file-document-first-analyses', $document->id) }}">Chronology</a>
                                                     <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"
                                                         data-action-type="copy">Copy
