@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -666,6 +666,8 @@
                                                         data-document-id="{{ $document->id }}"
                                                         data-action-type="move">Move
                                                         To another File</a>
+                                                    <a class="dropdown-item unassign-doc-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Unassign Document</a>
                                                 @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
