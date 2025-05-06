@@ -338,7 +338,7 @@
                                                     <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Assigne To File</a>
                                                     <a class="dropdown-item check_assignment" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->slug }}">Check
+                                                    data-document-id="{{ $document->slug }}"data-type="document">Check
                                                         Assignment</a>
                                                 @endif
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_documents', $Project_Permissions ?? []))
@@ -1314,6 +1314,22 @@
         $(document).ready(function() {
             $('.check_assignment').on('click', function() {
                 var documentId = $(this).data('document-id');
+                var type = $(this).data('type');
+                fetch("{{ route('set.session') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            key: 'file_doc_type',
+                            value: type
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // should log { status: 'ok' }
+                    });
                 $.ajax({
                     url: '/document/get-files/' +
                         documentId, // Adjust the route to your API endpoint
@@ -1403,7 +1419,7 @@
                             response.documents.forEach((doc, index) => {
                                 let x = doc.reference;
                                 const label =
-                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
+                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}"data-type="document">📄 ${doc.reference}</label>`;
                                 resultDiv.append(label);
                             });
 
@@ -1422,7 +1438,22 @@
                 let docSlug = $(this).data('doc-slug');
                 let docId = $(this).data('doc-id');
                 let docRef = $(this).data('doc-ref');
-
+                var type = $(this).data('type');
+                fetch("{{ route('set.session') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            key: 'file_doc_type',
+                            value: type
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // should log { status: 'ok' }
+                    });
                 $.ajax({
                     url: '/document/get-files/' + docSlug, // Your actual route
                     type: 'GET',

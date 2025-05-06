@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -640,7 +640,8 @@
                                                         data-document-id="{{ $document->id }}">Unassign Document</a>
                                                     <a class="dropdown-item Check-other-assignments-btn"
                                                         href="javascript:void(0);"
-                                                        data-document-id="{{ $document->document->slug }}">Check other
+                                                        data-document-id="{{ $document->document->slug }}"data-type="document">Check
+                                                        other
                                                         assignments</a>
                                                     @php
                                                         $threads = $document->document->threads
@@ -670,6 +671,11 @@
                                                         To another File</a>
                                                     <a class="dropdown-item unassign-doc-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Unassign Document</a>
+                                                    <a class="dropdown-item Check-other-assignments-btn"
+                                                        href="javascript:void(0);"
+                                                        data-document-id="{{ $document->note->slug }}"data-type="note">Check
+                                                        other
+                                                        assignments</a>
                                                 @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
@@ -1382,6 +1388,22 @@
             $("#check").removeClass("sorting_asc");
             $('.Check-other-assignments-btn').on('click', function() {
                 var documentId = $(this).data('document-id');
+                var type = $(this).data('type');
+                fetch("{{ route('set.session') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            key: 'file_doc_type',
+                            value: type
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // should log { status: 'ok' }
+                    });
                 $.ajax({
                     url: '/document/get-files/' +
                         documentId, // Adjust the route to your API endpoint
@@ -2515,7 +2537,7 @@
                             response.documents.forEach((doc, index) => {
                                 let x = doc.reference;
                                 const label =
-                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}">📄 ${doc.reference}</label>`;
+                                    `<label class="d-block doc-label" style="cursor:pointer;" oncontextmenu="showContextMenu(event, '${doc.storage_file.path}','${doc.slug}','${x.replace(/'/g, "\\'")}')"  data-doc-id="${doc.id}"data-doc-slug="${doc.slug}" data-doc-ref="${doc.reference}"data-type="document">📄 ${doc.reference}</label>`;
                                 resultDiv.append(label);
                             });
 
@@ -2534,7 +2556,22 @@
                 let docSlug = $(this).data('doc-slug');
                 let docId = $(this).data('doc-id');
                 let docRef = $(this).data('doc-ref');
-
+                var type = $(this).data('type');
+                fetch("{{ route('set.session') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            key: 'file_doc_type',
+                            value: type
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // should log { status: 'ok' }
+                    });
                 $.ajax({
                     url: '/document/get-files/' + docSlug, // Your actual route
                     type: 'GET',

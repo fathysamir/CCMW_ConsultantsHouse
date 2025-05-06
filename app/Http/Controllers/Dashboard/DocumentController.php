@@ -15,6 +15,7 @@ use App\Models\DocType;
 use App\Models\ProjectFolder;
 use App\Models\StorageFile;
 use App\Models\Project;
+use App\Models\Note;
 use App\Models\ProjectFile;
 use App\Models\FileDocument;
 use Illuminate\Support\Facades\File;
@@ -463,8 +464,15 @@ class DocumentController extends ApiController
     }
 
     public function get_assigned_files($id){
-        $doc=Document::where('slug',$id)->first();
-        $file_ids = FileDocument::where('document_id',$doc->id)->pluck('file_id')->toArray();
+        $file_doc_type=session('file_doc_type');
+        if($file_doc_type == 'document'){
+            $doc=Document::where('slug',$id)->first();
+            $file_ids = FileDocument::where('document_id',$doc->id)->pluck('file_id')->toArray();
+        }elseif($file_doc_type == 'note'){
+            $doc=Note::where('slug',$id)->first();
+            $file_ids = FileDocument::where('note_id',$doc->id)->pluck('file_id')->toArray();
+        }
+        session()->forget('file_doc_type');
         $files=ProjectFile::whereIn('id',$file_ids)->with('folder')->get();
         return response()->json(['files' => $files]);
 

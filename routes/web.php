@@ -233,7 +233,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/edit-docs-info', [FileDocumentController::class, 'edit_docs_info'])->name('download.edit_docs_info');
     Route::post('/project/change-flag', [FileDocumentController::class, 'change_flag'])->name('change-flag');
     Route::post('/project/create-new-note', [FileDocumentController::class, 'create_note'])->name('create-note');
-
+    Route::post('/set-session', function (\Illuminate\Http\Request $request) {
+        session([$request->key => $request->value]);
+        return response()->json(['status' => 'ok']);
+    })->name('set.session');
+    
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');
     Route::post('/upload-multi-files', [ImportDocumentController::class, 'upload_multi_files'])->name('upload_multi_files');
