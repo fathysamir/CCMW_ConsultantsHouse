@@ -894,7 +894,11 @@ class FileDocumentController extends ApiController
         if($request->actionType=='copy'){
             foreach($request->document_ids as $doc_id){
                 $file_doc=FileDocument::findOrFail($doc_id);
-                $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+                if($file_doc->document){
+                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+                }else{
+                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
+                }
                 if (!$fileDoc) {
                     $doc=FileDocument::create(['user_id' => auth()->user()->id,
                                         'file_id' => $request->file_id,
@@ -905,9 +909,11 @@ class FileDocumentController extends ApiController
                                         'forClaim'   => $file_doc->forClaim ,
                                         'forChart'   => $file_doc->forChart ,
                                         'forLetter'  => $file_doc->forLetter ,
-                                        'document_id' => $file_doc->document_id]);
+                                        'document_id' => $file_doc->document_id,
+                                        'note_id'=> $file_doc->note_id]);
                     
                 }
+                
             }
 
             return response()->json([
@@ -919,8 +925,11 @@ class FileDocumentController extends ApiController
         }elseif($request->actionType=='move'){
             foreach($request->document_ids as $doc_id){
                 $file_doc=FileDocument::findOrFail($doc_id);
-                $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-            
+                if($file_doc->document){
+                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
+                }else{
+                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
+                }
                 if (!$fileDoc) {
                     $file_doc->file_id=$request->file_id;
                     $file_doc->save();

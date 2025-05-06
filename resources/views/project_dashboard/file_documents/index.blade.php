@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -657,6 +657,15 @@
                                                     <a class="dropdown-item Delete-from-CMW-btn"
                                                         href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                @else
+                                                    <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}"
+                                                        data-action-type="copy">Copy
+                                                        To another File</a>
+                                                    <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}"
+                                                        data-action-type="move">Move
+                                                        To another File</a>
                                                 @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
