@@ -515,7 +515,7 @@
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
                                                     class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
-                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}">
+                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}" @if ($document->document_id == null) disabled @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
