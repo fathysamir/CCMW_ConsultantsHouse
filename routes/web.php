@@ -242,6 +242,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/download-specific-documents', [FileDocumentController::class, 'download_specific_documents'])->name('download.download_specific_documents');
     Route::post('/project/edit-docs-info', [FileDocumentController::class, 'edit_docs_info'])->name('download.edit_docs_info');
     Route::post('/project/change-flag', [FileDocumentController::class, 'change_flag'])->name('change-flag');
+    Route::post('/get-narrative', [FileDocumentController::class, 'get_narrative'])->name('get_narrative');
     Route::post('/project/create-new-note', [FileDocumentController::class, 'create_note'])->name('create-note');
     Route::post('/set-session', function (\Illuminate\Http\Request $request) {
         session([$request->key => $request->value]);

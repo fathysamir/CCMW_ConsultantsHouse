@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -564,7 +564,9 @@
                                             </label>
                                             <br>
                                             <span
-                                                class="fe fe-22 @if ($document->narrative != null) fe-file-text @else fe-file @endif"></span>
+                                                class="fe fe-22 @if ($document->narrative != null) fe-file-text doc_narrative @else fe-file @endif"
+                                                @if ($document->narrative != null) style="cursor:pointer;" @endif
+                                                data-doc-id="{{ $document->id }}"></span>
                                             <label>{{ $document->note_id == null ? $document->document->docType->name : 'Note/Activity' }}</label>
 
 
@@ -847,8 +849,8 @@
                                     <input type="radio" name="formate_type" value="formate" id="formate"
                                         class="custom-control-input"required>
                                     <label class="custom-control-label" for="formate"><span
-                                            style="background-color: #4dff00"><b>Prefix</b></span> – <span
-                                            style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
+                                            style="background-color: #4dff00"><b>Prefix SN</b></span> – [From]’s [Type]
+                                        Ref-
                                         [Ref] - dated [Date]</label>
                                 </div>
                             </div>
@@ -868,7 +870,7 @@
                                         placeholder="SN" value="" style="width: 30%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
-                                    <label class="mt-1" for="Start">Start : </label>
+                                    <label class="mt-1" for="Start">SN - Start : </label>
                                     <input type="number" name="Start" id="Start" class="form-control"
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
@@ -1042,7 +1044,7 @@
                                         placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
-                                    <label class="mt-1" for="Start">Start : </label>
+                                    <label class="mt-1" for="Start">SN - Start : </label>
                                     <input type="number" name="Start" id="Start" class="form-control"
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
@@ -1194,6 +1196,26 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="narrativeModal" tabindex="-1" role="dialog"
+        aria-labelledby="narrativeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="narrativeModalLabel">Narrative
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="narrative_container">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <ul id="contextMenu" class="custom-context-menu" style="position:absolute; z-index:9999;">
         <li><a href="#" id="Preview-Document"><i class="fe fe-arrow-right"></i> Preview Document</a></li>
         <li><a href="#" id="Jump"><i class="fe fe-arrow-right"></i> Jump</a></li>
@@ -1337,6 +1359,29 @@
     <script>
         $(document).ready(function() {
 
+            $('.doc_narrative').on('click', function() {
+                const DOCid = $(this).data('doc-id');
+                
+                $.ajax({
+                    url: '/get-narrative',
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_id: DOCid, // Pass the array here
+                        },
+                    
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        $('#narrative_container').html(response.html);
+                        $('#narrativeModal').modal('show');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+                
+            });
             // When "Download All" button is clicked
             $('#download-allDoc').on('click', function() {
                 const fileId = $(this).data('file-id');

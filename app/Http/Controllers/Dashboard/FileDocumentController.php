@@ -61,6 +61,21 @@ class FileDocumentController extends ApiController
         $array_blue_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','blue')->pluck('file_document_id')->toArray();
         return view('project_dashboard.file_documents.index',compact('array_red_flags','array_blue_flags','documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
     }
+    public function get_narrative(Request $request){
+      
+        $doc=FileDocument::findOrFail($request->document_id);
+        if($doc->note_id==null){
+            $date=date("d F Y", strtotime($doc->document->start_date));
+            $text='On '. $date . ', ';
+        }else{
+            $text='Note: ';
+        }
+        $html='<p>'. $text .' </p>' . $doc->narrative;
+       
+        return response()->json([
+            'html' => $html,
+        ]);
+    }
 
     public function exportWordClaimDocs(Request $request){
         
@@ -377,7 +392,7 @@ class FileDocumentController extends ApiController
                 $listItemRun->addText(", ",$GetStandardStylesP);
                 $x++;
             }else{
-                $listItemRun->addText("Note/Activity : ",$GetStandardStylesP);
+                $listItemRun->addText("Note: ",$GetStandardStylesP);
             }
             
             if($paragraph->narrative==null){
