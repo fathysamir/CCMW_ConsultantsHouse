@@ -19,7 +19,8 @@ class Note extends Model
         'subject',
         'start_date',
         'end_date',
-        'analysis_complete'
+        'analysis_complete',
+        'note'
     ];
 
     protected $allowedSorts = [

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->enum('analysis_complete', ['0', '1'])->default('1');
+            $table->longText('note')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

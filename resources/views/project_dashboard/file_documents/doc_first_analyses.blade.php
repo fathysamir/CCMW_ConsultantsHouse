@@ -160,7 +160,7 @@
                         <div class="col-md-1">
                             <div class="form-group mb-3">
                                 <button type="button" class="btn mt-4 btn-success"
-                                onclick="window.location.href='/project/file-notes/<?php echo $doc->id; ?>/doc/<?php echo $doc->note->slug; ?>/edit'">Edit</button>
+                                onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->note->slug; ?>/edit'">Edit</button>
                             </div>
                         </div>
                     </div>

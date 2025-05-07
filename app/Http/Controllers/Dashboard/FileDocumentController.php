@@ -973,17 +973,24 @@ class FileDocumentController extends ApiController
         }
         foreach($request->document_ids as $doc_id){
             $doc=FileDocument::findOrFail($doc_id);
-            $document=Document::find($doc->document_id);
-            FileDocument::where('document_id',$document->id)->delete();
-            $docs = Document::where('storage_file_id', $document->storage_file_id)->where('id', '!=', $document->id)->get();
-            if (count($docs) == 0) {
-                $path = public_path($document->storageFile->path);
-
-                if (file_exists($path)) {
-                    unlink($path);
+            if($doc->note_id==null){
+                $document=Document::find($doc->document_id);
+                FileDocument::where('document_id',$document->id)->delete();
+                $docs = Document::where('storage_file_id', $document->storage_file_id)->where('id', '!=', $document->id)->get();
+                if (count($docs) == 0) {
+                    $path = public_path($document->storageFile->path);
+    
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
                 }
+                $document->delete();
+            }else{
+                $note=Note::find($doc->note_id);
+                FileDocument::where('note_id',$note->id)->delete();
+                $note->delete();
             }
-            $document->delete();
+            
         }
         return response()->json([
             'status' => 'success',

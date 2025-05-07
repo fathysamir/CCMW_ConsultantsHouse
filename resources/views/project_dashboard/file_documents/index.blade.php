@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -660,6 +660,10 @@
                                                         data-document-id="{{ $document->id }}">Delete from CMW</a>
                                                 @else
                                                     <a class="dropdown-item"
+                                                        href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->note->slug) }}">
+                                                        Edit Document
+                                                    </a>
+                                                    <a class="dropdown-item"
                                                         href="{{ route('project.file-document-first-analyses', $document->id) }}">Chronology</a>
                                                     <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"
@@ -676,6 +680,9 @@
                                                         data-document-id="{{ $document->note->slug }}"data-type="note">Check
                                                         other
                                                         assignments</a>
+                                                    <a class="dropdown-item Delete-from-CMW-btn"
+                                                        href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Delete from CMW</a>
                                                 @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"

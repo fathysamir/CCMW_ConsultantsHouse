@@ -18,6 +18,7 @@ use App\Http\Controllers\Dashboard\ImportDocumentController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Models\ProjectFile;
 use App\Models\FileDocument;
+use App\Http\Controllers\Dashboard\NoteController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -187,22 +188,31 @@ Route::group(['middleware' => ['admin']], function () {
         return redirect()->route('project.file-documents.index',$file->slug);
     })->name('goToDocFile');
     Route::post('/get-files-by-document', [DocumentController::class, 'getFilesByDoc']);
-
     Route::get('/download-document/{id}', [DocumentController::class, 'downloadDocument'])->name('download.document');
     Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc,$id) {
         session(['current_view' => 'file_doc']);
         session(['current_file_doc' => $doc]);
-        
-        return redirect()->route('project.edit-document',$id);
+        $file_document=FileDocument::findOrFail($doc);
+        if($file_document->note_id==null){
+            return redirect()->route('project.edit-document',$id);
+        }else{
+            return redirect()->route('project.edit-note',$id);
+        }
     });
 
     Route::get('/project/files_file/{fil}/doc/{doc}/edit/{id}', function ($fil,$doc,$id) {
         session(['current_view' => 'file']);
         session(['current_file2' => $fil]);
         session(['specific_file_doc' => $doc]);
-        return redirect()->route('project.edit-document',$id);
+        $file_document=FileDocument::findOrFail($doc);
+        if($file_document->note_id==null){
+            return redirect()->route('project.edit-document',$id);
+        }else{
+            return redirect()->route('project.edit-note',$id);
+        }
     });
-
+    Route::get('/project/note/edit/{id}', [NoteController::class, 'edit_note'])->name('project.edit-note');
+    Route::post('/project/note/update/{id}', [NoteController::class, 'update_note'])->name('project.update-note');
     Route::get('/switch-folder/{id}', function ($id) {
         //session(['current_account_id' => $id]);
         $user=auth()->user();

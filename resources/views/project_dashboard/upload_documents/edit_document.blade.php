@@ -229,7 +229,7 @@
                             <button type="submit" class="btn mb-2 btn-outline-primary"
                                 onclick="document.getElementById('formAction').value='update'">Update</button>
                             <button type="button"
-                                class="btn mb-2 btn-outline-secondary"@if (session()->has('current_view') && session('current_view') == 'file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @else 
+                                class="btn mb-2 btn-outline-secondary"@if (session()->has('current_view') && session('current_view') == 'file_doc') onclick="window.location.href='/project/file-document-first-analyses/<?php echo session('current_file_doc'); ?>'" @elseif(session()->has('current_view') && session('current_view') == 'file') onclick="window.location.href='/project/file/<?php echo session('current_file2'); ?>/documents'" @else 
                                 onclick="window.location.href='/project/all-documents'" @endif>Back</button>
                         </div>
                     </form>
