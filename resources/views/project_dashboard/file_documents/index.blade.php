@@ -867,6 +867,12 @@
                                     <input type="number" name="sn" id="sn" class="form-control"
                                         placeholder="SN" value="" style="width: 30%;margin-left:2%;">
                                 </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Start">Start : </label>
+                                    <input type="number" name="Start" id="Start" class="form-control"
+                                        placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
+                                </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn">In case of e-mails : </label>
                                     <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
@@ -1031,9 +1037,15 @@
                                         placeholder="Perfix" value="Exhibit 1.1." style="width: 85%;margin-left:2%;">
                                 </div>
                                 <div class="row form-group mb-3">
-                                    <label class="mt-1" for="sn2">SN - Number of <del></del>digits : </label>
+                                    <label class="mt-1" for="sn2">SN - Number of digits : </label>
                                     <input type="number" name="sn2" id="sn2" class="form-control"
                                         placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Start">Start : </label>
+                                    <input type="number" name="Start" id="Start" class="form-control"
+                                        placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>
@@ -1274,6 +1286,7 @@
                     $('#extraOptions2').removeClass('d-none');
                     $('#Prefix2').attr('required', true);
                     $('#sn2').attr('required', true);
+                    $('#Start').attr('required', true);
                     $('input[name="ref_part2"]').attr('required', true);
                 } else {
                     $('#extraOptions2').addClass('d-none');
@@ -1285,6 +1298,7 @@
                     // Remove required attributes
                     $('#Prefix2').removeAttr('required');
                     $('#sn2').removeAttr('required');
+                    $('#Start').removeAttr('required');
                     $('input[name="ref_part2"]').removeAttr('required');
                 }
             });
@@ -1336,6 +1350,7 @@
                     $('#extraOptions').removeClass('d-none');
                     $('#Prefix').attr('required', true);
                     $('#sn').attr('required', true);
+                    $('#Start').attr('required', true);
                     $('input[name="ref_part"]').attr('required', true);
                 } else {
                     $('#extraOptions').addClass('d-none');
@@ -1347,6 +1362,7 @@
                     // Remove required attributes
                     $('#Prefix').removeAttr('required');
                     $('#sn').removeAttr('required');
+                    $('#Start').removeAttr('required');
                     $('input[name="ref_part"]').removeAttr('required');
                 }
             });

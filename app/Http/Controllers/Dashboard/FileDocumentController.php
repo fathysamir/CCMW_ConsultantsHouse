@@ -323,6 +323,7 @@ class FileDocumentController extends ApiController
                 'firstLine'=>0
             ]
         ];
+        $x=intval($request->Start);
         foreach ($paragraphs as $index => $paragraph) {
             //dd($paragraphs);
             $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
@@ -351,7 +352,7 @@ class FileDocumentController extends ApiController
                 }elseif($request->formate_type2=='formate'){
                     $sn=$request->sn2;
                     $prefix=$request->prefix2;
-                    $listNumber = "$prefix" . str_pad($index + 1, $sn, '0', STR_PAD_LEFT);
+                    $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
                     $hint=$listNumber . ": ";
                     $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
                     $type=$paragraph->document->docType->name;
@@ -374,6 +375,7 @@ class FileDocumentController extends ApiController
                 }
                 $footnote->addText($hint,$GetStandardStylesFootNotes);
                 $listItemRun->addText(", ",$GetStandardStylesP);
+                $x++;
             }else{
                 $listItemRun->addText("Note/Activity : ",$GetStandardStylesP);
             }
@@ -664,7 +666,7 @@ class FileDocumentController extends ApiController
                 }
             }
             
-
+            
         }
         
         $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
@@ -1081,7 +1083,7 @@ class FileDocumentController extends ApiController
                 
                 return redirect()->back()->with('error', 'Could not create ZIP file');
             }
-            $counter = 1;
+            $counter = intval($request->Start);
             foreach($fileDocuments as $document){
                 $filePath = public_path($document->document->storageFile->path);
                 if($request->formate_type=='reference'){
