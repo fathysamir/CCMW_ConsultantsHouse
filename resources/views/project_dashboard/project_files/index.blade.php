@@ -135,8 +135,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                    max-height:650px;
-                                                                                } */
+                                                                                        max-height:650px;
+                                                                                    } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -235,15 +235,24 @@
                                                         data-file-id="{{ $file->id }}"data-file-owner-id="{{ $file->user_id }}">Change
                                                         Owner</a>
                                                 @endif
-                                                <a class="dropdown-item"  href="{{ route('project.file-documents.index', $file->slug) }}">Chronology of Events</a>
-                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'1'] ) }}">Synopsis</a>
-                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'2']) }}">Contractual Position</a>
-                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'3']) }}">Cause-and-Effect Analysis</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.file-documents.index', $file->slug) }}">Chronology
+                                                    of Events</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.file-attachments.index', ['id' => $file->slug, 'type' => '1']) }}">Synopsis</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.file-attachments.index', ['id' => $file->slug, 'type' => '2']) }}">Contractual
+                                                    Position</a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('project.file-attachments.index', ['id' => $file->slug, 'type' => '3']) }}">Cause-and-Effect
+                                                    Analysis</a>
 
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('cope_move_file', $Project_Permissions ?? []))
                                                     <a class="dropdown-item" href="">Copy</a>
                                                     <a class="dropdown-item" href="">Move</a>
                                                 @endif
+                                                <a class="dropdown-item export_file" href="javascript:void(0);"
+                                                    data-file-id="{{ $file->slug }}">Export</a>
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_file', $Project_Permissions ?? []))
                                                     <a class="dropdown-item"
                                                         href="javascript:void(0);"onclick="confirmArchive('{{ route('project.files.archive', $file->id) }}')">Archive</a>
@@ -293,11 +302,172 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width:800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Settings To Export Documents
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        @csrf
+                        <input type="hidden" id="file_id111" name="file_id111">
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Heading 1 Number</label>
+                            <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1"
+                                id="Chapter" value="1" min="1"
+                                oninput="this.value = Math.max(1, this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Heading 2 Number</label>
+                            <input type="Number" required name="Section" class="form-control" placeholder="Heading 2"
+                                id="Section" value="0" min="0"
+                                oninput="this.value = Math.max(0, this.value)">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="subtitle1">Section1</label>
+                                    <input type="text" required name="subtitle1" class="form-control"
+                                        placeholder="Subtitle 1" id="subtitle1" value="Synopsis">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="subtitle2">Section2</label>
+                                    <input type="text" required name="subtitle2" class="form-control"
+                                        placeholder="Subtitle 2" id="subtitle2" value="Chronology of Events">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="subtitle3">Section3</label>
+                                    <input type="text" required name="subtitle3" class="form-control"
+                                        placeholder="Subtitle 3" id="subtitle3" value="Contractual Position">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label for="subtitle4">Section4</label>
+                                    <input type="text" required name="subtitle4" class="form-control"
+                                        placeholder="Subtitle 4" id="subtitle4" value="Cause-and-Effect Analysis">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"checked id="forclaimdocs"
+                                name="forclaimdocs">
+                            <label class="custom-control-label" for="forclaimdocs">For Claim Documents</label>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label for="folder_id">Select Footnote format</label>
+                            <div>
+
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="reference_only2" name="formate_type2" value="reference"
+                                        class="custom-control-input" required checked>
+                                    <label class="custom-control-label" for="reference_only2">Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="dateAndReference2" name="formate_type2"
+                                        class="custom-control-input" value="dateAndReference"required>
+                                    <label class="custom-control-label" for="dateAndReference2">YYMMDD – Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="formate_type2" value="formate" id="formate2"
+                                        class="custom-control-input"required>
+                                    <label class="custom-control-label" for="formate2"><span
+                                            style="background-color: #4dff00"><b>Prefix </b></span> <span
+                                            style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
+                                        [Ref] - dated [Date]</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="extraOptions2" class="row d-none">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-11">
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Prefix2">Prefix : </label>
+                                    <input type="text" name="prefix2" id="Prefix2" class="form-control"
+                                        placeholder="Perfix" value="Exhibit 1.1." style="width: 85%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="sn2">SN - Number of digits : </label>
+                                    <input type="number" name="sn2" id="sn2" class="form-control"
+                                        placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Start">SN - Start : </label>
+                                    <input type="number" name="Start" id="Start" class="form-control"
+                                        placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                                <div class="row form-group mb-0">
+                                    <label for="sn2">In case of e-mails : </label>
+                                    <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
+
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option12" name="ref_part2" value="option1"
+                                                class="custom-control-input" checked>
+                                            <label class="custom-control-label" for="option12">Omit Ref part</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option22" name="ref_part2"
+                                                class="custom-control-input" value="option2">
+                                            <label class="custom-control-label" for="option22">Keep Ref part, but replace
+                                                word “Ref” with “from”</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" name="ref_part2" value="option3" id="option32"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option32">Keep as other types</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="export">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updatePrefix() {
+            const h1 = document.getElementById('Chapter').value;
+            const h2 = document.getElementById('Section').value;
+            document.getElementById('Prefix2').value = `Exhibit ${h1}.${h2}.`;
+        }
+
+        // Listen to changes on both inputs
+        document.getElementById('Chapter').addEventListener('input', updatePrefix);
+        document.getElementById('Section').addEventListener('input', updatePrefix);
+
+        // Initial run in case values are preset
+        updatePrefix();
+    </script>
     <script>
         $(document).ready(function() {
             $('.dropdown-toggle').dropdown();
@@ -308,6 +478,64 @@
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
             $("#check").removeClass("sorting_asc");
+
+            $('.export_file').on('click', function() {
+                const fileId = $(this).data('file-id');
+                $('#file_id111').val(fileId);
+                $('#exportModal').modal('show');
+            });
+            $('input[name="formate_type2"]').on('change', function() {
+                if ($('#formate2').is(':checked')) {
+                    $('#extraOptions2').removeClass('d-none');
+                    $('#Prefix2').attr('required', true);
+                    $('#sn2').attr('required', true);
+                    $('#Start').attr('required', true);
+                    $('input[name="ref_part2"]').attr('required', true);
+                } else {
+                    $('#extraOptions2').addClass('d-none');
+
+                    // Clear all inputs inside extraOptions
+                    $('#extraOptions2').find('input[type="text"], input[type="number"]').val('');
+                    $('#extraOptions2').find('input[type="radio"]').prop('checked', false);
+
+                    // Remove required attributes
+                    $('#Prefix2').removeAttr('required');
+                    $('#sn2').removeAttr('required');
+                    $('#Start').removeAttr('required');
+                    $('input[name="ref_part2"]').removeAttr('required');
+                }
+            });
+
+            // When user clicks "Save" (download)
+            $('#export').on('click', function() {
+                const form = $('#exportForm');
+
+                // Optional client-side check before AJAX send
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: '/export-fill', // Replace with real route
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#exportModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+            });
+
             const parentDiv = document.getElementById('dataTable-1_wrapper');
 
             if (parentDiv) {

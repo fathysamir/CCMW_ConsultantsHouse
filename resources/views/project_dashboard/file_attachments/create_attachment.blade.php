@@ -53,7 +53,7 @@
                             <div class="col-md-2">
                                 <div class="form-group mb-3">
                                     <label for="sn">Order.</label>
-                                    <input type="number" name="order" id="order" class="form-control"
+                                    <input type="number" required name="order" id="order" class="form-control"
                                         placeholder="Enter Serial Number" value="">
                                 </div>
                             </div>

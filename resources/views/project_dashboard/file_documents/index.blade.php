@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -1201,8 +1201,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="narrativeModal" tabindex="-1" role="dialog"
-        aria-labelledby="narrativeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="narrativeModal" tabindex="-1" role="dialog" aria-labelledby="narrativeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document" style="max-width: 800px;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1366,15 +1366,15 @@
 
             $('.doc_narrative').on('click', function() {
                 const DOCid = $(this).data('doc-id');
-                
+
                 $.ajax({
                     url: '/get-narrative',
                     type: 'POST',
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
                         document_id: DOCid, // Pass the array here
-                        },
-                    
+                    },
+
                     success: function(response) {
                         // showHint(response.message || 'Download started!');
                         $('#narrative_container').html(response.html);
@@ -1385,7 +1385,7 @@
                         alert('Failed to process. Please try again.');
                     }
                 });
-                
+
             });
             // When "Download All" button is clicked
             $('#download-allDoc').on('click', function() {
