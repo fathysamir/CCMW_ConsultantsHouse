@@ -999,6 +999,11 @@
                                 id="Section" value="0" min="0"
                                 oninput="this.value = Math.max(0, this.value)">
                         </div>
+                        <div class="form-group">
+                            <label for="subtitle">Section</label>
+                            <input type="text" required name="subtitle" class="form-control" placeholder="Subtitle"
+                                id="subtitle" value="Chronology of Events">
+                        </div>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"checked id="forclaimdocs"
                                 name="forclaimdocs">

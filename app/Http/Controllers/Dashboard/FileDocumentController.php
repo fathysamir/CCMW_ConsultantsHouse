@@ -312,7 +312,7 @@ class FileDocumentController extends ApiController
         //$section->addListItem($header, 0, ['size' => 16,'bold' => true,], 'multilevel');
         //dd($section);
         
-        $subtitle = "Chronology of Event";
+        $subtitle = $request->subtitle;
         $subtitle = str_replace('&', '&amp;', $subtitle);
         $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
 
