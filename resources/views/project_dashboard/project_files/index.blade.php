@@ -235,6 +235,11 @@
                                                         data-file-id="{{ $file->id }}"data-file-owner-id="{{ $file->user_id }}">Change
                                                         Owner</a>
                                                 @endif
+                                                <a class="dropdown-item"  href="{{ route('project.file-documents.index', $file->slug) }}">Chronology of Events</a>
+                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'1'] ) }}">Synopsis</a>
+                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'2']) }}">Contractual Position</a>
+                                                <a class="dropdown-item"  href="{{ route('project.file-attachments.index', ['id'=>$file->slug,'type'=>'3']) }}">Cause-and-Effect Analysis</a>
+
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('cope_move_file', $Project_Permissions ?? []))
                                                     <a class="dropdown-item" href="">Copy</a>
                                                     <a class="dropdown-item" href="">Move</a>

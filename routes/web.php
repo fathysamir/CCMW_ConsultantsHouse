@@ -19,6 +19,7 @@ use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Models\ProjectFile;
 use App\Models\FileDocument;
 use App\Http\Controllers\Dashboard\NoteController;
+use App\Http\Controllers\Dashboard\FileAttachmentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -249,6 +250,18 @@ Route::group(['middleware' => ['admin']], function () {
         return response()->json(['status' => 'ok']);
     })->name('set.session');
     
+    Route::get('/project/file/{id}/attachments/{type}', [FileAttachmentController::class, 'index'])->name('project.file-attachments.index');
+    Route::get('/project/files_file/attachment/{id}', [FileAttachmentController::class, 'attachment'])->name('project.file-attachments.attachment');
+    Route::post('/export-word-claim-attachments', [FileAttachmentController::class, 'exportWordClaimAttachments']);
+    Route::post('/get-attachment-narrative', [FileAttachmentController::class, 'get_attachment_narrative'])->name('get_attachment_narrative');
+    Route::post('/project/delete-attach-from-file', [FileAttachmentController::class, 'delete_attachments'])->name('project.delete_attachments');
+    Route::post('/project/change-flag/attachment', [FileAttachmentController::class, 'change_flag'])->name('change-flag-attachments');
+    Route::post('/project/attachment/make-for-claim', [FileAttachmentController::class, 'change_for_claimOrNoticeOrChart'])->name('project.change_for_claimOrNoticeOrChart_attachment');
+    Route::post('/project/copy_move_attachment_to_another_file', [FileAttachmentController::class, 'copy_move_attachment_to_another_file'])->name('copy_move_attachment_to_another_file');
+    Route::post('/project/update_file_attachment/update/{id}', [FileAttachmentController::class, 'Update_file_attachment'])->name('project.update_attachment.update');
+    Route::get('/project/files_file/create-attachment/{type}/{file_id}', [FileAttachmentController::class, 'create_attachment'])->name('project.file-attachments.create_attachment');
+    Route::post('/project/store_file_attachment/store', [FileAttachmentController::class, 'stor_file_attachment'])->name('project.stor_attachment.stor');
+
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');
     Route::post('/upload-multi-files', [ImportDocumentController::class, 'upload_multi_files'])->name('upload_multi_files');

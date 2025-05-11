@@ -13,8 +13,8 @@ use App\Models\Document;
 use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\ProjectFile;
-use App\Models\DocType;
-use App\Models\ContractTag;
+use App\Models\FileAttachmentFlag;
+use App\Models\FileAttachment;
 use App\Models\FileDocument;
 use App\Models\FileDocumentFlags;
 use Illuminate\Validation\Rule;
@@ -26,11 +26,10 @@ use Illuminate\Http\Response;
 use SebastianBergmann\Type\FalseType;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
-use DOMDocument;
 
-class FileDocumentController extends ApiController
+class FileAttachmentController extends ApiController
 {
-    public function index($id){
+    public function index($id,$type){
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -40,61 +39,104 @@ class FileDocumentController extends ApiController
             session()->forget('zip_file');
         }
         $file=ProjectFile::where('slug',$id)->first();
-        $documents = FileDocument::with(['document', 'note'])
-            ->where('file_id', $file->id)
-            ->get()
-            ->sortBy([
-                fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
-                            <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
-                fn ($a, $b) => $a->sn <=> $b->sn,
-            ])
-            ->values();
-        $specific_file_doc= session('specific_file_doc');
-        session()->forget('specific_file_doc');
+        $attachments = FileAttachment::where('file_id', $file->id)->where('section',$type)->orderBy('order','asc')
+            ->get();
+        $specific_file_attach= session('specific_file_attach');
+        session()->forget('specific_file_attach');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-        $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
+        $array_red_flags=FileAttachmentFlag::where('user_id',auth()->user()->id)->where('flag','red')->pluck('file_attachment_id')->toArray();
+        $array_blue_flags=FileAttachmentFlag::where('user_id',auth()->user()->id)->where('flag','blue')->pluck('file_attachment_id')->toArray();
+        $Type_Name=["1"=>"Synopsis","2"=>"Contractual Position","3"=>"Cause-and-Effect Analysis"];
+        return view('project_dashboard.file_attachments.index',compact('Type_Name','type','array_red_flags','array_blue_flags','attachments','folders','file','specific_file_attach'));
+    }
+
+    public function create_attachment($type,$file_id){
+        $file=ProjectFile::where('slug',$file_id)->first();
+        $Type_Name=["1"=>"Synopsis","2"=>"Contractual Position","3"=>"Cause-and-Effect Analysis"];
+        return view('project_dashboard.file_attachments.create_attachment',compact('Type_Name','type','file'));
+    }
+
+    public function stor_file_attachment(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        if ($this->hasContent($request->narrative)) {
+            $narrative=$request->narrative;
+        } else {
+            $narrative=null;
+        }
+
+
        
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
-        $stake_holders = $project->stakeHolders;
-
-        $array_red_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','red')->pluck('file_document_id')->toArray();
-        $array_blue_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','blue')->pluck('file_document_id')->toArray();
-        return view('project_dashboard.file_documents.index',compact('array_red_flags','array_blue_flags','documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
-    }
-    public function get_narrative(Request $request){
-      
-        $doc=FileDocument::findOrFail($request->document_id);
-        if($doc->note_id==null){
-            $date=date("d F Y", strtotime($doc->document->start_date));
-            $text='On '. $date . ',';
-        }else{
-            $text='Note:';
-        }
-        $html=$doc->narrative;
-
-        $doc = new \DOMDocument();
-        @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-
-        $xpath = new \DOMXPath($doc);
-        $firstP = $xpath->query('//p')->item(0);
-
-        if ($firstP) {
-            $fragment = $doc->createDocumentFragment();
-            $fragment->appendXML('<strong>' . $text . '</strong> '); // or just $text if no HTML formatting
-
-            // Prepend the fragment to the first <p>
-            $firstP->insertBefore($fragment, $firstP->firstChild);
-        }
-
-        $newHtml = $doc->saveHTML($doc->getElementsByTagName('body')->item(0));
-      
-        return response()->json([
-            'html' => $newHtml,
+        $doc=FileAttachment::create([
+            'user_id'=>auth()->user()->id,
+            'section'=>$request->type,
+            'file_id'=>$request->file_id,
+            'narrative'  => $narrative,
+            'order'     => $request->order,
+            'forClaim'   => $request->forClaim ? '1' : '0',
+           
         ]);
+
+        session(['specific_file_attach' => $doc->id]);
+
+        return redirect('/project/file/' . $doc->file->slug . '/attachments/' . $doc->section )->with('success', 'File Attachment saved successfully.');
+        
+
     }
 
-    public function exportWordClaimDocs(Request $request){
+    public function attachment($id){
+        $file_attachment=FileAttachment::where('id',$id)->first();
+        session(['specific_file_attach' => $file_attachment->id]);
+        return view('project_dashboard.file_attachments.attachment_analyses',compact('file_attachment'));
+
+    }
+
+    public function Update_file_attachment(Request $request,$id){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        if ($this->hasContent($request->narrative)) {
+            $narrative=$request->narrative;
+        } else {
+            $narrative=null;
+        }
+        $doc = FileAttachment::findOrFail($id);
+        $doc->update([
+            'narrative'  => $narrative,
+            'order'     => $request->order,
+            'forClaim'   => $request->forClaim ? '1' : '0',
+           
+        ]);
+
+        if($request->action=='save'){
+            return redirect('/project/files_file/attachment/'. $doc->id)->with('success', 'File attachment saved successfully.');
+        }else{
+            return redirect('/project/file/' . $doc->file->slug . '/attachments/' . $doc->section )->with('success', 'File Attachment saved successfully.');
+        }
+
+    }
+    private function hasContent($narrative) {
+        // Remove all HTML tags except text content
+        $text = strip_tags($narrative);
+        
+        // Remove extra spaces & line breaks
+        $text = trim($text);
+        
+        // Check if there's any actual content
+        return !empty($text);
+    }
+    public function exportWordClaimAttachments(Request $request){
         
         $zip_file= session('zip_file');
         if($zip_file){
@@ -312,106 +354,32 @@ class FileDocumentController extends ApiController
         //$section->addListItem($header, 0, ['size' => 16,'bold' => true,], 'multilevel');
         //dd($section);
         
-        $subtitle = "Chronology of Event";
+        $subtitle = $request->subtitle;
         $subtitle = str_replace('&', '&amp;', $subtitle);
         $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
 
         // Paragraphs
         //$paragraphs=FileDocument::where('file_id',$file->id)->where('forClaim','1')->orderBy()->get();
-        $paragraphs = FileDocument::with(['document', 'note'])
+        $paragraphs = FileAttachment::where('section',$request->attach_type)
             ->where('file_id', $file->id);
         if($request->forclaimdocs){
             $paragraphs->where('forClaim','1');
         }
             
-        $paragraphs=$paragraphs->get()
-                        ->sortBy([
-                            fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
-                                        <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
-                            fn ($a, $b) => $a->sn <=> $b->sn,
-                        ])
-                        ->values();
-           
-           
-           
-            
-       
+        $paragraphs=$paragraphs->orderBy('order','asc')->get();
         
-        $GetStandardStylesFootNotes = [
-            'name'=>'Calibri',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 9,
-            'bold' => false,
-            'italic' => false,
-            'underline'=>false
-            
-        ];
-        $GetParagraphStyleFootNotes=[
-            'spaceBefore'=> 0,
-            'spaceAfter' => 0,
-            'lineSpacing' => 240,
-            'indentation' =>[
-                'left'=>0,
-                'hanging'=>0,
-                'firstLine'=>0
-            ]
-        ];
-        $x=intval($request->Start);
+        
+        
+       
         foreach ($paragraphs as $index => $paragraph) {
             //dd($paragraphs);
             $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
             $existedList=false;
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
-            if($paragraph->document){
-                $date=date("d F Y", strtotime($paragraph->document->start_date)); 
-
-                // Add the main sentence
-                $listItemRun->addText("On ",$GetStandardStylesP);
-                
-                // Add the date with a footnote
-                $listItemRun->addText($date,$GetStandardStylesP);
-                $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-                $Exhibit=true;
-                $dated=true;
-                $senderAndDocType=true;
-                $hint='';
-                if($request->formate_type2=='reference'){
-                    $hint=$paragraph->document->reference . ".";
-                }elseif($request->formate_type2=='dateAndReference'){
-                   
-                    $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
-                    $hint = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
-                }elseif($request->formate_type2=='formate'){
-                    $sn=$request->sn2;
-                    $prefix=$request->prefix2;
-                    $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
-                    $hint=$listNumber . ": ";
-                    $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                    $type=$paragraph->document->docType->name;
-                    $hint .=$from . $type . " ";
-                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
-                        $ref_part=$request->ref_part2;
-                        if($ref_part == 'option1'){
-                            $hint .= ', ';
-                        }elseif($ref_part == 'option2'){
-                           
-                            $hint .= 'From: ' . $paragraph->document->reference . ', ';
-                        }elseif($ref_part == 'option3'){
-                            $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
-                        }
-                    }else{
-                        $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
-                    }
-                    $hint .= 'dated: ' . $date . '.';
-    
-                }
-                $footnote->addText($hint,$GetStandardStylesFootNotes);
-                $listItemRun->addText(", ",$GetStandardStylesP);
-                $x++;
-            }else{
-                $listItemRun->addText("Note: ",$GetStandardStylesP);
-            }
+          
+            
+            
             
             if($paragraph->narrative==null){
                 $listItemRun->addText("____________.");
@@ -681,17 +649,6 @@ class FileDocumentController extends ApiController
                                 error_log("Error adding HTML: " . $e->getMessage());
                             }
                         }
-                    
-                        // Add a paragraph break after each element to separate them
-                        // if ($index2 < count($paragraphsArray) - 1) {
-                            
-                        //     if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                               
-                        //         $listItemRun->addTextBreak();
-                        //     }
-                            
-                                
-                        // }
                         
                     }
                     
@@ -809,230 +766,48 @@ class FileDocumentController extends ApiController
         $cleanHtml = $dom->saveHTML();
         return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], '', $cleanHtml));
     }
-   
 
-    public function file_document_first_analyses($id){
-        $user=auth()->user();
-        session(['specific_file_doc' => $id]);
-        $doc=FileDocument::findOrFail($id);
-        $tags=ContractTag::where('account_id',$user->current_account_id)->where('project_id',$user->current_project_id)->orderBy('order','asc')->get();
-        return view('project_dashboard.file_documents.doc_first_analyses',compact('doc','tags'));
+    public function get_attachment_narrative(Request $request){
+        $doc=FileAttachment::findOrFail($request->document_id);
+        $html= $doc->narrative;
+        return response()->json([
+            'html' => $html,
+        ]);
     }
 
-    public function upload_editor_image(Request $request)
-    {
-
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:51200' // 10MB max
+    public function delete_attachments(Request $request){
+        $zip_file= session('zip_file');
+        if($zip_file){
+            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        FileAttachment::whereIn('id',$request->document_ids)->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => count($request->document_ids)>1 ? 'Selected Attachments is deleted successfully.' : 'Attachment is deleted successfully.',
+            //'redirect' => url('/project/file/' . $currentFile . '/documents')
         ]);
-
-        $file = $request->file('image');
-        $name = $file->getClientOriginalName();
-        $size = $file->getSize();
-        $type = $file->getMimeType();
-
-        $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
-        if ($storageFile) {
+    }
+   
+    public function change_flag(Request $request){
+        $docId=$request->docId;
+        $type=$request->type;
+        
+        $record=FileAttachmentFlag::where('user_id',auth()->user()->id)->where('file_attachment_id',$docId)->where('flag',$type)->first();
+        if($record){
+            $record->delete();
+            return response()->json([
+                'success' => false,
+            ]);
+        }else{
+            FileAttachmentFlag::create(['user_id'=>auth()->user()->id,'file_attachment_id'=>$docId,'flag'=>$type]);
             return response()->json([
                 'success' => true,
-                'file' => $storageFile
             ]);
         }
-        $fileName = auth()->user()->id . '_' . time() . '_' . $file->getClientOriginalName();
-
-        // Create project-specific folder in public path
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/images';
-        $path = public_path($projectFolder);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
-
-        // Move file to public folder
-        $file->move($path, $fileName);
-
-        // Save file info to database
-        $storageFile = StorageFile::create([
-            'user_id' => auth()->user()->id,
-            'project_id' => auth()->user()->current_project_id,
-            'file_name' => $name,
-            'size' => $size,
-            'file_type' => $type,
-            'path' => $projectFolder . '/' . $fileName
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'file' => $storageFile
-        ]);
-    }
-    private function hasContent($narrative) {
-        // Remove all HTML tags except text content
-        $text = strip_tags($narrative);
-        
-        // Remove extra spaces & line breaks
-        $text = trim($text);
-        
-        // Check if there's any actual content
-        return !empty($text);
-    }
-    public function store_file_document_first_analyses(Request $request,$id){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            if (File::exists($filePath)) {
-                File::deleteDirectory($filePath);
-            }
-            session()->forget('zip_file');
-        }
-        if ($this->hasContent($request->narrative)) {
-            $narrative=$request->narrative;
-        } else {
-            $narrative=null;
-        }
-
-        $doc = FileDocument::findOrFail($id);
-        $doc->update([
-            'narrative'  => $narrative,
-            'notes1'     => $request->notes1,
-            'notes2'     => $request->notes2,
-            'sn'         => $request->sn,
-            'forClaim'   => $request->forClaim ? '1' : '0',
-            'forChart'   => $request->forChart ? '1' : '0',
-            'forLetter'  => $request->forLetter ? '1' : '0',
-        ]);
-    
-        // Assign tags (assuming many-to-many relationship)
-        if ($request->has('tags')) {
-            $doc->tags()->sync($request->tags); // Sync tags
-        }
-        if($request->action=='save'){
-            return redirect('/project/file-document-first-analyses/'. $doc->id)->with('success', $doc->document? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
-        }else{
-            return redirect('/project/file/' . $doc->file->slug . '/documents')->with('success', $doc->document ? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
-        }
-
-        
-        
-    }
-
-    public function copy_move_doc_to_another_file(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            if (File::exists($filePath)) {
-                File::deleteDirectory($filePath);
-            }
-            session()->forget('zip_file');
-        }
-
-        
-        if($request->actionType=='copy'){
-            foreach($request->document_ids as $doc_id){
-                $file_doc=FileDocument::findOrFail($doc_id);
-                if($file_doc->document){
-                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-                }else{
-                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
-                }
-                if (!$fileDoc) {
-                    $doc=FileDocument::create(['user_id' => auth()->user()->id,
-                                        'file_id' => $request->file_id,
-                                        'narrative'  => $file_doc->narrative,
-                                        'notes1'     => $file_doc->notes1,
-                                        'notes2'     => $file_doc->notes2,
-                                        'sn'         => $file_doc->sn,
-                                        'forClaim'   => $file_doc->forClaim ,
-                                        'forChart'   => $file_doc->forChart ,
-                                        'forLetter'  => $file_doc->forLetter ,
-                                        'document_id' => $file_doc->document_id,
-                                        'note_id'=> $file_doc->note_id]);
-                    
-                }
-                
-            }
-
-            return response()->json([
-                'status' => 'success',
-                'message' => count($request->document_ids)>1 ? 'Selected Documents Copied To Selected File Successfully.' : 'Document Copied To Selected File Successfully.',
-
-            // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
-            ]);
-        }elseif($request->actionType=='move'){
-            foreach($request->document_ids as $doc_id){
-                $file_doc=FileDocument::findOrFail($doc_id);
-                if($file_doc->document){
-                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-                }else{
-                    $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
-                }
-                if (!$fileDoc) {
-                    $file_doc->file_id=$request->file_id;
-                    $file_doc->save();
-                    
-
-                }
-            }
-            return response()->json([
-                'status' => 'success',
-                'message' => count($request->document_ids)>1 ? 'Selected Documents Moved To Selected File Successfully.' : 'Document Moved To Selected File Successfully.',
-                //'redirect' => url('/project/file/' . $currentFile . '/documents')
-            ]);
-        }
-    }
-
-    public function unassign_doc(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            if (File::exists($filePath)) {
-                File::deleteDirectory($filePath);
-            }
-            session()->forget('zip_file');
-        }
-        FileDocument::whereIn('id',$request->document_ids)->delete();
-        return response()->json([
-            'status' => 'success',
-            'message' => count($request->document_ids)>1 ? 'Selected documents is unassigned from file.' : 'Document is unassigned from file.',
-            //'redirect' => url('/project/file/' . $currentFile . '/documents')
-        ]);
-    }
-
-    public function delete_doc_from_cmw_entirely(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            if (File::exists($filePath)) {
-                File::deleteDirectory($filePath);
-            }
-            session()->forget('zip_file');
-        }
-        foreach($request->document_ids as $doc_id){
-            $doc=FileDocument::findOrFail($doc_id);
-            if($doc->note_id==null){
-                $document=Document::find($doc->document_id);
-                FileDocument::where('document_id',$document->id)->delete();
-                $docs = Document::where('storage_file_id', $document->storage_file_id)->where('id', '!=', $document->id)->get();
-                if (count($docs) == 0) {
-                    $path = public_path($document->storageFile->path);
-    
-                    if (file_exists($path)) {
-                        unlink($path);
-                    }
-                }
-                $document->delete();
-            }else{
-                $note=Note::find($doc->note_id);
-                FileDocument::where('note_id',$note->id)->delete();
-                $note->delete();
-            }
-            
-        }
-        return response()->json([
-            'status' => 'success',
-            'message' => count($request->document_ids)>1 ? 'Selected documents is deleted from CMW entirely.' : 'Document is deleted from CMW entirely.',
-            //'redirect' => url('/project/file/' . $currentFile . '/documents')
-        ]);
-        
     }
 
     public function change_for_claimOrNoticeOrChart(Request $request){
@@ -1045,20 +820,20 @@ class FileDocumentController extends ApiController
             session()->forget('zip_file');
         }
         if(count($request->document_ids)>1){
-            $do=FileDocument::findOrFail($request->document_ids[0]);
+            $do=FileAttachment::findOrFail($request->document_ids[0]);
             $ac=$request->action_type;
             if($do->$ac =='1'){
                 $va='0';
             }else{
                 $va='1';
             }
-            FileDocument::whereIn('id',$request->document_ids)->update([$ac=>$va]);
+            FileAttachment::whereIn('id',$request->document_ids)->update([$ac=>$va]);
             return response()->json([
                 'status' => 'success',
                 'value' => $va
             ]);
         }else{
-            FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
+            FileAttachment::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
             return response()->json([
                 'status' => 'success',
             ]);
@@ -1066,8 +841,7 @@ class FileDocumentController extends ApiController
         
     }
 
-    public function download_documents(Request $request){
-        //dd($request->all());
+    public function copy_move_attachment_to_another_file(Request $request){
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -1076,237 +850,47 @@ class FileDocumentController extends ApiController
             }
             session()->forget('zip_file');
         }
-        $file=ProjectFile::where('slug',$request->file_id_)->first();
-        // $fileDocuments=FileDocument::where('file_id',$file->id);
-        // if($request->forclaimdocs2){
-        //     $fileDocuments->where('forClaim','1');
-        // }
+
         
-        // $fileDocuments=$fileDocuments->get();
-
-        $fileDocuments = FileDocument::where('note_id',null)->with('document')
-            ->where('file_id', $file->id);
-        if($request->forclaimdocs2){
-            $fileDocuments->where('forClaim','1');
-        }
-            
-        $fileDocuments=$fileDocuments->get()
-            ->sortBy([
-                fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
-                fn ($a, $b) => $a->sn <=> $b->sn,
-            ])
-            ->values();
-        if(count($fileDocuments)>0){
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
-
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true); // true = create nested directories
-            }
-            $zip = new ZipArchive();
-           
-            $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
-
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true); // true = create nested directories
-            }
-            $zipFileName = $file->code . '-' . $file->name . '.zip';
-            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+        if($request->actionType=='Copy'){
+            foreach($request->document_ids as $doc_id){
+                $file_doc=FileAttachment::findOrFail($doc_id);
+               
+                $fileDoc = FileAttachment::where('file_id', $request->file_id)->where('narrative', $file_doc->narrative)->where('section', $file_doc->section)->where('order', $file_doc->order)->first();
                 
-                return redirect()->back()->with('error', 'Could not create ZIP file');
-            }
-            $counter = intval($request->Start);
-            foreach($fileDocuments as $document){
-                $filePath = public_path($document->document->storageFile->path);
-                if($request->formate_type=='reference'){
-                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
-                    $sanitizedFilename = trim($sanitizedFilename, '-');
-                    //$date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                }elseif($request->formate_type=='dateAndReference'){
-                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
-                    $sanitizedFilename = trim($sanitizedFilename, '-');
-                    $date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                }elseif($request->formate_type=='formate'){
+                if (!$fileDoc) {
+                    $doc=FileAttachment::create(['user_id' => auth()->user()->id,
+                                        'file_id' => $request->file_id,
+                                        'narrative'  => $file_doc->narrative,
+                                        'section'     => $file_doc->section,
+                                        'order'     => $file_doc->order,
+                                        'forClaim'         => $file_doc->forClaim
+                                      ]);
                     
-                    $prefix=$request->prefix;
-                    $sn=$request->sn;
-                    
-                    $date=date('d-M-y', strtotime($document->document->start_date));
-                    $from=$document->document->fromStakeHolder? $document->document->fromStakeHolder->narrative . "'s " : '';
-                    $type=$document->document->docType->name;
-                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
-                    $sanitizedFilename = trim($sanitizedFilename, '-');
-                    $number_prefix = str_pad($counter, $sn, '0', STR_PAD_LEFT);
-                    $fileName = $prefix  . $number_prefix . ' - ' . $from . $type . ' ' ;
-                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
-                        $ref_part=$request->ref_part;
-                        if($ref_part == 'option1'){
-                            $fileName .= '- ';
-                        }elseif($ref_part == 'option2'){
-                           
-                            $fileName .= 'From- ' . $sanitizedFilename . ' - ';
-                        }elseif($ref_part == 'option3'){
-                            $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
-                        }
-                    }else{
-                        $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
-                    }
-                    $fileName .= 'dated ' . $date . '.' . pathinfo($filePath, PATHINFO_EXTENSION);;
-                    $counter++;
                 }
                 
-                if (file_exists($filePath)) {
-                    $zip->addFile($filePath, $fileName);
-                }
-            }
-            
-            $zip->close();
-
-            // Return the zip file as a download
-            if (file_exists($zipFilePath)) {
-                session(['zip_file' => $code]);
-                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
-                return response()->json(['download_url' => asset($relativePath)]);
-                // return response()->download($zipFilePath,null, [
-                //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                //     'Pragma' => 'no-cache',
-                //     'Expires' => '0',
-                // ]);
-            }
-        }
-        return redirect()->back()->with('error', 'No files found to download.');
-        
-    }
-
-    public function download_specific_documents(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            if (File::exists($filePath)) {
-                File::deleteDirectory($filePath);
-            }
-            session()->forget('zip_file');
-        }
-        $file=ProjectFile::where('slug',$request->file_id)->first();
-        $fileDocuments=FileDocument::whereIn('id',$request->document_ids)->get();
-        if(count($fileDocuments)>0){
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
-
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true); // true = create nested directories
-            }
-            $zip = new ZipArchive();
-           
-            $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
-
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true); // true = create nested directories
-            }
-            $zipFileName = $file->code . '-' . $file->name . ' - selected documents ' . '.zip';
-            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
-                
-                return redirect()->back()->with('error', 'Could not create ZIP file');
-            }
-           
-            foreach($fileDocuments as $document){
-                $filePath = public_path($document->document->storageFile->path);
-                if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
-                    $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
-                    $date = date('y_m_d', strtotime($document->document->start_date));
-                    $date2 = date('d-M-y', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                } else {
-                    $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
-                    $sanitizedFilename = trim($sanitizedFilename, '-');
-                    $date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                }
-        
-                if (file_exists($filePath)) {
-                    $zip->addFile($filePath, $fileName);
-                }
             }
 
-            $zip->close();
-
-            // Return the zip file as a download
-            if (file_exists($zipFilePath)) {
-                session(['zip_file' => $code]);
-                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
-                return response()->json(['message'=>'Selected Documnets Downloaded successfully','download_url' => asset($relativePath)]);
-                // return response()->download($zipFilePath,null, [
-                //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                //     'Pragma' => 'no-cache',
-                //     'Expires' => '0',
-                // ]);
-            }
-
-        }
-        return redirect()->back()->with('error', 'No files found to download.');
-
-    }
-
-    public function edit_docs_info(Request $request){
-        foreach($request->document_ids as $id){
-            $file_doc=FileDocument::findOrFail($id);
-            $doc=$file_doc->document;
-            if($request->doc_type){
-                $doc->doc_type_id=$request->doc_type;
-            }
-            if($request->from){
-                $doc->from_id=$request->from;
-            }
-            if($request->to){
-                $doc->to_id=$request->to;
-            }
-            if($request->owner){
-                $doc->user_id=$request->owner;
-            }
-            $doc->save();
-        }
-        return response()->json([
-            'status' => 'success',
-        ]);
-    }
-
-    public function change_flag(Request $request){
-        $docId=$request->docId;
-        $type=$request->type;
-        
-        $record=FileDocumentFlags::where('user_id',auth()->user()->id)->where('file_document_id',$docId)->where('flag',$type)->first();
-        if($record){
-            $record->delete();
             return response()->json([
-                'success' => false,
+                'status' => 'success',
+                'message' => count($request->document_ids)>1 ? 'Selected Attachments Copied To Selected File Successfully.' : 'Attachment Copied To Selected File Successfully.',
+
+            // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
             ]);
-        }else{
-            FileDocumentFlags::create(['user_id'=>auth()->user()->id,'file_document_id'=>$docId,'flag'=>$type]);
+        }elseif($request->actionType=='Move'){
+            foreach($request->document_ids as $doc_id){
+                $file_doc=FileAttachment::findOrFail($doc_id);
+                $fileDoc = FileAttachment::where('file_id', $request->file_id)->where('narrative', $file_doc->narrative)->where('section', $file_doc->section)->where('order', $file_doc->order)->first();
+                if (!$fileDoc) {
+                    $file_doc->file_id=$request->file_id;
+                    $file_doc->save();
+                }
+            }
             return response()->json([
-                'success' => true,
+                'status' => 'success',
+                'message' => count($request->document_ids)>1 ? 'Selected Attachments Moved To Selected File Successfully.' : 'Attachment Moved To Selected File Successfully.',
+                //'redirect' => url('/project/file/' . $currentFile . '/documents')
             ]);
         }
-    }
-
-    public function create_note(Request $request){
-      
-        do {
-            $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-        } while (Note::where('slug', $slug)->exists());
-
-        $file=ProjectFile::where('slug',$request->file_slug)->first();
-        $note=Note::create(['slug'=>$slug,'user_id'=>auth()->user()->id,
-                            'project_id'=>auth()->user()->current_project_id,
-                            'start_date'=>$request->start_date,
-                            'subject'=>$request->subject]);
-        $fileDoc=FileDocument::create(['file_id'=>$file->id,'note_id'=>$note->id,'user_id'=>auth()->user()->id,'forClaim'=>'1','forChart'=>'1']);
-        session(['specific_file_doc' => $fileDoc->id]);
-        return response()->json([
-            'success' => true,
-        ]);
     }
 }
