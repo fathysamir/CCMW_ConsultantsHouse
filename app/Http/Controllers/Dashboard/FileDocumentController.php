@@ -82,7 +82,17 @@ class FileDocumentController extends ApiController
         $firstP = $xpath->query('//body/p')->item(0);
         if ($firstP && trim($firstP->textContent) !== '')
         {
+            foreach ($firstP->childNodes as $child) {
+                if ($child->nodeType === XML_TEXT_NODE) {
+                    $textContent = $child->nodeValue;
         
+                    if (isset($textContent[0]) && $textContent[0] === 'T') {
+                        $child->nodeValue = 't' . substr($textContent, 1);
+                    }
+        
+                    break; // Only check and update the first text node
+                }
+            }
             $fragment = $doc->createDocumentFragment();
             $fragment->appendXML('<strong>' . $text . '</strong> ');
             $firstP->insertBefore($fragment, $firstP->firstChild);
