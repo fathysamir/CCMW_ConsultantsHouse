@@ -77,17 +77,30 @@ class FileDocumentController extends ApiController
         @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $xpath = new \DOMXPath($doc);
-        $firstP = $xpath->query('//p')->item(0);
+        $body = $doc->getElementsByTagName('body')->item(0); // ✅ define body here
 
-        if ($firstP) {
+        $firstP = $xpath->query('//body/p')->item(0);
+        if ($firstP && trim($firstP->textContent) !== '')
+        {
+        
             $fragment = $doc->createDocumentFragment();
-            $fragment->appendXML('<strong>' . $text . '</strong> '); // or just $text if no HTML formatting
-
-            // Prepend the fragment to the first <p>
+            $fragment->appendXML('<strong>' . $text . '</strong> ');
             $firstP->insertBefore($fragment, $firstP->firstChild);
+        } else {
+        
+            $p = $doc->createElement('p');
+            $strong = $doc->createElement('strong', $text);
+            $p->appendChild($strong);
+            $body->insertBefore($p, $body->firstChild); // ✅ insert new <p> at top of body
         }
 
-        $newHtml = $doc->saveHTML($doc->getElementsByTagName('body')->item(0));
+        // Return the body content without <html><body> wrapper
+        $newHtml = '';
+        foreach ($body->childNodes as $node) {
+            $newHtml .= $doc->saveHTML($node);
+        }
+
+
       
         return response()->json([
             'html' => $newHtml,
