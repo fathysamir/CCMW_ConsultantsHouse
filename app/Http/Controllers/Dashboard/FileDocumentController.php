@@ -1332,4 +1332,8 @@ class FileDocumentController extends ApiController
             'success' => true,
         ]);
     }
+
+    public function extractPowerPoint(){
+        
+    }
 }
