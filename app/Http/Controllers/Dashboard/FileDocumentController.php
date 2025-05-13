@@ -27,6 +27,9 @@ use SebastianBergmann\Type\FalseType;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
 use DOMDocument;
+///////////////////////////////////////////////////////////////////////////
+
+
 
 class FileDocumentController extends ApiController
 {
@@ -1333,7 +1336,5 @@ class FileDocumentController extends ApiController
         ]);
     }
 
-    public function extractPowerPoint(){
-        
-    }
+    
 }

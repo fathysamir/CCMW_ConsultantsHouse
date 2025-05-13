@@ -20,6 +20,7 @@ use App\Models\ProjectFile;
 use App\Models\FileDocument;
 use App\Http\Controllers\Dashboard\NoteController;
 use App\Http\Controllers\Dashboard\FileAttachmentController;
+use App\Http\Controllers\Dashboard\ExtractPowerPointController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -246,6 +247,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/change-flag', [FileDocumentController::class, 'change_flag'])->name('change-flag');
     Route::post('/get-narrative', [FileDocumentController::class, 'get_narrative'])->name('get_narrative');
     Route::post('/project/create-new-note', [FileDocumentController::class, 'create_note'])->name('create-note');
+    Route::get('/uuu', [ExtractPowerPointController::class, 'extractPowerPoint2'])->name('project.file-documents.extractPowerPoint');
+
     Route::post('/set-session', function (\Illuminate\Http\Request $request) {
         session([$request->key => $request->value]);
         return response()->json(['status' => 'ok']);
