@@ -56,7 +56,7 @@ class ImportDocumentController extends ApiController
             if (empty($rows) || count($rows) < 2) {
                 continue; // Skip empty or invalid sheets
             }
-            $sheets[]=$sheetName;
+            $sheets[]=trim($sheetName);
             $headers = array_map('trim', $rows[0]); // Extract headers
             $sheetData = [];
 
