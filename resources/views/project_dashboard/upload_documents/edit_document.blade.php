@@ -1,11 +1,13 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Edit Document')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <h2 class="page-title">Edit Document</h2>
 
     <div class="card shadow mb-4">
@@ -16,7 +18,8 @@
                         enctype="multipart/form-data">
                         @csrf
 
-                        <input type="hidden" id="doc_id" name="doc_id" required value="{{ $document->storage_file_id }}">
+                        <input type="hidden" id="doc_id" name="doc_id" required
+                            value="{{ $document->storage_file_id }}">
                         <div class="row">
                             <!-- Type Input -->
                             <div class="col-md-4">
@@ -56,12 +59,19 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         <!-- Conditionally show the "View PDF" icon if the old document exists -->
                                         @if ($document->storage_file_id)
-                                            <span class="fe fe-24 fe-eye" id="viewPdf" title="View PDF"
-                                                style="cursor: pointer;"
-                                                data-file-path="{{ $document->storageFile->path }}"></span>
+                                            <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                               <img id="ocr_image"
+                                                    data-ocr="{{ 'project/ocr_layer/'.$document->slug }}" src="{{ asset('dashboard/assets/images/scanner.svg') }}">
+                                                <i class="fa-regular fa-eye"
+                                                    style="font-size: 20px;cursor: pointer;color:#234EFA"
+                                                    id="viewPdf"
+                                                    title="View PDF"data-file-path="{{ $document->storageFile->path }}"></i>
+                                                
+                                            </div>
                                         @else
-                                            <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
-                                                style="cursor: pointer;"></span>
+                                            <i class="fa-regular fa-eye d-none"
+                                                style="font-size: 20px;cursor: pointer;color:#234EFA"
+                                                id="viewPdf" title="View PDF"></i>
                                         @endif
                                     </div>
                                     <div class="custom-file">
@@ -183,7 +193,7 @@
                                 <div class="col-md-6 d-none files_">
                                     <select class="form-control" id="newFile" name="file_id">
                                         <option value="" disabled selected>Select File</option>
-        
+
                                     </select>
                                 </div>
                             </div>
@@ -249,7 +259,7 @@
 
                 $.ajax({
                     url: '/project/folder/get-files/' +
-                    folderId, // Adjust the route to your API endpoint
+                        folderId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let fileDropdown = $('#newFile');
@@ -284,6 +294,15 @@
             if (viewPdfIcon) {
                 viewPdfIcon.addEventListener('click', function() {
                     const filePath = this.getAttribute('data-file-path');
+                    if (filePath) {
+                        window.open('/' + filePath, '_blank'); // Open the file in a new tab
+                    }
+                });
+            }
+            const ocr_image = document.getElementById('ocr_image');
+             if (ocr_image) {
+                ocr_image.addEventListener('click', function() {
+                    const filePath = this.getAttribute('data-ocr');
                     if (filePath) {
                         window.open('/' + filePath, '_blank'); // Open the file in a new tab
                     }

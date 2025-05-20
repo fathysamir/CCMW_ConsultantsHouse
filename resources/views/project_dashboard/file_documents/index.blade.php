@@ -645,6 +645,7 @@
                                                         data-document-id="{{ $document->document->slug }}"data-type="document">Check
                                                         other
                                                         assignments</a>
+                                                    <a class="dropdown-item" href="{{ route('project.file-documents.ocr_layer',$document->document->slug) }}">OCR</a>
                                                     @php
                                                         $threads = $document->document->threads
                                                             ? json_decode($document->document->threads, true)

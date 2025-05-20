@@ -340,6 +340,7 @@
                                                     <a class="dropdown-item check_assignment" href="javascript:void(0);"
                                                     data-document-id="{{ $document->slug }}"data-type="document">Check
                                                         Assignment</a>
+                                                    <a class="dropdown-item" href="{{ route('project.file-documents.ocr_layer',$document->slug) }}">OCR</a>
                                                 @endif
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_documents', $Project_Permissions ?? []))
                                                     <a class="dropdown-item text-danger"

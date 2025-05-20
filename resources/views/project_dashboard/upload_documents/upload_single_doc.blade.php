@@ -1,6 +1,7 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Upload Single Document')
 @section('content')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
     .date{
         background-color:#fff !important;
@@ -49,8 +50,10 @@
                                 <div class="form-group mb-3">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <label for="file">Document <span style="color: red">*</span></label>
-                                        <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
-                                            style="cursor: pointer;"></span>
+                                        {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
+                                            style="cursor: pointer;"></span> --}}
+                                        <i class="fa-regular fa-eye d-none"  style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf" title="View PDF"></i>
+
                                     </div>
                                     <div class="custom-file">
                                         <input type="file" disabled class="custom-file-input" id="customFile">

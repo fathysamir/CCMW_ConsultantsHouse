@@ -502,5 +502,14 @@ class DocumentController extends ApiController
 
     }
     
+    public function ocr_layer($id){
+        $doc=Document::where('slug',$id)->first();
+        if($doc){
+            $path=$doc->storageFile->path;
+        }else{
+            $path=null;
+        }
 
+        return view('project_dashboard.upload_documents.ocr_layer',compact('path'));
+    }
 }
