@@ -182,6 +182,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/get-documents-by-thread', [DocumentController::class, 'getDocsByReference']);
     Route::post('/project/document/assign-document-bySlug', [DocumentController::class, 'assignDocumentbyslug'])->name('project.document.assign-document-slug');
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
+    Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
 
     Route::get('go-to-fileDocument/{docId}/{fileId}',function($doc,$file){
        

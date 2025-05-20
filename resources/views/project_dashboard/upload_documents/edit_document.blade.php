@@ -60,7 +60,7 @@
                                         <!-- Conditionally show the "View PDF" icon if the old document exists -->
                                         @if ($document->storage_file_id)
                                             <div style="display: flex;margin-right:6%;cursor: pointer;">
-                                               <img id="ocr_image"
+                                               <img id="ocr_image" title="OCR"
                                                     data-ocr="{{ 'project/ocr_layer/'.$document->slug }}" src="{{ asset('dashboard/assets/images/scanner.svg') }}">
                                                 <i class="fa-regular fa-eye"
                                                     style="font-size: 20px;cursor: pointer;color:#234EFA"
@@ -69,6 +69,7 @@
                                                 
                                             </div>
                                         @else
+                                            <img class="d-none" title="OCR" id="ocr_image" src="{{ asset('dashboard/assets/images/scanner.svg') }}">
                                             <i class="fa-regular fa-eye d-none"
                                                 style="font-size: 20px;cursor: pointer;color:#234EFA"
                                                 id="viewPdf" title="View PDF"></i>
@@ -302,10 +303,10 @@
             const ocr_image = document.getElementById('ocr_image');
              if (ocr_image) {
                 ocr_image.addEventListener('click', function() {
-                    const filePath = this.getAttribute('data-ocr');
-                    if (filePath) {
-                        window.open('/' + filePath, '_blank'); // Open the file in a new tab
-                    }
+                    
+                  
+                    window.open('/project/ocr_layer', '_blank'); // Open the file in a new tab
+                   
                 });
             }
             $.ajaxSetup({
@@ -362,6 +363,8 @@
                                         window.open('/' + $(this).attr('data-file-path'),
                                             '_blank');
                                     });
+                                  
+                               
                             }
 
                             // Show success message

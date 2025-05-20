@@ -1,12 +1,12 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Upload Single Document')
 @section('content')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <h2 class="page-title">Upload a New Document</h2>
 
     <div class="card shadow mb-4">
@@ -52,7 +52,13 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
                                             style="cursor: pointer;"></span> --}}
-                                        <i class="fa-regular fa-eye d-none"  style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf" title="View PDF"></i>
+                                        <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                            <img class="d-none" id="ocr_image"
+                                                src="{{ asset('dashboard/assets/images/scanner.svg') }}">
+                                            <i class="fa-regular fa-eye d-none"
+                                                style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
+                                                title="View PDF"></i>
+                                        </div>
 
                                     </div>
                                     <div class="custom-file">
@@ -171,7 +177,7 @@
                                 <div class="col-md-6 d-none files_">
                                     <select class="form-control" id="newFile" name="file_id">
                                         <option value="" disabled selected>Select File</option>
-        
+
                                     </select>
                                 </div>
                             </div>
@@ -193,7 +199,8 @@
                             <label class="custom-control-label" for="analyzed">Notify for Analysis</label>
                         </div>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"id="analysis_complete" name="analysis_complete">
+                            <input type="checkbox" class="custom-control-input"id="analysis_complete"
+                                name="analysis_complete">
                             <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                         </div>
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
@@ -218,7 +225,7 @@
 
                 $.ajax({
                     url: '/project/folder/get-files/' +
-                    folderId, // Adjust the route to your API endpoint
+                        folderId, // Adjust the route to your API endpoint
                     type: 'GET',
                     success: function(response) {
                         let fileDropdown = $('#newFile');
@@ -298,6 +305,12 @@
                                 $viewPdf.removeClass('d-none');
                                 $viewPdf.off('click').on('click', function() {
                                     window.open('/' + file.path, '_blank');
+                                });
+
+                                 const $ocr_image = $('#ocr_image');
+                                  $ocr_image.removeClass('d-none');
+                                   $ocr_image.off('click').on('click', function() {
+                                    window.open('/project/ocr_layer', '_blank');
                                 });
                             }
 

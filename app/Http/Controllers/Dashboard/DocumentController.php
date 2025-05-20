@@ -25,6 +25,8 @@ class DocumentController extends ApiController
 {
     public function create_single_doc_view()
     {
+        session()->forget('path');
+
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
        
@@ -93,6 +95,8 @@ class DocumentController extends ApiController
 
         $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
         if ($storageFile) {
+            session(['path' => $storageFile->path]);
+
             return response()->json([
                 'success' => true,
                 'file' => $storageFile
@@ -121,7 +125,7 @@ class DocumentController extends ApiController
             'file_type' => $type,
             'path' => $projectFolder . '/' . $fileName
         ]);
-
+        session(['path' => $projectFolder . '/' . $fileName]);
         return response()->json([
             'success' => true,
             'file' => $storageFile
@@ -130,6 +134,7 @@ class DocumentController extends ApiController
 
     public function all_documents(Request $request)
     {
+        session()->forget('path');
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -168,6 +173,8 @@ class DocumentController extends ApiController
 
     public function edit_document($id)
     {
+        session()->forget('path');
+
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -183,7 +190,7 @@ class DocumentController extends ApiController
         $document = Document::where('slug', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->where('id', '!=', $document->id)->pluck('reference');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-
+        session(['path' => $document->storageFile->path]);
         return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads','folders'));
     }
 
@@ -510,6 +517,11 @@ class DocumentController extends ApiController
             $path=null;
         }
 
+        return view('project_dashboard.upload_documents.ocr_layer',compact('path'));
+    }
+
+    public function ocr_with_path(){
+        $path= session('path');
         return view('project_dashboard.upload_documents.ocr_layer',compact('path'));
     }
 }
