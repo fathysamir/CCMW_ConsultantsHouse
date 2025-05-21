@@ -18,7 +18,7 @@
             border: 1px solid black;
             width: 100% !important;
             /* Force 100% width */
-            height: 590PX !important;
+            height: auto !important;
             /* Maintain aspect ratio */
             display: block;
         }
