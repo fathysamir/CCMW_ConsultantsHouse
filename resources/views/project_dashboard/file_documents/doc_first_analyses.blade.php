@@ -1,15 +1,16 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - First Analyses')
 @section('content')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
-    <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon" class="fe fe-24 fe-chevrons-right"></span>Details of
-        "{{ $doc->document ? $doc->document->subject :  $doc->note->subject}}"</h2>
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
+    <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon"
+            class="fe fe-24 fe-chevrons-right"></span>Details of
+        "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"</h2>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
             style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">
@@ -26,150 +27,152 @@
     <div class="card shadow mb-4 d-none"id="detailsCard">
         <div class="card-body">
             <div class="row">
-                @if($doc->document)
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group mb-3">
-                                <label for="Type">Type</label>
-                                <input type="text" id="Type" class="form-control"
-                                    placeholder="Type" disabled value="{{ $doc->document->docType->name }}">
+                @if ($doc->document)
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="Type">Type</label>
+                                    <input type="text" id="Type" class="form-control" placeholder="Type" disabled
+                                        value="{{ $doc->document->docType->name }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="form-group mb-3">
-                                <label for="Subject">Subject</label>
-                                <input type="text"id="Subject" class="form-control"
-                                    placeholder="Subject" disabled value="{{ $doc->document->subject }}">
+                            <div class="col-md-5">
+                                <div class="form-group mb-3">
+                                    <label for="Subject">Subject</label>
+                                    <input type="text"id="Subject" class="form-control" placeholder="Subject" disabled
+                                        value="{{ $doc->document->subject }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group mb-3">
-                                <label for="Reference">Reference</label>
-                                <input type="text"id="Reference" class="form-control"
-                                    placeholder="Reference" disabled value="{{ $doc->document->reference }}">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="Reference">Reference</label>
+                                    <input type="text"id="Reference" class="form-control" placeholder="Reference"
+                                        disabled value="{{ $doc->document->reference }}">
+                                </div>
                             </div>
+
                         </div>
-                    
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group mb-3">
-                                <label for="Date">Date</label>
-                                <input type="text" id="Date" class="form-control"
-                                    placeholder="Date" disabled value="{{$doc->document->start_date? date('d-M-Y', strtotime( $doc->document->start_date)):'' }}">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="Date">Date</label>
+                                    <input type="text" id="Date" class="form-control" placeholder="Date" disabled
+                                        value="{{ $doc->document->start_date ? date('d-M-Y', strtotime($doc->document->start_date)) : '' }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group mb-3">
-                                <label for="Return_Date">Return Date</label>
-                                <input type="text"id="Return_Date" class="form-control"
-                                    placeholder="Return Date" disabled value="{{ $doc->document->end_date? date('d-M-Y', strtotime( $doc->document->end_date)):'' }}">
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="Return_Date">Return Date</label>
+                                    <input type="text"id="Return_Date" class="form-control" placeholder="Return Date"
+                                        disabled
+                                        value="{{ $doc->document->end_date ? date('d-M-Y', strtotime($doc->document->end_date)) : '' }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group mb-3">
-                                <label for="Status">Status</label>
-                                <input type="text"id="Status" class="form-control"
-                                    placeholder="Status" disabled value="{{ $doc->document->status }}">
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="Status">Status</label>
+                                    <input type="text"id="Status" class="form-control" placeholder="Status" disabled
+                                        value="{{ $doc->document->status }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="form-group mb-3">
-                                <label for="Revision">Revision</label>
-                                <input type="text"id="Revision" class="form-control"
-                                    placeholder="Revision" disabled value="{{ $doc->document->revision }}">
+                            <div class="col-md-1">
+                                <div class="form-group mb-3">
+                                    <label for="Revision">Revision</label>
+                                    <input type="text"id="Revision" class="form-control" placeholder="Revision" disabled
+                                        value="{{ $doc->document->revision }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="form-group mb-3">
-                                <label for="Thread">Thread</label>
-                                <select class="form-control select2-multi" disabled  id="multi-select2" multiple style="height: calc(1.5em + 0.75rem + 2px) !important;">
-            
-                                    @if ($doc->document->threads)
-                                        @foreach (json_decode($doc->document->threads, true) as $thread2)
-                                           
-                                            <option value="{{ $thread2 }}"selected>
+                            <div class="col-md-5">
+                                <div class="form-group mb-3">
+                                    <label for="Thread">Thread</label>
+                                    <select class="form-control select2-multi" disabled id="multi-select2" multiple
+                                        style="height: calc(1.5em + 0.75rem + 2px) !important;">
+
+                                        @if ($doc->document->threads)
+                                            @foreach (json_decode($doc->document->threads, true) as $thread2)
+                                                <option value="{{ $thread2 }}"selected>
                                                     {{ $thread2 }}</option>
-                                          
-                                        @endforeach
-                                    @endif
-                                </select>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="form-group mb-3">
+                                    <label for="Note">Note</label>
+                                    <input type="text" id="Note" class="form-control" placeholder="Note" disabled
+                                        value="{{ $doc->document->notes }}">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group mb-3">
+                                    <button type="button" class="btn mt-4 btn-success"
+                                        onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->document->slug; ?>/edit'">Edit</button>
+                                </div>
                             </div>
                         </div>
-                    
                     </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                            <div class="form-group mb-3">
-                                <label for="Note">Note</label>
-                                <input type="text" id="Note" class="form-control"
-                                    placeholder="Note" disabled value="{{$doc->document->notes}}">
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="form-group mb-3">
-                                <button type="button" class="btn mt-4 btn-success"
-                                onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->document->slug; ?>/edit'">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 @else
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group mb-3">
-                                <label for="Type">Type</label>
-                                <input type="text" id="Type" class="form-control"
-                                    placeholder="Type" disabled value="Note/Activity">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="Type">Type</label>
+                                    <input type="text" id="Type" class="form-control" placeholder="Type" disabled
+                                        value="Note/Activity">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group mb-3">
+                                    <label for="Subject">Subject</label>
+                                    <input type="text"id="Subject" class="form-control" placeholder="Subject" disabled
+                                        value="{{ $doc->note->subject }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="Date">Date</label>
+                                    <input type="text" id="Date" class="form-control" placeholder="Date"
+                                        disabled
+                                        value="{{ $doc->note->start_date ? date('d-M-Y', strtotime($doc->note->start_date)) : '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <label for="Return_Date">Return Date</label>
+                                    <input type="text"id="Return_Date" class="form-control" placeholder="Return Date"
+                                        disabled
+                                        value="{{ $doc->note->end_date ? date('d-M-Y', strtotime($doc->note->end_date)) : '' }}">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="form-group mb-3">
+                                    <label for="Note">Note</label>
+                                    <input type="text" id="Note" class="form-control" placeholder="Note"
+                                        disabled value="{{ $doc->note->notes }}">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group mb-3">
+                                    <button type="button" class="btn mt-4 btn-success"
+                                        onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->note->slug; ?>/edit'">Edit</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-5">
-                            <div class="form-group mb-3">
-                                <label for="Subject">Subject</label>
-                                <input type="text"id="Subject" class="form-control"
-                                    placeholder="Subject" disabled value="{{ $doc->note->subject }}">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group mb-3">
-                                <label for="Date">Date</label>
-                                <input type="text" id="Date" class="form-control"
-                                    placeholder="Date" disabled value="{{$doc->note->start_date? date('d-M-Y', strtotime( $doc->note->start_date)):'' }}">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group mb-3">
-                                <label for="Return_Date">Return Date</label>
-                                <input type="text"id="Return_Date" class="form-control"
-                                    placeholder="Return Date" disabled value="{{ $doc->note->end_date? date('d-M-Y', strtotime( $doc->note->end_date)):'' }}">
-                            </div>
-                        </div>
-                    
                     </div>
-                   
-                    <div class="row">
-                        <div class="col-md-11">
-                            <div class="form-group mb-3">
-                                <label for="Note">Note</label>
-                                <input type="text" id="Note" class="form-control"
-                                    placeholder="Note" disabled value="{{$doc->note->notes}}">
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="form-group mb-3">
-                                <button type="button" class="btn mt-4 btn-success"
-                                onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->note->slug; ?>/edit'">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 @endif
             </div>
         </div>
     </div>
-    <div class="card shadow mb-4" >
+    <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
 
@@ -183,12 +186,17 @@
                         <div class="form-group mb-3">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <label for="owner">Narrative</label>
-                                @if($doc->document)
-                                <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i class="fa-regular fa-eye" style="font-size: 24px;"title="View PDF"></i></a>
+                                @if ($doc->document)
+                                    <div style="display: flex;cursor: pointer;">
+                                        <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img id="ocr_image" title="OCR" style="width:25px;" src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
+                                        <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i
+                                                class="fa-regular fa-eye"
+                                                style="font-size: 24px;"title="View PDF"></i></a>
+                                    </div>
                                 @endif
-                               
+
                             </div>
-                            
+
                             <div id="editor" style="min-height:250px;">
                                 {!! $doc->narrative !!}
                             </div>
@@ -216,7 +224,8 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="Revision">Tags</label>
-                                    <select class="form-control select2-multi" id="multi-select2" name="tags[]"multiple @if($doc->document_id==null) disabled @endif>
+                                    <select class="form-control select2-multi" id="multi-select2" name="tags[]"multiple
+                                        @if ($doc->document_id == null) disabled @endif>
                                         @foreach ($tags as $tag)
                                             <option
                                                 value="{{ $tag->id }}"{{ count($doc->tags) != 0 && in_array($tag->id, $doc->tags->pluck('id')->toArray()) ? 'selected' : '' }}>
@@ -227,19 +236,24 @@
                             </div>
                             <div class="col-md-5">
                                 <div class="row"style="margin-left: 50px;">
-                                               
-                                    <div class="custom-control custom-checkbox" style="margin-right: 20px;margin-top: 6.5%;">
-                                                   
-                                                    <input type="checkbox" class="custom-control-input" name="forClaim" id="forClaim" @if ($doc->forClaim == '1') checked @endif>
+
+                                    <div class="custom-control custom-checkbox"
+                                        style="margin-right: 20px;margin-top: 6.5%;">
+
+                                        <input type="checkbox" class="custom-control-input" name="forClaim"
+                                            id="forClaim" @if ($doc->forClaim == '1') checked @endif>
                                         <label class="custom-control-label" for="forClaim">For Claim (c)</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
+                                    <div
+                                        class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
 
-                                        <input type="checkbox" class="custom-control-input" name="forLetter"id="forLetter"
-                                            @if ($doc->forLetter == '1') checked @endif @if($doc->document_id==null) disabled @endif>
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="forLetter"id="forLetter" @if ($doc->forLetter == '1') checked @endif
+                                            @if ($doc->document_id == null) disabled @endif>
                                         <label class="custom-control-label" for="forLetter">For Notice (N)</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
+                                    <div
+                                        class="custom-control custom-checkbox"style="margin-right: 20px;margin-top: 6.5%;">
 
                                         <input type="checkbox" class="custom-control-input" name="forChart"id="forChart"
                                             @if ($doc->forChart == '1') checked @endif>
@@ -345,5 +359,4 @@
 
         });
     </script>
-    
 @endpush

@@ -34,6 +34,7 @@ use DOMDocument;
 class FileDocumentController extends ApiController
 {
     public function index($id){
+        session()->forget('path');
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
@@ -842,6 +843,7 @@ class FileDocumentController extends ApiController
         session(['specific_file_doc' => $id]);
         $doc=FileDocument::findOrFail($id);
         $tags=ContractTag::where('account_id',$user->current_account_id)->where('project_id',$user->current_project_id)->orderBy('order','asc')->get();
+         session(['path' => $doc->document->storageFile->path]);
         return view('project_dashboard.file_documents.doc_first_analyses',compact('doc','tags'));
     }
 
@@ -902,6 +904,7 @@ class FileDocumentController extends ApiController
         return !empty($text);
     }
     public function store_file_document_first_analyses(Request $request,$id){
+        session()->forget('path');
         $zip_file= session('zip_file');
         if($zip_file){
             $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
