@@ -26,6 +26,7 @@ use DateTime;
 class UploadGroupDocumentController extends ApiController
 {
     public function index(){
+        session()->forget('path');
         session()->forget('testDocumentsIDs');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
         $project = Project::findOrFail(auth()->user()->current_project_id);
@@ -89,6 +90,7 @@ class UploadGroupDocumentController extends ApiController
 
     public function saveDocuments(Request $request){
        // dd($request->all());
+       session()->forget('path');
         $documents = $request->input('documents');
         $testDocumentsIDs = [];
         foreach ($documents as $docData) {
@@ -129,6 +131,7 @@ class UploadGroupDocumentController extends ApiController
 
 
     public function view_doc($id){
+        session()->forget('path');
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
@@ -136,7 +139,7 @@ class UploadGroupDocumentController extends ApiController
         $document = TestDocument::where('id', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
-
+        session(['path' => $document->storageFile->path]);
         return view('project_dashboard.upload_group_documents.test_doc_view', compact('documents_types', 'users', 'stake_holders', 'document', 'threads','folders'));
     }
 
@@ -178,6 +181,7 @@ class UploadGroupDocumentController extends ApiController
             
         }
         $doc->save();
+        session()->forget('path');
         return response()->json(['message' => 'Document updated successfully.']);
     }
 

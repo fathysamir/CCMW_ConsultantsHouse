@@ -1,11 +1,13 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Check Document')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <h2 class="page-title">Edit "{{ $document->reference }}" Document</h2>
 
     <div class="card shadow mb-4">
@@ -58,12 +60,22 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         <!-- Conditionally show the "View PDF" icon if the old document exists -->
                                         @if ($document->storage_file_id)
-                                            <span class="fe fe-24 fe-eye" id="viewPdf" title="View PDF"
-                                                style="cursor: pointer;"
-                                                data-file-path="{{ $document->storageFile->path }}"></span>
+                                            <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img id="ocr_image" title="OCR" style="width: 25px;"
+                                                        src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
+
+                                                <i class="fa-regular fa-eye"
+                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
+                                                    title="View PDF"data-file-path="{{ $document->storageFile->path }}"></i>
+                                            </div>
                                         @else
-                                            <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
-                                                style="cursor: pointer;"></span>
+                                            <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img class="d-none" title="OCR" id="ocr_image"
+                                                    src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
+                                                <i class="fa-regular fa-eye d-none"
+                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
+                                                    title="View PDF"></i>
+                                            </div>
                                         @endif
                                     </div>
                                     <div class="custom-file">
