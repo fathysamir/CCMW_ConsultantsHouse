@@ -177,7 +177,10 @@ class FileController extends ApiController
             $file->folder_id = $Folder->id;
             $file->save();
         }else{
+            FileAttachment::where('file_id',$file->id)->delete();
+            FileDocument::where('file_id',$file->id)->delete();
             $file->delete();
+           
         }
         return redirect('/project/files')->with('success', 'File Deleted successfully.');
 
