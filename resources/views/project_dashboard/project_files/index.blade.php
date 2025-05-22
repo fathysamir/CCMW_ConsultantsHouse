@@ -135,10 +135,24 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                        max-height:650px;
-                                                                                    } */
+                                                                                                max-height:650px;
+                                                                                            } */
     </style>
-
+    <div id="hintBox"
+        style="
+        display:none;
+        position: fixed;
+        top: 65px;
+        right: 42%;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 9999;
+        font-size: 0.9rem;
+        ">
+    </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $folder->name }}</h2>
@@ -198,7 +212,7 @@
                             <tbody>
 
                                 @foreach ($all_files as $file)
-                                    <tr>
+                                    <tr id="file_{{ $file->slug }}">
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -248,8 +262,10 @@
                                                     Analysis</a>
 
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('cope_move_file', $Project_Permissions ?? []))
-                                                    <a class="dropdown-item" href="">Copy</a>
-                                                    <a class="dropdown-item" href="">Move</a>
+                                                    <a class="dropdown-item copy_move_file"href="javascript:void(0);"
+                                                        data-file-id="{{ $file->slug }}"data-type="Copy">Copy</a>
+                                                    <a class="dropdown-item copy_move_file"href="javascript:void(0);"
+                                                        data-file-id="{{ $file->slug }}"data-type="Move">Move</a>
                                                 @endif
                                                 <a class="dropdown-item export_file" href="javascript:void(0);"
                                                     data-file-id="{{ $file->slug }}">Export</a>
@@ -449,6 +465,41 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="copyToModal" tabindex="-1" role="dialog" aria-labelledby="copyToModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="copyToModalLabel">
+                        <spam id="type">Copy</spam> File To another Folder
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assigneToForm">
+                        @csrf
+                        <input type="hidden" id="fileId_" name="file_id">
+                        <input type="hidden" id="action_type" name="action_type">
+                        <div class="form-group">
+                            <label for="folder_id">Select Folder</label>
+                            <select class="form-control" id="folder_id" required name="folder_id">
+                                <option value="" disabled selected>Select Folder</option>
+                                @foreach ($folders as $key => $name)
+                                    <option value="{{ $key }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveCopyDoc">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -470,6 +521,71 @@
     </script>
     <script>
         $(document).ready(function() {
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
+
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
+            $('.copy_move_file').on('click', function() {
+                var fileId_ = $(this).data('file-id');
+                var action_type = $(this).data('type');
+
+                $('#fileId_').val(fileId_);
+                $('#action_type').val(action_type);
+                $('#folder_id').val('');
+
+                document.getElementById('type').innerText = action_type;
+
+                $('#copyToModal').modal('show'); // Show the modal
+            });
+
+            $('#saveCopyDoc').click(function() {
+
+                //let documentId = $('#documentId_').val();
+                let folderId = $('#folder_id').val();
+                let fileId = $('#fileId_').val();
+                let actionType = $('#action_type').val();
+
+                if (!folderId) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/project/copy_move_file', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        folder_id: folderId,
+                        file_id: fileId,
+                        action_type: actionType
+                    },
+                    success: function(response) {
+                        if (response.status == 'error') {
+                            alert("⚠️ " + response.message);
+                        } else {
+                            if (actionType == 'Move') {
+
+                                document.getElementById('file_' + fileId)?.remove();
+
+                            }
+                            showHint(response.message); // Show success message
+
+                        }
+                        $('#copyToModal').modal('hide');
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+            /////////////////////////////////////////////////
             $('.dropdown-toggle').dropdown();
 
 

@@ -233,6 +233,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/files/archive/{id}', [FileController::class, 'archive'])->name('project.files.archive');
     Route::post('/project/file/change-owner', [FileController::class, 'changeOwner'])->name('project.file.change-owner');
     Route::post('/export-fill', [FileController::class, 'exportWordClaimDocs']);
+    Route::post('/project/copy_move_file', [FileController::class, 'copy_move_file']);
 
     Route::get('/project/file/{id}/documents', [FileDocumentController::class, 'index'])->name('project.file-documents.index');
     Route::get('/project/file-document-first-analyses/{id}', [FileDocumentController::class, 'file_document_first_analyses'])->name('project.file-document-first-analyses');

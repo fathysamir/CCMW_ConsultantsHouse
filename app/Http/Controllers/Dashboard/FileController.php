@@ -37,8 +37,9 @@ class FileController extends ApiController
         $user = auth()->user();
         $folder = ProjectFolder::findOrFail($user->current_folder_id);
         $all_files = ProjectFile::where('folder_id',$folder->id)->orderBy('code', 'asc')->get(); 
+        $folders = ProjectFolder::where('id','!=',$folder->id)->where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
 
-        return view('project_dashboard.project_files.index', compact('all_files','folder','users'));
+        return view('project_dashboard.project_files.index', compact('all_files','folders','folder','users'));
     }
 
     public function create(){
@@ -1801,6 +1802,71 @@ class FileController extends ApiController
         // Clean up the output and return formatted HTML
         $cleanHtml = $dom->saveHTML();
         return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], '', $cleanHtml));
+    }
+
+    public function copy_move_file(Request $request){
+        $file=ProjectFile::where('slug',$request->file_id)->first();
+        $counter=1;
+        $ex='';
+        if($request->action_type=='Copy'){
+            do {
+                $name = $file->name. $ex;
+                $ex=' (' . $counter . ')';
+                $counter++;
+            } while (ProjectFile::where('name', $name)->where('folder_id',$request->folder_id)->exists());
+            do {
+                $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            } while (ProjectFile::where('slug', $slug)->exists());
+            $new_file=ProjectFile::create(['name'=>$name,'slug'=>$slug,'code'=>$file->code,
+                                 'user_id'=>$file->user_id,'project_id'=>$file->project_id,
+                                 'against_id'=>$file->against_id,'start_date'=>$file->start_date,
+                                 'end_date'=>$file->end_date,'folder_id'=>$request->folder_id,
+                                 'notes'=>$file->notes,'time'=>$file->time,'prolongation_cost'=>$file->prolongation_cost,
+                                 'disruption_cost'=>$file->disruption_cost,'variation'=>$file->variation,
+                                 'closed'=>$file->closed,'assess_not_pursue'=>$file->assess_not_pursue]);
+            $file_attachment=FileAttachment::where('file_id',$file->id)->get();
+            foreach($file_attachment as $attachment){
+                FileAttachment::create(['file_id'=>$new_file->id,'user_id'=>auth()->user()->id,
+                                        'order'=>$attachment->order,
+                                        'narrative'=>$attachment->narrative,
+                                        'forClaim'=>$attachment->forClaim,
+                                        'section'=>$attachment->section]);
+            }
+            $file_documents=FileDocument::where('file_id',$file->id)->get();
+             foreach($file_documents as $doc){
+                $new_doc=FileDocument::create(['file_id'=>$new_file->id,'user_id' => auth()->user()->id,
+                                      'document_id'=>$doc->document_id,
+                                      'note_id'=>$doc->note_id,
+                                      'sn'=>$doc->sn,'forClaim'=> $doc->forClaim,'narrative'=> $doc->narrative,'notes1'=> $doc->notes1,
+                                      'forChart'=> $doc->forChart,'notes2'=> $doc->notes2,
+                                      'forLetter'=> $doc->forLetter]);
+                $ids=$doc->tags->pluck('id')->toArray();
+                if (count($ids)>0) {
+                    $new_doc->tags()->sync($ids); // Sync tags
+                }
+             }
+            return response()->json([
+                            'status' => 'success',
+                            'message' => 'File Copied To Selected Folder Successfully.',
+
+                        // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+            ]);
+        }elseif($request->action_type=='Move'){
+            do {
+                $name = $file->name. $ex;
+                $ex=' (' . $counter . ')';
+                $counter++;
+            } while (ProjectFile::where('name', $name)->where('folder_id',$request->folder_id)->exists());
+            $file->name=$name;
+            $file->folder_id = $request->folder_id;
+            $file->save();
+            return response()->json([
+                            'status' => 'success',
+                            'message' => 'File Moved To Selected Folder Successfully.',
+
+                        // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+            ]);
+        }
     }
 
 }
