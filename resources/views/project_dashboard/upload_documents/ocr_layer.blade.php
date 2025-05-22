@@ -67,12 +67,12 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="row2">
-                        <div class="mr-2" style="width:49.5%;">
+                        <div class="mr-2" style="width:59.4%;">
                             <div style="height: 100%;">
                                 <textarea style="height: 100%;" class="form-control" id="ocr-result"></textarea>
                             </div>
                         </div>
-                        <div style="width:49.9%;">
+                        <div style="width:40%;">
                             <div id="canvas-container">
                                 <canvas id="pdf-canvas"></canvas>
                                 <canvas class="overlay" id="selection-canvas"></canvas>
