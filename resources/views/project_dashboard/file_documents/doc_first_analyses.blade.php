@@ -400,6 +400,7 @@
                     success: function(response) {
 
                         $('#pagesFromToModal').modal('hide');
+                        window.open('/project/AI-layer/'+response.ai_zip_file, '_blank');
                     },
                     error: function() {
                         alert('Failed to assign document. Please try again.');

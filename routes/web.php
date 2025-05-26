@@ -253,6 +253,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/get-narrative', [FileDocumentController::class, 'get_narrative'])->name('get_narrative');
     Route::post('/project/create-new-note', [FileDocumentController::class, 'create_note'])->name('create-note');
     Route::post('/project/create_ai_pdf', [FileDocumentController::class, 'create_ai_pdf'])->name('project.create_ai_pdf');
+    Route::get('/project/AI-layer/{id}', [FileDocumentController::class, 'ai_layer'])->name('project.ai_layer');
+    Route::post('/project/summarize', [FileDocumentController::class, 'summarize_pdf'])->name('project.summarize_pdf');
 
     Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 

@@ -29,6 +29,15 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
+        session()->forget('ai_zip_file');
+        $ai_zip_file = session('ai_zip_file');
+        if ($ai_zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('ai_zip_file');
+        }
         session()->forget('path');
         $zip_file = session('zip_file');
         if ($zip_file) {
@@ -821,6 +830,7 @@ class FileDocumentController extends ApiController
 
     public function file_document_first_analyses($id)
     {
+
         session()->forget('path');
         $user = auth()->user();
         session(['specific_file_doc' => $id]);
@@ -927,6 +937,15 @@ class FileDocumentController extends ApiController
         if ($request->action == 'save') {
             return redirect('/project/file-document-first-analyses/'.$doc->id)->with('success', $doc->document ? 'analyses for "'.$doc->document->subject.'" document saved successfully.' : 'analyses for "'.$doc->note->subject.'" document saved successfully.');
         } else {
+            session()->forget('ai_zip_file');
+            $ai_zip_file = session('ai_zip_file');
+            if ($ai_zip_file) {
+                $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
+                if (File::exists($filePath)) {
+                    File::deleteDirectory($filePath);
+                }
+                session()->forget('ai_zip_file');
+            }
             return redirect('/project/file/'.$doc->file->slug.'/documents')->with('success', $doc->document ? 'analyses for "'.$doc->document->subject.'" document saved successfully.' : 'analyses for "'.$doc->note->subject.'" document saved successfully.');
         }
 
@@ -1351,15 +1370,8 @@ class FileDocumentController extends ApiController
     {
         $path = session('path');
         $sourcePath = public_path($path);
-
-        $zip_file = session('ai_zip_file');
-        if ($zip_file) {
-            // $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
-            // if (File::exists($filePath)) {
-            //     File::deleteDirectory($filePath);
-            // }
-            session()->forget('ai_zip_file');
-        }
+        session()->forget('ai_zip_file');
+        
 
         $projectFolder = 'projects/'.auth()->user()->current_project_id.'/temp';
         $path = public_path($projectFolder);
@@ -1389,11 +1401,70 @@ class FileDocumentController extends ApiController
         // حفظ الملف في temp
         $pdf->Output('F', $targetPath);
         session(['ai_zip_file' => $code]);
-        session(['ai_pdf_path' => $targetPath]);
+        session(['ai_pdf_path' => 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/extracted.pdf']);
 
         return response()->json([
-            'message' => 'تم استخراج الصفحات بنجاح',
+            'message' => 'success',
+            'ai_zip_file' => $code
         ]);
         // Save document
+    }
+
+    public function ai_layer($id){
+        $ai_zip_file=session('ai_zip_file');
+        $ai_pdf_path=session('ai_pdf_path');
+        //session()->forget('ai_pdf_path');
+        return view('project_dashboard.file_documents.ai_layer',compact('ai_zip_file','ai_pdf_path'));
+    }
+
+    public function summarize_pdf(Request $request){
+        //dd($request->all());
+        if($request->source_id == null){
+            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Replace with your actual API key
+            $url = 'https://ccmw.app/projects/7/documents/1748288269_1933-Request-for-Release-of-DEWA-Water-Submeters-Ref-1924.pdf';
+
+            $payload = json_encode([
+                'url' => $url,
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'https://api.chatpdf.com/v1/sources/add-url',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                // handle error
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+
+            // Access sourceId from response
+            $sourceId = $data['sourceId'] ?? null;
+            dd($sourceId);
+            // $ai_zip_file = $request->ai_zip_file;
+            // if ($ai_zip_file) {
+            //     $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
+            //     if (File::exists($filePath)) {
+            //         File::deleteDirectory($filePath);
+            //     }
+            // }
+        }else{
+
+        }
     }
 }
