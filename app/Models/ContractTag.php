@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Casts\CustomDateTimeCast;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ContractTag extends Model
 {
     use HasFactory,SoftDeletes;
+
     protected $table = 'contract_tags';
 
     protected $fillable = [
@@ -20,25 +21,24 @@ class ContractTag extends Model
         'is_notice',
         'sub_clause',
         'var_process',
-        'for_letter'
+        'for_letter',
     ];
 
     protected $allowedSorts = [
-       
+
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $hidden = ['deleted_at'];
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id','id')->withTrashed();
+        return $this->belongsTo(Project::class, 'project_id', 'id')->withTrashed();
     }
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id','id')->withTrashed();
+        return $this->belongsTo(Account::class, 'account_id', 'id')->withTrashed();
     }
-
 }

@@ -185,10 +185,15 @@
                         @csrf
                         <div class="form-group mb-3">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <label for="owner">Narrative</label>
+                                <label for="owner" style="margin-bottom: 0.1rem !important">Narrative</label>
                                 @if ($doc->document)
                                     <div style="display: flex;cursor: pointer;">
-                                        <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img id="ocr_image" title="OCR" style="width:25px;" src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
+                                        <img id="ai_image" title="AI" style="width:25px;margin-right:5px;"
+                                            src="{{ asset('dashboard/assets/images/ai.png') }}">
+                                        <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
+                                            style="margin-right:5px;" target="_blank"><img id="ocr_image" title="OCR"
+                                                style="width:25px;"
+                                                src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
                                         <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i
                                                 class="fa-regular fa-eye"
                                                 style="font-size: 24px;"title="View PDF"></i></a>
@@ -321,6 +326,38 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="pagesFromToModal" tabindex="-1" role="dialog" aria-labelledby="pagesFromToModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pagesFromToModalLabel">PDF Pages</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="from">From</label>
+                        <input type="number" name="from" id="from" class="form-control" placeholder="From"
+                            value="1" min="1" oninput="this.value = Math.max(1, this.value)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="to">To</label>
+                        <input type="number" name="to" id="to" class="form-control" placeholder="To"
+                            value="1" min="1" oninput="this.value = Math.max(1, this.value)">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="pagesFromTo">Open</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -338,6 +375,37 @@
     </script>
     <script>
         $(document).ready(function() {
+            $('#ai_image').on('click', function() {
+
+                $('#pagesFromToModal').modal('show'); // Show the modal
+            });
+            $('#pagesFromTo').click(function() {
+                let from = $('#from').val();
+                let to = $('#to').val();
+
+                if (parseInt(to) < parseInt(from)) {
+                    alert('"To" page number should be greater than or equal to "From" page number.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/project/create_ai_pdf', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        from: from,
+                        to: to,
+
+                    },
+                    success: function(response) {
+
+                        $('#pagesFromToModal').modal('hide');
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
             $('.dropdown-toggle').dropdown();
             setTimeout(function() {
                 $('#errorAlert').fadeOut();

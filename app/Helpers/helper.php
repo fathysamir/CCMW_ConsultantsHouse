@@ -1,7 +1,7 @@
 <?php
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-
 
 function uploadMedia($request_file, $collection_name, $model)
 {
@@ -11,71 +11,71 @@ function uploadMedia($request_file, $collection_name, $model)
     set_time_limit(10000000);
     $directory = public_path('images');
 
-    if (!File::exists($directory)) {
+    if (! File::exists($directory)) {
         File::makeDirectory($directory, 0755, true);
     }
     $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'), 0, 12);
-    $image = $model->id.''.$invitation_code.''.time() . '.' . $request_file->extension();
+    $image = $model->id.''.$invitation_code.''.time().'.'.$request_file->extension();
 
     $request_file->move(public_path('images/'), $image);
-    $path = ('/images/') . $image;
+    $path = ('/images/').$image;
     DB::table('media')->insert([
         'attachmentable_type' => get_class($model),
         'attachmentable_id' => $model->id,
         'collection_name' => $collection_name,
-        'Path' => $path
+        'Path' => $path,
     ]);
+
     return $path;
 }
 
 function getMediaUrl($model, $collection_name)
-{  
+{
     // $attachment = $model->attachment()
     //     ->where('collection_name', $collection_name)
     //     ->first();
-     $attachments=DB::table('media')->where('attachmentable_id',$model->id)->where('collection_name',$collection_name)->where('attachmentable_type',get_class($model))->select('path')->get();
-    
-    if (count($attachments)==0) {
+    $attachments = DB::table('media')->where('attachmentable_id', $model->id)->where('collection_name', $collection_name)->where('attachmentable_type', get_class($model))->select('path')->get();
+
+    if (count($attachments) == 0) {
         return null;
-    }else{
-       
-        foreach($attachments as $attachment){
-            $attachment->path=url($attachment->path);
+    } else {
+
+        foreach ($attachments as $attachment) {
+            $attachment->path = url($attachment->path);
         }
+
         return $attachments;
     }
 
-   
-    
 }
 
-function getFirstMediaUrl($model, $collection_name,$with_url=TRUE)
-{  
+function getFirstMediaUrl($model, $collection_name, $with_url = true)
+{
     // $attachment = $model->attachment()
     //     ->where('collection_name', $collection_name)
     //     ->first();
-     $attachment=DB::table('media')->where('attachmentable_id',$model->id)->where('collection_name',$collection_name)->where('attachmentable_type',get_class($model))->first();
-    
-    if (!$attachment || $attachment->path==null) {
+    $attachment = DB::table('media')->where('attachmentable_id', $model->id)->where('collection_name', $collection_name)->where('attachmentable_type', get_class($model))->first();
+
+    if (! $attachment || $attachment->path == null) {
         return null;
     }
-    if($with_url){
+    if ($with_url) {
         return url($attachment->path);
 
-    }else{
+    } else {
         return $attachment->path;
     }
 }
 
 function deleteMedia($model, $collection_name = null)
-{    
-               
-        return DB::table('media')->where('attachmentable_type',get_class($model))->where('attachmentable_id',$model->id)->where('collection_name',$collection_name)->delete();
-     
-            
+{
+
+    return DB::table('media')->where('attachmentable_type', get_class($model))->where('attachmentable_id', $model->id)->where('collection_name', $collection_name)->delete();
+
 }
 
-function generateOTP() {
+function generateOTP()
+{
     return rand(100000, 999999);
 }
 
@@ -84,10 +84,6 @@ function highlight($text, $search)
     if ($search) {
         return str_ireplace($search, "<mark style='background-color:rgb(143, 118, 9); padding:0px;'>$search</mark>", $text);
     }
+
     return $text;
 }
-
-
-
-
-

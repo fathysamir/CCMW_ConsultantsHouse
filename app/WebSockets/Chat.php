@@ -2,29 +2,21 @@
 
 namespace App\WebSockets;
 
-use Ratchet\MessageComponentInterface;
-use Ratchet\ConnectionInterface;
 use App\Models\User;
-use App\Models\Setting;
-use App\Models\Trip;
-use App\Models\Offer;
-use App\Models\Car;
-use App\Models\Notification;
-use App\Services\FirebaseService;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Hash;
-use React\EventLoop\Factory;
-use React\EventLoop\LoopInterface;
+use Ratchet\ConnectionInterface;
+use Ratchet\MessageComponentInterface;
 
 class Chat implements MessageComponentInterface
 {
     protected $clients;
+
     protected $loop;
+
     private $clientUserIdMap;
 
     public function __construct($loop)
     {
-        $this->clients = new \SplObjectStorage();
+        $this->clients = new \SplObjectStorage;
         $this->loop = $loop;
         $this->clientUserIdMap = [];
     }
@@ -39,10 +31,10 @@ class Chat implements MessageComponentInterface
         $userToken = $queryParams['token'] ?? null;
         $user = User::where('id', $userId)->first();
 
-
-        if (!$user) {
+        if (! $user) {
             echo "Invalid user. Connection refused.\n";
             $conn->close();
+
             return;
         } else {
 
@@ -55,20 +47,21 @@ class Chat implements MessageComponentInterface
             // //dd($userToken,$tokenId,$tokenValue,$token->token);
 
             // dd(Crypt::encryptString($tokenValue),$token->token);
-            if ($token && hash('sha256', $tokenValue) ===  $token->token) {
+            if ($token && hash('sha256', $tokenValue) === $token->token) {
                 // Token matches
                 $this->clients->attach($conn, $userId);
                 $this->clientUserIdMap[$userId] = $conn;
                 $date_time = date('Y-m-d h:i:s a');
-                //$conn->send(json_encode(['type' => 'ping']));
+                // $conn->send(json_encode(['type' => 'ping']));
                 $this->periodicPing($conn);
-                //echo "New connection! ({$conn->resourceId})\n";
+                // echo "New connection! ({$conn->resourceId})\n";
                 echo "[ {$date_time} ],New connection! User ID: {$userId}, Connection ID: ({$conn->resourceId})\n";
 
             } else {
                 // Token does not match
-                echo "Token does not match.";
+                echo 'Token does not match.';
                 $conn->close();
+
                 return;
             }
         }
@@ -92,7 +85,7 @@ class Chat implements MessageComponentInterface
             }
         });
     }
-   
+
     public function onMessage(ConnectionInterface $from, $msg)
     {
         $numRecv = count($this->clients) - 1;
@@ -103,16 +96,14 @@ class Chat implements MessageComponentInterface
         $data = json_decode($msg, true);
 
         if (array_key_exists('pong', $data)) {
-            echo sprintf("sss");
+            echo sprintf('sss');
         } else {
             $AuthUserID = $this->clients[$from];
             $requestData = json_encode($data['data'], JSON_UNESCAPED_UNICODE);
 
-            
             $from->send(json_encode(['type' => 'pong']));
             $date_time = date('Y-m-d h:i:s a');
-            echo sprintf('[ %s ], New pong has been sent' . "\n", $date_time);
-                   
+            echo sprintf('[ %s ], New pong has been sent'."\n", $date_time);
 
         }
     }

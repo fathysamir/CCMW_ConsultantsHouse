@@ -3,17 +3,11 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Redirect;
 use App\Models\Account;
 use App\Models\Category;
-use App\Services\ProjectService;
 use App\Models\Project;
-use Illuminate\Validation\Rule;
+use App\Services\ProjectService;
+use Illuminate\Http\Request;
 
 class ProjectController extends ApiController
 {
@@ -23,6 +17,7 @@ class ProjectController extends ApiController
     {
         $this->projectService = $projectService;
     }
+
     public function index()
     {
         $user = auth()->user();
@@ -36,25 +31,27 @@ class ProjectController extends ApiController
                 ->where('accounts.id', $user->current_account_id)
                 ->wherePivot('role', 'Admin Account')
                 ->exists();
-            if($hasRole){
+            if ($hasRole) {
                 $EPS = Category::where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
-            }else{
-                $projectsId=$user->assign_projects()->pluck('projects.id')->toArray();
-                
-                $categoriesId=Project::whereIn('id',$projectsId)->pluck('category_id')->toArray();
+            } else {
+                $projectsId = $user->assign_projects()->pluck('projects.id')->toArray();
+
+                $categoriesId = Project::whereIn('id', $projectsId)->pluck('category_id')->toArray();
                 $subCategories = Category::whereIn('id', $categoriesId)->get();
 
                 // Get top-level parents
                 $parentCategoryIds = $subCategories->map(function ($cat) {
                     return $cat->getRootCategory()->id;
                 })->unique()->toArray();
-                $EPS = Category::whereIn('id',$parentCategoryIds)->where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+                $EPS = Category::whereIn('id', $parentCategoryIds)->where('account_id', $user->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
             }
-           
+
         }
+
         return view('account_dashboard.projects', compact('EPS', 'account'));
 
     }
+
     public function create_project_view()
     {
         $roles = [
@@ -67,10 +64,11 @@ class ProjectController extends ApiController
             'Authority',
             'Another Contractor',
             'Lower-Tier Subcontractor',
-            'Other'
+            'Other',
         ];
-        $EPS = Category::whereNotIn('name',['Recycle Bin','Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+        $EPS = Category::whereNotIn('name', ['Recycle Bin', 'Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
         $route = 'projects.store_project';
+
         return view('account_dashboard.projects.create', compact('roles', 'EPS', 'route'));
     }
 
@@ -78,7 +76,7 @@ class ProjectController extends ApiController
     {
         $result = $this->projectService->createProject($request);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->back()->withInput()->withErrors($result['errors']);
         }
 
@@ -87,7 +85,7 @@ class ProjectController extends ApiController
 
     public function edit_project_view($id)
     {
-        $project = Project::where('slug',$id)->first();
+        $project = Project::where('slug', $id)->first();
         $project->logo = getFirstMediaUrl($project, $project->logoCollection);
         $roles = [
             'Employer',
@@ -99,9 +97,10 @@ class ProjectController extends ApiController
             'Authority',
             'Another Contractor',
             'Lower-Tier Subcontractor',
-            'Other'
+            'Other',
         ];
-        $EPS = Category::whereNotIn('name',['Recycle Bin','Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+        $EPS = Category::whereNotIn('name', ['Recycle Bin', 'Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+
         return view('account_dashboard.projects.edit', compact('roles', 'project', 'EPS'));
 
     }
@@ -110,53 +109,58 @@ class ProjectController extends ApiController
     {
         $result = $this->projectService->updateProject($request, $project);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->back()->withInput()->withErrors($result['errors']);
         }
-        if(auth()->user()->current_project_id){
+        if (auth()->user()->current_project_id) {
             return redirect('/project')->with('success', 'Project updated successfully.');
-        }else{
+        } else {
             return redirect('/account/projects')->with('success', 'Project updated successfully.');
         }
     }
 
-    public function archiveProject(Request $request){
-        $archiveEPS=Category::where('account_id',auth()->user()->current_account_id)->where('name','Archive')->first();
-        $project=Project::findOrFail($request->project_id);
-        if($project->old_category_id==null){
-            $project->old_category_id=$project->category_id;
+    public function archiveProject(Request $request)
+    {
+        $archiveEPS = Category::where('account_id', auth()->user()->current_account_id)->where('name', 'Archive')->first();
+        $project = Project::findOrFail($request->project_id);
+        if ($project->old_category_id == null) {
+            $project->old_category_id = $project->category_id;
         }
-        $project->category_id=$archiveEPS->id;
-        $project->status='Archived';
+        $project->category_id = $archiveEPS->id;
+        $project->status = 'Archived';
         $project->save();
+
         return $this->sendResponse(null, 'success');
 
     }
 
-    public function deleteProject(Request $request){
-        $EPS=Category::where('account_id',auth()->user()->current_account_id)->where('name','Recycle Bin')->first();
-        $project=Project::findOrFail($request->project_id);
-        if($project->status=='Deleted'){
+    public function deleteProject(Request $request)
+    {
+        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('name', 'Recycle Bin')->first();
+        $project = Project::findOrFail($request->project_id);
+        if ($project->status == 'Deleted') {
             $project->delete();
-        }else{
-            if($project->old_category_id==null){
-                $project->old_category_id=$project->category_id;
+        } else {
+            if ($project->old_category_id == null) {
+                $project->old_category_id = $project->category_id;
             }
-            $project->category_id=$EPS->id;
-            $project->status='Deleted';
+            $project->category_id = $EPS->id;
+            $project->status = 'Deleted';
             $project->save();
         }
+
         return $this->sendResponse(null, 'success');
 
     }
 
-    public function restoreProject(Request $request){
-        $project=Project::findOrFail($request->project_id);
-        $project->category_id=$project->old_category_id;
-        $project->old_category_id=null;
-        $project->status='Active';
+    public function restoreProject(Request $request)
+    {
+        $project = Project::findOrFail($request->project_id);
+        $project->category_id = $project->old_category_id;
+        $project->old_category_id = null;
+        $project->status = 'Active';
         $project->save();
+
         return $this->sendResponse(null, 'success');
     }
-
 }

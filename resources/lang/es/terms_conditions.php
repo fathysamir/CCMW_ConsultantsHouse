@@ -1,4 +1,5 @@
 <?php
+
 return [
     'title' => 'Términos y Condiciones',
     'content' => '

@@ -1,4 +1,5 @@
 <?php
+
 return [
     'title' => 'Условия и положения',
     'content' => '

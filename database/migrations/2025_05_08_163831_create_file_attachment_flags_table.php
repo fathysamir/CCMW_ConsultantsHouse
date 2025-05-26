@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('file_attachment_id');
             $table->foreign('file_attachment_id')->references('id')->on('file_attachments')->onDelete('cascade');
-            $table->enum('flag',['red','blue']);
+            $table->enum('flag', ['red', 'blue']);
             $table->timestamps();
         });
     }

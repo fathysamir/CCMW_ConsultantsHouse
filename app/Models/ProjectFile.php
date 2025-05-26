@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Casts\CustomDateTimeCast;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectFile extends Model
 {
     use HasFactory,SoftDeletes;
+
     protected $table = 'project_files';
 
     protected $fillable = [
@@ -30,16 +30,14 @@ class ProjectFile extends Model
         'disruption_cost',
         'variation',
         'closed',
-        'assess_not_pursue'
+        'assess_not_pursue',
     ];
 
     protected $allowedSorts = [
 
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
-
-
 
     public function project()
     {
@@ -55,6 +53,7 @@ class ProjectFile extends Model
     {
         return $this->belongsTo(StakeHolder::class, 'against_id', 'id')->withTrashed();
     }
+
     public function folder()
     {
         return $this->belongsTo(ProjectFolder::class, 'folder_id', 'id')->withTrashed();
@@ -67,7 +66,6 @@ class ProjectFile extends Model
 
     public function documents()
     {
-        return $this->belongsToMany(Document::class,'file_documents', 'file_id', 'document_id');
+        return $this->belongsToMany(Document::class, 'file_documents', 'file_id', 'document_id');
     }
-
 }

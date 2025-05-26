@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Redirect;
-use App\Models\Document;
-use App\Models\User;
 use App\Models\DocType;
+use App\Models\Document;
+use App\Models\FileDocument;
+use App\Models\Note;
+use App\Models\Project;
+use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
 use App\Models\StorageFile;
-use App\Models\Project;
-use App\Models\Note;
-use App\Models\ProjectFile;
-use App\Models\FileDocument;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Validation\Rule;
 
 class DocumentController extends ApiController
 {
@@ -29,20 +23,21 @@ class DocumentController extends ApiController
 
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-       
+
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
 
-        return view('project_dashboard.upload_documents.upload_single_doc', compact('documents_types', 'users', 'stake_holders', 'threads','folders'));
+        return view('project_dashboard.upload_documents.upload_single_doc', compact('documents_types', 'users', 'stake_holders', 'threads', 'folders'));
     }
 
     public function store_single_doc(Request $request)
     {
         // dd($request->all());
         $request->validate([
-            'start_date' => 'required' // 10MB max
+            'start_date' => 'required', 
+            'doc_id' => 'required'// 10MB max
         ]);
         do {
             $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
@@ -63,7 +58,7 @@ class DocumentController extends ApiController
             'status' => $request->status,
             'notes' => $request->notes,
             'storage_file_id' => intval($request->doc_id),
-            'threads' => $request->threads && count($request->threads) > 0 ? json_encode($request->threads) : null
+            'threads' => $request->threads && count($request->threads) > 0 ? json_encode($request->threads) : null,
 
         ]);
 
@@ -74,9 +69,10 @@ class DocumentController extends ApiController
             $doc->analysis_complete = '1';
         }
         $doc->save();
-        if($request->file_id){
-            FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+        if ($request->file_id) {
+            FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $request->file_id, 'document_id' => $doc->id]);
         }
+
         return redirect('/project/all-documents')->with('success', 'Document Created successfully.');
 
     }
@@ -85,7 +81,7 @@ class DocumentController extends ApiController
     {
 
         $request->validate([
-            'file' => 'required|file|max:512000' // 10MB max
+            'file' => 'required|file|max:512000', // 10MB max
         ]);
 
         $file = $request->file('file');
@@ -99,17 +95,17 @@ class DocumentController extends ApiController
 
             return response()->json([
                 'success' => true,
-                'file' => $storageFile
+                'file' => $storageFile,
             ]);
         }
         $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $cleanedName = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
-        $fileName = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+        $fileName = time().'_'.$cleanedName.'.'.pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
 
         // Create project-specific folder in public path
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/documents';
+        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/documents';
         $path = public_path($projectFolder);
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             mkdir($path, 0777, true);
         }
 
@@ -123,27 +119,28 @@ class DocumentController extends ApiController
             'file_name' => $name,
             'size' => $size,
             'file_type' => $type,
-            'path' => $projectFolder . '/' . $fileName
+            'path' => $projectFolder.'/'.$fileName,
         ]);
-        session(['path' => $projectFolder . '/' . $fileName]);
+        session(['path' => $projectFolder.'/'.$fileName]);
+
         return response()->json([
             'success' => true,
-            'file' => $storageFile
+            'file' => $storageFile,
         ]);
     }
 
     public function all_documents(Request $request)
     {
         session()->forget('path');
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        
+
         session()->forget('current_file_doc');
         session()->forget('current_view');
         $project = Project::findOrFail(auth()->user()->current_project_id);
@@ -152,21 +149,22 @@ class DocumentController extends ApiController
         $all_documents = Document::where('project_id', auth()->user()->current_project_id);
         if ($request->threads) {
             $threadValues = array_filter(array_map('trim', explode(',', $request->threads)));
-        
+
             $all_documents->where(function ($query) use ($threadValues) {
                 foreach ($threadValues as $thread) {
-                    
+
                     $query->orWhere('threads', 'like', '%'.$thread.'%');
                 }
             });
         }
         if ($request->slug) {
-            $all_documents->where('slug',$request->slug);
-        }        
-        $all_documents= $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
-        //dd($all_documents);
+            $all_documents->where('slug', $request->slug);
+        }
+        $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
+        // dd($all_documents);
         $stake_holders = $project->stakeHolders;
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
+
         return view('project_dashboard.documents', compact('all_documents', 'users', 'stake_holders', 'documents_types', 'folders'));
 
     }
@@ -175,9 +173,9 @@ class DocumentController extends ApiController
     {
         session()->forget('path');
 
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
@@ -189,16 +187,17 @@ class DocumentController extends ApiController
         $stake_holders = $project->stakeHolders;
         $document = Document::where('slug', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->where('id', '!=', $document->id)->pluck('reference');
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
         session(['path' => $document->storageFile->path]);
-        return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads','folders'));
+
+        return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads', 'folders'));
     }
 
     public function update_document(Request $request, $id)
     {
         // dd($request->all());
         $request->validate([
-            'start_date' => 'required' // 10MB max
+            'start_date' => 'required', // 10MB max
         ]);
         Document::where('slug', $id)->update([
 
@@ -214,7 +213,7 @@ class DocumentController extends ApiController
             'status' => $request->status,
             'notes' => $request->notes,
             'storage_file_id' => intval($request->doc_id),
-            'threads' => $request->threads && count($request->threads) > 0 ? json_encode($request->threads) : null
+            'threads' => $request->threads && count($request->threads) > 0 ? json_encode($request->threads) : null,
 
         ]);
         $doc = Document::where('slug', $id)->first();
@@ -231,44 +230,46 @@ class DocumentController extends ApiController
         $doc->save();
         if ($request->file_id) {
             $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $doc->id)->first();
-            if (!$fileDoc) {
-                FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+            if (! $fileDoc) {
+                FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $request->file_id, 'document_id' => $doc->id]);
             }
         }
-        
-        if(session()->has('current_view') && session('current_view')=='file'){
-            if($request->action=='save'){ 
-                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
-            }else{
+
+        if (session()->has('current_view') && session('current_view') == 'file') {
+            if ($request->action == 'save') {
+                return redirect('/project/document/edit/'.$doc->slug)->with('success', 'Document Updated successfully.');
+            } else {
                 $current_file = session('current_file2');
-                
+
                 session()->forget('current_file2');
                 session()->forget('current_view');
 
-                return redirect(route('project.file-documents.index', $current_file) )->with('success', 'Document Updated successfully.');
+                return redirect(route('project.file-documents.index', $current_file))->with('success', 'Document Updated successfully.');
             }
-        }elseif(session()->has('current_view') && session('current_view')=='file_doc'){
-            if($request->action=='save'){ 
-                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
-            }else{
-                $current_file_doc = session('current_file_doc'); 
+        } elseif (session()->has('current_view') && session('current_view') == 'file_doc') {
+            if ($request->action == 'save') {
+                return redirect('/project/document/edit/'.$doc->slug)->with('success', 'Document Updated successfully.');
+            } else {
+                $current_file_doc = session('current_file_doc');
                 session()->forget('current_file_doc');
                 session()->forget('current_view');
 
-                return redirect('/project/file-document-first-analyses/'.$current_file_doc )->with('success', 'Document Updated successfully.');
+                return redirect('/project/file-document-first-analyses/'.$current_file_doc)->with('success', 'Document Updated successfully.');
             }
-        }else{
-            if($request->action=='save'){
-                return redirect('/project/document/edit/'. $doc->slug)->with('success', 'Document Updated successfully.');
-            }else{
+        } else {
+            if ($request->action == 'save') {
+                return redirect('/project/document/edit/'.$doc->slug)->with('success', 'Document Updated successfully.');
+            } else {
                 return redirect('/project/all-documents')->with('success', 'Document Updated successfully.');
             }
         }
-        
+
     }
+
     public function getFolderFiles($folderId)
     {
         $files = ProjectFile::where('folder_id', $folderId)->get(['id', 'name']); // Fetch files
+
         return response()->json(['files' => $files]);
     }
 
@@ -279,8 +280,9 @@ class DocumentController extends ApiController
             'file_id' => 'required|exists:project_files,id',
         ]);
         $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $request->document_id)->first();
-        if (!$fileDoc) {
-            FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $request->document_id]);
+        if (! $fileDoc) {
+            FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $request->file_id, 'document_id' => $request->document_id]);
+
             return response()->json(['message' => 'Document assigned successfully']);
 
         } else {
@@ -306,7 +308,7 @@ class DocumentController extends ApiController
                 ->where('document_id', $documentId)
                 ->first();
 
-            if (!$fileDoc) {
+            if (! $fileDoc) {
                 FileDocument::create([
                     'user_id' => $userId,
                     'file_id' => $request->file_id,
@@ -326,6 +328,7 @@ class DocumentController extends ApiController
             'skipped_docs' => $skippedDocs, // List of documents that were already assigned
         ]);
     }
+
     public function changeOwner(Request $request)
     {
         $request->validate([
@@ -352,6 +355,7 @@ class DocumentController extends ApiController
             }
         }
         $doc->delete();
+
         return redirect('/project/all-documents')->with('success', 'Document Deleted successfully.');
 
     }
@@ -365,7 +369,7 @@ class DocumentController extends ApiController
         // Update the owner for all selected documents
         foreach ($request->document_ids as $id) {
             $doc = Document::where('id', $id)->first();
-            FileDocument::where('document_id',$id)->delete();
+            FileDocument::where('document_id', $id)->delete();
             $docs = Document::where('storage_file_id', $doc->storage_file_id)->where('id', '!=', $id)->get();
             if (count($docs) == 0) {
                 $path = public_path($doc->storageFile->path);
@@ -382,22 +386,22 @@ class DocumentController extends ApiController
 
     public function changeOwnerForAll(Request $request)
     {
-                // Update the owner for all selected documents
-       
-        foreach($request->document_ids as $id){
-            $doc=Document::findOrFail($id);
-            
-            if($request->doc_type){
-                $doc->doc_type_id=$request->doc_type;
+        // Update the owner for all selected documents
+
+        foreach ($request->document_ids as $id) {
+            $doc = Document::findOrFail($id);
+
+            if ($request->doc_type) {
+                $doc->doc_type_id = $request->doc_type;
             }
-            if($request->from){
-                $doc->from_id=$request->from;
+            if ($request->from) {
+                $doc->from_id = $request->from;
             }
-            if($request->to){
-                $doc->to_id=$request->to;
+            if ($request->to) {
+                $doc->to_id = $request->to;
             }
-            if($request->owner){
-                $doc->user_id=$request->owner;
+            if ($request->owner) {
+                $doc->user_id = $request->owner;
             }
             $doc->save();
         }
@@ -423,7 +427,6 @@ class DocumentController extends ApiController
                 ->update(['to_id' => $request->newToStakeHolderId]);
         }
 
-
         return response()->json(['success' => true]);
     }
 
@@ -436,7 +439,7 @@ class DocumentController extends ApiController
 
         // Update the owner for all selected documents
         Document::whereIn('id', $request->document_ids)
-                ->update(['doc_type_id' => $request->doc_type_id]);
+            ->update(['doc_type_id' => $request->doc_type_id]);
 
         return response()->json(['success' => true]);
     }
@@ -446,16 +449,16 @@ class DocumentController extends ApiController
         $document = FileDocument::findOrFail($id);
         $filePath = public_path($document->document->storageFile->path);
 
-        if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
-            $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
-            //$date = date('y_m_d', strtotime($document->document->start_date));
+        if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)), 'email')) {
+            $sanitizedFilename = $document->document->fromStakeHolder->narrative."'s e-mail dated ";
+            // $date = date('y_m_d', strtotime($document->document->start_date));
             $date2 = date('d-M-y', strtotime($document->document->start_date));
-            $fileName = $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            $fileName = $sanitizedFilename.$date2.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
         } else {
             $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
             $sanitizedFilename = trim($sanitizedFilename, '-');
-            //$date = date('y_m_d', strtotime($document->document->start_date));
-            $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            // $date = date('y_m_d', strtotime($document->document->start_date));
+            $fileName = $sanitizedFilename.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
         }
 
         if (file_exists($filePath)) {
@@ -466,40 +469,44 @@ class DocumentController extends ApiController
             ]);
         }
 
-
         return redirect()->back()->with('error', 'File not found.');
     }
 
-    public function get_assigned_files($id){
-        $file_doc_type=session('file_doc_type');
-        if($file_doc_type == 'document'){
-            $doc=Document::where('slug',$id)->first();
-            $file_ids = FileDocument::where('document_id',$doc->id)->pluck('file_id')->toArray();
-        }elseif($file_doc_type == 'note'){
-            $doc=Note::where('slug',$id)->first();
-            $file_ids = FileDocument::where('note_id',$doc->id)->pluck('file_id')->toArray();
+    public function get_assigned_files($id)
+    {
+        $file_doc_type = session('file_doc_type');
+        if ($file_doc_type == 'document') {
+            $doc = Document::where('slug', $id)->first();
+            $file_ids = FileDocument::where('document_id', $doc->id)->pluck('file_id')->toArray();
+        } elseif ($file_doc_type == 'note') {
+            $doc = Note::where('slug', $id)->first();
+            $file_ids = FileDocument::where('note_id', $doc->id)->pluck('file_id')->toArray();
         }
         session()->forget('file_doc_type');
-        $files=ProjectFile::whereIn('id',$file_ids)->with('folder')->get();
+        $files = ProjectFile::whereIn('id', $file_ids)->with('folder')->get();
+
         return response()->json(['files' => $files]);
 
-
     }
 
-    public function getDocsByReference(Request $request){
-        
+    public function getDocsByReference(Request $request)
+    {
+
         $reference = $request->reference;
 
-        $documents = Document::where('project_id', auth()->user()->current_project_id)->where('reference', 'like', '%' . $reference . '%')->with('storageFile')->get();
+        $documents = Document::where('project_id', auth()->user()->current_project_id)->where('reference', 'like', '%'.$reference.'%')->with('storageFile')->get();
+
         return response()->json(['documents' => $documents]);
     }
+
     public function assignDocumentbyslug(Request $request)
     {
-       
-        $doc=Document::where('slug',$request->slug)->first();
+
+        $doc = Document::where('slug', $request->slug)->first();
         $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $doc->id)->first();
-        if (!$fileDoc) {
-            FileDocument::create(['user_id' => auth()->user()->id,'file_id' => $request->file_id,'document_id' => $doc->id]);
+        if (! $fileDoc) {
+            FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $request->file_id, 'document_id' => $doc->id]);
+
             return response()->json(['message' => 'Document assigned successfully']);
 
         } else {
@@ -508,20 +515,23 @@ class DocumentController extends ApiController
         }
 
     }
-    
-    public function ocr_layer($id){
-        $doc=Document::where('slug',$id)->first();
-        if($doc){
-            $path=$doc->storageFile->path;
-        }else{
-            $path=null;
+
+    public function ocr_layer($id)
+    {
+        $doc = Document::where('slug', $id)->first();
+        if ($doc) {
+            $path = $doc->storageFile->path;
+        } else {
+            $path = null;
         }
 
-        return view('project_dashboard.upload_documents.ocr_layer',compact('path'));
+        return view('project_dashboard.upload_documents.ocr_layer', compact('path'));
     }
 
-    public function ocr_with_path(){
-        $path= session('path');
+    public function ocr_with_path()
+    {
+        $path = session('path');
+
         return view('project_dashboard.upload_documents.ocr_layer',compact('path'));
     }
 }

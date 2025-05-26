@@ -1,26 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\AuthController;
-use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\AccountController;
 use App\Http\Controllers\Dashboard\AccountDashboardController;
-use App\Http\Controllers\Dashboard\ProjectController;
-use App\Http\Controllers\Dashboard\settings\ContractTagController;
-use App\Http\Controllers\Dashboard\ProjectDashboardController;
-use App\Http\Controllers\Dashboard\settings\ContractSettingController;
-use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
-use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
+use App\Http\Controllers\Dashboard\AuthController;
 use App\Http\Controllers\Dashboard\DocumentController;
+use App\Http\Controllers\Dashboard\ExtractPowerPointController;
+use App\Http\Controllers\Dashboard\FileAttachmentController;
 use App\Http\Controllers\Dashboard\FileController;
 use App\Http\Controllers\Dashboard\FileDocumentController;
 use App\Http\Controllers\Dashboard\ImportDocumentController;
-use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
-use App\Models\ProjectFile;
-use App\Models\FileDocument;
 use App\Http\Controllers\Dashboard\NoteController;
-use App\Http\Controllers\Dashboard\FileAttachmentController;
-use App\Http\Controllers\Dashboard\ExtractPowerPointController;
+use App\Http\Controllers\Dashboard\ProjectController;
+use App\Http\Controllers\Dashboard\ProjectDashboardController;
+use App\Http\Controllers\Dashboard\settings\ContractSettingController;
+use App\Http\Controllers\Dashboard\settings\ContractTagController;
+use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
+use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
+use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
+use App\Http\Controllers\Dashboard\UserController;
+use App\Models\FileDocument;
+use App\Models\ProjectFile;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,10 +43,10 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register_view'])->name('register_view');
 Route::post('/sign-up', [AuthController::class, 'sign_up'])->name('sign-up');
 Route::get('/', function () {
-    
-    if(!auth()->user()){
+
+    if (! auth()->user()) {
         return redirect('/login');
-    }else{
+    } else {
         return redirect('/accounts');
     }
 });
@@ -55,7 +56,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/accounts/store', [AccountController::class, 'store'])->name('accounts.store');
     Route::get('/account/{id}', function ($id) {
         session(['current_edit_account' => $id]);
-        
+
         return redirect()->route('account.edit');
     })->where('id', '[0-9]+');
     Route::get('/accounts/edit', [AccountController::class, 'edit'])->name('account.edit');
@@ -68,7 +69,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/accounts/contract-tags/edit/{id}', [ContractTagController::class, 'edit'])->name('accounts.contract-tags.edit');
     Route::post('/accounts/contract-tags/update/{id}', [ContractTagController::class, 'update'])->name('accounts.contract-tags.update');
     Route::get('/accounts/contract-tags/delete/{id}', [ContractTagController::class, 'delete'])->name('accounts.contract-tags.delete');
-
 
     Route::get('/accounts/document-types', [DocumentTypeController::class, 'index'])->name('accounts.document-types');
     Route::get('/accounts/document-types/create', [DocumentTypeController::class, 'create'])->name('accounts.document-types.create');
@@ -84,7 +84,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/accounts/project-folders/update/{id}', [ProjectFolderController::class, 'update'])->name('accounts.project-folders.update');
     Route::get('/accounts/project-folders/delete/{id}', [ProjectFolderController::class, 'delete'])->name('accounts.project-folders.delete');
 
-
     Route::get('/accounts/contract-settings/{id}', [ContractSettingController::class, 'index'])->name('accounts.contract-settings');
     Route::get('/accounts/contract-settings/{id}/create', [ContractSettingController::class, 'create'])->name('accounts.contract-settings.create');
     Route::post('/accounts/contract-settings/store', [ContractSettingController::class, 'store'])->name('accounts.contract-settings.store');
@@ -93,10 +92,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/accounts/contract-settings/delete/{id}', [ContractSettingController::class, 'delete'])->name('accounts.contract-settings.delete');
 
     Route::get('/switch-account/{id}', function ($id) {
-        //session(['current_account_id' => $id]);
-        $user=auth()->user();
-        $user->current_account_id=$id;
+        // session(['current_account_id' => $id]);
+        $user = auth()->user();
+        $user->current_account_id = $id;
         $user->save();
+
         return redirect()->route('account.home');
     })->where('id', '[0-9]+')->name('switch.account');
     Route::get('/account', [AccountDashboardController::class, 'index'])->where('id', '[0-9]+')->name('account.home');
@@ -140,12 +140,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/deleteProject', [ProjectController::class, 'deleteProject'])->name('deleteProject');
     Route::post('/restoreProject', [ProjectController::class, 'restoreProject'])->name('restoreProject');
 
-
     Route::get('/switch-project/{id}', function ($id) {
-        //session(['current_account_id' => $id]);
-        $user=auth()->user();
-        $user->current_project_id=$id;
+        // session(['current_account_id' => $id]);
+        $user = auth()->user();
+        $user->current_project_id = $id;
         $user->save();
+
         return redirect()->route('project.home');
     })->where('id', '[0-9]+')->name('switch.project');
     Route::get('/project', [ProjectDashboardController::class, 'index'])->where('id', '[0-9]+')->name('project.home');
@@ -184,44 +184,46 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
     Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
 
-    Route::get('go-to-fileDocument/{docId}/{fileId}',function($doc,$file){
-       
-        $document=FileDocument::where('file_id',$file)->where('document_id',$doc)->first();
-        $file=ProjectFile::findOrFail($file);
+    Route::get('go-to-fileDocument/{docId}/{fileId}', function ($doc, $file) {
+
+        $document = FileDocument::where('file_id', $file)->where('document_id', $doc)->first();
+        $file = ProjectFile::findOrFail($file);
         session(['specific_file_doc' => $document->id]);
-        return redirect()->route('project.file-documents.index',$file->slug);
+
+        return redirect()->route('project.file-documents.index', $file->slug);
     })->name('goToDocFile');
     Route::post('/get-files-by-document', [DocumentController::class, 'getFilesByDoc']);
     Route::get('/download-document/{id}', [DocumentController::class, 'downloadDocument'])->name('download.document');
-    Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc,$id) {
+    Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc, $id) {
         session(['current_view' => 'file_doc']);
         session(['current_file_doc' => $doc]);
-        $file_document=FileDocument::findOrFail($doc);
-        if($file_document->note_id==null){
-            return redirect()->route('project.edit-document',$id);
-        }else{
-            return redirect()->route('project.edit-note',$id);
+        $file_document = FileDocument::findOrFail($doc);
+        if ($file_document->note_id == null) {
+            return redirect()->route('project.edit-document', $id);
+        } else {
+            return redirect()->route('project.edit-note', $id);
         }
     });
 
-    Route::get('/project/files_file/{fil}/doc/{doc}/edit/{id}', function ($fil,$doc,$id) {
+    Route::get('/project/files_file/{fil}/doc/{doc}/edit/{id}', function ($fil, $doc, $id) {
         session(['current_view' => 'file']);
         session(['current_file2' => $fil]);
         session(['specific_file_doc' => $doc]);
-        $file_document=FileDocument::findOrFail($doc);
-        if($file_document->note_id==null){
-            return redirect()->route('project.edit-document',$id);
-        }else{
-            return redirect()->route('project.edit-note',$id);
+        $file_document = FileDocument::findOrFail($doc);
+        if ($file_document->note_id == null) {
+            return redirect()->route('project.edit-document', $id);
+        } else {
+            return redirect()->route('project.edit-note', $id);
         }
     });
     Route::get('/project/note/edit/{id}', [NoteController::class, 'edit_note'])->name('project.edit-note');
     Route::post('/project/note/update/{id}', [NoteController::class, 'update_note'])->name('project.update-note');
     Route::get('/switch-folder/{id}', function ($id) {
-        //session(['current_account_id' => $id]);
-        $user=auth()->user();
-        $user->current_folder_id=$id;
+        // session(['current_account_id' => $id]);
+        $user = auth()->user();
+        $user->current_folder_id = $id;
         $user->save();
+
         return redirect()->route('project.files');
     })->where('id', '[0-9]+')->name('switch.folder');
     Route::get('/project/files', [FileController::class, 'index'])->name('project.files');
@@ -250,14 +252,16 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/change-flag', [FileDocumentController::class, 'change_flag'])->name('change-flag');
     Route::post('/get-narrative', [FileDocumentController::class, 'get_narrative'])->name('get_narrative');
     Route::post('/project/create-new-note', [FileDocumentController::class, 'create_note'])->name('create-note');
+    Route::post('/project/create_ai_pdf', [FileDocumentController::class, 'create_ai_pdf'])->name('project.create_ai_pdf');
 
     Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
     Route::post('/set-session', function (\Illuminate\Http\Request $request) {
         session([$request->key => $request->value]);
+
         return response()->json(['status' => 'ok']);
     })->name('set.session');
-    
+
     Route::get('/project/file/{id}/attachments/{type}', [FileAttachmentController::class, 'index'])->name('project.file-attachments.index');
     Route::get('/project/files_file/attachment/{id}', [FileAttachmentController::class, 'attachment'])->name('project.file-attachments.attachment');
     Route::post('/export-word-claim-attachments', [FileAttachmentController::class, 'exportWordClaimAttachments']);
@@ -285,12 +289,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/group-documents/check_test_documents', [UploadGroupDocumentController::class, 'check_test_documents'])->name('group-documents.check_test_documents');
     Route::get('/group-documents/import_group_documents', [UploadGroupDocumentController::class, 'import_group_documents'])->name('group-documents.import_group_documents');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+
     Route::post('/change-sideBarTheme', [AuthController::class, 'change_sideBarTheme'])->name('change_sideBarTheme');
 
-    
-        Route::any('/users', [UserController::class, 'index'])->name('users'); 
-        Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('edit.user');
-        Route::post('/user/update/{id}', [UserController::class, 'update'])->name('update.user');
-        Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('delete.user');
+    Route::any('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/user/edit/{id}', [UserController::class, 'edit'])->name('edit.user');
+    Route::post('/user/update/{id}', [UserController::class, 'update'])->name('update.user');
+    Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('delete.user');
 });

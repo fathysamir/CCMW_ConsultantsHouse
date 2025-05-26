@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('sender_id');
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
-            $table->enum('status',['pending','accepted','expired']);
+            $table->enum('status', ['pending', 'accepted', 'expired']);
             $table->timestamps();
         });
     }

@@ -2,17 +2,18 @@
 
 namespace App\Console\Commands;
 
+use App\WebSockets\Chat;
 use Illuminate\Console\Command;
-use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
+use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
+// use MyApp\Chat;
 use React\EventLoop\Loop;
-//use MyApp\Chat;
-use App\WebSockets\Chat; 
 
 class WebSocketServer extends Command
 {
     protected $signature = 'websockets:init';
+
     protected $description = 'Start the WebSocket server';
 
     public function __construct()
@@ -21,7 +22,8 @@ class WebSocketServer extends Command
     }
 
     public function handle()
-    {   $loop = Loop::get();
+    {
+        $loop = Loop::get();
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(

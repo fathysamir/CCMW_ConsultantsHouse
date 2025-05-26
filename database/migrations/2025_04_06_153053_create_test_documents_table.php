@@ -35,7 +35,7 @@ return new class extends Migration
             $table->enum('analyzed', ['0', '1'])->default('0');
             $table->enum('analysis_complete', ['0', '1'])->default('0');
             $table->json('threads')->nullable();
-            $table->enum('confirmed',['0', '1'])->default('0');
+            $table->enum('confirmed', ['0', '1'])->default('0');
             $table->unsignedBigInteger('file_id')->nullable();
             $table->timestamps();
         });

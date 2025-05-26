@@ -4,15 +4,15 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,SoftDeletes,HasRoles;
+    use HasApiTokens, HasFactory, HasRoles,Notifiable,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     public $avatarCollection = 'avatar-image';
+
     protected $fillable = [
         'name',
         'code',
@@ -29,7 +30,7 @@ class User extends Authenticatable
         'current_project_id',
         'current_folder_id',
         'password',
-        'sideBarTheme'
+        'sideBarTheme',
     ];
 
     /**
@@ -51,7 +52,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    
+
     public function projects()
     {
         return $this->hasMany(Project::class, 'user_id');
@@ -59,8 +60,9 @@ class User extends Authenticatable
 
     public function accounts()
     {
-        return $this->belongsToMany(Account::class,'accounts_users', 'user_id', 'account_id')->withPivot('role','permissions');
+        return $this->belongsToMany(Account::class, 'accounts_users', 'user_id', 'account_id')->withPivot('role', 'permissions');
     }
+
     public function assign_projects()
     {
         return $this->belongsToMany(Project::class, 'projects_users', 'user_id', 'project_id')->withPivot('permissions'); // Optional, if your pivot table has timestamps

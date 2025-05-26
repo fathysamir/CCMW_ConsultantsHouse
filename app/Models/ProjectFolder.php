@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Casts\CustomDateTimeCast;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ProjectFolder extends Model
 {
     use HasFactory,SoftDeletes;
+
     protected $table = 'project_folders';
 
     protected $fillable = [
@@ -20,26 +21,24 @@ class ProjectFolder extends Model
         'label2',
         'label3',
         'potential_impact',
-        'shortcut'
+        'shortcut',
     ];
 
     protected $allowedSorts = [
-       
+
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $hidden = ['deleted_at'];
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id','id')->withTrashed();
+        return $this->belongsTo(Project::class, 'project_id', 'id')->withTrashed();
     }
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id','id')->withTrashed();
+        return $this->belongsTo(Account::class, 'account_id', 'id')->withTrashed();
     }
-    
-
 }

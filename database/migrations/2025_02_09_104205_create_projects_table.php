@@ -33,8 +33,8 @@ return new class extends Migration
             $table->string('measurement_basis')->nullable();
             $table->longText('notes')->nullable(true);
             $table->longText('summary')->nullable(true);
-            $table->enum('status',['Active','Archived','Deleted'])->default('Active');
-           
+            $table->enum('status', ['Active', 'Archived', 'Deleted'])->default('Active');
+
             $table->timestamps();
             $table->softDeletes();
 

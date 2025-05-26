@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class SendReply extends Mailable
@@ -14,7 +11,9 @@ class SendReply extends Mailable
     use Queueable, SerializesModels;
 
     public $name;
+
     public $reply;
+
     public $subject;
 
     /**
@@ -22,16 +21,15 @@ class SendReply extends Mailable
      *
      * @return void
      */
-    public function __construct($name,$reply,$subject)
+    public function __construct($name, $reply, $subject)
     {
         $this->name = $name;
         $this->reply = $reply;
         $this->subject = $subject;
-      
+
     }
 
-
-  /**
+    /**
      * Build the message.
      *
      * @return $this
@@ -39,11 +37,11 @@ class SendReply extends Mailable
     public function build()
     {
         return $this->view('emails.contactus_reply')
-                    ->subject('Lady Driver - ' . $this->subject)
-                    ->with([
-                        'name' => $this->name,
-                        'reply' => $this->reply,
-                       
-                    ]);
+            ->subject('Lady Driver - '.$this->subject)
+            ->with([
+                'name' => $this->name,
+                'reply' => $this->reply,
+
+            ]);
     }
 }

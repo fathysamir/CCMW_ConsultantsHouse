@@ -3,10 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class AdminSeeder extends Seeder
 {
@@ -17,18 +14,9 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-       //create role "Employee" for users
-       
+        // create role "Employee" for users
 
-      
-        $admin_role = Role::where('name','Super Admin')->first();
-        
-       
+        $admin_role = Role::where('name', 'Super Admin')->first();
 
-       
-        
-
-
-        
     }
 }

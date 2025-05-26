@@ -20,6 +20,8 @@
         "phpoffice/phppresentation": "1.1.0",
         "phpoffice/phpword": "^1.3",
         "predis/predis": "*",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.6",
         "spatie/laravel-permission": "^6.9",
         "zendframework/zend-escaper": "^2.5"
     },

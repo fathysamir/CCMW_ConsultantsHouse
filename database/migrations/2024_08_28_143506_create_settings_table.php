@@ -19,7 +19,7 @@ return new class extends Migration
             $table->longtext('value')->nullable();
             $table->string('category')->default('Default');
             $table->timestamps();
-            
+
         });
     }
 

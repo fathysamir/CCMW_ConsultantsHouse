@@ -1,4 +1,5 @@
 <?php
+
 return [
     'title' => 'Şartlar ve Koşullar',
     'content' => '

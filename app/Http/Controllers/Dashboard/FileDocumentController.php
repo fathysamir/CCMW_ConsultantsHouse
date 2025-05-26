@@ -3,47 +3,42 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Redirect;
-use App\Models\StorageFile;
-use App\Models\Document;
-use App\Models\Project;
-use App\Models\ProjectFolder;
-use App\Models\ProjectFile;
-use App\Models\DocType;
 use App\Models\ContractTag;
+use App\Models\DocType;
+use App\Models\Document;
 use App\Models\FileDocument;
 use App\Models\FileDocumentFlags;
-use Illuminate\Validation\Rule;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Shared\Html;
 use App\Models\Note;
+use App\Models\Project;
+use App\Models\ProjectFile;
+use App\Models\ProjectFolder;
+use App\Models\StorageFile;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use SebastianBergmann\Type\FalseType;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redirect;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\Shared\Html;
+use setasign\Fpdi\Fpdi;
 use ZipArchive;
-use DOMDocument;
-///////////////////////////////////////////////////////////////////////////
 
-
+// /////////////////////////////////////////////////////////////////////////
 
 class FileDocumentController extends ApiController
 {
-    public function index($id){
+    public function index($id)
+    {
         session()->forget('path');
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        $file=ProjectFile::where('slug',$id)->first();
+        $file = ProjectFile::where('slug', $id)->first();
         $documents = FileDocument::with(['document', 'note'])
             ->where('file_id', $file->id)
             ->get()
@@ -53,55 +48,57 @@ class FileDocumentController extends ApiController
                 fn ($a, $b) => $a->sn <=> $b->sn,
             ])
             ->values();
-        $specific_file_doc= session('specific_file_doc');
+        $specific_file_doc = session('specific_file_doc');
         session()->forget('specific_file_doc');
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive','Recycle Bin'])->pluck('name', 'id');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-       
+
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
         $stake_holders = $project->stakeHolders;
 
-        $array_red_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','red')->pluck('file_document_id')->toArray();
-        $array_blue_flags=FileDocumentFlags::where('user_id',auth()->user()->id)->where('flag','blue')->pluck('file_document_id')->toArray();
-        return view('project_dashboard.file_documents.index',compact('array_red_flags','array_blue_flags','documents','users','documents_types','stake_holders','folders','file','specific_file_doc'));
-    }
-    public function get_narrative(Request $request){
-      
-        $doc=FileDocument::findOrFail($request->document_id);
-        if($doc->note_id==null){
-            $date=date("d F Y", strtotime($doc->document->start_date));
-            $text='On '. $date . ',';
-        }else{
-            $text='Note:';
-        }
-        $html=$doc->narrative;
+        $array_red_flags = FileDocumentFlags::where('user_id', auth()->user()->id)->where('flag', 'red')->pluck('file_document_id')->toArray();
+        $array_blue_flags = FileDocumentFlags::where('user_id', auth()->user()->id)->where('flag', 'blue')->pluck('file_document_id')->toArray();
 
-        $doc = new \DOMDocument();
+        return view('project_dashboard.file_documents.index', compact('array_red_flags', 'array_blue_flags', 'documents', 'users', 'documents_types', 'stake_holders', 'folders', 'file', 'specific_file_doc'));
+    }
+
+    public function get_narrative(Request $request)
+    {
+
+        $doc = FileDocument::findOrFail($request->document_id);
+        if ($doc->note_id == null) {
+            $date = date('d F Y', strtotime($doc->document->start_date));
+            $text = 'On '.$date.',';
+        } else {
+            $text = 'Note:';
+        }
+        $html = $doc->narrative;
+
+        $doc = new \DOMDocument;
         @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $xpath = new \DOMXPath($doc);
         $body = $doc->getElementsByTagName('body')->item(0); // ✅ define body here
 
         $firstP = $xpath->query('//body/p')->item(0);
-        if ($firstP && trim($firstP->textContent) !== '')
-        {
+        if ($firstP && trim($firstP->textContent) !== '') {
             foreach ($firstP->childNodes as $child) {
                 if ($child->nodeType === XML_TEXT_NODE) {
                     $textContent = $child->nodeValue;
-        
+
                     if (isset($textContent[0]) && $textContent[0] === 'T') {
-                        $child->nodeValue = 't' . substr($textContent, 1);
+                        $child->nodeValue = 't'.substr($textContent, 1);
                     }
-        
+
                     break; // Only check and update the first text node
                 }
             }
             $fragment = $doc->createDocumentFragment();
-            $fragment->appendXML('<strong>' . $text . '</strong> ');
+            $fragment->appendXML('<strong>'.$text.'</strong> ');
             $firstP->insertBefore($fragment, $firstP->firstChild);
         } else {
-        
+
             $p = $doc->createElement('p');
             $strong = $doc->createElement('strong', $text);
             $p->appendChild($strong);
@@ -114,26 +111,25 @@ class FileDocumentController extends ApiController
             $newHtml .= $doc->saveHTML($node);
         }
 
-
-      
         return response()->json([
             'html' => $newHtml,
         ]);
     }
 
-    public function exportWordClaimDocs(Request $request){
-        
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function exportWordClaimDocs(Request $request)
+    {
+
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        $phpWord = new PhpWord();
+        $phpWord = new PhpWord;
         $section = $phpWord->addSection();
-        
+
         $chapter = $request->Chapter; // Dynamic chapter number
         $sectionNumber = $request->Section; // Dynamic section number
         $phpWord->addNumberingStyle(
@@ -142,15 +138,15 @@ class FileDocumentController extends ApiController
                 'type' => 'multilevel',
                 'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
                 'levels' => [
-                    ['Heading0', 'format' => 'decimal', 'text' => "%1.", 'start' => (int)$chapter],
-                    ['Heading1', 'format' => 'decimal', 'text' => "%1.%2", 'start' => (int)$sectionNumber],
-                    ['Heading2', 'format' => 'decimal', 'text' => "%1.%2.%3", 'start' => 1,],
-                    ['Heading3', 'format' => 'decimal', 'text' => "%1.%2.%3.%4", 'start' => 1,],
-                    ['Heading3', 'format' => 'decimal', 'text' => '']
+                    ['Heading0', 'format' => 'decimal', 'text' => '%1.', 'start' => (int) $chapter],
+                    ['Heading1', 'format' => 'decimal', 'text' => '%1.%2', 'start' => (int) $sectionNumber],
+                    ['Heading2', 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1],
+                    ['Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.%4', 'start' => 1],
+                    ['Heading3', 'format' => 'decimal', 'text' => ''],
                 ],
             ]
         );
-        
+
         $phpWord->addNumberingStyle(
             'multilevel2',
             [
@@ -160,8 +156,7 @@ class FileDocumentController extends ApiController
                     ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
                     ['Heading6', 'format' => 'decimal', 'text' => '%1.%2.'],
                     ['Heading7', 'format' => 'decimal', 'text' => '%1.%2.%3.'],
-                      
-                   
+
                     // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
                     // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
                 ],
@@ -172,37 +167,37 @@ class FileDocumentController extends ApiController
             [
                 'type' => 'multilevel', // Use 'multilevel' for bullet points
                 'levels' => [
-                    ['format' => 'bullet', 'text' => '•', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '◦', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '▪', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '■', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '☑', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '➤', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '➥', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '➟', 'alignment' => 'left'],  
-                    ['format' => 'bullet', 'text' => '➡', 'alignment' => 'left'],  
-                    
+                    ['format' => 'bullet', 'text' => '•', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '◦', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '▪', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '■', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '☑', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '➤', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '➥', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '➟', 'alignment' => 'left'],
+                    ['format' => 'bullet', 'text' => '➡', 'alignment' => 'left'],
+
                 ],
             ]
         );
         // Define styles for headings
         $GetStandardStylesH1 = [
-            'name'=>'Arial',
+            'name' => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 24,
             'bold' => true,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-        $GetParagraphStyleH1=[
-            'spaceBefore'=> 0,
+        $GetParagraphStyleH1 = [
+            'spaceBefore' => 0,
             'spaceAfter' => 240,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>803.6,
-                'hanging'=>803.6,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 803.6,
+                'hanging' => 803.6,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => true,
             'next' => true,
@@ -210,22 +205,22 @@ class FileDocumentController extends ApiController
             'widowControl' => true,
         ];
         $GetStandardStylesH2 = [
-            'name'=>'Arial',
+            'name' => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 16,
             'bold' => true,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-        $GetParagraphStyleH2=[
-            'spaceBefore'=> 0,
+        $GetParagraphStyleH2 = [
+            'spaceBefore' => 0,
             'spaceAfter' => 240,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>1071.6,
-                'hanging'=>1071.6,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 1071.6,
+                'hanging' => 1071.6,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => true,
             'next' => true,
@@ -234,22 +229,22 @@ class FileDocumentController extends ApiController
         ];
 
         $GetStandardStylesH3 = [
-            'name'=>'Arial',
+            'name' => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 14,
             'bold' => false,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-        $GetParagraphStyleH3=[
-            'spaceBefore'=> 0,
+        $GetParagraphStyleH3 = [
+            'spaceBefore' => 0,
             'spaceAfter' => 240,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>1071.6,
-                'hanging'=>1071.6,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 1071.6,
+                'hanging' => 1071.6,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => true,
             'next' => true,
@@ -258,22 +253,22 @@ class FileDocumentController extends ApiController
         ];
 
         $GetStandardStylesSubtitle = [
-            'name'=>'Arial',
+            'name' => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 14,
             'bold' => true,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-        $GetParagraphStyleSubtitle=[
-            'spaceBefore'=> 0,
+        $GetParagraphStyleSubtitle = [
+            'spaceBefore' => 0,
             'spaceAfter' => 240,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>1071.6,
-                'hanging'=>0,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 1071.6,
+                'hanging' => 0,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => true,
             'next' => true,
@@ -281,244 +276,238 @@ class FileDocumentController extends ApiController
             'widowControl' => true,
         ];
         $GetStandardStylesP = [
-            'name'=>'Arial',
+            'name' => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 11,
             'bold' => false,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-       
+
         $phpWord->addParagraphStyle('listParagraphStyle', [
-            'spaceBefore'=> 0,
+            'spaceBefore' => 0,
             'spaceAfter' => 240,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>1071.6,
-                'hanging'=>1071.6,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 1071.6,
+                'hanging' => 1071.6,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => false,
             'next' => true,
             'keepNext' => true,
             'widowControl' => true,
-            'keepLines' => true,          
-            'hyphenation' => false ,
-            'pageBreakBefore'=>false
+            'keepLines' => true,
+            'hyphenation' => false,
+            'pageBreakBefore' => false,
         ]);
 
         $phpWord->addParagraphStyle('listParagraphStyle2', [
-            'spaceBefore'=> 0,
+            'spaceBefore' => 0,
             'spaceAfter' => 10,
             'lineHeight' => '1.5',
-            'indentation' =>[
-                'left'=>1428.8,
-                'hanging'=>357.2,
-                'firstLine'=>0
+            'indentation' => [
+                'left' => 1428.8,
+                'hanging' => 357.2,
+                'firstLine' => 0,
             ],
             'contextualSpacing' => false,
             'next' => true,
             'keepNext' => true,
             'widowControl' => true,
-            'keepLines' => true,          
-            'hyphenation' => false ,
-            'pageBreakBefore'=>false
+            'keepLines' => true,
+            'hyphenation' => false,
+            'pageBreakBefore' => false,
         ]);
-          
-        $phpWord->addTitleStyle(1, $GetStandardStylesH1,$GetParagraphStyleH1);
-        $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 1]));
-        $phpWord->addTitleStyle(3, $GetStandardStylesH3,$GetParagraphStyleH3);
 
-        $file=ProjectFile::where('slug',$request->file_id111)->first();
+        $phpWord->addTitleStyle(1, $GetStandardStylesH1, $GetParagraphStyleH1);
+        $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 1]));
+        $phpWord->addTitleStyle(3, $GetStandardStylesH3, $GetParagraphStyleH3);
+
+        $file = ProjectFile::where('slug', $request->file_id111)->first();
         // Header (Level 1 Outline)
         $header = $file->name;
         $header = str_replace('&', '&amp;', $header);
-        $section->addTitle($header,2);
+        $section->addTitle($header, 2);
 
-        //$section->addListItem($header, 0, ['size' => 16,'bold' => true,], 'multilevel');
-        //dd($section);
-        
+        // $section->addListItem($header, 0, ['size' => 16,'bold' => true,], 'multilevel');
+        // dd($section);
+
         $subtitle = $request->subtitle;
         $subtitle = str_replace('&', '&amp;', $subtitle);
         $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
 
         // Paragraphs
-        //$paragraphs=FileDocument::where('file_id',$file->id)->where('forClaim','1')->orderBy()->get();
+        // $paragraphs=FileDocument::where('file_id',$file->id)->where('forClaim','1')->orderBy()->get();
         $paragraphs = FileDocument::with(['document', 'note'])
             ->where('file_id', $file->id);
-        if($request->forclaimdocs){
-            $paragraphs->where('forClaim','1');
+        if ($request->forclaimdocs) {
+            $paragraphs->where('forClaim', '1');
         }
-            
-        $paragraphs=$paragraphs->get()
-                        ->sortBy([
-                            fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
-                                        <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
-                            fn ($a, $b) => $a->sn <=> $b->sn,
-                        ])
-                        ->values();
-           
-           
-           
-            
-       
-        
+
+        $paragraphs = $paragraphs->get()
+            ->sortBy([
+                fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                            <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                fn ($a, $b) => $a->sn <=> $b->sn,
+            ])
+            ->values();
+
         $GetStandardStylesFootNotes = [
-            'name'=>'Calibri',
+            'name' => 'Calibri',
             'alignment' => 'left', // Options: left, center, right, justify
             'size' => 9,
             'bold' => false,
             'italic' => false,
-            'underline'=>false
-            
+            'underline' => false,
+
         ];
-        $GetParagraphStyleFootNotes=[
-            'spaceBefore'=> 0,
+        $GetParagraphStyleFootNotes = [
+            'spaceBefore' => 0,
             'spaceAfter' => 0,
             'lineSpacing' => 240,
-            'indentation' =>[
-                'left'=>0,
-                'hanging'=>0,
-                'firstLine'=>0
-            ]
+            'indentation' => [
+                'left' => 0,
+                'hanging' => 0,
+                'firstLine' => 0,
+            ],
         ];
-        $x=intval($request->Start);
+        $x = intval($request->Start);
         foreach ($paragraphs as $index => $paragraph) {
-            //dd($paragraphs);
-            $listItemRun = $section->addListItemRun(2, 'multilevel','listParagraphStyle');
-            $existedList=false;
+            // dd($paragraphs);
+            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+            $existedList = false;
             // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
             $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
-            if($paragraph->document){
-                $date=date("d F Y", strtotime($paragraph->document->start_date)); 
+            if ($paragraph->document) {
+                $date = date('d F Y', strtotime($paragraph->document->start_date));
 
                 // Add the main sentence
-                $listItemRun->addText("On ",$GetStandardStylesP);
-                
+                $listItemRun->addText('On ', $GetStandardStylesP);
+
                 // Add the date with a footnote
-                $listItemRun->addText($date,$GetStandardStylesP);
+                $listItemRun->addText($date, $GetStandardStylesP);
                 $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-                $Exhibit=true;
-                $dated=true;
-                $senderAndDocType=true;
-                $hint='';
-                if($request->formate_type2=='reference'){
-                    $hint=$paragraph->document->reference . ".";
-                }elseif($request->formate_type2=='dateAndReference'){
-                   
+                $Exhibit = true;
+                $dated = true;
+                $senderAndDocType = true;
+                $hint = '';
+                if ($request->formate_type2 == 'reference') {
+                    $hint = $paragraph->document->reference.'.';
+                } elseif ($request->formate_type2 == 'dateAndReference') {
+
                     $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
-                    $hint = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
-                }elseif($request->formate_type2=='formate'){
-                    $sn=$request->sn2;
-                    $prefix=$request->prefix2;
-                    $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
-                    $hint=$listNumber . ": ";
-                    $from=$paragraph->document->fromStakeHolder? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                    $type=$paragraph->document->docType->name;
-                    $hint .=$from . $type . " ";
-                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)),'email')){
-                        $ref_part=$request->ref_part2;
-                        if($ref_part == 'option1'){
+                    $hint = preg_replace('/_/', '', $date2).' - '.$paragraph->document->reference.'.';
+                } elseif ($request->formate_type2 == 'formate') {
+                    $sn = $request->sn2;
+                    $prefix = $request->prefix2;
+                    $listNumber = "$prefix".str_pad($x, $sn, '0', STR_PAD_LEFT);
+                    $hint = $listNumber.': ';
+                    $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative."'s " : '';
+                    $type = $paragraph->document->docType->name;
+                    $hint .= $from.$type.' ';
+                    if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
+                        $ref_part = $request->ref_part2;
+                        if ($ref_part == 'option1') {
                             $hint .= ', ';
-                        }elseif($ref_part == 'option2'){
-                           
-                            $hint .= 'From: ' . $paragraph->document->reference . ', ';
-                        }elseif($ref_part == 'option3'){
-                            $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                        } elseif ($ref_part == 'option2') {
+
+                            $hint .= 'From: '.$paragraph->document->reference.', ';
+                        } elseif ($ref_part == 'option3') {
+                            $hint .= 'Ref: '.$paragraph->document->reference.', ';
                         }
-                    }else{
-                        $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                    } else {
+                        $hint .= 'Ref: '.$paragraph->document->reference.', ';
                     }
-                    $hint .= 'dated: ' . $date . '.';
-    
+                    $hint .= 'dated: '.$date.'.';
+
                 }
-                $footnote->addText($hint,$GetStandardStylesFootNotes);
-                $listItemRun->addText(", ",$GetStandardStylesP);
+                $footnote->addText($hint, $GetStandardStylesFootNotes);
+                $listItemRun->addText(', ', $GetStandardStylesP);
                 $x++;
-            }else{
-                $listItemRun->addText("Note: ",$GetStandardStylesP);
+            } else {
+                $listItemRun->addText('Note: ', $GetStandardStylesP);
             }
-            
-            if($paragraph->narrative==null){
-                $listItemRun->addText("____________.");
-            }else{
-                if (!$containsHtml) {
-                    $listItemRun->addText($paragraph->narrative . ".");
-                }else{
-                   
-                    $paragraph_=$this->fixParagraphsWithImages($paragraph->narrative);
-                    
+
+            if ($paragraph->narrative == null) {
+                $listItemRun->addText('____________.');
+            } else {
+                if (! $containsHtml) {
+                    $listItemRun->addText($paragraph->narrative.'.');
+                } else {
+
+                    $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
+
                     // preg_match('/<ol>.*?<\/ol>/s', $paragraph_, $olMatches);
                     // $olContent = $olMatches[0] ?? ''; // Get the <ol> content if it exists
                     // preg_match('/<ul>.*?<\/ul>/s', $paragraph_, $ulMatches);
                     // $ulContent = $ulMatches[0] ?? ''; // Get the <ol> content if it exists
-    
+
                     // Step 2: Remove the <ol> content from the main paragraph
                     // $paragraphWithoutOl = preg_replace('/<ol>.*?<\/ol>/s', '', $paragraph);
                     // $paragraphWithoutOlUl = preg_replace('/<ul>.*?<\/ul>/s', '', $paragraphWithoutOl);
                     $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
-                   
+
                     // Step 2: Remove empty <p></p> tags
                     $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
-                  
+
                     $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
-                   
+
                     // Step 3: Split into an array of <p> tags
-                    //$paragraphsArray = preg_split('/(?=<p>)|(?<=<\/p>)/', $paragraphWithoutEmptyParagraphs);
-    
+                    // $paragraphsArray = preg_split('/(?=<p>)|(?<=<\/p>)/', $paragraphWithoutEmptyParagraphs);
+
                     // Step 4: Filter out empty elements
-                    $paragraphsArray = array_filter($paragraphsArray, function($item) {
-                        return !empty(trim($item));
+                    $paragraphsArray = array_filter($paragraphsArray, function ($item) {
+                        return ! empty(trim($item));
                     });
-                   
+
                     // Step 5: Add each <p> tag to the document with a newline after it
                     foreach ($paragraphsArray as $index2 => $pTag) {
-                        //dd($paragraphsArray);
+                        // dd($paragraphsArray);
                         if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
-                            
+
                             $imgPath = $matches[1]; // Extract image path
                             $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
                             $fullImagePath = public_path($imgPath); // Convert relative path to absolute
-                        
+
                             if ($existedList) {
                                 if (file_exists($fullImagePath)) {
                                     $textRun = $section->addTextRun([
                                         'spaceBefore' => 0,
                                         'spaceAfter' => 240,
                                         'lineHeight' => 0.9,
-                                        'lineSpacing'=>'single',
+                                        'lineSpacing' => 'single',
                                         'indentation' => [
-                                            'left' => 1071.6 
+                                            'left' => 1071.6,
                                         ],
                                     ]);
-                        
+
                                     // Add Image
-                                    $shape =$textRun->addImage($fullImagePath, [
+                                    $shape = $textRun->addImage($fullImagePath, [
                                         'width' => 100,
                                         'height' => 80,
-                                        'alignment' => 'left'
+                                        'alignment' => 'left',
                                     ]);
-                                   
+
                                     // Add Caption (Alt text)
-                                    if (!empty($altText)) {
+                                    if (! empty($altText)) {
                                         $textRun->addTextBreak(); // New line
-                                        $textRun->addText($altText . ".", [ 'name'=>'Calibri',
-                                        'alignment' => 'left', // Options: left, center, right, justify
-                                        'size' => 9,
-                                        'bold' => false,
-                                        'italic' => true,
-                                        'underline'=>false]); // Add caption in italics
+                                        $textRun->addText($altText.'.', ['name' => 'Calibri',
+                                            'alignment' => 'left', // Options: left, center, right, justify
+                                            'size' => 9,
+                                            'bold' => false,
+                                            'italic' => true,
+                                            'underline' => false]); // Add caption in italics
                                     }
-                                    
+
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $textRun->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
                                 }
                             } else {
@@ -527,37 +516,36 @@ class FileDocumentController extends ApiController
                                     $listItemRun->addImage($fullImagePath, [
                                         'width' => 100,
                                         'height' => 80,
-                                        'alignment' => 'left'
+                                        'alignment' => 'left',
                                     ]);
-                        
+
                                     // Add Caption (Alt text)
-                                    if (!empty($altText)) {
+                                    if (! empty($altText)) {
                                         $listItemRun->addTextBreak(); // New line
-                                        $listItemRun->addText($altText . ".", ['name'=>'Calibri',
-                                        'alignment' => 'left', // Options: left, center, right, justify
-                                        'size' => 9,
-                                        'bold' => false,
-                                        'italic' => true,
-                                        'underline'=>false]); // Add caption in italics
+                                        $listItemRun->addText($altText.'.', ['name' => 'Calibri',
+                                            'alignment' => 'left', // Options: left, center, right, justify
+                                            'size' => 9,
+                                            'bold' => false,
+                                            'italic' => true,
+                                            'underline' => false]); // Add caption in italics
                                     }
-                                    
+
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $listItemRun->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
                                 }
                             }
-                        }elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
-                            
+                        } elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
+
                             $imgPath = $matches[1]; // Extract image path
-                            
+
                             $fullImagePath = public_path($imgPath); // Convert relative path to absolute
-                        
+
                             if ($existedList) {
                                 if (file_exists($fullImagePath)) {
                                     $textRun = $section->addTextRun([
@@ -565,26 +553,24 @@ class FileDocumentController extends ApiController
                                         'spaceAfter' => 240,
                                         'lineHeight' => 1.5,
                                         'indentation' => [
-                                            'left' => 1071.6 
+                                            'left' => 1071.6,
                                         ],
                                     ]);
-                        
+
                                     // Add Image
                                     $textRun->addImage($fullImagePath, [
                                         'width' => 100,
                                         'height' => 80,
-                                        'alignment' => 'left'
+                                        'alignment' => 'left',
                                     ]);
-                        
-                                   
+
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $textRun->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
                                 }
                             } else {
@@ -593,31 +579,28 @@ class FileDocumentController extends ApiController
                                     $listItemRun->addImage($fullImagePath, [
                                         'width' => 100,
                                         'height' => 80,
-                                        'alignment' => 'left'
+                                        'alignment' => 'left',
                                     ]);
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $listItemRun->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
-                                
+
                                 }
                             }
-                        }elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
+                        } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                             $phpWord->addNumberingStyle(
                                 'multilevel_1'.$index.$index2,
                                 [
                                     'type' => 'multilevel',
                                     'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
                                     'levels' => [
-                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.']
-                                        
-                                          
-                                       
+                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
+
                                         // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
                                         // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
                                     ],
@@ -625,137 +608,133 @@ class FileDocumentController extends ApiController
                             );
                             if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
                                 $listItems = $liMatches[1] ?? [];
-                                
+
                                 // Add each list item as a nested list item
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
-                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2,'listParagraphStyle2'); // Use a numbering style
+                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2, 'listParagraphStyle2'); // Use a numbering style
                                     // $nestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
                                     Html::addHtml($nestedListItemRun, $item, false, false);
                                 }
                             }
-                            $existedList=true;
-                        }elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
+                            $existedList = true;
+                        } elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
                             if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
                                 $listItems = $liMatches[1] ?? [];
-                              
+
                                 // Add each list item as a nested list item
                                 foreach ($listItems as $item) {
                                     // Add a nested list item
-                                    //dd($listItems);
-                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered','listParagraphStyle2'); // Use a numbering style
+                                    // dd($listItems);
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                     // $unNestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
                                     Html::addHtml($unNestedListItemRun, $item, false, false);
                                 }
                             }
-                           
-                            $existedList=true;
-                        }else {
-                           
+
+                            $existedList = true;
+                        } else {
+
                             // If the paragraph contains only text (including <span>, <strong>, etc.)
                             try {
-                                if($existedList){
-                                   
+                                if ($existedList) {
+
                                     $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                        'spaceBefore'=> 0,
+                                        'spaceBefore' => 0,
                                         'spaceAfter' => 240,
                                         'lineHeight' => '1.5',
-                                        'indentation' =>[
-                                            'left'=>1071.6,
-                                           
-                                            
+                                        'indentation' => [
+                                            'left' => 1071.6,
+
                                         ],
                                         'contextualSpacing' => false,
                                         'next' => true,
                                         'keepNext' => true,
                                         'widowControl' => true,
-                                        'keepLines' => true,          
-                                        'hyphenation' => false ,
-                                        'pageBreakBefore'=>false
+                                        'keepLines' => true,
+                                        'hyphenation' => false,
+                                        'pageBreakBefore' => false,
                                     ]);
-                                    $pTag=$this->lowercaseFirstCharOnly($pTag);
+                                    $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun2, $pTag, false, false);
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $listItemRun2->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
-                                }else{
-                                    //$pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
-                                    $pTag=$this->lowercaseFirstCharOnly($pTag);
+                                } else {
+                                    // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+                                    $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun, $pTag, false, false);
-                                    
+
                                     if ($index2 < count($paragraphsArray) - 1) {
-                            
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                                           
+
+                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
                                             $listItemRun->addTextBreak();
                                         }
-                                        
-                                            
+
                                     }
                                 }
-                                
+
                             } catch (\Exception $e) {
-                                error_log("Error adding HTML: " . $e->getMessage());
+                                error_log('Error adding HTML: '.$e->getMessage());
                             }
                         }
-                    
+
                         // Add a paragraph break after each element to separate them
                         // if ($index2 < count($paragraphsArray) - 1) {
-                            
+
                         //     if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2+1], '<ol>') === false && stripos($paragraphsArray[$index2+1], '<ul>') === false) {
-                               
+
                         //         $listItemRun->addTextBreak();
                         //     }
-                            
-                                
+
                         // }
-                        
+
                     }
-                    
-                   
+
                 }
             }
-            
-            
+
         }
-        
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+
+        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/temp';
         $path = public_path($projectFolder);
-        if (!file_exists($path)) {
-           
+        if (! file_exists($path)) {
+
             mkdir($path, 0755, true);
         }
         $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+        $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
-        if (!file_exists($directory)) {
+        if (! file_exists($directory)) {
             mkdir($directory, 0755, true); // true = create nested directories
         }
         // Save document
         // Define file path in public folder
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
+        $fileName = 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/'.$file->code.'_'.$header.'.docx';
         $filePath = public_path($fileName);
-       
+
         // Save document to public folder
         $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($filePath);
         session(['zip_file' => $code]);
+
         return response()->json(['download_url' => asset($fileName)]);
         // Return file as a response and delete after download
-        //return response()->download($filePath)->deleteFileAfterSend(true);
+        // return response()->download($filePath)->deleteFileAfterSend(true);
     }
 
-    public function lowercaseFirstCharOnly($html) {
+    public function lowercaseFirstCharOnly($html)
+    {
         return preg_replace_callback(
             '/(?:^|>)(T)/u',  // Match only "T" after start or closing tag
             function ($matches) {
@@ -765,26 +744,28 @@ class FileDocumentController extends ApiController
             1 // Only first match
         );
     }
+
     public function splitHtmlToArray($html)
     {
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument;
         libxml_use_internal_errors(true); // Prevent warnings from invalid HTML
         $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         libxml_clear_errors();
-    
+
         $resultArray = [];
         $xpath = new \DOMXPath($dom);
         $elements = $xpath->query('//p | //ul | //ol'); // Select only <p>, <ul>, and <ol> elements
-    
+
         foreach ($elements as $element) {
             $resultArray[] = $dom->saveHTML($element); // Store each element as a separate string
         }
-    
+
         return $resultArray;
     }
+
     public function fixParagraphsWithImages($html)
     {
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument;
         libxml_use_internal_errors(true);
         $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         libxml_clear_errors();
@@ -794,7 +775,7 @@ class FileDocumentController extends ApiController
 
         foreach ($pElements as $p) {
             $newNodes = [];
-            $currentFragment = new \DOMDocument();
+            $currentFragment = new \DOMDocument;
             $newP = $dom->createElement('p'); // Use the original document to avoid Wrong Document Error
 
             foreach (iterator_to_array($p->childNodes) as $child) {
@@ -834,24 +815,29 @@ class FileDocumentController extends ApiController
 
         // Clean up the output and return formatted HTML
         $cleanHtml = $dom->saveHTML();
+
         return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], '', $cleanHtml));
     }
-   
 
-    public function file_document_first_analyses($id){
-        $user=auth()->user();
+    public function file_document_first_analyses($id)
+    {
+        session()->forget('path');
+        $user = auth()->user();
         session(['specific_file_doc' => $id]);
-        $doc=FileDocument::findOrFail($id);
-        $tags=ContractTag::where('account_id',$user->current_account_id)->where('project_id',$user->current_project_id)->orderBy('order','asc')->get();
-         session(['path' => $doc->document->storageFile->path]);
-        return view('project_dashboard.file_documents.doc_first_analyses',compact('doc','tags'));
+        $doc = FileDocument::findOrFail($id);
+        $tags = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->orderBy('order', 'asc')->get();
+        if ($doc->document) {
+            session(['path' => $doc->document->storageFile->path]);
+        }
+
+        return view('project_dashboard.file_documents.doc_first_analyses', compact('doc', 'tags'));
     }
 
     public function upload_editor_image(Request $request)
     {
 
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:51200' // 10MB max
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:51200', // 10MB max
         ]);
 
         $file = $request->file('image');
@@ -863,15 +849,15 @@ class FileDocumentController extends ApiController
         if ($storageFile) {
             return response()->json([
                 'success' => true,
-                'file' => $storageFile
+                'file' => $storageFile,
             ]);
         }
-        $fileName = auth()->user()->id . '_' . time() . '_' . $file->getClientOriginalName();
+        $fileName = auth()->user()->id.'_'.time().'_'.$file->getClientOriginalName();
 
         // Create project-specific folder in public path
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/images';
+        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/images';
         $path = public_path($projectFolder);
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             mkdir($path, 0777, true);
         }
 
@@ -885,319 +871,330 @@ class FileDocumentController extends ApiController
             'file_name' => $name,
             'size' => $size,
             'file_type' => $type,
-            'path' => $projectFolder . '/' . $fileName
+            'path' => $projectFolder.'/'.$fileName,
         ]);
 
         return response()->json([
             'success' => true,
-            'file' => $storageFile
+            'file' => $storageFile,
         ]);
     }
-    private function hasContent($narrative) {
+
+    private function hasContent($narrative)
+    {
         // Remove all HTML tags except text content
         $text = strip_tags($narrative);
-        
+
         // Remove extra spaces & line breaks
         $text = trim($text);
-        
+
         // Check if there's any actual content
-        return !empty($text);
+        return ! empty($text);
     }
-    public function store_file_document_first_analyses(Request $request,$id){
+
+    public function store_file_document_first_analyses(Request $request, $id)
+    {
         session()->forget('path');
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
         if ($this->hasContent($request->narrative)) {
-            $narrative=$request->narrative;
+            $narrative = $request->narrative;
         } else {
-            $narrative=null;
+            $narrative = null;
         }
 
         $doc = FileDocument::findOrFail($id);
         $doc->update([
-            'narrative'  => $narrative,
-            'notes1'     => $request->notes1,
-            'notes2'     => $request->notes2,
-            'sn'         => $request->sn,
-            'forClaim'   => $request->forClaim ? '1' : '0',
-            'forChart'   => $request->forChart ? '1' : '0',
-            'forLetter'  => $request->forLetter ? '1' : '0',
+            'narrative' => $narrative,
+            'notes1' => $request->notes1,
+            'notes2' => $request->notes2,
+            'sn' => $request->sn,
+            'forClaim' => $request->forClaim ? '1' : '0',
+            'forChart' => $request->forChart ? '1' : '0',
+            'forLetter' => $request->forLetter ? '1' : '0',
         ]);
-    
+
         // Assign tags (assuming many-to-many relationship)
         if ($request->has('tags')) {
             $doc->tags()->sync($request->tags); // Sync tags
         }
-        if($request->action=='save'){
-            return redirect('/project/file-document-first-analyses/'. $doc->id)->with('success', $doc->document? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
-        }else{
-            return redirect('/project/file/' . $doc->file->slug . '/documents')->with('success', $doc->document ? 'analyses for "' . $doc->document->subject .'" document saved successfully.' : 'analyses for "' . $doc->note->subject .'" document saved successfully.');
+        if ($request->action == 'save') {
+            return redirect('/project/file-document-first-analyses/'.$doc->id)->with('success', $doc->document ? 'analyses for "'.$doc->document->subject.'" document saved successfully.' : 'analyses for "'.$doc->note->subject.'" document saved successfully.');
+        } else {
+            return redirect('/project/file/'.$doc->file->slug.'/documents')->with('success', $doc->document ? 'analyses for "'.$doc->document->subject.'" document saved successfully.' : 'analyses for "'.$doc->note->subject.'" document saved successfully.');
         }
 
-        
-        
     }
 
-    public function copy_move_doc_to_another_file(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function copy_move_doc_to_another_file(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
 
-        
-        if($request->actionType=='copy'){
-            foreach($request->document_ids as $doc_id){
-                $file_doc=FileDocument::findOrFail($doc_id);
-                if($file_doc->document){
+        if ($request->actionType == 'copy') {
+            foreach ($request->document_ids as $doc_id) {
+                $file_doc = FileDocument::findOrFail($doc_id);
+                if ($file_doc->document) {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-                }else{
+                } else {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
                 }
-                if (!$fileDoc) {
-                    $doc=FileDocument::create(['user_id' => auth()->user()->id,
-                                        'file_id' => $request->file_id,
-                                        'narrative'  => $file_doc->narrative,
-                                        'notes1'     => $file_doc->notes1,
-                                        'notes2'     => $file_doc->notes2,
-                                        'sn'         => $file_doc->sn,
-                                        'forClaim'   => $file_doc->forClaim ,
-                                        'forChart'   => $file_doc->forChart ,
-                                        'forLetter'  => $file_doc->forLetter ,
-                                        'document_id' => $file_doc->document_id,
-                                        'note_id'=> $file_doc->note_id]);
-                    
+                if (! $fileDoc) {
+                    $doc = FileDocument::create(['user_id' => auth()->user()->id,
+                        'file_id' => $request->file_id,
+                        'narrative' => $file_doc->narrative,
+                        'notes1' => $file_doc->notes1,
+                        'notes2' => $file_doc->notes2,
+                        'sn' => $file_doc->sn,
+                        'forClaim' => $file_doc->forClaim,
+                        'forChart' => $file_doc->forChart,
+                        'forLetter' => $file_doc->forLetter,
+                        'document_id' => $file_doc->document_id,
+                        'note_id' => $file_doc->note_id]);
+
                 }
-                
+
             }
 
             return response()->json([
                 'status' => 'success',
-                'message' => count($request->document_ids)>1 ? 'Selected Documents Copied To Selected File Successfully.' : 'Document Copied To Selected File Successfully.',
+                'message' => count($request->document_ids) > 1 ? 'Selected Documents Copied To Selected File Successfully.' : 'Document Copied To Selected File Successfully.',
 
-            // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
+                // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
             ]);
-        }elseif($request->actionType=='move'){
-            foreach($request->document_ids as $doc_id){
-                $file_doc=FileDocument::findOrFail($doc_id);
-                if($file_doc->document){
+        } elseif ($request->actionType == 'move') {
+            foreach ($request->document_ids as $doc_id) {
+                $file_doc = FileDocument::findOrFail($doc_id);
+                if ($file_doc->document) {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();
-                }else{
+                } else {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
                 }
-                if (!$fileDoc) {
-                    $file_doc->file_id=$request->file_id;
+                if (! $fileDoc) {
+                    $file_doc->file_id = $request->file_id;
                     $file_doc->save();
-                    
 
                 }
             }
+
             return response()->json([
                 'status' => 'success',
-                'message' => count($request->document_ids)>1 ? 'Selected Documents Moved To Selected File Successfully.' : 'Document Moved To Selected File Successfully.',
-                //'redirect' => url('/project/file/' . $currentFile . '/documents')
+                'message' => count($request->document_ids) > 1 ? 'Selected Documents Moved To Selected File Successfully.' : 'Document Moved To Selected File Successfully.',
+                // 'redirect' => url('/project/file/' . $currentFile . '/documents')
             ]);
         }
     }
 
-    public function unassign_doc(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function unassign_doc(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        FileDocument::whereIn('id',$request->document_ids)->delete();
+        FileDocument::whereIn('id', $request->document_ids)->delete();
+
         return response()->json([
             'status' => 'success',
-            'message' => count($request->document_ids)>1 ? 'Selected documents is unassigned from file.' : 'Document is unassigned from file.',
-            //'redirect' => url('/project/file/' . $currentFile . '/documents')
+            'message' => count($request->document_ids) > 1 ? 'Selected documents is unassigned from file.' : 'Document is unassigned from file.',
+            // 'redirect' => url('/project/file/' . $currentFile . '/documents')
         ]);
     }
 
-    public function delete_doc_from_cmw_entirely(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function delete_doc_from_cmw_entirely(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        foreach($request->document_ids as $doc_id){
-            $doc=FileDocument::findOrFail($doc_id);
-            if($doc->note_id==null){
-                $document=Document::find($doc->document_id);
-                FileDocument::where('document_id',$document->id)->delete();
+        foreach ($request->document_ids as $doc_id) {
+            $doc = FileDocument::findOrFail($doc_id);
+            if ($doc->note_id == null) {
+                $document = Document::find($doc->document_id);
+                FileDocument::where('document_id', $document->id)->delete();
                 $docs = Document::where('storage_file_id', $document->storage_file_id)->where('id', '!=', $document->id)->get();
                 if (count($docs) == 0) {
                     $path = public_path($document->storageFile->path);
-    
+
                     if (file_exists($path)) {
                         unlink($path);
                     }
                 }
                 $document->delete();
-            }else{
-                $note=Note::find($doc->note_id);
-                FileDocument::where('note_id',$note->id)->delete();
+            } else {
+                $note = Note::find($doc->note_id);
+                FileDocument::where('note_id', $note->id)->delete();
                 $note->delete();
             }
-            
+
         }
+
         return response()->json([
             'status' => 'success',
-            'message' => count($request->document_ids)>1 ? 'Selected documents is deleted from CMW entirely.' : 'Document is deleted from CMW entirely.',
-            //'redirect' => url('/project/file/' . $currentFile . '/documents')
+            'message' => count($request->document_ids) > 1 ? 'Selected documents is deleted from CMW entirely.' : 'Document is deleted from CMW entirely.',
+            // 'redirect' => url('/project/file/' . $currentFile . '/documents')
         ]);
-        
+
     }
 
-    public function change_for_claimOrNoticeOrChart(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function change_for_claimOrNoticeOrChart(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        if(count($request->document_ids)>1){
-            $do=FileDocument::findOrFail($request->document_ids[0]);
-            $ac=$request->action_type;
-            if($do->$ac =='1'){
-                $va='0';
-            }else{
-                $va='1';
+        if (count($request->document_ids) > 1) {
+            $do = FileDocument::findOrFail($request->document_ids[0]);
+            $ac = $request->action_type;
+            if ($do->$ac == '1') {
+                $va = '0';
+            } else {
+                $va = '1';
             }
-            FileDocument::whereIn('id',$request->document_ids)->update([$ac=>$va]);
+            FileDocument::whereIn('id', $request->document_ids)->update([$ac => $va]);
+
             return response()->json([
                 'status' => 'success',
-                'value' => $va
+                'value' => $va,
             ]);
-        }else{
-            FileDocument::whereIn('id',$request->document_ids)->update([$request->action_type=>$request->val]);
+        } else {
+            FileDocument::whereIn('id', $request->document_ids)->update([$request->action_type => $request->val]);
+
             return response()->json([
                 'status' => 'success',
             ]);
         }
-        
+
     }
 
-    public function download_documents(Request $request){
-        //dd($request->all());
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function download_documents(Request $request)
+    {
+        // dd($request->all());
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        $file=ProjectFile::where('slug',$request->file_id_)->first();
+        $file = ProjectFile::where('slug', $request->file_id_)->first();
         // $fileDocuments=FileDocument::where('file_id',$file->id);
         // if($request->forclaimdocs2){
         //     $fileDocuments->where('forClaim','1');
         // }
-        
+
         // $fileDocuments=$fileDocuments->get();
 
-        $fileDocuments = FileDocument::where('note_id',null)->with('document')
+        $fileDocuments = FileDocument::where('note_id', null)->with('document')
             ->where('file_id', $file->id);
-        if($request->forclaimdocs2){
-            $fileDocuments->where('forClaim','1');
+        if ($request->forclaimdocs2) {
+            $fileDocuments->where('forClaim', '1');
         }
-            
-        $fileDocuments=$fileDocuments->get()
+
+        $fileDocuments = $fileDocuments->get()
             ->sortBy([
                 fn ($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
                 fn ($a, $b) => $a->sn <=> $b->sn,
             ])
             ->values();
-        if(count($fileDocuments)>0){
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
+        if (count($fileDocuments) > 0) {
+            $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp');
 
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 mkdir($directory, 0755, true); // true = create nested directories
             }
-            $zip = new ZipArchive();
-           
+            $zip = new ZipArchive;
+
             $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 mkdir($directory, 0755, true); // true = create nested directories
             }
-            $zipFileName = $file->code . '-' . $file->name . '.zip';
-            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
-                
+            $zipFileName = $file->code.'-'.$file->name.'.zip';
+            $zipFilePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/').$zipFileName;
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== true) {
+
                 return redirect()->back()->with('error', 'Could not create ZIP file');
             }
             $counter = intval($request->Start);
-            foreach($fileDocuments as $document){
+            foreach ($fileDocuments as $document) {
                 $filePath = public_path($document->document->storageFile->path);
-                if($request->formate_type=='reference'){
+                if ($request->formate_type == 'reference') {
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
-                    //$date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                }elseif($request->formate_type=='dateAndReference'){
+                    // $date = date('y_m_d', strtotime($document->document->start_date));
+                    $fileName = $sanitizedFilename.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
+                } elseif ($request->formate_type == 'dateAndReference') {
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                }elseif($request->formate_type=='formate'){
-                    
-                    $prefix=$request->prefix;
-                    $sn=$request->sn;
-                    
-                    $date=date('d-M-y', strtotime($document->document->start_date));
-                    $from=$document->document->fromStakeHolder? $document->document->fromStakeHolder->narrative . "'s " : '';
-                    $type=$document->document->docType->name;
+                    $fileName = preg_replace('/_/', '', $date).' - '.$sanitizedFilename.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
+                } elseif ($request->formate_type == 'formate') {
+
+                    $prefix = $request->prefix;
+                    $sn = $request->sn;
+
+                    $date = date('d-M-y', strtotime($document->document->start_date));
+                    $from = $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative."'s " : '';
+                    $type = $document->document->docType->name;
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $number_prefix = str_pad($counter, $sn, '0', STR_PAD_LEFT);
-                    $fileName = $prefix  . $number_prefix . ' - ' . $from . $type . ' ' ;
-                    if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
-                        $ref_part=$request->ref_part;
-                        if($ref_part == 'option1'){
+                    $fileName = $prefix.$number_prefix.' - '.$from.$type.' ';
+                    if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)), 'email')) {
+                        $ref_part = $request->ref_part;
+                        if ($ref_part == 'option1') {
                             $fileName .= '- ';
-                        }elseif($ref_part == 'option2'){
-                           
-                            $fileName .= 'From- ' . $sanitizedFilename . ' - ';
-                        }elseif($ref_part == 'option3'){
-                            $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                        } elseif ($ref_part == 'option2') {
+
+                            $fileName .= 'From- '.$sanitizedFilename.' - ';
+                        } elseif ($ref_part == 'option3') {
+                            $fileName .= 'Ref- '.$sanitizedFilename.' - ';
                         }
-                    }else{
-                        $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                    } else {
+                        $fileName .= 'Ref- '.$sanitizedFilename.' - ';
                     }
-                    $fileName .= 'dated ' . $date . '.' . pathinfo($filePath, PATHINFO_EXTENSION);;
+                    $fileName .= 'dated '.$date.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
                     $counter++;
                 }
-                
+
                 if (file_exists($filePath)) {
                     $zip->addFile($filePath, $fileName);
                 }
             }
-            
+
             $zip->close();
 
             // Return the zip file as a download
             if (file_exists($zipFilePath)) {
                 session(['zip_file' => $code]);
-                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
+                $relativePath = 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/'.$zipFileName;
+
                 return response()->json(['download_url' => asset($relativePath)]);
                 // return response()->download($zipFilePath,null, [
                 //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
@@ -1206,56 +1203,58 @@ class FileDocumentController extends ApiController
                 // ]);
             }
         }
+
         return redirect()->back()->with('error', 'No files found to download.');
-        
+
     }
 
-    public function download_specific_documents(Request $request){
-        $zip_file= session('zip_file');
-        if($zip_file){
-            $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+    public function download_specific_documents(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        $file=ProjectFile::where('slug',$request->file_id)->first();
-        $fileDocuments=FileDocument::whereIn('id',$request->document_ids)->get();
-        if(count($fileDocuments)>0){
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
+        $file = ProjectFile::where('slug', $request->file_id)->first();
+        $fileDocuments = FileDocument::whereIn('id', $request->document_ids)->get();
+        if (count($fileDocuments) > 0) {
+            $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp');
 
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 mkdir($directory, 0755, true); // true = create nested directories
             }
-            $zip = new ZipArchive();
-           
+            $zip = new ZipArchive;
+
             $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
-            if (!file_exists($directory)) {
+            if (! file_exists($directory)) {
                 mkdir($directory, 0755, true); // true = create nested directories
             }
-            $zipFileName = $file->code . '-' . $file->name . ' - selected documents ' . '.zip';
-            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/') . $zipFileName;
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
-                
+            $zipFileName = $file->code.'-'.$file->name.' - selected documents '.'.zip';
+            $zipFilePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/').$zipFileName;
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== true) {
+
                 return redirect()->back()->with('error', 'Could not create ZIP file');
             }
-           
-            foreach($fileDocuments as $document){
+
+            foreach ($fileDocuments as $document) {
                 $filePath = public_path($document->document->storageFile->path);
-                if(str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)),'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)),'email')){
-                    $sanitizedFilename = $document->document->fromStakeHolder->narrative . "'s e-mail dated ";
+                if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->document->docType->description)), 'email')) {
+                    $sanitizedFilename = $document->document->fromStakeHolder->narrative."'s e-mail dated ";
                     $date = date('y_m_d', strtotime($document->document->start_date));
                     $date2 = date('d-M-y', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                    $fileName = preg_replace('/_/', '', $date).' - '.$sanitizedFilename.$date2.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
                 } else {
                     $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
                     $date = date('y_m_d', strtotime($document->document->start_date));
-                    $fileName = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                    $fileName = preg_replace('/_/', '', $date).' - '.$sanitizedFilename.'.'.pathinfo($filePath, PATHINFO_EXTENSION);
                 }
-        
+
                 if (file_exists($filePath)) {
                     $zip->addFile($filePath, $fileName);
                 }
@@ -1266,8 +1265,9 @@ class FileDocumentController extends ApiController
             // Return the zip file as a download
             if (file_exists($zipFilePath)) {
                 session(['zip_file' => $code]);
-                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code .'/' . $zipFileName;
-                return response()->json(['message'=>'Selected Documnets Downloaded successfully','download_url' => asset($relativePath)]);
+                $relativePath = 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/'.$zipFileName;
+
+                return response()->json(['message' => 'Selected Documnets Downloaded successfully', 'download_url' => asset($relativePath)]);
                 // return response()->download($zipFilePath,null, [
                 //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
                 //     'Pragma' => 'no-cache',
@@ -1276,68 +1276,124 @@ class FileDocumentController extends ApiController
             }
 
         }
+
         return redirect()->back()->with('error', 'No files found to download.');
 
     }
 
-    public function edit_docs_info(Request $request){
-        foreach($request->document_ids as $id){
-            $file_doc=FileDocument::findOrFail($id);
-            $doc=$file_doc->document;
-            if($request->doc_type){
-                $doc->doc_type_id=$request->doc_type;
+    public function edit_docs_info(Request $request)
+    {
+        foreach ($request->document_ids as $id) {
+            $file_doc = FileDocument::findOrFail($id);
+            $doc = $file_doc->document;
+            if ($request->doc_type) {
+                $doc->doc_type_id = $request->doc_type;
             }
-            if($request->from){
-                $doc->from_id=$request->from;
+            if ($request->from) {
+                $doc->from_id = $request->from;
             }
-            if($request->to){
-                $doc->to_id=$request->to;
+            if ($request->to) {
+                $doc->to_id = $request->to;
             }
-            if($request->owner){
-                $doc->user_id=$request->owner;
+            if ($request->owner) {
+                $doc->user_id = $request->owner;
             }
             $doc->save();
         }
+
         return response()->json([
             'status' => 'success',
         ]);
     }
 
-    public function change_flag(Request $request){
-        $docId=$request->docId;
-        $type=$request->type;
-        
-        $record=FileDocumentFlags::where('user_id',auth()->user()->id)->where('file_document_id',$docId)->where('flag',$type)->first();
-        if($record){
+    public function change_flag(Request $request)
+    {
+        $docId = $request->docId;
+        $type = $request->type;
+
+        $record = FileDocumentFlags::where('user_id', auth()->user()->id)->where('file_document_id', $docId)->where('flag', $type)->first();
+        if ($record) {
             $record->delete();
+
             return response()->json([
                 'success' => false,
             ]);
-        }else{
-            FileDocumentFlags::create(['user_id'=>auth()->user()->id,'file_document_id'=>$docId,'flag'=>$type]);
+        } else {
+            FileDocumentFlags::create(['user_id' => auth()->user()->id, 'file_document_id' => $docId, 'flag' => $type]);
+
             return response()->json([
                 'success' => true,
             ]);
         }
     }
 
-    public function create_note(Request $request){
-      
+    public function create_note(Request $request)
+    {
+
         do {
             $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         } while (Note::where('slug', $slug)->exists());
 
-        $file=ProjectFile::where('slug',$request->file_slug)->first();
-        $note=Note::create(['slug'=>$slug,'user_id'=>auth()->user()->id,
-                            'project_id'=>auth()->user()->current_project_id,
-                            'start_date'=>$request->start_date,
-                            'subject'=>$request->subject]);
-        $fileDoc=FileDocument::create(['file_id'=>$file->id,'note_id'=>$note->id,'user_id'=>auth()->user()->id,'forClaim'=>'1','forChart'=>'1']);
+        $file = ProjectFile::where('slug', $request->file_slug)->first();
+        $note = Note::create(['slug' => $slug, 'user_id' => auth()->user()->id,
+            'project_id' => auth()->user()->current_project_id,
+            'start_date' => $request->start_date,
+            'subject' => $request->subject]);
+        $fileDoc = FileDocument::create(['file_id' => $file->id, 'note_id' => $note->id, 'user_id' => auth()->user()->id, 'forClaim' => '1', 'forChart' => '1']);
         session(['specific_file_doc' => $fileDoc->id]);
+
         return response()->json([
             'success' => true,
         ]);
     }
 
-    
+    public function create_ai_pdf(Request $request)
+    {
+        $path = session('path');
+        $sourcePath = public_path($path);
+
+        $zip_file = session('ai_zip_file');
+        if ($zip_file) {
+            // $filePath=public_path('projects/' . auth()->user()->current_project_id . '/temp/'.$zip_file) ;
+            // if (File::exists($filePath)) {
+            //     File::deleteDirectory($filePath);
+            // }
+            session()->forget('ai_zip_file');
+        }
+
+        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/temp';
+        $path = public_path($projectFolder);
+        if (! file_exists($path)) {
+
+            mkdir($path, 0755, true);
+        }
+        $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
+
+        if (! file_exists($directory)) {
+            mkdir($directory, 0755, true); // true = create nested directories
+        }
+        $targetPath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/extracted.pdf');
+        $pdf = new Fpdi;
+        $pageCount = $pdf->setSourceFile($sourcePath);
+
+        // استخراج الصفحات من 3 إلى 10
+        for ($i = intval($request->from); $i <= intval($request->to) && $i <= $pageCount; $i++) {
+            $templateId = $pdf->importPage($i);
+            $size = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
+        }
+
+        // حفظ الملف في temp
+        $pdf->Output('F', $targetPath);
+        session(['ai_zip_file' => $code]);
+        session(['ai_pdf_path' => $targetPath]);
+
+        return response()->json([
+            'message' => 'تم استخراج الصفحات بنجاح',
+        ]);
+        // Save document
+    }
 }

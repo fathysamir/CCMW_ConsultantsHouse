@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('account_id');
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
-            $table->enum('role',['User','Admin Account'])->default('User');
+            $table->enum('role', ['User', 'Admin Account'])->default('User');
             $table->json('permissions')->nullable();
 
             $table->timestamps();

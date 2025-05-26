@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Casts\CustomDateTimeCast;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 class StorageFile extends Model
 {
     use HasFactory;
+
     protected $table = 'storage_files';
 
     protected $fillable = [
@@ -17,25 +17,22 @@ class StorageFile extends Model
         'file_name',
         'size',
         'file_type',
-        'path'
+        'path',
     ];
 
     protected $allowedSorts = [
-       
-        'created_at',
-        'updated_at'
-    ];
 
-  
+        'created_at',
+        'updated_at',
+    ];
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id','id')->withTrashed();
+        return $this->belongsTo(Project::class, 'project_id', 'id')->withTrashed();
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id','id')->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
-
 }
