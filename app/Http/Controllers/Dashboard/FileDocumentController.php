@@ -1379,12 +1379,12 @@ class FileDocumentController extends ApiController
 
             mkdir($path, 0755, true);
         }
-        // $imagick = new \Imagick();
-        // $imagick->readImage($sourcePath);
-        // $imagick->setImageFormat('pdf');
-        // $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
+        $imagick = new \Imagick();
+        $imagick->readImage($sourcePath);
+        $imagick->setImageFormat('pdf');
+        $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
 
-        // $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
         $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
