@@ -21,7 +21,7 @@ class FileController extends ApiController
     public function index()
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -212,7 +212,7 @@ class FileController extends ApiController
     {
 
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);

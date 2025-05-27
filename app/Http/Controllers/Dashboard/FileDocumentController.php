@@ -40,7 +40,7 @@ class FileDocumentController extends ApiController
         }
         session()->forget('path');
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -129,7 +129,7 @@ class FileDocumentController extends ApiController
     {
 
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -906,7 +906,7 @@ class FileDocumentController extends ApiController
     {
         session()->forget('path');
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -939,7 +939,7 @@ class FileDocumentController extends ApiController
         } else {
             session()->forget('ai_zip_file');
             $ai_zip_file = session('ai_zip_file');
-            if ($ai_zip_file) {
+            if ($ai_zip_file != null) {
                 $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
                 if (File::exists($filePath)) {
                     File::deleteDirectory($filePath);
@@ -954,7 +954,7 @@ class FileDocumentController extends ApiController
     public function copy_move_doc_to_another_file(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1019,7 +1019,7 @@ class FileDocumentController extends ApiController
     public function unassign_doc(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1038,7 +1038,7 @@ class FileDocumentController extends ApiController
     public function delete_doc_from_cmw_entirely(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1078,7 +1078,7 @@ class FileDocumentController extends ApiController
     public function change_for_claimOrNoticeOrChart(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1113,7 +1113,7 @@ class FileDocumentController extends ApiController
     {
         // dd($request->all());
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1230,7 +1230,7 @@ class FileDocumentController extends ApiController
     public function download_specific_documents(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -1425,14 +1425,55 @@ class FileDocumentController extends ApiController
     public function ai_layer($id){
         $ai_zip_file=session('ai_zip_file');
         $ai_pdf_path=session('ai_pdf_path');
+        $file_doc_id=session('specific_file_doc');
+
         //session()->forget('ai_pdf_path');
-        return view('project_dashboard.file_documents.ai_layer',compact('ai_zip_file','ai_pdf_path'));
+        return view('project_dashboard.file_documents.ai_layer',compact('ai_zip_file','ai_pdf_path','file_doc_id'));
     }
 
     public function summarize_pdf(Request $request){
         //dd($request->all());
+        $file_doc=FileDocument::findOrFail($request->file_doc_id);
+        $document=$file_doc->document;
+        $message="This was a " . $document->docType->name;
+        if($document->fromStakeHolder){
+            $message .=" sent from " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+        }
+        if($document->toStakeHolder){
+            $message .=" to " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
+        }
+        $message .=". Please summarize and rephrase it in the past tense";
+        if($request->support == 'sender' && $document->fromStakeHolder){
+             $message .=" in a way supporting " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+        }elseif($request->support == 'receiver' && $document->toStakeHolder){
+             $message .=" in a way supporting " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
+        }
+        if($document->fromStakeHolder){
+            $message .=" and starting with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+        }
+        $message .=". No need to mention the project name or to repeat the letter subject.";
+        if($request->focus == 'none'){
+            $message .="";
+        }elseif($request->focus == 'note 1' && $file_doc->notes1 != null){
+            $note1=str_replace('"', '\"', $file_doc->notes1);
+            $message .=" Please focus on the following: \"" . $note1 . "\".";
+        }elseif($request->focus == 'note 2' && $file_doc->notes2 != null){
+            $note2=str_replace('"', '\"', $file_doc->notes2);
+            $message .=" Please focus on the following: \"" . $note2 . "\".";
+        }elseif($request->focus == 'document note' && $document->notes != null){
+            $documentNote=str_replace('"', '\"', $document->notes);
+            $message .=" Please focus on the following: \"" . $documentNote . "\".";
+        }elseif($request->focus == 'narrative' && $file_doc->narrative != null){
+            $narrative=$this->hasContent($request->narrative);
+            $narrative=str_replace('"', '\"', $narrative);
+            $message .=" Please focus on the following: \"" . $narrative . "\".";
+        }else{
+            $focus=str_replace('"', '\"', $request->focus);
+            $message .=" Please focus on the following: \"" . $focus . "\".";
+        }
+         $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Replace with your actual API key
         if($request->source_id == null){
-            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Replace with your actual API key
+           
             $url = 'https://ccmw.app/projects/7/documents/1748288269_1933-Request-for-Release-of-DEWA-Water-Submeters-Ref-1924.pdf';
 
             $payload = json_encode([
@@ -1467,16 +1508,92 @@ class FileDocumentController extends ApiController
 
             // Access sourceId from response
             $sourceId = $data['sourceId'] ?? null;
-            dd($sourceId);
+            $payload = json_encode([
+                'sourceId' => $sourceId,
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $message,
+                    ],
+                ],
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'https://api.chatpdf.com/v1/chats/message',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+
+            // Get the response content
+            $answer = $data['content'] ?? 'No answer found';
+          
             // $ai_zip_file = $request->ai_zip_file;
-            // if ($ai_zip_file) {
+            // if ($ai_zip_file != null) {
             //     $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
             //     if (File::exists($filePath)) {
             //         File::deleteDirectory($filePath);
             //     }
             // }
         }else{
+            $sourceId=$request->source_id;
+            $payload = json_encode([
+                'sourceId' => $sourceId,
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $message,
+                    ],
+                ],
+            ]);
 
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'https://api.chatpdf.com/v1/chats/message',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+
+            // Get the response content
+            $answer = $data['content'] ?? 'No answer found';
         }
+
+        dd($answer);
     }
 }

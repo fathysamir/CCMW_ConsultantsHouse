@@ -15,7 +15,7 @@ class NoteController extends ApiController
     public function edit_note($id)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);

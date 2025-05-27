@@ -23,7 +23,7 @@ class FileAttachmentController extends ApiController
     public function index($id, $type)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -54,7 +54,7 @@ class FileAttachmentController extends ApiController
     public function stor_file_attachment(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -95,7 +95,7 @@ class FileAttachmentController extends ApiController
     public function Update_file_attachment(Request $request, $id)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -139,7 +139,7 @@ class FileAttachmentController extends ApiController
     {
 
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -766,7 +766,7 @@ class FileAttachmentController extends ApiController
     public function delete_attachments(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -806,7 +806,7 @@ class FileAttachmentController extends ApiController
     public function change_for_claimOrNoticeOrChart(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
@@ -840,7 +840,7 @@ class FileAttachmentController extends ApiController
     public function copy_move_attachment_to_another_file(Request $request)
     {
         $zip_file = session('zip_file');
-        if ($zip_file) {
+        if ($zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);

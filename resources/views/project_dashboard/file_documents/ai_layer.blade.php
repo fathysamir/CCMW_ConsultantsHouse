@@ -96,6 +96,7 @@
                             <div class="mt-2 ml-1 mr-1 row justify-content-between align-items-center">
                                 <input hidden id="source_id" value="src_Hd6khdL0UretnbaqUsUPQ">
                                 <input hidden id="ai_zip_file" value="{{ $ai_zip_file }}">
+                                <input hidden id="file_doc_id" value="{{ $file_doc_id }}">
                                 <input hidden id="ai_pdf_path" value="{{ $ai_pdf_path }}">
                                 <h5 style="text-align: center;width:100%;color:rgb(110, 112, 114)">Summarization</h5>
                                 <div class="d-flex mb-3" style="height: 20px;width:100%;">
@@ -313,6 +314,7 @@
                 }
             });
             let source_id = $('#source_id').val();
+            let file_doc_id = $('#file_doc_id').val();
             let ai_zip_file = $('#ai_zip_file').val();
             let ai_pdf_path = $('#ai_pdf_path').val();
 
@@ -337,10 +339,11 @@
                     ai_zip_file: ai_zip_file,
                     ai_pdf_path: ai_pdf_path,
                     support: support,
-                    focus: focus
+                    focus: focus,
+                    file_doc_id: file_doc_id
                 },
                 success: function(response) {
-                    alert('تم التلخيص بنجاح!');
+                   
                     console.log(response);
                     // ممكن تفتح صفحة أو تعمل redirect حسب الحاجة
                 },
