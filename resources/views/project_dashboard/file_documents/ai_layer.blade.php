@@ -347,7 +347,7 @@
                     const ocrResult = document.getElementById('ocr-result');
                     const currentValue = ocrResult.value || '';
                     const separator = currentValue ? '\n' : '';
-                    ocrResult.value = currentValue + separator + response.answer;
+                    ocrResult.value = currentValue + separator + response.answer + '\n';
                     //console.log(response);
                     // ممكن تفتح صفحة أو تعمل redirect حسب الحاجة
                 },
