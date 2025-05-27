@@ -1547,13 +1547,13 @@ class FileDocumentController extends ApiController
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
           
-            // $ai_zip_file = $request->ai_zip_file;
-            // if ($ai_zip_file != null) {
-            //     $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
-            //     if (File::exists($filePath)) {
-            //         File::deleteDirectory($filePath);
-            //     }
-            // }
+            $ai_zip_file = $request->ai_zip_file;
+            if ($ai_zip_file != null) {
+                $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
+                if (File::exists($filePath)) {
+                    File::deleteDirectory($filePath);
+                }
+            }
         }else{
             $sourceId=$request->source_id;
             $payload = json_encode([
@@ -1594,7 +1594,12 @@ class FileDocumentController extends ApiController
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
         }
+        return response()->json([
+            'message' => 'success',
+            'answer' => $answer,
+            'sourceId'=> $sourceId
+        ]);
+        
 
-        dd($answer);
     }
 }

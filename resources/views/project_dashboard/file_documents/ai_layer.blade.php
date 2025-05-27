@@ -343,8 +343,12 @@
                     file_doc_id: file_doc_id
                 },
                 success: function(response) {
-                   
-                    console.log(response);
+                    $('#source_id').val(response.sourceId)
+                    const ocrResult = document.getElementById('ocr-result');
+                    const currentValue = ocrResult.value || '';
+                    const separator = currentValue ? '\n' : '';
+                    ocrResult.value = currentValue + separator + response.answer;
+                    //console.log(response);
                     // ممكن تفتح صفحة أو تعمل redirect حسب الحاجة
                 },
                 error: function(xhr) {
