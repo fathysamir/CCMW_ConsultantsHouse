@@ -35,7 +35,7 @@ class ProjectService
         }
         $all_DocTypes = DocType::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_DocTypes as $DocType) {
-            DocType::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description]);
+            DocType::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description,'relevant_word' => $DocType->relevant_word,'shortcut' => $DocType->shortcut]);
         }
         $all_ContractTags = ContractTag::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_ContractTags as $ContractTag) {

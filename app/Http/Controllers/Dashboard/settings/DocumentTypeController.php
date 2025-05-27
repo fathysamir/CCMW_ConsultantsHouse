@@ -35,12 +35,16 @@ class DocumentTypeController extends ApiController
 
     public function store(Request $request)
     {
-        DocType::create(['project_id' => auth()->user()->current_project_id,
+        $type=DocType::create(['project_id' => auth()->user()->current_project_id,
             'account_id' => auth()->user()->current_account_id,
             'name' => $request->name,
             'description' => $request->description,
+            'relevant_word' => $request->relevant_word,
             'order' => $request->order ? intval($request->order) : 0]);
-
+        if ($request->shortcut) {
+            $type->shortcut = '1';
+        }
+        $type->save();
         if (auth()->user()->current_account_id == null) {
             return redirect('/accounts/document-types')->with('success', 'Document Type created successfully.');
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
@@ -68,8 +72,15 @@ class DocumentTypeController extends ApiController
         DocType::where('id', $id)->update([
             'name' => $request->name,
             'description' => $request->description,
+            'relevant_word' => $request->relevant_word,
             'order' => $request->order ? intval($request->order) : 0]);
-
+        $type = DocType::findOrFail($id);
+         if (! $request->shortcut) {
+            $type->shortcut = '0';
+        } else {
+            $type->shortcut = '1';
+        }
+        $type->save();
         if (auth()->user()->current_account_id == null) {
             return redirect('/accounts/document-types')->with('success', 'Document Type updated successfully.');
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {

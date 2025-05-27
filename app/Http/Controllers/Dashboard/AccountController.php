@@ -136,7 +136,7 @@ class AccountController extends ApiController
         }
         $all_DocTypes = DocType::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_DocTypes as $DocType) {
-            DocType::create(['account_id' => $account->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description]);
+            DocType::create(['account_id' => $account->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description,'relevant_word' => $DocType->relevant_word,'shortcut' => $DocType->shortcut]);
         }
         $all_ContractTags = ContractTag::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_ContractTags as $ContractTag) {

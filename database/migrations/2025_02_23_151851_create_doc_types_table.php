@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->integer('order')->default(0);
             $table->longText('description')->nullable();
+            $table->string('relevant_word')->nullable();
+             $table->enum('shortcut', ['0', '1'])->default('0');
             $table->unsignedBigInteger('account_id')->nullable();
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('project_id')->nullable();

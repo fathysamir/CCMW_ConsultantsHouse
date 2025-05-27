@@ -25,10 +25,26 @@
 
 
 
-                        <div class="form-group mb-3">
-                            <label for="example-order">Order</label>
-                            <input type="number" name="order" id="example-order" class="form-control" placeholder="Order"
-                                value="{{ $document_type->order }}">
+                         <div class="row">
+                            <!-- Type Input -->
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="example-order">Order</label>
+                                    <input type="number" name="order" id="example-order" class="form-control"
+                                        placeholder="Order"value="{{ $document_type->order }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="relevant_word">Relevant Word</label>
+                                    <input type="text" name="relevant_word" id="relevant_word" class="form-control"
+                                        placeholder="Relevant Word"value="{{ $document_type->relevant_word }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" name="shortcut"id="shortcut" @if($document_type->shortcut=='1') checked @endif>
+                            <label class="custom-control-label" for="shortcut">Add To Shortcut Menu</label>
                         </div>
 
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
