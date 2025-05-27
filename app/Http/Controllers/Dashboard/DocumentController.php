@@ -348,7 +348,7 @@ class DocumentController extends ApiController
         $doc = Document::where('id', $id)->first();
         $docs = Document::where('storage_file_id', $doc->storage_file_id)->where('id', '!=', $id)->get();
         if (count($docs) == 0) {
-            $path = public_path('projects/1/documents/1740495513_iSchool 2025 - Company Profile.pdf');
+            $path = public_path($doc->storageFile->path);
 
             if (file_exists($path)) {
                 unlink($path);

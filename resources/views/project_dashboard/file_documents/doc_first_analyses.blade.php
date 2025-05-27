@@ -188,8 +188,8 @@
                                 <label for="owner" style="margin-bottom: 0.1rem !important">Narrative</label>
                                 @if ($doc->document)
                                     <div style="display: flex;cursor: pointer;">
-                                        {{-- <img id="ai_image" title="AI" style="width:25px;margin-right:5px;"
-                                            src="{{ asset('dashboard/assets/images/ai.png') }}"> --}}
+                                        <img id="ai_image" title="AI" style="width:25px;margin-right:5px;"
+                                            src="{{ asset('dashboard/assets/images/ai.png') }}">
                                         <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
                                             style="margin-right:5px;" target="_blank"><img id="ocr_image" title="OCR"
                                                 style="width:25px;"

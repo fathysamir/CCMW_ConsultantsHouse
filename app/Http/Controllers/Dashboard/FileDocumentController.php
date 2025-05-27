@@ -1371,7 +1371,7 @@ class FileDocumentController extends ApiController
         $path = session('path');
         $sourcePath = public_path($path);
         session()->forget('ai_zip_file');
-        
+       
 
         $projectFolder = 'projects/'.auth()->user()->current_project_id.'/temp';
         $path = public_path($projectFolder);
@@ -1379,6 +1379,12 @@ class FileDocumentController extends ApiController
 
             mkdir($path, 0755, true);
         }
+        $imagick = new \Imagick();
+        $imagick->readImage($sourcePath);
+        $imagick->setImageFormat('pdf');
+        $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
+
+        $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
         $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
@@ -1402,7 +1408,11 @@ class FileDocumentController extends ApiController
         $pdf->Output('F', $targetPath);
         session(['ai_zip_file' => $code]);
         session(['ai_pdf_path' => 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/extracted.pdf']);
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
 
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
         return response()->json([
             'message' => 'success',
             'ai_zip_file' => $code
