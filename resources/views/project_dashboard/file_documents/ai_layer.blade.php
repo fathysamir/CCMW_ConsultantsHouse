@@ -73,7 +73,7 @@
 
                             </div>
                             <div style="width: 100%; margin-top:1%;height: 4%;">
-                                <button class="btn btn-warning btn-sm" style="width: 100%;color:#fff">Clear</button>
+                                <button class="btn btn-warning btn-sm" style="width: 100%;color:#fff" id="clear">Clear</button>
                             </div>
                         </div>
                         <div style="width:40%;">
@@ -364,6 +364,9 @@
     </script>
     <script>
         $(document).ready(function() {
+             $('#clear').on('click', function() {
+                $('#ocr-result').val('')
+             });
             $('input[name="focus"]').on('change', function() {
                 if ($(this).val() === 'other' && $(this).is(':checked')) {
                     $('#otherInput').prop('disabled', false);

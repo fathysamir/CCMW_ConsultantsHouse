@@ -160,6 +160,9 @@ class DocumentController extends ApiController
         if ($request->slug) {
             $all_documents->where('slug', $request->slug);
         }
+        if ($request->doc_type) {
+            $all_documents->where('doc_type_id', $request->doc_type);
+        }
         $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         // dd($all_documents);
         $stake_holders = $project->stakeHolders;
