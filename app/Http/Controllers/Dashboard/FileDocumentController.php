@@ -1435,9 +1435,9 @@ class FileDocumentController extends ApiController
         //dd($request->all());
         $file_doc=FileDocument::findOrFail($request->file_doc_id);
         $document=$file_doc->document;
-        $message="This was a " . $document->docType->name;
+        $message="This was a " . $document->docType->name . " " . $document->docType->relevant_word;
         if($document->fromStakeHolder){
-            $message .=" sent from " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+            $message .=" from " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
         }
         if($document->toStakeHolder){
             $message .=" to " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
@@ -1449,7 +1449,7 @@ class FileDocumentController extends ApiController
              $message .=" in a way supporting " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
         }
         if($document->fromStakeHolder){
-            $message .=". please start the paragraph  with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+            $message .=". please start the paragraph  with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative . " " . $document->docType->relevant_word . " a " . $document->docType->name ;
         }
         $message .=". No need to mention the project name or to repeat the letter subject.";
         if($request->focus == 'none'){
