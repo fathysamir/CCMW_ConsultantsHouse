@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="relevant_word">Relevant Word</label>
+                                    <label for="relevant_word">Relevant Verb</label>
                                     <input type="text" name="relevant_word" id="relevant_word" class="form-control"
                                         placeholder="Relevant Word">
                                 </div>

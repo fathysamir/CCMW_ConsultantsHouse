@@ -49,7 +49,7 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Description</th>
-                                <th>Relevant Word</th>
+                                <th>Relevant Verb</th>
                                 <th>Order</th>
                                 <th>Action</th>
                             </tr>
