@@ -68,7 +68,7 @@
                 <div class="col-md-12">
                     <div class="row2">
                         <div class="mr-2" style="width:59.4%;">
-                            <div style="height: 95,6%;">
+                            <div style="height: 95.6%;">
                                 <textarea style="height: 100%;" class="form-control" id="ocr-result"></textarea>
 
                             </div>
