@@ -84,7 +84,7 @@
                                 </div>
 
                                 <!-- Right side: Equal-width Previous/Next buttons -->
-                                <div class="d-flex" style="gap: 8px; min-width: 160px;">
+                                <div class="d-flex" style="gap: 8px; min-width: 60px;">
                                     <button onclick="prevPage()" class="btn btn-secondary btn-sm flex-fill"
                                         title="Previous Page">
                                         <<</button>
