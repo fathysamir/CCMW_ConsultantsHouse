@@ -70,9 +70,10 @@
                         <div class="mr-2" style="width:59.4%;">
                             <div style="height: 100%;">
                                 <textarea style="height: 100%;" class="form-control" id="ocr-result"></textarea>
-                                <div style="width: 100%; margin-top:5px;">
-                                    <button class="btn btn-danger w-100">Clear</button>
-                                </div>
+
+                            </div>
+                            <div style="width: 100%; margin-top:5px;">
+                                <button class="btn btn-danger w-100">Clear</button>
                             </div>
                         </div>
                         <div style="width:40%;">
