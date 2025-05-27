@@ -1476,7 +1476,7 @@ class FileDocumentController extends ApiController
            // src_Hd6khdL0UretnbaqUsUPQ
             //$url = 'https://ccmw.app/projects/7/documents/1748288269_1933-Request-for-Release-of-DEWA-Water-Submeters-Ref-1924.pdf';
             $url=url($request->ai_pdf_path);
-            dd($url);
+            //dd($url);
             $payload = json_encode([
                 'url' => $url,
             ]);
