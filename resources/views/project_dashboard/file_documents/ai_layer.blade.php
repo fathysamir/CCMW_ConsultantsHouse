@@ -73,7 +73,7 @@
 
                             </div>
                             <div style="width: 100%; margin-top:1%;height: 4%;">
-                                <button class="btn btn-danger">Clear</button>
+                                <button class="btn btn-danger btn-sm">Clear</button>
                             </div>
                         </div>
                         <div style="width:40%;">
