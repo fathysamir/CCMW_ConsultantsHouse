@@ -1380,8 +1380,10 @@ class FileDocumentController extends ApiController
             mkdir($path, 0755, true);
         }
         $imagick = new \Imagick();
+        $imagick->setResolution(300, 300); // زيادة الدقة
         $imagick->readImage($sourcePath);
         $imagick->setImageFormat('pdf');
+        $imagick->setImageCompressionQuality(100);
         $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
 
         $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
