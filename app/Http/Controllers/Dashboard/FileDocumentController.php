@@ -1449,7 +1449,7 @@ class FileDocumentController extends ApiController
              $message .=" in a way supporting " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
         }
         if($document->fromStakeHolder){
-            $message .=" and starting with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
+            $message .=". please start the paragraph  with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
         }
         $message .=". No need to mention the project name or to repeat the letter subject.";
         if($request->focus == 'none'){
