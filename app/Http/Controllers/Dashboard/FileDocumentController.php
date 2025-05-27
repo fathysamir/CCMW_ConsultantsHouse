@@ -29,8 +29,9 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
-        session()->forget('ai_zip_file');
+        
         $ai_zip_file = session('ai_zip_file');
+        dd($ai_zip_file);
         if ($ai_zip_file) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
             if (File::exists($filePath)) {
