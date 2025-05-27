@@ -31,8 +31,7 @@ class FileDocumentController extends ApiController
     {
         
         $ai_zip_file = session('ai_zip_file');
-        dd($ai_zip_file);
-        if ($ai_zip_file) {
+        if ($ai_zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
