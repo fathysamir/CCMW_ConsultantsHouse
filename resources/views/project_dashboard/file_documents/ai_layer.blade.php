@@ -73,7 +73,7 @@
 
                             </div>
                             <div style="width: 100%; margin-top:1%;height: 4%;">
-                                <button class="btn btn-warning btn-sm" style="width: 100%;">Clear</button>
+                                <button class="btn btn-warning btn-sm" style="width: 100%;color:#fff">Clear</button>
                             </div>
                         </div>
                         <div style="width:40%;">
