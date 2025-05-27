@@ -1473,9 +1473,10 @@ class FileDocumentController extends ApiController
         }
          $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Replace with your actual API key
         if($request->source_id == null){
-           
-            $url = 'https://ccmw.app/projects/7/documents/1748288269_1933-Request-for-Release-of-DEWA-Water-Submeters-Ref-1924.pdf';
-
+           // src_Hd6khdL0UretnbaqUsUPQ
+            //$url = 'https://ccmw.app/projects/7/documents/1748288269_1933-Request-for-Release-of-DEWA-Water-Submeters-Ref-1924.pdf';
+            $url=url($request->ai_pdf_path);
+            dd($url);
             $payload = json_encode([
                 'url' => $url,
             ]);

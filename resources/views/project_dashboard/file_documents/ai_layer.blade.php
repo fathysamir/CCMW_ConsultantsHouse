@@ -94,7 +94,7 @@
                             </div>
                             <hr>
                             <div class="mt-2 ml-1 mr-1 row justify-content-between align-items-center">
-                                <input hidden id="source_id" value="src_Hd6khdL0UretnbaqUsUPQ">
+                                <input hidden id="source_id">
                                 <input hidden id="ai_zip_file" value="{{ $ai_zip_file }}">
                                 <input hidden id="file_doc_id" value="{{ $file_doc_id }}">
                                 <input hidden id="ai_pdf_path" value="{{ $ai_pdf_path }}">
