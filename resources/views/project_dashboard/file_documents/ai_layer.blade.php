@@ -73,7 +73,8 @@
 
                             </div>
                             <div style="width: 100%; margin-top:1%;height: 4%;">
-                                <button class="btn btn-warning btn-sm" style="width: 100%;color:#fff" id="clear">Clear</button>
+                                <button class="btn btn-warning btn-sm" style="width: 100%;color:#fff"
+                                    id="clear">Clear</button>
                             </div>
                         </div>
                         <div style="width:40%;">
@@ -171,7 +172,7 @@
                     </div>
 
                     <div style="width: 100%; margin-top:20px;">
-                        <button class="btn mb-2 btn-danger w-100">Close</button>
+                        <button class="btn mb-2 btn-danger w-100" id="close">Close</button>
                     </div>
 
                 </div> <!-- /.col -->
@@ -364,9 +365,36 @@
     </script>
     <script>
         $(document).ready(function() {
-             $('#clear').on('click', function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $('#close').on('click', function() {
+                let source_id = $('#source_id').val();
+                let ai_zip_file = $('#ai_zip_file').val();
+                $.ajax({
+                    url: '/project/summarize', // عدّل الرابط حسب ما يناسبك
+                    type: 'POST',
+                    data: {
+
+                        source_id: source_id,
+                        ai_zip_file: ai_zip_file
+                       
+                    },
+                    success: function(response) {
+                         window.close();
+                        
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+                        console.error(xhr);
+                    }
+                });
+            });
+            $('#clear').on('click', function() {
                 $('#ocr-result').val('')
-             });
+            });
             $('input[name="focus"]').on('change', function() {
                 if ($(this).val() === 'other' && $(this).is(':checked')) {
                     $('#otherInput').prop('disabled', false);

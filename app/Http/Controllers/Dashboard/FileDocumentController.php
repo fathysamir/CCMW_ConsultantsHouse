@@ -1599,7 +1599,54 @@ class FileDocumentController extends ApiController
             'answer' => $answer,
             'sourceId'=> $sourceId
         ]);
-        
+    }
+
+    public function close_summarize_pdf(Request $request){
+        $ai_zip_file = $request->ai_zip_file;
+        if ($ai_zip_file != null) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('ai_zip_file');
+        }
+        session()->forget('ai_pdf_path');
+        if($request->source_id != null){
+            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Your API key
+            $sourceId = $request->source_id; // The source ID you want to delete
+
+            $payload = json_encode([
+                'sources' => [$sourceId],
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'https://api.chatpdf.com/v1/sources/delete',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+        }
+        return response()->json([
+            'message' => 'success',
+        ]);
 
     }
 }
