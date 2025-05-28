@@ -225,15 +225,15 @@
                             </div>
                             <div class="row">
                                 <!-- Name Input -->
-                                <div class="col-md-5"><label>Name</label></div>
+                                <div class="col-md-4"><label>Name</label></div>
                                 <div class="col-md-2"><label>Contractual Finish Date</label></div>
                                 <div class="col-md-2"><label>Revised Finish Date</label></div>
-                                <div class="col-md-2"><label>Substantial Completion Date</label></div>
+                                <div class="col-md-3"><label>Substantial Completion Date</label></div>
                                 <div class="col-md-1"></div>
                             </div>
                             <div id="milestonesContainer">
                                 <div class="row milestone-row">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <div class="form-group mb-3">
                                             <input type="text" required name="milestones[{{$milestones_counter}}][name]" class="form-control"
                                                 placeholder="Name">
@@ -253,7 +253,7 @@
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[{{$milestones_counter}}][substantial_completion_date]"
                                                 class="form-control date"
@@ -399,7 +399,7 @@
             $("#addMilestone").click(function() {
                 let newRow = `
                      <div class="row milestone-row">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <div class="form-group mb-3">
                                             <input type="text"required name="milestones[${milestoneCounter}][name]" class="form-control"
                                             placeholder="Name">
@@ -417,7 +417,7 @@
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[${milestoneCounter}][substantial_completion_date]" class="form-control date"
                                                 placeholder="Substantial Completion Date"style="background-color:#fff;">

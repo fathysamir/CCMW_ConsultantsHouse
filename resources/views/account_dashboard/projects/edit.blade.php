@@ -247,16 +247,16 @@
                             <div class="row">
                                 <!-- Name Input -->
                                 
-                                <div class="col-md-5"><label>Name</label></div>
+                                <div class="col-md-4"><label>Name</label></div>
                                 <div class="col-md-2"><label>Contractual Finish Date</label></div>
                                 <div class="col-md-2"><label>Revised Finish Date</label></div>
-                                <div class="col-md-2"><label>Substantial Completion Date</label></div>
+                                <div class="col-md-3"><label>Substantial Completion Date</label></div>
                                 <div class="col-md-1"></div>
                             </div>
                             <div id="milestonesContainer">
                                 @foreach ($project->milestones as $key2=>$milestone)
                                     <div class="row milestone-row">
-                                        <div class="col-md-5">
+                                        <div class="col-md-4">
                                             <div class="form-group mb-3">
                                                 <input type="text" required
                                                     name="old_milestones[{{ $milestone->id }}][name]"
@@ -282,7 +282,7 @@
                                                     value="{{ $milestone->revised_finish_date }}">
                                             </div>
                                         </div>
-                                        <div class="col-md-2">
+                                        <div class="col-md-3">
                                             <div class="form-group mb-3">
                                                 <input type="date"
                                                     name="old_milestones[{{ $milestone->id }}][substantial_completion_date]"
@@ -434,7 +434,7 @@
             $("#addMilestone").click(function() {
                 let newRow = `
                      <div class="row milestone-row">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <div class="form-group mb-3">
                                             <input type="text"required name="milestones[${milestoneCounter}][name]" class="form-control"
                                             placeholder="Name">
@@ -452,7 +452,7 @@
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[${milestoneCounter}][substantial_completion_date]" class="form-control date"
                                                 placeholder="Substantial Completion Date"style="background-color:#fff;">
