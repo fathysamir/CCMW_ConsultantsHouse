@@ -376,8 +376,28 @@
     <script>
         $(document).ready(function() {
             $('#ai_image').on('click', function() {
+                $.ajax({
+                    url: '/project/checkDoc_aiLayerUsed', // Adjust the route to your API endpoint
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        id: {{ $doc->id }}
 
-                $('#pagesFromToModal').modal('show'); // Show the modal
+                    },
+                    success: function(response) {
+                        if(response.result=='1'){
+                            alert('Someone Use AI Layer for this document');
+                        }else{
+                            $('#pagesFromToModal').modal('show'); // Show the modal
+
+                        }
+                       
+                       
+                    },
+                    error: function() {
+                        alert('Failed to assign document. Please try again.');
+                    }
+                });
             });
             $('#pagesFromTo').click(function() {
                 let from = $('#from').val();
@@ -400,7 +420,7 @@
                     success: function(response) {
 
                         $('#pagesFromToModal').modal('hide');
-                        window.open('/project/AI-layer/'+response.ai_zip_file, '_blank');
+                        window.open('/project/AI-layer/' + response.ai_zip_file, '_blank');
                     },
                     error: function() {
                         alert('Failed to assign document. Please try again.');

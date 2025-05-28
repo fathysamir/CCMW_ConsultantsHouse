@@ -1403,9 +1403,9 @@ class FileDocumentController extends ApiController
         }
         $imagick->setImageFormat('pdf');
         $imagick->setImageCompressionQuality(100);
-        $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
+        $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
 
-        $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $sourcePath=public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
         $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
 
@@ -1429,7 +1429,7 @@ class FileDocumentController extends ApiController
         $pdf->Output('F', $targetPath);
         session(['ai_zip_file' => $code]);
         session(['ai_pdf_path' => 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/extracted.pdf']);
-        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
 
         if (file_exists($path2)) {
             unlink($path2);
@@ -1716,12 +1716,16 @@ class FileDocumentController extends ApiController
 
             $data = json_decode($response, true);
         }
-        session(['aaaa' => 'Fathy']);
+        
         return response()->json(['status' => 'cleaned']);
     }
 
     public function checkDoc_aiLayerUsed(Request $request){
         $file_doc=FileDocument::findOrFail($request->id);
         $result=$file_doc->ai_layer;
+        return response()->json([
+            'message' => 'success',
+            'result' => $result
+        ]);
     }
 }
