@@ -374,7 +374,7 @@
                 let source_id = $('#source_id').val();
                 let ai_zip_file = $('#ai_zip_file').val();
                 $.ajax({
-                    url: '/project/summarize', // عدّل الرابط حسب ما يناسبك
+                    url: '/project/summarize/close', // عدّل الرابط حسب ما يناسبك
                     type: 'POST',
                     data: {
 
