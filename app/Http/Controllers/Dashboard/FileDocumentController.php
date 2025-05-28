@@ -1394,7 +1394,13 @@ class FileDocumentController extends ApiController
         }
         $imagick = new \Imagick();
         $imagick->setResolution(300, 300); // زيادة الدقة
-        $imagick->readImage($sourcePath . '[' . $request->from . '-' . $request->to . ']');
+        if($request->to == 1){
+            $imagick->readImage($sourcePath);
+
+        }else{
+            $imagick->readImage($sourcePath . '[' . $request->from . '-' . $request->to . ']');
+
+        }
         $imagick->setImageFormat('pdf');
         $imagick->setImageCompressionQuality(100);
         $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
