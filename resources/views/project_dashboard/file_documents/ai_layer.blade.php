@@ -380,11 +380,11 @@
 
                         source_id: source_id,
                         ai_zip_file: ai_zip_file
-                       
+
                     },
                     success: function(response) {
-                         window.close();
-                        
+                        window.close();
+
                     },
                     error: function(xhr) {
                         alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
@@ -407,6 +407,23 @@
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
+        });
+    </script>
+    <script>
+        window.addEventListener('unload', function() {
+            const sourceId = document.getElementById('source_id').value;
+            const aiZipFile = document.getElementById('ai_zip_file').value;
+
+            if (sourceId || aiZipFile) {
+                const data = {
+                    source_id: sourceId,
+                    ai_zip_file: aiZipFile,
+                    _token: '{{ csrf_token() }}'
+                };
+
+                // Send cleanup request using Beacon (doesn't block close)
+                navigator.sendBeacon("/ai/cleanup", new URLSearchParams(data));
+            }
         });
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

@@ -256,6 +256,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/AI-layer/{id}', [FileDocumentController::class, 'ai_layer'])->name('project.ai_layer');
     Route::post('/project/summarize', [FileDocumentController::class, 'summarize_pdf'])->name('project.summarize_pdf');
     Route::post('/project/summarize/close', [FileDocumentController::class, 'close_summarize_pdf'])->name('project.close_summarize_pdf');
+    Route::post('/ai/cleanup', [FileDocumentController::class, 'cleanupAI']);
 
     Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 

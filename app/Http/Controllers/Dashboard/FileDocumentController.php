@@ -29,7 +29,7 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
-        
+        dd(session('aaaa'));
         $ai_zip_file = session('ai_zip_file');
         if ($ai_zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
@@ -937,7 +937,7 @@ class FileDocumentController extends ApiController
         if ($request->action == 'save') {
             return redirect('/project/file-document-first-analyses/'.$doc->id)->with('success', $doc->document ? 'analyses for "'.$doc->document->subject.'" document saved successfully.' : 'analyses for "'.$doc->note->subject.'" document saved successfully.');
         } else {
-            session()->forget('ai_zip_file');
+            
             $ai_zip_file = session('ai_zip_file');
             if ($ai_zip_file != null) {
                 $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
@@ -1648,5 +1648,56 @@ class FileDocumentController extends ApiController
             'message' => 'success',
         ]);
 
+    }
+
+    public function cleanupAI(Request $request)
+    {
+        $sourceId = $request->source_id;
+        $aiZipFile = $request->ai_zip_file;
+        if ($aiZipFile != null) {
+            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$aiZipFile);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('ai_zip_file');
+        }
+        session()->forget('ai_pdf_path');
+       
+        // مثلاً:
+        if ($sourceId != null) {
+            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW'; // Your API key
+            
+
+            $payload = json_encode([
+                'sources' => [$sourceId],
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'https://api.chatpdf.com/v1/sources/delete',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+        }
+        session(['aaaa' => 'Fathy']);
+        return response()->json(['status' => 'cleaned']);
     }
 }
