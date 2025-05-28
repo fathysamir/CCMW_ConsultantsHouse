@@ -373,13 +373,15 @@
             $('#close').on('click', function() {
                 let source_id = $('#source_id').val();
                 let ai_zip_file = $('#ai_zip_file').val();
+                let file_doc_id = $('#file_doc_id').val();
                 $.ajax({
                     url: '/project/summarize/close', // عدّل الرابط حسب ما يناسبك
                     type: 'POST',
                     data: {
 
                         source_id: source_id,
-                        ai_zip_file: ai_zip_file
+                        ai_zip_file: ai_zip_file,
+                        file_doc_id: file_doc_id
 
                     },
                     success: function(response) {
@@ -413,11 +415,12 @@
         window.addEventListener('unload', function() {
             const sourceId = document.getElementById('source_id').value;
             const aiZipFile = document.getElementById('ai_zip_file').value;
-
+            const fileDoc_id = document.getElementById('file_doc_id').value;
             if (sourceId || aiZipFile) {
                 const data = {
                     source_id: sourceId,
                     ai_zip_file: aiZipFile,
+                    fileDoc_id: fileDoc_id,
                     _token: '{{ csrf_token() }}'
                 };
 

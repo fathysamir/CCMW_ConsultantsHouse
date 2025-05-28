@@ -1439,6 +1439,8 @@ class FileDocumentController extends ApiController
         if (file_exists($path2)) {
             unlink($path2);
         }
+
+
         return response()->json([
             'message' => 'success',
             'ai_zip_file' => $code
@@ -1450,7 +1452,9 @@ class FileDocumentController extends ApiController
         $ai_zip_file=session('ai_zip_file');
         $ai_pdf_path=session('ai_pdf_path');
         $file_doc_id=session('specific_file_doc');
-
+        $file_doc=FileDocument::findOrFail($file_doc_id);
+        $file_doc->ai_layer='1';
+        $file_doc->save();
         //session()->forget('ai_pdf_path');
         return view('project_dashboard.file_documents.ai_layer',compact('ai_zip_file','ai_pdf_path','file_doc_id'));
     }
@@ -1668,6 +1672,10 @@ class FileDocumentController extends ApiController
 
             $data = json_decode($response, true);
         }
+
+        $file_doc=FileDocument::findOrFail($request->file_doc_id);
+        $file_doc->ai_layer='0';
+        $file_doc->save();
         return response()->json([
             'message' => 'success',
         ]);
@@ -1721,7 +1729,12 @@ class FileDocumentController extends ApiController
 
             $data = json_decode($response, true);
         }
-        
+        $file_doc=FileDocument::findOrFail($request->fileDoc_id);
+        $file_doc->ai_layer='0';
+        $file_doc->save();
+        return response()->json([
+            'message' => 'success',
+        ]);
         return response()->json(['status' => 'cleaned']);
     }
 
