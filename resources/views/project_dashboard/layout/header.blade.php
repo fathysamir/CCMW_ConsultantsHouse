@@ -4,7 +4,7 @@
     </button>
     <div class="row">
         <ul class="nav">
-            <li class=" row nav-item dropdown mr-3">
+            <li class=" row nav-item dropdown mr-4">
                 <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white; font-size:1.2rem; padding-top:0px !important;padding-bottom:0px !important;" href="{{ route('switch.folder', $Folders->first()->id) }}">
                     <span class="item-text"><b>Files</b></span>
                 </a>
@@ -31,10 +31,30 @@
                     @endforelse
                 </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
+            <li class="row nav-item dropdown mr-3">
+                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('project.all_documents.index') }}"><span
                         class="ml-1 item-text"><b>Documents</b></span></a>
+                <a class="nav-link dropdown-toggle pr-0 vibrate-hover" href="#" id="navbarDropdownMenuLink3"
+                    role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    style="color:white; padding-left: 0.25rem;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;">
+                </a>
+
+                <!-- Dropdown menu -->
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink3">
+                    @forelse($DocTypes_ as $type)
+                        @if ($type->shortcut == '1')
+                            <a class="nav-link pl-3 l-link" style="color:rgb(80, 78, 78);"
+                                href="{{ url('/project/all-documents?doc_type=' . $type->id) }}">
+                                <span class="ml-1 item-text">{{ $type->name }}</span>
+                            </a>
+                        @endif
+                    @empty
+                        <a class="nav-link pl-3" href="#">
+                            <span class="ml-1 item-text">No folders found</span>
+                        </a>
+                    @endforelse
+                </div>
             </li>
 @php
     $project=\App\Models\Project::findOrFail(auth()->user()->current_project_id);

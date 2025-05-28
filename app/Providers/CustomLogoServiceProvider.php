@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\AccountUser;
 use App\Models\ProjectFolder;
 use App\Models\ProjectUser;
+use App\Models\DocType;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,15 @@ class CustomLogoServiceProvider extends ServiceProvider
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id);
 
             return $Folders;
+        });
+
+        $this->app->bind('DocTypes_', function () {
+            // Logic to determine the path to the logo image
+            // $logo=url(Setting::where('key','logo')->where('category','website')->where('type','file')->first()->value);
+            $user = auth()->user();
+            $DocTypes_ = DocType::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id);
+
+            return $DocTypes_;
         });
 
         $this->app->bind('Acco_Permissions', function () {
@@ -70,6 +80,28 @@ class CustomLogoServiceProvider extends ServiceProvider
 
             $view->with('Folders', $Folders);
         });
+
+        view()->composer('*', function ($view) {
+            $currentRoute = Route::currentRouteName();
+
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
+            }
+
+            $user = auth()->user();
+
+            // Avoid running for guest users
+            if (! $user) {
+                return;
+            }
+            $DocTypes_ = DocType::where('account_id', $user->current_account_id)
+                ->where('project_id', $user->current_project_id)->orderBy('order')
+                ->get();
+
+            $view->with('DocTypes_', $DocTypes_);
+        });
+
         view()->composer('*', function ($view) {
             $currentRoute = Route::currentRouteName();
 
