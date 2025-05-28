@@ -29,7 +29,7 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
-        dd(session('aaaa'));
+        
         $ai_zip_file = session('ai_zip_file');
         if ($ai_zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
