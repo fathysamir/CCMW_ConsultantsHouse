@@ -1401,6 +1401,11 @@ class FileDocumentController extends ApiController
             $imagick->readImage($sourcePath . '[' . $request->from . '-' . $request->to . ']');
 
         }
+        $directoryeee = public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id);
+
+        if (! file_exists($directoryeee)) {
+            mkdir($directoryeee, 0755, true); // true = create nested directories
+        }
         $imagick->setImageFormat('pdf');
         $imagick->setImageCompressionQuality(100);
         $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
