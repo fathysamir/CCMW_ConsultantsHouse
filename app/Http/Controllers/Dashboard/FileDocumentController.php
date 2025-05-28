@@ -29,7 +29,11 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
-        
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+
+        if (file_exists($path2)) {
+            unlink($path2);
+        }
         $ai_zip_file = session('ai_zip_file');
         if ($ai_zip_file != null) {
             $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$ai_zip_file);
@@ -63,7 +67,7 @@ class FileDocumentController extends ApiController
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
 
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $stake_holders = $project->stakeHolders;
 
         $array_red_flags = FileDocumentFlags::where('user_id', auth()->user()->id)->where('flag', 'red')->pluck('file_document_id')->toArray();
@@ -830,7 +834,11 @@ class FileDocumentController extends ApiController
 
     public function file_document_first_analyses($id)
     {
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
 
+        if (file_exists($path2)) {
+            unlink($path2);
+        }
         session()->forget('path');
         $user = auth()->user();
         session(['specific_file_doc' => $id]);
@@ -1368,6 +1376,11 @@ class FileDocumentController extends ApiController
 
     public function create_ai_pdf(Request $request)
     {
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+
+        if (file_exists($path2)) {
+            unlink($path2);
+        }
         $path = session('path');
         $sourcePath = public_path($path);
         session()->forget('ai_zip_file');
@@ -1381,7 +1394,7 @@ class FileDocumentController extends ApiController
         }
         $imagick = new \Imagick();
         $imagick->setResolution(300, 300); // زيادة الدقة
-        $imagick->readImage($sourcePath);
+        $imagick->readImage($sourcePath , '[' . $request->from . '-' . $request->to . ']');
         $imagick->setImageFormat('pdf');
         $imagick->setImageCompressionQuality(100);
         $imagick->writeImages(public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf'), true);
@@ -1412,9 +1425,9 @@ class FileDocumentController extends ApiController
         session(['ai_pdf_path' => 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/extracted.pdf']);
         $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
 
-            if (file_exists($path2)) {
-                unlink($path2);
-            }
+        if (file_exists($path2)) {
+            unlink($path2);
+        }
         return response()->json([
             'message' => 'success',
             'ai_zip_file' => $code
@@ -1699,5 +1712,10 @@ class FileDocumentController extends ApiController
         }
         session(['aaaa' => 'Fathy']);
         return response()->json(['status' => 'cleaned']);
+    }
+
+    public function checkDoc_aiLayerUsed(Request $request){
+        $file_doc=FileDocument::findOrFail($request->id);
+        $result=$file_doc->ai_layer;
     }
 }

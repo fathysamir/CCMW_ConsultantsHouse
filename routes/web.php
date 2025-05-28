@@ -184,6 +184,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
     Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
 
+
     Route::get('go-to-fileDocument/{docId}/{fileId}', function ($doc, $file) {
 
         $document = FileDocument::where('file_id', $file)->where('document_id', $doc)->first();
@@ -257,6 +258,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/summarize', [FileDocumentController::class, 'summarize_pdf'])->name('project.summarize_pdf');
     Route::post('/project/summarize/close', [FileDocumentController::class, 'close_summarize_pdf'])->name('project.close_summarize_pdf');
     Route::post('/ai/cleanup', [FileDocumentController::class, 'cleanupAI']);
+    Route::post('/project/checkDoc_aiLayerUsed', [FileDocumentController::class, 'checkDoc_aiLayerUsed'])->name('project.file_document.checkDoc_aiLayerUsed-document-slug');
 
     Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 

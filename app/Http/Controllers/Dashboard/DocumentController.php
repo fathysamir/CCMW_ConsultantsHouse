@@ -24,7 +24,7 @@ class DocumentController extends ApiController
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
 
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $stake_holders = $project->stakeHolders;
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
@@ -145,7 +145,7 @@ class DocumentController extends ApiController
         session()->forget('current_view');
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $all_documents = Document::where('project_id', auth()->user()->current_project_id);
         if ($request->threads) {
             $threadValues = array_filter(array_map('trim', explode(',', $request->threads)));
@@ -186,7 +186,7 @@ class DocumentController extends ApiController
         }
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $stake_holders = $project->stakeHolders;
         $document = Document::where('slug', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->where('id', '!=', $document->id)->pluck('reference');

@@ -22,7 +22,7 @@ class UploadGroupDocumentController extends ApiController
         $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $stake_holders = $project->stakeHolders;
 
         return view('project_dashboard.upload_group_documents.index', compact('folders', 'users', 'project', 'documents_types', 'stake_holders'));
@@ -129,7 +129,7 @@ class UploadGroupDocumentController extends ApiController
         session()->forget('path');
         $project = Project::findOrFail(auth()->user()->current_project_id);
         $users = $project->assign_users;
-        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->get();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
         $stake_holders = $project->stakeHolders;
         $document = TestDocument::where('id', $id)->first();
         $threads = Document::where('project_id', auth()->user()->current_project_id)->pluck('reference');

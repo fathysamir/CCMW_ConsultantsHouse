@@ -28,6 +28,7 @@ return new class extends Migration
             $table->enum('forClaim', ['0', '1'])->default('1');
             $table->enum('forLetter', ['0', '1'])->default('0');
             $table->enum('forChart', ['0', '1'])->default('0');
+            $table->enum('ai_layer', ['0', '1'])->default('0');
 
             $table->timestamps();
             $table->softDeletes();

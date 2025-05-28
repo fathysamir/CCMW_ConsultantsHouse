@@ -24,6 +24,7 @@ class FileDocument extends Model
         'forClaim',
         'forLetter',
         'forChart',
+        'ai_layer'
 
     ];
 
