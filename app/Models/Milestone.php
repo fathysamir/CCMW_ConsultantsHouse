@@ -17,6 +17,7 @@ class Milestone extends Model
         'name',
         'contract_finish_date',
         'revised_finish_date',
+        'substantial_completion_date'
 
     ];
 

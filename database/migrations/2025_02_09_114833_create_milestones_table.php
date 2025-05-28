@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->date('contract_finish_date')->nullable(true);
             $table->date('revised_finish_date')->nullable(true);
+            $table->date('substantial_completion_date')->nullable(true);
+            
             $table->timestamps();
             $table->softDeletes();
 

@@ -217,6 +217,7 @@ class ProjectService
                     'name' => $milestone['name'],
                     'contract_finish_date' => $milestone['contract_finish_date'],
                     'revised_finish_date' => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date']
                 ]);
             }
         }
@@ -233,6 +234,7 @@ class ProjectService
                     'name' => $milestone['name'],
                     'contract_finish_date' => $milestone['contract_finish_date'],
                     'revised_finish_date' => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date']
                 ]);
                 $existingIds[] = $id;
             }
@@ -253,6 +255,7 @@ class ProjectService
                     'name' => $milestone['name'],
                     'contract_finish_date' => $milestone['contract_finish_date'],
                     'revised_finish_date' => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date']
                 ]);
             }
         }

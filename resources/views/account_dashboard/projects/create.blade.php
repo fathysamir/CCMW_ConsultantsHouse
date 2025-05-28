@@ -226,8 +226,9 @@
                             <div class="row">
                                 <!-- Name Input -->
                                 <div class="col-md-5"><label>Name</label></div>
-                                <div class="col-md-3"><label>Contractual Finish Date</label></div>
-                                <div class="col-md-3"><label>Revised Finish Date</label></div>
+                                <div class="col-md-2"><label>Contractual Finish Date</label></div>
+                                <div class="col-md-2"><label>Revised Finish Date</label></div>
+                                <div class="col-md-2"><label>Substantial Completion Date</label></div>
                                 <div class="col-md-1"></div>
                             </div>
                             <div id="milestonesContainer">
@@ -238,18 +239,25 @@
                                                 placeholder="Name">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[{{$milestones_counter}}][contract_finish_date]"
                                                 class="form-control date"
                                                 placeholder="Contractual Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[{{$milestones_counter}}][revised_finish_date]"
                                                 class="form-control date"
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group mb-3">
+                                            <input type="date" name="milestones[{{$milestones_counter}}][substantial_completion_date]"
+                                                class="form-control date"
+                                                placeholder="Substantial Completion Date"style="background-color:#fff;">
                                         </div>
                                     </div>
 
@@ -397,16 +405,22 @@
                                             placeholder="Name">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[${milestoneCounter}][contract_finish_date]" class="form-control date"
                                                 placeholder="Contractual Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group mb-3">
                                             <input type="date" name="milestones[${milestoneCounter}][revised_finish_date]" class="form-control date"
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group mb-3">
+                                            <input type="date" name="milestones[${milestoneCounter}][substantial_completion_date]" class="form-control date"
+                                                placeholder="Substantial Completion Date"style="background-color:#fff;">
                                         </div>
                                     </div>
 
