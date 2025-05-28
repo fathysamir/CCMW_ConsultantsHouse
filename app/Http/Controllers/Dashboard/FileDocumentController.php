@@ -29,7 +29,7 @@ class FileDocumentController extends ApiController
 {
     public function index($id)
     {
-        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'. auth()->user()->id . '/' .'cleaned_gyjt__test_11.pdf');
 
         if (file_exists($path2)) {
             unlink($path2);
@@ -834,7 +834,7 @@ class FileDocumentController extends ApiController
 
     public function file_document_first_analyses($id)
     {
-        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'. auth()->user()->id . '/' .'cleaned_gyjt__test_11.pdf');
 
         if (file_exists($path2)) {
             unlink($path2);
@@ -1376,7 +1376,7 @@ class FileDocumentController extends ApiController
 
     public function create_ai_pdf(Request $request)
     {
-        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.'cleaned_gyjt__test_11.pdf');
+        $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'. auth()->user()->id . '/' .'cleaned_gyjt__test_11.pdf');
 
         if (file_exists($path2)) {
             unlink($path2);
