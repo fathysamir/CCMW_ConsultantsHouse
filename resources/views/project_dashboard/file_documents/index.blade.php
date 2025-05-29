@@ -260,7 +260,8 @@
     </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{ $file->name }}</h2>
+            <h2 class="h3 mb-0 page-title">{{ $file->folder->name }}<span id="chevronIcon"
+            class="fe fe-24 fe-chevrons-right"></span>{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
             <button type="button" class="btn mb-2 dropdown-toggle btn-success"data-toggle="dropdown" aria-haspopup="true"
