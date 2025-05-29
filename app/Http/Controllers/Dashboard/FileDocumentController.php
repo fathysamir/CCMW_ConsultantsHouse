@@ -1423,7 +1423,7 @@ class FileDocumentController extends ApiController
         $pageCount = $pdf->setSourceFile($sourcePath);
 
         // استخراج الصفحات من 3 إلى 10
-        for ($i = intval($from); $i <= intval($to) && $i <= $pageCount; $i++) {
+        for ($i = intval($request->from); $i <= intval($request->to) && $i <= $pageCount; $i++) {
             $templateId = $pdf->importPage($i);
             $size = $pdf->getTemplateSize($templateId);
 
