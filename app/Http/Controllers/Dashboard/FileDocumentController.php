@@ -1377,7 +1377,8 @@ class FileDocumentController extends ApiController
     public function create_ai_pdf(Request $request)
     {
         $path2 = public_path('projects/'.auth()->user()->current_project_id.'/temp/'. auth()->user()->id . '/' .'cleaned_gyjt__test_11.pdf');
-
+        $from = $request->from - 1;
+        $to = $request->to - 1;
         if (file_exists($path2)) {
             unlink($path2);
         }
@@ -1398,7 +1399,7 @@ class FileDocumentController extends ApiController
             $imagick->readImage($sourcePath);
 
         }else{
-            $imagick->readImage($sourcePath . '[' . $request->from . '-' . $request->to . ']');
+            $imagick->readImage($sourcePath . '[' . $from . '-' . $to . ']');
 
         }
         $directoryeee = public_path('projects/'.auth()->user()->current_project_id.'/temp/' . auth()->user()->id);
@@ -1422,7 +1423,7 @@ class FileDocumentController extends ApiController
         $pageCount = $pdf->setSourceFile($sourcePath);
 
         // استخراج الصفحات من 3 إلى 10
-        for ($i = intval($request->from); $i <= intval($request->to) && $i <= $pageCount; $i++) {
+        for ($i = intval($from); $i <= intval($to) && $i <= $pageCount; $i++) {
             $templateId = $pdf->importPage($i);
             $size = $pdf->getTemplateSize($templateId);
 
@@ -1463,7 +1464,7 @@ class FileDocumentController extends ApiController
         //dd($request->all());
         $file_doc=FileDocument::findOrFail($request->file_doc_id);
         $document=$file_doc->document;
-        $message="This was a " . $document->docType->name . " " . $document->docType->relevant_word;
+        $message="This was a " . $document->docType->description . " " . $document->docType->relevant_word;
         if($document->fromStakeHolder){
             $message .=" from " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative;
         }
@@ -1477,7 +1478,7 @@ class FileDocumentController extends ApiController
              $message .=" in a way supporting " . $document->toStakeHolder->article . " " . $document->toStakeHolder->narrative;
         }
         if($document->fromStakeHolder){
-            $message .=". please start the paragraph  with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative . " " . $document->docType->relevant_word . " a " . $document->docType->name ;
+            $message .=". please start the paragraph  with " . $document->fromStakeHolder->article . " " . $document->fromStakeHolder->narrative . " " . $document->docType->relevant_word . " a " . $document->docType->description ;
         }
         $message .=". No need to mention the project name or to repeat the letter subject.";
         if($request->focus == 'none'){
