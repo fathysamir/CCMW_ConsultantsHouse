@@ -166,7 +166,7 @@
 
                         </div>
                         <div class="form-group mb-3">
-                            <label for="masterFile">Project Perspective</label>
+                            <label for="masterFile">Master Layout</label>
                             <div class="custom-file">
                                 <input name="master" type="file" class="custom-file-input"
                                     id="masterFile"accept="application/pdf" onchange="updateFileName(this)">
