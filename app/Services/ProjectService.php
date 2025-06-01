@@ -148,6 +148,20 @@ class ProjectService
             }
             uploadMedia($request->logo, $project->logoCollection, $project);
         }
+        if ($request->file('perspective')) {
+            $perspective = getFirstMediaUrl($project, $project->perspectiveCollection);
+            if ($perspective != null) {
+                deleteMedia($project, $project->perspectiveCollection);
+            }
+            uploadMedia($request->perspective, $project->perspectiveCollection, $project);
+        }
+        if ($request->file('master')) {
+            $master = getFirstMediaUrl($project, $project->masterCollection);
+            if ($master != null) {
+                deleteMedia($project, $project->masterCollection);
+            }
+            uploadMedia($request->master, $project->masterCollection, $project);
+        }
     }
 
     private function createStakeholders(Request $request, Project $project)

@@ -1,11 +1,11 @@
 @extends('account_dashboard.layout.app')
 @section('title', 'Update Project')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <style>
         #epsTree {
             list-style-type: none;
@@ -145,8 +145,8 @@
                             <label for="customFile">Project Logo</label>
                             <div class="custom-file">
                                 <input name="logo" type="file" class="custom-file-input" id="customFile"
-                                    onchange="previewImage(event)">
-                                <label class="custom-file-label" for="customFile">Choose Image</label>
+                                    accept="image/*"onchange="previewImage(event);updateFileName(this)">
+                                <label class="custom-file-label" for="customFile"id="customFileLabel">Choose Image</label>
                             </div>
                             <!-- Image Preview -->
                             <div class="mt-3">
@@ -154,6 +154,26 @@
                                     class="img-thumbnail"
                                     style="@if ($project->logo) display: block; @else display: none; @endif max-width: 200px; height: auto;">
                             </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="PerspectiveFile">Project Perspective</label>
+                            <div class="custom-file">
+                                <input name="perspective" type="file" class="custom-file-input"
+                                    id="PerspectiveFile"accept="application/pdf" onchange="updateFileName(this)">
+                                <label class="custom-file-label" for="PerspectiveFile"id="PerspectiveFileLabel">Choose File</label>
+                            </div>
+                            <!-- Image Preview -->
+
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="masterFile">Project Perspective</label>
+                            <div class="custom-file">
+                                <input name="master" type="file" class="custom-file-input"
+                                    id="masterFile"accept="application/pdf" onchange="updateFileName(this)">
+                                <label class="custom-file-label" for="masterFile"id="masterFileLabel">Choose File</label>
+                            </div>
+                            <!-- Image Preview -->
+
                         </div>
                         <div class="form-group mb-3">
                             <label for="summary">Summary Scope of works</label>
@@ -246,7 +266,7 @@
                             </div>
                             <div class="row">
                                 <!-- Name Input -->
-                                
+
                                 <div class="col-md-4"><label>Name</label></div>
                                 <div class="col-md-2"><label>Contractual Finish Date</label></div>
                                 <div class="col-md-2"><label>Revised Finish Date</label></div>
@@ -254,7 +274,7 @@
                                 <div class="col-md-1"></div>
                             </div>
                             <div id="milestonesContainer">
-                                @foreach ($project->milestones as $key2=>$milestone)
+                                @foreach ($project->milestones as $key2 => $milestone)
                                     <div class="row milestone-row">
                                         <div class="col-md-4">
                                             <div class="form-group mb-3">
@@ -315,7 +335,8 @@
                                 <ul id="epsTree">
                                     @foreach ($EPS as $category)
                                         @include('account_dashboard.partials.project_category_tree', [
-                                            'category' => $category,'project'=>$project
+                                            'category' => $category,
+                                            'project' => $project,
                                         ])
                                     @endforeach
                                 </ul>
@@ -366,6 +387,12 @@
         });
     </script>
     <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || 'Choose File';
+            const labelId = input.id + 'Label';
+            document.getElementById(labelId).textContent = fileName;
+        }
+
         function previewImage(event) {
             var input = event.target;
             var reader = new FileReader();

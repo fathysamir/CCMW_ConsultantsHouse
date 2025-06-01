@@ -1,11 +1,11 @@
 @extends('account_dashboard.layout.app')
 @section('title', 'Create Project')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <style>
         #epsTree {
             list-style-type: none;
@@ -116,7 +116,7 @@
                                 <div class="form-group mb-3">
                                     <label for="revised_value">Revised Value</label>
                                     <input type="number" id="revised_value" name="revised_value" class="form-control"
-                                        placeholder="Revised Value"step="0.01"value="{{ old('revised_value') }}">
+                                        placeholder="Revised Value"step="0.01" value="{{ old('revised_value') }}">
                                 </div>
                             </div>
                         </div>
@@ -141,8 +141,8 @@
                             <label for="customFile">Project Logo</label>
                             <div class="custom-file">
                                 <input name="logo" type="file" class="custom-file-input" id="customFile"
-                                    onchange="previewImage(event)">
-                                <label class="custom-file-label" for="customFile">Choose Image</label>
+                                    onchange="previewImage(event);updateFileName(this)">
+                                <label class="custom-file-label" for="customFile"id="customFileLabel">Choose Image</label>
                             </div>
                             <!-- Image Preview -->
                             <div class="mt-3">
@@ -151,13 +151,34 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
+                            <label for="PerspectiveFile">Project Perspective</label>
+                            <div class="custom-file">
+                                <input name="perspective" type="file" class="custom-file-input"
+                                    id="PerspectiveFile"accept="application/pdf" onchange="updateFileName(this)">
+                                <label class="custom-file-label" for="PerspectiveFile"id="PerspectiveFileLabel">Choose
+                                    File</label>
+                            </div>
+                            <!-- Image Preview -->
+
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="masterFile">Project Perspective</label>
+                            <div class="custom-file">
+                                <input name="master" type="file" class="custom-file-input"
+                                    id="masterFile"accept="application/pdf" onchange="updateFileName(this)">
+                                <label class="custom-file-label" for="masterFile"id="masterFileLabel">Choose File</label>
+                            </div>
+                            <!-- Image Preview -->
+
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="summary">Summary Scope of works</label>
                             <textarea name="summary" rows="5" id="summary" class="form-control" placeholder="Summary Scope of works">{{ old('summary') }}</textarea>
                         </div>
-<?php
-  $stakeholders_counter=0;
-  $milestones_counter=0;
-?>
+                        <?php
+                        $stakeholders_counter = 0;
+                        $milestones_counter = 0;
+                        ?>
                         <fieldset class="border p-3 mb-3">
                             <legend style="width: 190px;margin-bottom: 0px;">Key Stakeholders</legend>
                             <div class="d-flex justify-content-between align-items-center" style="margin-top: -25px;">
@@ -177,7 +198,8 @@
                                 <div class="row stakeholder-row">
                                     <div class="col-md-3">
                                         <div class="form-group mb-3">
-                                            <select name="stakeholders[{{$stakeholders_counter}}][role]" required class="form-control">
+                                            <select name="stakeholders[{{ $stakeholders_counter }}][role]" required
+                                                class="form-control">
                                                 <option value='' selected disabled>Select Role</option>
                                                 @foreach ($roles as $role)
                                                     <option value="{{ $role }}">{{ $role }}</option>
@@ -187,19 +209,21 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group mb-3">
-                                            <input type="text" name="stakeholders[{{$stakeholders_counter}}][name]" class="form-control"
-                                                placeholder="Name">
+                                            <input type="text" name="stakeholders[{{ $stakeholders_counter }}][name]"
+                                                class="form-control" placeholder="Name">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group mb-3">
-                                            <input type="text" name="stakeholders[{{$stakeholders_counter}}][chronology]" class="form-control"
-                                                placeholder="Chronology">
+                                            <input type="text"
+                                                name="stakeholders[{{ $stakeholders_counter }}][chronology]"
+                                                class="form-control" placeholder="Chronology">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group mb-3">
-                                            <select name="stakeholders[{{$stakeholders_counter}}][article]" class="form-control">
+                                            <select name="stakeholders[{{ $stakeholders_counter }}][article]"
+                                                class="form-control">
                                                 <option value=""></option>
                                                 <option value="the">The</option>
                                             </select>
@@ -235,27 +259,31 @@
                                 <div class="row milestone-row">
                                     <div class="col-md-4">
                                         <div class="form-group mb-3">
-                                            <input type="text" required name="milestones[{{$milestones_counter}}][name]" class="form-control"
+                                            <input type="text" required
+                                                name="milestones[{{ $milestones_counter }}][name]" class="form-control"
                                                 placeholder="Name">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group mb-3">
-                                            <input type="date" name="milestones[{{$milestones_counter}}][contract_finish_date]"
+                                            <input type="date"
+                                                name="milestones[{{ $milestones_counter }}][contract_finish_date]"
                                                 class="form-control date"
                                                 placeholder="Contractual Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group mb-3">
-                                            <input type="date" name="milestones[{{$milestones_counter}}][revised_finish_date]"
+                                            <input type="date"
+                                                name="milestones[{{ $milestones_counter }}][revised_finish_date]"
                                                 class="form-control date"
                                                 placeholder="Revised Finish Date"style="background-color:#fff;">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group mb-3">
-                                            <input type="date" name="milestones[{{$milestones_counter}}][substantial_completion_date]"
+                                            <input type="date"
+                                                name="milestones[{{ $milestones_counter }}][substantial_completion_date]"
                                                 class="form-control date"
                                                 placeholder="Substantial Completion Date"style="background-color:#fff;">
                                         </div>
@@ -285,9 +313,9 @@
                                     @endforeach
                                 </ul>
                                 @if ($errors->has('selected_category'))
-                                <p class="text-error more-info-err" style="color: red;">
-                                    {{ $errors->first('selected_category') }}</p>
-                            @endif
+                                    <p class="text-error more-info-err" style="color: red;">
+                                        {{ $errors->first('selected_category') }}</p>
+                                @endif
                             </div>
                         </fieldset>
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
@@ -331,6 +359,12 @@
         });
     </script>
     <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || 'Choose File';
+            const labelId = input.id + 'Label';
+            document.getElementById(labelId).textContent = fileName;
+        }
+
         function previewImage(event) {
             var input = event.target;
             var reader = new FileReader();

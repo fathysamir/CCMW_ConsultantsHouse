@@ -13,6 +13,8 @@ class Project extends Model
     protected $table = 'projects';
 
     public $logoCollection = 'logo';
+    public $perspectiveCollection = 'perspective';
+    public $masterCollection = 'master';
 
     protected $fillable = [
         'code',
