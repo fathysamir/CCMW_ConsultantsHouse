@@ -1,5 +1,5 @@
 @extends('project_dashboard.layout.app')
-@section('title', 'Project Home - Project Abbreviations')
+@section('title', 'Project Home - Project Contacts')
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
 
@@ -67,16 +67,24 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 12% !important;
+            width: 20% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 80% !important;
+            width: 20% !important;
         }
-
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
+            width: 20% !important;
+        }
+        .table-container th:nth-child(5),
+        .table-container td:nth-child(5) {
+            width: 32% !important;
+        }
+
+        .table-container th:nth-child(6),
+        .table-container td:nth-child(6) {
             width: 7% !important;
         }
 
@@ -114,13 +122,13 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Abbreviations</h2>
+            <h2 class="h3 mb-0 page-title">Contacts</h2>
         </div>
         @if (auth()->user()->roles->first()->name == 'Super Admin' ||
-                in_array('create_abbreviation', $Project_Permissions ?? []))
+                in_array('create_project_contact', $Project_Permissions ?? []))
             <div class="col-auto">
-                <a type="button" href="{{ route('project.create_abbreviation') }}"
-                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Abbreviation</a>
+                <a type="button" href="{{ route('project.create_contact') }}"
+                    class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Contact</a>
             </div>
         @endif
     </div>
@@ -151,9 +159,10 @@
                             <tr>
 
                                 <th></th>
-                                <th>Abbreviation</th>
-                                <th>Description</th>
-
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Phone</th>
+                                <th>Email</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -161,32 +170,28 @@
                             <?php
                             $counter = 1;
                             ?>
-                            @foreach ($abbreviations as $abbreviation)
+                            @foreach ($contacts as $contact)
                                 <tr>
 
                                     <td>{{ $counter }}</td>
-                                    <td>{{ $abbreviation->abb }}</td>
-                                    <td>
-                                        @if (strlen($abbreviation->description) > 120)
-                                            {{ substr($abbreviation->description, 0, 120) }}...
-                                        @else
-                                            {{ $abbreviation->description }}
-                                        @endif
-                                    </td>
+                                    <td>{{ $contact->name }}</td>
+                                    <td>{{ $contact->role }}</td>
+                                    <td>{{ $contact->country_code . $contact->phone }}</td>
+                                    <td>{{ $contact->email }}</td>
 
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span class="text-muted sr-only">Action</span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_abbreviation', $Project_Permissions ?? []))
+                                            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_project_contact', $Project_Permissions ?? []))
                                                 <a class="dropdown-item"
-                                                    href="{{ route('project.edit_abbreviation', $abbreviation->id) }}">Edit</a>
+                                                    href="{{ route('project.edit_contact', $contact->id) }}">Edit</a>
                                             @endif
                                             @if (auth()->user()->roles->first()->name == 'Super Admin' ||
-                                                    in_array('delete_abbreviation', $Project_Permissions ?? []))
+                                                    in_array('delete_project_contact', $Project_Permissions ?? []))
                                                 <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                    onclick="confirmDelete('{{ route('project.delete_abbreviation', $abbreviation->id) }}')">Remove</a>
+                                                    onclick="confirmDelete('{{ route('project.delete_contact', $contact->id) }}')">Remove</a>
                                             @endif
                                         </div>
                                     </td>
@@ -228,7 +233,7 @@
     </script>
     <script>
         function confirmDelete(url) {
-            if (confirm('Are you sure you want to delete this abbreviation? This action cannot be undone.')) {
+            if (confirm('Are you sure you want to delete this contact? This action cannot be undone.')) {
                 window.location.href = url; // Redirect to delete route
             }
         }

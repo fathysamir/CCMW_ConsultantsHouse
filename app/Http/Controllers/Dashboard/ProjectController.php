@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\Category;
 use App\Models\Project;
 use App\Models\StakeHolder;
+use App\Models\ProjectContact;
 use App\Models\ProjectAbbreviation;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
@@ -255,6 +256,41 @@ class ProjectController extends ApiController
     {
         ProjectAbbreviation::where('id', $id)->delete();
         return redirect('/account/project/abbreviations')->with('success', 'Abbreviation deleted successfully.');
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////Project Contacts///////////////////////////////////////
+
+    public function index_contacts(){
+        $contacts=ProjectContact::where('project_id',auth()->user()->current_project_id)->get();
+        return view('project_dashboard.project.contacts.index', compact('contacts'));
+    }
+    public function create_contact(){
+        return view('project_dashboard.project.contacts.create');
+    }
+    public function store_contact(Request $request){
+        ProjectContact::create(['project_id'=>auth()->user()->current_project_id,'name'=>$request->name,'role'=>$request->role,'email'=>$request->email,'phone'=>$request->phone,'country_code'=>$request->country_code]);
+        return redirect('/account/project/contacts')->with('success', 'New Contact Saved successfully.');
+    }
+    public function edit_contact($id){
+        $contact=ProjectContact::where('id',$id)->first();
+        return view('project_dashboard.project.contacts.edit',compact('contact'));
+    }
+    public function update_contact(Request $request,ProjectContact $contact){
+      
+        $contact->name=$request->name;
+        $contact->email=$request->email;
+        $contact->role=$request->role;
+        $contact->phone=$request->phone;
+        $contact->country_code=$request->country_code;
+        $contact->save();
+        return redirect('/account/project/contacts')->with('success', 'Contact Updated successfully.');
+    }
+    public function delete_contact($id)
+    {
+        ProjectContact::where('id', $id)->delete();
+        return redirect('/account/project/contacts')->with('success', 'Contact deleted successfully.');
 
     }
 }

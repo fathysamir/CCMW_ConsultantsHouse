@@ -65,10 +65,17 @@
                             <span class="ml-1 item-text">Stakeholders</span>
                         </a>
                     </li>
-                     @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_abbreviations', $Project_Permissions ?? []))
+                    @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_abbreviations', $Project_Permissions ?? []))
                     <li class="nav-item">
                         <a class="nav-link pl-3"href="{{ route('project.index_abbreviations') }}">
                             <span class="ml-1 item-text">Abbreviations</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_project_contacts', $Project_Permissions ?? []))
+                    <li class="nav-item">
+                        <a class="nav-link pl-3"href="{{ route('project.index_contacts') }}">
+                            <span class="ml-1 item-text">Contacts</span>
                         </a>
                     </li>
                     @endif

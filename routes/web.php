@@ -148,6 +148,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/account/project/abbreviations/edit/{id}', [ProjectController::class, 'edit_abbreviation'])->name('project.edit_abbreviation');
     Route::post('/account/project/abbreviations/update/{abbreviation}', [ProjectController::class, 'update_abbreviation'])->name('project.update_abbreviation');
     Route::get('/account/project/abbreviations/delete/{id}', [ProjectController::class, 'delete_abbreviation'])->name('project.delete_abbreviation');
+
+    Route::get('/account/project/contacts', [ProjectController::class, 'index_contacts'])->name('project.index_contacts');
+    Route::get('/account/project/contacts/create', [ProjectController::class, 'create_contact'])->name('project.create_contact');
+    Route::post('/account/project/contacts/store', [ProjectController::class, 'store_contact'])->name('project.store_contact');
+    Route::get('/account/project/contacts/edit/{id}', [ProjectController::class, 'edit_contact'])->name('project.edit_contact');
+    Route::post('/account/project/contacts/update/{contact}', [ProjectController::class, 'update_contact'])->name('project.update_contact');
+    Route::get('/account/project/contacts/delete/{id}', [ProjectController::class, 'delete_contact'])->name('project.delete_contact');
     Route::get('/switch-project/{id}', function ($id) {
         // session(['current_account_id' => $id]);
         $user = auth()->user();

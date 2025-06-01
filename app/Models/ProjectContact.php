@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProjectAbbreviation extends Model
+class ProjectContact extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $table = 'project_abbreviations';
+    protected $table = 'project_contacts';
 
     protected $fillable = [
         'project_id',
