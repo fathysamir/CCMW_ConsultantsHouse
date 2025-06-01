@@ -139,7 +139,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/archiveProject', [ProjectController::class, 'archiveProject'])->name('archiveProject');
     Route::post('/deleteProject', [ProjectController::class, 'deleteProject'])->name('deleteProject');
     Route::post('/restoreProject', [ProjectController::class, 'restoreProject'])->name('restoreProject');
-
+    Route::get('/account/project/stakeholders/{id}', [ProjectController::class, 'stakeholders_view'])->name('account.project.stakeholders_view');
+    Route::post('/account/project/update-stakeholders/{project}', [ProjectController::class, 'update_stakeholders'])->name('projects.update_stakeholders');
+    ///////////////////////////////////////////////////////
+    Route::get('/account/project/abbreviations', [ProjectController::class, 'index_abbreviations'])->name('project.index_abbreviations');
+    Route::get('/account/project/abbreviations/create', [ProjectController::class, 'create_abbreviation'])->name('project.create_abbreviation');
+    Route::post('/account/project/abbreviations/store', [ProjectController::class, 'store_abbreviation'])->name('project.store_abbreviation');
+    Route::get('/account/project/abbreviations/edit/{id}', [ProjectController::class, 'edit_abbreviation'])->name('project.edit_abbreviation');
+    Route::post('/account/project/abbreviations/update/{abbreviation}', [ProjectController::class, 'update_abbreviation'])->name('project.update_abbreviation');
+    Route::get('/account/project/abbreviations/delete/{id}', [ProjectController::class, 'delete_abbreviation'])->name('project.delete_abbreviation');
     Route::get('/switch-project/{id}', function ($id) {
         // session(['current_account_id' => $id]);
         $user = auth()->user();

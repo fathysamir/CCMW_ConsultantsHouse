@@ -6,6 +6,8 @@ use App\Http\Controllers\ApiController;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Project;
+use App\Models\StakeHolder;
+use App\Models\ProjectAbbreviation;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 
@@ -162,5 +164,97 @@ class ProjectController extends ApiController
         $project->save();
 
         return $this->sendResponse(null, 'success');
+    }
+
+
+    public function stakeholders_view($id){
+        $project = Project::where('slug', $id)->first();
+        $roles = [
+            'Employer',
+            'Contractor',
+            'Engineer',
+            'Project Manager',
+            'Consultant',
+            'Sub-Contractor',
+            'Authority',
+            'Another Contractor',
+            'Lower-Tier Subcontractor',
+            'Other',
+        ];
+        return view('project_dashboard.project.stakeholders', compact('roles', 'project'));
+
+    }
+
+    public function update_stakeholders(Request $request,Project $project){
+        $existingIds = [];
+        // Update existing stakeholders
+        if ($request->old_stakeholders && count($request->old_stakeholders) > 0) {
+            foreach ($request->old_stakeholders as $id => $stakeholder) {
+                $narrative = $stakeholder['chronology'] ?? $stakeholder['role'];
+
+                StakeHolder::where('id', $id)->update([
+                    'name' => $stakeholder['name'],
+                    'role' => $stakeholder['role'],
+                    'narrative' => $narrative,
+                    'article' => $stakeholder['article'],
+                ]);
+                $existingIds[] = $id;
+            }
+            // Delete stakeholders that are no longer in the list
+            StakeHolder::whereNotIn('id', $existingIds)
+                ->where('project_id', $project->id)
+                ->delete();
+        } else {
+            // If no existing stakeholders are provided, delete all current stakeholders
+            StakeHolder::where('project_id', $project->id)->delete();
+        }
+
+        // Create new stakeholders
+        if ($request->stakeholders && count($request->stakeholders) > 0) {
+            foreach ($request->stakeholders as $stakeholder) {
+                $narrative = $stakeholder['chronology'] ?? $stakeholder['role'];
+
+                StakeHolder::create([
+                    'project_id' => $project->id,
+                    'name' => $stakeholder['name'],
+                    'role' => $stakeholder['role'],
+                    'narrative' => $narrative,
+                    'article' => $stakeholder['article'],
+                ]);
+            }
+        }
+        return redirect('/account/project/stakeholders/'. $project->slug)->with('success', 'Project Stakeholders updated successfully.');
+ 
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////Project Abbreviations///////////////////////////////////////
+
+    public function index_abbreviations(){
+        $abbreviations=ProjectAbbreviation::where('project_id',auth()->user()->current_project_id)->get();
+        return view('project_dashboard.project.abbreviations.index', compact('abbreviations'));
+    }
+    public function create_abbreviation(){
+        return view('project_dashboard.project.abbreviations.create');
+    }
+    public function store_abbreviation(Request $request){
+        ProjectAbbreviation::create(['project_id'=>auth()->user()->current_project_id,'abb'=>$request->abb,'description'=>$request->description]);
+        return redirect('/account/project/abbreviations')->with('success', 'New Abbreviation Saved successfully.');
+    }
+    public function edit_abbreviation($id){
+        $abbreviation=ProjectAbbreviation::where('id',$id)->first();
+        return view('project_dashboard.project.abbreviations.edit',compact('abbreviation'));
+    }
+    public function update_abbreviation(Request $request,ProjectAbbreviation $abbreviation){
+        $abbreviation->abb=$request->abb;
+        $abbreviation->description=$request->description;
+        $abbreviation->save();
+        return redirect('/account/project/abbreviations')->with('success', 'Abbreviation Updated successfully.');
+    }
+    public function delete_abbreviation($id)
+    {
+        ProjectAbbreviation::where('id', $id)->delete();
+        return redirect('/account/project/abbreviations')->with('success', 'Abbreviation deleted successfully.');
+
     }
 }
