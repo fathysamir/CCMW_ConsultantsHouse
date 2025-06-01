@@ -531,6 +531,73 @@
                                                 Files</label>
                                         </div>
 
+                                          <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="show_abbreviations"id="show_abbreviations{{ $project->id }}"
+                                                @if (in_array('show_abbreviations', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="show_abbreviations{{ $project->id }}">Show Abbreviations</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="create_abbreviation"id="create_abbreviation{{ $project->id }}"
+                                                @if (in_array('create_abbreviation', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="create_abbreviation{{ $project->id }}">Create Abbreviations</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="edit_abbreviation"id="edit_abbreviation{{ $project->id }}"
+                                                @if (in_array('edit_abbreviation', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="edit_abbreviation{{ $project->id }}">Edit Abbreviations</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="delete_abbreviation"id="delete_abbreviation{{ $project->id }}"
+                                                @if (in_array('delete_abbreviation', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="delete_abbreviation{{ $project->id }}">Delete Abbreviations</label>
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="show_project_contacts"id="show_project_contacts{{ $project->id }}"
+                                                @if (in_array('show_project_contacts', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="show_project_contacts{{ $project->id }}">Show Project Contacts</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="create_project_contact"id="create_project_contact{{ $project->id }}"
+                                                @if (in_array('create_project_contact', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="create_project_contact{{ $project->id }}">Create Project Contact</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="edit_project_contact"id="edit_project_contact{{ $project->id }}"
+                                                @if (in_array('edit_project_contact', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="edit_project_contact{{ $project->id }}">Edit Project Contact</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox" style="width:25%">
+
+                                            <input type="checkbox" class="custom-control-input"
+                                                name="projects_permissions[{{ $project->id }}][]"
+                                                value="delete_project_contact"id="delete_project_contact{{ $project->id }}"
+                                                @if (in_array('delete_project_contact', $project_permission ?? [])) checked @endif>
+                                            <label class="custom-control-label" for="delete_project_contact{{ $project->id }}">Delete Project Contact</label>
+                                        </div>
+
+
 
 
                                     </div>
