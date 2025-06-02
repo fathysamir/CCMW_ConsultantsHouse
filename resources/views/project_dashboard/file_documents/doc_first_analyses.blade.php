@@ -188,15 +188,16 @@
                                 <label for="owner" style="margin-bottom: 0.1rem !important">Narrative</label>
                                 @if ($doc->document)
                                     <div style="display: flex;cursor: pointer;">
-                                        <img id="ai_image" title="AI" style="width:25px;margin-right:5px;"
-                                            src="{{ asset('dashboard/assets/images/ai.png') }}">
+                                            <img id="ai_image"
+                                                src="{{ asset('/dashboard/assets/selected_images/ai.png') }}"
+                                                width="25"height="25" title="AI" style="position: relative; top: 9px; margin-right:5px;">
                                         <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
-                                            style="margin-right:5px;" target="_blank"><img id="ocr_image" title="OCR"
-                                                style="width:25px;"
-                                                src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
-                                        <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <i
-                                                class="fa-regular fa-eye"
-                                                style="font-size: 24px;"title="View PDF"></i></a>
+                                             target="_blank"><img
+                                                src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                width="30" title="OCR" style="margin-bottom: -25px;"></a>
+                                        <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <img
+                                                src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                width="50" title="PDF" style="margin-bottom: -10px;"></a>
                                     </div>
                                 @endif
 
@@ -385,14 +386,14 @@
 
                     },
                     success: function(response) {
-                        if(response.result=='1'){
+                        if (response.result == '1') {
                             alert('Someone Use AI Layer for this document');
-                        }else{
+                        } else {
                             $('#pagesFromToModal').modal('show'); // Show the modal
 
                         }
-                       
-                       
+
+
                     },
                     error: function() {
                         alert('Failed to assign document. Please try again.');
