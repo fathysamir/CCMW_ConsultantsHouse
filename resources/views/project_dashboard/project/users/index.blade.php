@@ -1,5 +1,5 @@
-@extends('account_dashboard.layout.app')
-@section('title', 'Admin Account Home - Users')
+@extends('project_dashboard.layout.app')
+@section('title', 'Project Home - Users')
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
 
@@ -85,6 +85,7 @@
             width: 3% !important; 
         }
         
+        
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
@@ -124,7 +125,7 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{ $account->name }} - Users</h2>
+            <h2 class="h3 mb-0 page-title">{{ $project->name }} - Users</h2>
         </div>
         <div class="col-auto">
 
@@ -181,11 +182,11 @@
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_users_permissions', $Account_Permissions ?? []))
                                                     <a class="dropdown-item"
-                                                        href="{{ route('account.edit-user', $user->code) }}">Edit</a>
+                                                        href="{{ route('project.edit_user', $user->code) }}">Edit</a>
                                                 @endif
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_users', $Account_Permissions ?? []))
                                                     <a class="dropdown-item text-danger"
-                                                        href="javascript:void(0);"onclick="confirmDelete('{{ route('account.delete-user', $user->code) }}')">Delete</a>
+                                                        href="javascript:void(0);"onclick="confirmDelete('{{ route('project.delete_user', $user->code) }}')">Delete</a>
                                                 @endif
                                             </div>
                                         </td>

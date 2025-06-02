@@ -11,6 +11,9 @@ use App\Models\ProjectContact;
 use App\Models\ProjectAbbreviation;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\ProjectUser;
+use App\Models\AccountUser;
 
 class ProjectController extends ApiController
 {
@@ -291,6 +294,48 @@ class ProjectController extends ApiController
     {
         ProjectContact::where('id', $id)->delete();
         return redirect('/account/project/contacts')->with('success', 'Contact deleted successfully.');
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////Users//////////////////////////////////////////////////////
+    public function index_users(){
+        $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users = $project->assign_users;
+        return view('project_dashboard.project.users.index',compact('users','project'));
+    }
+    public function edit_user($id)
+    {
+        $user = User::where('code', $id)->first();
+        $project = Project::findOrFail(auth()->user()->current_project_id);
+
+        return view('project_dashboard.project.users.edit', compact('user','project'));
+
+    }
+
+     public function update_user(Request $request,User $user)
+    {
+        // dd($request->all());
+      
+        if ($request->account_permissions) {
+            AccountUser::where('user_id', $user->id)->where('account_id', auth()->user()->current_account_id)->update(['role' => $request->role, 'permissions' => json_encode($request->account_permissions)]);
+        } else {
+            AccountUser::where('user_id', $user->id)->where('account_id', auth()->user()->current_account_id)->update(['role' => $request->role, 'permissions' => json_encode([])]);
+        }
+        if ($request->projects_permissions) {
+
+            ProjectUser::where('user_id', $user->id)->where('project_id', auth()->user()->current_project_id)->update(['permissions' => json_encode($request->projects_permissions)]);
+           
+        }
+
+        return redirect('/account/project/users')->with('success', 'User Permissions Updated successfully.');
+    }
+     public function delete_user($id)
+    {
+        $user = User::where('code', $id)->first();
+        ProjectUser::where('user_id', $user->id)->where('account_id', auth()->user()->current_account_id)->delete();
+
+        return redirect('/account/project/users')->with('success', 'User deleted from project successfully.');
 
     }
 }

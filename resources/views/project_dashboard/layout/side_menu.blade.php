@@ -79,6 +79,13 @@
                         </a>
                     </li>
                     @endif
+                    @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_users', $Account_Permissions ?? []))
+                    <li class="nav-item">
+                        <a class="nav-link pl-3"href="{{ route('project.index_users') }}">
+                            <span class="ml-1 item-text">Users</span>
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </li>
             @php
