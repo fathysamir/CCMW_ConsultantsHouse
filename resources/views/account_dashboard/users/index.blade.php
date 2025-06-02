@@ -179,7 +179,7 @@
                                                 <span class="text-muted sr-only">Action</span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
-                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_users_permissions', $Account_Permissions ?? []))
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_user_permissions', $Account_Permissions ?? []))
                                                     <a class="dropdown-item"
                                                         href="{{ route('account.edit-user', $user->code) }}">Edit</a>
                                                 @endif
