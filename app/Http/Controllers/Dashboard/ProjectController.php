@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ProjectUser;
 use App\Models\AccountUser;
+use App\Exports\AbbreviationsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends ApiController
 {
@@ -235,7 +237,7 @@ class ProjectController extends ApiController
     ////////////////////////////////////Project Abbreviations///////////////////////////////////////
 
     public function index_abbreviations(){
-        $abbreviations=ProjectAbbreviation::where('project_id',auth()->user()->current_project_id)->get();
+        $abbreviations=ProjectAbbreviation::where('project_id',auth()->user()->current_project_id) ->orderByRaw("LOWER(abb) ASC")->get();
         return view('project_dashboard.project.abbreviations.index', compact('abbreviations'));
     }
     public function create_abbreviation(){
@@ -260,6 +262,10 @@ class ProjectController extends ApiController
         ProjectAbbreviation::where('id', $id)->delete();
         return redirect('/account/project/abbreviations')->with('success', 'Abbreviation deleted successfully.');
 
+    }
+
+    public function export(){
+        return Excel::download(new AbbreviationsExport, 'abbreviations.xlsx');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////

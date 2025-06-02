@@ -118,6 +118,10 @@
         </div>
         @if (auth()->user()->roles->first()->name == 'Super Admin' ||
                 in_array('create_abbreviation', $Project_Permissions ?? []))
+            <div class="col-auto" style="padding: 0px;">
+                <a type="button" href="{{ route('project.export_abbreviation') }}"
+                    class="btn mb-2 btn-outline-warning">Export Abbreviation</a>
+            </div>
             <div class="col-auto">
                 <a type="button" href="{{ route('project.create_abbreviation') }}"
                     class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Abbreviation</a>
@@ -143,61 +147,61 @@
             <div class="card shadow">
                 <div class="card-body">
                     <!-- table -->
-                   <div class="table-container">
+                    <div class="table-container">
 
                         <!-- Table -->
                         <table class="table datatables" id="dataTable-1" style="font-size: 0.9rem;">
-                        <thead>
-                            <tr>
-
-                                <th></th>
-                                <th>Abbreviation</th>
-                                <th>Description</th>
-
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $counter = 1;
-                            ?>
-                            @foreach ($abbreviations as $abbreviation)
+                            <thead>
                                 <tr>
 
-                                    <td>{{ $counter }}</td>
-                                    <td>{{ $abbreviation->abb }}</td>
-                                    <td>
-                                        @if (strlen($abbreviation->description) > 120)
-                                            {{ substr($abbreviation->description, 0, 120) }}...
-                                        @else
-                                            {{ $abbreviation->description }}
-                                        @endif
-                                    </td>
+                                    <th></th>
+                                    <th>Abbreviation</th>
+                                    <th>Description</th>
 
-                                    <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <span class="text-muted sr-only">Action</span>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_abbreviation', $Project_Permissions ?? []))
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.edit_abbreviation', $abbreviation->id) }}">Edit</a>
-                                            @endif
-                                            @if (auth()->user()->roles->first()->name == 'Super Admin' ||
-                                                    in_array('delete_abbreviation', $Project_Permissions ?? []))
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);"
-                                                    onclick="confirmDelete('{{ route('project.delete_abbreviation', $abbreviation->id) }}')">Remove</a>
-                                            @endif
-                                        </div>
-                                    </td>
+                                    <th>Action</th>
                                 </tr>
+                            </thead>
+                            <tbody>
                                 <?php
-                                $counter++;
+                                $counter = 1;
                                 ?>
-                            @endforeach
-                        </tbody>
-                    </table>
-                   </div>
+                                @foreach ($abbreviations as $abbreviation)
+                                    <tr>
+
+                                        <td>{{ $counter }}</td>
+                                        <td>{{ $abbreviation->abb }}</td>
+                                        <td>
+                                            @if (strlen($abbreviation->description) > 120)
+                                                {{ substr($abbreviation->description, 0, 120) }}...
+                                            @else
+                                                {{ $abbreviation->description }}
+                                            @endif
+                                        </td>
+
+                                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="text-muted sr-only">Action</span>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_abbreviation', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.edit_abbreviation', $abbreviation->id) }}">Edit</a>
+                                                @endif
+                                                @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                                        in_array('delete_abbreviation', $Project_Permissions ?? []))
+                                                    <a class="dropdown-item text-danger" href="javascript:void(0);"
+                                                        onclick="confirmDelete('{{ route('project.delete_abbreviation', $abbreviation->id) }}')">Remove</a>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                    $counter++;
+                                    ?>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
