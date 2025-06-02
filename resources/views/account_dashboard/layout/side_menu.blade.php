@@ -78,7 +78,7 @@
                 <li class="nav-item dropdown">
                     <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                         <i class="fe fe-settings fe-16"></i>
-                        <span class="ml-3 item-text">Defaults</span>
+                        <span class="ml-3 item-text">Settings</span>
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100" id="forms">
                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_contract_tags', $Account_Permissions ?? []))

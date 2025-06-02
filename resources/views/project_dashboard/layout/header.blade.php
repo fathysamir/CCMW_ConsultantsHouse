@@ -81,9 +81,12 @@
     </div>
     <ul class="nav">
         <li class="nav-item">
-            <a class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light" style="padding-top:0px !important;padding-bottom:0px !important;">
-                <i style="color:white" class="fe fe-sun fe-16"></i>
+            <a onclick="toggle2()" class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light" style="padding-top:0px !important;padding-bottom:0px !important;">
+                <img id="modeIcon" src="{{ asset('/dashboard/assets/selected_images/moon.png') }}" width="20">
             </a>
+        </li>
+         <li class="nav-item">
+            <img src="{{ asset('/dashboard/assets/selected_images/bill.png') }}" width="22" style="margin-top: 6px;">
         </li>
         {{-- <li class="nav-item">
       <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">

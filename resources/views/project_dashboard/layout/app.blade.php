@@ -115,7 +115,12 @@
 
 
         }
+
+        .link_kkkkk:hover {
+            background: #495057 !important;
+        }
     </style>
+
 </head>
 
 <body class="vertical  light  @if ($sideBarTheme == '0') collapsed @endif">
@@ -521,12 +526,28 @@
         });
     </script>
     <script>
+        function toggle2() {
+            const icon = document.getElementById('modeIcon');
+            const currentSrc = icon.getAttribute('src');
+
+            // استخرج اسم الصورة فقط (moon.png أو sun.png)
+            const fileName = currentSrc.split('/').pop();
+
+            if (fileName === 'moon.png') {
+                icon.setAttribute('src', '{{ asset('/dashboard/assets/selected_images/sun2.png') }}');
+            } else {
+                icon.setAttribute('src', '{{ asset('/dashboard/assets/selected_images/moon.png') }}');
+            }
+        }
+
+
         function toggleWidth() {
             const logo = document.getElementById('logo');
             const currentWidth = parseInt(logo.getAttribute('width'));
 
-            if (currentWidth === 100) {
+            if (currentWidth === 130) {
                 logo.setAttribute('width', '50');
+                logo.style.border = '3px solid #495057';
                 $.ajax({
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
@@ -547,7 +568,8 @@
                     }
                 });
             } else {
-                logo.setAttribute('width', '100'); // Increase width
+                logo.setAttribute('width', '130'); // Increase width
+                logo.style.border = '6px solid #495057';
                 $.ajax({
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
