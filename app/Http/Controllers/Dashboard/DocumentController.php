@@ -90,14 +90,14 @@ class DocumentController extends ApiController
         $type = $file->getMimeType();
 
         $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
-        if ($storageFile) {
-            session(['path' => $storageFile->path]);
+        // if ($storageFile) {
+        //     session(['path' => $storageFile->path]);
 
-            return response()->json([
-                'success' => true,
-                'file' => $storageFile,
-            ]);
-        }
+        //     return response()->json([
+        //         'success' => true,
+        //         'file' => $storageFile,
+        //     ]);
+        // }
         $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $cleanedName = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
         $fileName = time().'_'.$cleanedName.'.'.pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
