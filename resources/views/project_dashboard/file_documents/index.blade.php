@@ -307,7 +307,7 @@
                                 <tr>
                                     <th id="check"class="">
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="select-all" @if(file_exists(public_path($document->document->storageFile->path))) checked @endif>
+                                            <input type="checkbox" class="custom-control-input" id="select-all">
                                             <label class="custom-control-label" for="select-all"></label>
                                         </div>
                                     </th>
@@ -517,7 +517,7 @@
                                                 <input type="checkbox"
                                                     class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
                                                     id="checkbox-{{ $document->id }}" value="{{ $document->id }}"
-                                                    @if ($document->document_id == null) disabled @endif>
+                                                    @if ($document->document_id == null) disabled @endif @if(($document->document_id != null && file_exists(public_path($document->document->storageFile->path))) || $document->document_id == null) checked @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
