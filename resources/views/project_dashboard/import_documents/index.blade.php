@@ -54,10 +54,10 @@
                     </div>
                     <input type="hidden" id="excel_file_id" name="excel_file_id" value="">
                     <div class="form-group mb-3">
-                        <label for="file">Upload PDF Files <span style="color: red">*</span></label>
+                        {{-- <label for="file"></label> --}}
                         <div class="card shadow mb-4">
                             <div class="card-header">
-                                <strong>Upload PDF Files</strong>
+                                <strong>Upload PDF Files <span style="color: red">*</span></strong>
                             </div>
                             <div class="card-body">
                                 <div id="drag-drop-area"></div>
