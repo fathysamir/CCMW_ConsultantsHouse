@@ -228,10 +228,10 @@
                 <div class="col-md-12 " id="step1">
 
                     <div class="form-group mb-3">
-                        <label for="file">Upload PDF Files <span style="color: red">*</span></label>
+                        {{-- <label for="file"></label> --}}
                         <div class="card shadow mb-4">
                             <div class="card-header">
-                                <strong>Uppy</strong>
+                                <strong>Upload PDF Files <span style="color: red">*</span></strong>
                             </div>
                             <div class="card-body">
                                 <div id="drag-drop-area"></div>
