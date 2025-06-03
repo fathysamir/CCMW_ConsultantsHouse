@@ -307,7 +307,7 @@
                                 <tr>
                                     <th id="check"class="">
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="select-all">
+                                            <input type="checkbox" class="custom-control-input" id="select-all" @if(file_exists(public_path($document->document->storageFile->path))) checked @endif>
                                             <label class="custom-control-label" for="select-all"></label>
                                         </div>
                                     </th>
