@@ -163,7 +163,7 @@
         </div>
         <div class="col-auto">
             <a type="button" href="{{ route('project.file-attachments.create_attachment',['type'=>$type,'file_id'=>$file->slug]) }}"
-            class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create Attachment</a>
+            class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Add Attachment</a>
             <button type="button" class="btn mb-2 dropdown-toggle btn-success"data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">File
                 Action</button>
