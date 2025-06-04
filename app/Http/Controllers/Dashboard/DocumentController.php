@@ -358,7 +358,7 @@ class DocumentController extends ApiController
             if (file_exists($path)) {
                 unlink($path);
             }
-            StorageFile::where($doc->storage_file_id)->delete();
+            StorageFile::where('id',$doc->storage_file_id)->delete();
         }
         $doc->delete();
 
@@ -383,7 +383,7 @@ class DocumentController extends ApiController
                 if (file_exists($path)) {
                     unlink($path);
                 }
-                StorageFile::where($doc->storage_file_id)->delete();
+                StorageFile::where('id',$doc->storage_file_id)->delete();
 
             }
             $doc->delete();
