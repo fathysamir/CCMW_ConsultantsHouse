@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -261,7 +261,7 @@
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $file->folder->name }}<span id="chevronIcon"
-            class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }}</h2>
+                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
             <button type="button" class="btn mb-2 dropdown-toggle btn-success"data-toggle="dropdown" aria-haspopup="true"
@@ -517,7 +517,10 @@
                                                 <input type="checkbox"
                                                     class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
                                                     id="checkbox-{{ $document->id }}" value="{{ $document->id }}"
-                                                    @if ($document->document_id == null) disabled @endif @if(($document->document_id != null && file_exists(public_path($document->document->storageFile->path))) || $document->document_id == null) checked @endif>
+                                                    @if ($document->document_id == null) disabled @endif
+                                                    @if (
+                                                        ($document->document_id != null && file_exists(public_path($document->document->storageFile->path))) ||
+                                                            $document->document_id == null) checked @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
@@ -646,7 +649,8 @@
                                                         data-document-id="{{ $document->document->slug }}"data-type="document">Check
                                                         other
                                                         assignments</a>
-                                                    <a class="dropdown-item" href="{{ route('project.file-documents.ocr_layer',$document->document->slug) }}"target="_blank">OCR</a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.file-documents.ocr_layer', $document->document->slug) }}"target="_blank">OCR</a>
                                                     @php
                                                         $threads = $document->document->threads
                                                             ? json_decode($document->document->threads, true)
