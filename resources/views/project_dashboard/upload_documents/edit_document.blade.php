@@ -59,22 +59,27 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         <!-- Conditionally show the "View PDF" icon if the old document exists -->
                                         @if ($document->storage_file_id)
-                                            <div style="display: flex;margin-right:6%;cursor: pointer;">
-                                                <img id="ocr_image" title="OCR"
-                                                    data-ocr="{{ 'project/ocr_layer/' . $document->slug }}"
-                                                    src="{{ asset('dashboard/assets/images/scanner.svg') }}">
-                                                <i class="fa-regular fa-eye"
-                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
-                                                    title="View PDF"data-file-path="{{ $document->storageFile->path }}"></i>
+                                            <div style="display: flex;cursor: pointer;">
+
+                                                <img id="ocr_image"
+                                                    src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                    width="30"height="30" title="OCR"
+                                                    style="margin-bottom: -20px;"data-ocr="{{ 'project/ocr_layer/' . $document->slug }}">
+
+                                                <img src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                    width="50" style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf" title="PDF"
+                                                    data-file-path="{{ $document->storageFile->path }}">
 
                                             </div>
                                         @else
                                             <div style="display: flex;margin-right:6%;cursor: pointer;">
                                                 <img class="d-none" title="OCR" id="ocr_image"
                                                     src="{{ asset('dashboard/assets/images/scanner.svg') }}">
-                                                <i class="fa-regular fa-eye d-none"
-                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
-                                                    title="View PDF"></i>
+
+                                                <img class="d-none"
+                                                    src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                    width="50" title="PDF" style="margin-bottom: -10px;"id="viewPdf">
+
                                             </div>
                                         @endif
                                     </div>
@@ -112,7 +117,8 @@
                                 <div class="form-group mb-3">
                                     <label for="end_date">End Date</label>
                                     <input type="date" style="background-color:#fff;" name="end_date" id="end_date"
-                                        class="form-control date" placeholder="End Date" value="{{ $document->end_date }}">
+                                        class="form-control date" placeholder="End Date"
+                                        value="{{ $document->end_date }}">
                                 </div>
                             </div>
                         </div>

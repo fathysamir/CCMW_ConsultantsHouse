@@ -60,21 +60,32 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         <!-- Conditionally show the "View PDF" icon if the old document exists -->
                                         @if ($document->storage_file_id)
-                                            <div style="display: flex;margin-right:6%;cursor: pointer;">
-                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img id="ocr_image" title="OCR" style="width: 25px;"
-                                                        src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
+                                            <div style="display: flex;cursor: pointer;">
 
-                                                <i class="fa-regular fa-eye"
-                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
-                                                    title="View PDF"data-file-path="{{ $document->storageFile->path }}"></i>
+                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
+                                                    target="_blank"><img id="ocr_image"
+                                                        src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                        width="30"height="30" title="OCR"
+                                                        style="margin-bottom: -20px;"></a>
+
+                                                <img src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                    width="50"
+                                                    style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
+                                                    title="PDF"data-file-path="{{ $document->storageFile->path }}">
                                             </div>
                                         @else
                                             <div style="display: flex;margin-right:6%;cursor: pointer;">
-                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}" target="_blank"><img class="d-none" title="OCR" id="ocr_image"
-                                                    src="{{ asset('dashboard/assets/images/scanner.svg') }}"></a>
-                                                <i class="fa-regular fa-eye d-none"
-                                                    style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
-                                                    title="View PDF"></i>
+
+                                                <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
+                                                    target="_blank"><img class="d-none" id="ocr_image"
+                                                        src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                        width="30"height="30" title="OCR"
+                                                        style="margin-bottom: -20px;"></a>
+                                                
+                                                <img class="d-none" src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                    width="50"
+                                                    style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
+                                                    title="PDF">
                                             </div>
                                         @endif
                                     </div>
@@ -112,7 +123,8 @@
                                 <div class="form-group mb-3">
                                     <label for="end_date">End Date</label>
                                     <input type="date" style="background-color:#fff;" name="end_date" id="end_date"
-                                        class="form-control date" placeholder="End Date" value="{{ $document->end_date }}">
+                                        class="form-control date" placeholder="End Date"
+                                        value="{{ $document->end_date }}">
                                 </div>
                             </div>
                         </div>

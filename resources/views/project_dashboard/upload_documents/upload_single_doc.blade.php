@@ -52,12 +52,17 @@
                                         <label for="file">Document <span style="color: red">*</span></label>
                                         {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
                                             style="cursor: pointer;"></span> --}}
-                                        <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                        <div style="display: flex;cursor: pointer;">
+
                                             <img class="d-none" id="ocr_image"
-                                                src="{{ asset('dashboard/assets/images/scanner.svg') }}">
-                                            <i class="fa-regular fa-eye d-none"
-                                                style="font-size: 20px;cursor: pointer;color:#234EFA" id="viewPdf"
-                                                title="View PDF"></i>
+                                                src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                width="30"height="30" title="OCR" style="margin-bottom: -20px;">
+
+                                            <img class="d-none"
+                                                src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                width="50"
+                                                style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
+                                                title="PDF">
                                         </div>
 
                                     </div>
@@ -307,9 +312,9 @@
                                     window.open('/' + file.path, '_blank');
                                 });
 
-                                 const $ocr_image = $('#ocr_image');
-                                  $ocr_image.removeClass('d-none');
-                                   $ocr_image.off('click').on('click', function() {
+                                const $ocr_image = $('#ocr_image');
+                                $ocr_image.removeClass('d-none');
+                                $ocr_image.off('click').on('click', function() {
                                     window.open('/project/ocr_layer', '_blank');
                                 });
                             }
