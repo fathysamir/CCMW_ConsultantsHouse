@@ -120,7 +120,17 @@
             background: #495057 !important;
         }
     </style>
+    <style>
+        body.collapsed.hover #logo {
+            width: 130px !important;
+            border: 6px solid #495057 !important;
+        }
 
+        body.collapsed:not(.hover) #logo {
+            width: 50px !important;
+            border: 3px solid #495057 !important;
+        }
+    </style>
 </head>
 
 <body class="vertical  light  @if ($sideBarTheme == '0') collapsed @endif">
