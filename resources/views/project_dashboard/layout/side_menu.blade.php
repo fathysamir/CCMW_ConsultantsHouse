@@ -135,6 +135,10 @@
                                         from Excel</span></a>
                             </li>
                         @endif
+                        <li class="nav-item">
+                                <a class="nav-link pl-3 link_kkkkk" href="{{ route('project.all_documents.index') }}"><span
+                                        class="ml-1 item-text"style="color: #e4d125;">All Documents</span></a>
+                            </li>
 
                     </ul>
                 </li>

@@ -5,7 +5,9 @@
     <div class="row">
         <ul class="nav">
             <li class=" row nav-item dropdown mr-4">
-                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white; font-size:1.2rem; padding-top:0px !important;padding-bottom:0px !important;" href="{{ route('switch.folder', $Folders->first()->id) }}">
+                <a class="nav-link pl-3 pr-0 vibrate-hover"
+                    style="color:white; font-size:1.2rem; padding-top:0px !important;padding-bottom:0px !important;"
+                    href="{{ route('switch.folder', $Folders->first()->id) }}">
                     <span class="item-text"><b>Files</b></span>
                 </a>
 
@@ -32,7 +34,8 @@
                 </div>
             </li>
             <li class="row nav-item dropdown mr-3">
-                <a class="nav-link pl-3 pr-0 vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
+                <a class="nav-link pl-3 pr-0 vibrate-hover"
+                    style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('project.all_documents.index') }}"><span
                         class="ml-1 item-text"><b>Documents</b></span></a>
                 <a class="nav-link dropdown-toggle pr-0 vibrate-hover" href="#" id="navbarDropdownMenuLink3"
@@ -56,12 +59,13 @@
                     @endforelse
                 </div>
             </li>
-@php
-    $project=\App\Models\Project::findOrFail(auth()->user()->current_project_id);
-@endphp
+            @php
+                $project = \App\Models\Project::findOrFail(auth()->user()->current_project_id);
+            @endphp
             <li class="nav-item">
-                <a class="nav-link pl-3 nav-item vibrate-hover" style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
-                    href="{{ route('account.edit_project_view',$project->slug) }}"><span
+                <a class="nav-link pl-3 nav-item vibrate-hover"
+                    style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
+                    href="{{ route('account.edit_project_view', $project->slug) }}"><span
                         class="ml-1 item-text"><b>Project Card</b></span></a>
             </li>
             {{-- <li class="nav-item">
@@ -81,12 +85,14 @@
     </div>
     <ul class="nav">
         <li class="nav-item">
-            <a onclick="toggle2()" class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light" style="padding-top:0px !important;padding-bottom:0px !important;">
+            <a onclick="toggle2()" class="nav-link text-muted my-2" id="modeSwitcher" data-mode="light"
+                style="padding-top:0px !important;padding-bottom:0px !important;">
                 <img id="modeIcon" src="{{ asset('/dashboard/assets/selected_images/moon.png') }}" width="20">
             </a>
         </li>
-         <li class="nav-item">
-            <img src="{{ asset('/dashboard/assets/selected_images/bill.png') }}" width="22" style="margin-top: 6px;">
+        <li class="nav-item">
+            <img src="{{ asset('/dashboard/assets/selected_images/bill.png') }}" width="22"
+                style="margin-top: 6px;">
         </li>
         {{-- <li class="nav-item">
       <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
@@ -100,9 +106,9 @@
         </a>
         </li> --}}
         <li class="nav-item dropdown">
-            <a style="color:white;padding-top:0px !important;padding-bottom:0px !important;" class="nav-link dropdown-toggle text-muted pr-0" href="#"
-                id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
+            <a style="color:white;padding-top:0px !important;padding-bottom:0px !important;"
+                class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink"
+                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span style="color:white" class="avatar avatar-sm mt-2">
                     <img @if (getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) != null) src="{{ getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) }}" @else src="{{ asset('dashboard/assets/avatars/user_avatar.png') }}" @endif
                         alt="..." class="avatar-img rounded-circle">
