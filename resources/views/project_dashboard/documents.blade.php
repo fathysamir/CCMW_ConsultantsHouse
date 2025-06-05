@@ -293,7 +293,8 @@
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
                                                     class="custom-control-input row-checkbox"data-document-id="{{ $document->id }}"
-                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}">
+                                                    id="checkbox-{{ $document->id }}" value="{{ $document->id }}" @if (
+                                                         file_exists(public_path($document->storageFile->path))) checked @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
