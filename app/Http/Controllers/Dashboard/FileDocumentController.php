@@ -444,7 +444,7 @@ class FileDocumentController extends ApiController
             }
 
             if ($paragraph->narrative == null) {
-                $listItemRun->addText('____________.');
+                $listItemRun->addText('____________.',$GetStandardStylesP);
             } else {
                 if (! $containsHtml) {
                     $listItemRun->addText($paragraph->narrative.'.');
@@ -628,6 +628,7 @@ class FileDocumentController extends ApiController
                                     $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2, 'listParagraphStyle2'); // Use a numbering style
                                     // $nestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
+                                    $item = '<span style="font-size:11pt;">' . $item . '</span>';
                                     Html::addHtml($nestedListItemRun, $item, false, false);
                                 }
                             }
@@ -643,6 +644,8 @@ class FileDocumentController extends ApiController
                                     $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                     // $unNestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
+                                    $item = '<span style="font-size:11pt;">' . $item . '</span>';
+
                                     Html::addHtml($unNestedListItemRun, $item, false, false);
                                 }
                             }
@@ -672,6 +675,7 @@ class FileDocumentController extends ApiController
                                     ]);
                                     $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
+                                    $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
                                     Html::addHtml($listItemRun2, $pTag, false, false);
                                     if ($index2 < count($paragraphsArray) - 1) {
 
@@ -685,6 +689,7 @@ class FileDocumentController extends ApiController
                                     // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                     $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
+                                    $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
                                     Html::addHtml($listItemRun, $pTag, false, false);
 
                                     if ($index2 < count($paragraphsArray) - 1) {

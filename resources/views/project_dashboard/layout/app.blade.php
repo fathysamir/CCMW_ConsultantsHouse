@@ -131,6 +131,23 @@
             border: 3px solid #495057 !important;
         }
     </style>
+    <style>
+        /* تظهر القيمة في قائمة الحجم */
+        .ql-snow .ql-picker.ql-size .ql-picker-item[data-value]::before {
+            content: attr(data-value);
+        }
+
+        /* تظهر القيمة في الزر نفسه */
+        .ql-snow .ql-picker.ql-size .ql-picker-label[data-value]::before {
+            content: attr(data-value);
+        }
+
+        /* في حالة لا يوجد data-value (الحجم العادي الافتراضي) */
+        .ql-snow .ql-picker.ql-size .ql-picker-item:not([data-value])::before,
+        .ql-snow .ql-picker.ql-size .ql-picker-label:not([data-value])::before {
+            content: 'Normal';
+        }
+    </style>
 </head>
 
 <body class="vertical  light  @if ($sideBarTheme == '0') collapsed @endif">
@@ -263,12 +280,19 @@
         // editor
         var editor = document.getElementById('editor');
         if (editor) {
+            const Size = Quill.import('attributors/style/size');
+            Size.whitelist = ['10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt', '17pt','18pt', '19pt','20pt', '21pt','22pt','23pt','24pt','25pt', '32pt'];
+            Quill.register(Size, true);
+
             var toolbarOptions = [
                 // [{
                 //     'font': []
                 // }],
                 [{
                     'header': [1, 2, 3, 4, 5, 6, false]
+                }],
+                [{
+                    'size': Size.whitelist
                 }],
                 ['bold', 'italic', 'underline', 'strike'],
                 // ['blockquote', 'code-block'],
