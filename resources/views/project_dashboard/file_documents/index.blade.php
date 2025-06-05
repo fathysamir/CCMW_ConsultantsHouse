@@ -240,8 +240,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -517,10 +517,7 @@
                                                 <input type="checkbox"
                                                     class="custom-control-input @if ($document->note_id == null) row-checkbox @endif"data-file-id="{{ $document->id }}"
                                                     id="checkbox-{{ $document->id }}" value="{{ $document->id }}"
-                                                    @if ($document->document_id == null) disabled @endif
-                                                    @if (
-                                                        ($document->document_id != null && file_exists(public_path($document->document->storageFile->path))) ||
-                                                            $document->document_id == null) checked @endif>
+                                                    @if ($document->document_id == null) disabled @endif>
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $document->id }}"></label>
                                             </div>
