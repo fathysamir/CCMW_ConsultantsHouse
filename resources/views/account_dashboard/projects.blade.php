@@ -121,7 +121,7 @@
                             onclick="getEPSandProject('{{ $category->id }}','{{ $category->name }}',this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;">
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <img id="logo" src="{{ asset('dashboard/assets/images/file.png') }}" width="25"
+                                    <img src="{{ asset('dashboard/assets/images/file.png') }}" width="25"
                                         style="border-radius: 5px; margin-bottom: 5px;">
                                     <strong class="card-title my-0">{{ $category->name }}</strong>
                                 </div>
@@ -500,7 +500,7 @@
                                                 <div class="card-text my-2" onclick="getEPSandProject('${category.id}','${category.name}', this);"style="cursor:pointer;margin-bottom: 0.2rem !important;margin-top: 0.2rem !important;">
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <img id="logo" src="${category.image ? category.image : '{{ asset('dashboard/assets/images/file.png') }}'}" width="25"
+                                                            <img src="${category.image ? category.image : '{{ asset('dashboard/assets/images/file.png') }}'}" width="25"
                                                                 style="border-radius: 5px; margin-bottom: 5px;">
                                                             <strong class="card-title my-0">${category.name}</strong>
                                                         </div>
@@ -530,7 +530,7 @@
                                                                     oncontextmenu="showContextMenu(event, '${project.slug}' ,'${project.id}', '${project.name.replace(/'/g, "\\'")}')">
                                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                                                            <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
+                                                                            <img src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
                                                                                 style="border-radius: 5px; margin-bottom: 5px;">
                                                                             <strong class="card-title my-0">${project.name} - ${project.code}</strong>
                                                                         </div>
@@ -608,7 +608,7 @@
                                             div += `>
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <img id="logo" src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
+                                                            <img src="${project.image ? project.image : '{{ asset('dashboard/assets/images/project_logo.jpg') }}'}" width="25"
                                                                 style="border-radius: 5px; margin-bottom: 5px;">
                                                             <strong class="card-title my-0">${project.name} - ${project.code}</strong>
                                                         </div>

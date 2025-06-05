@@ -220,7 +220,7 @@
                             @if (!in_array($category->name, ['Archive', 'Recycle Bin'])) oncontextmenu="showContextMenu(event, '{{ $category->id }}','{{ $category->name }}')" @endif>
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <img id="logo" src="{{ asset('dashboard/assets/images/file.png') }}"
+                                    <img src="{{ asset('dashboard/assets/images/file.png') }}"
                                         width="25" style="border-radius: 5px; margin-bottom: 5px;">
                                     <strong class="card-title my-0">{{ $category->name }}</strong>
                                 </div>
@@ -565,7 +565,7 @@
                                                         oncontextmenu="showContextMenu(event, '${category.id}','${category.name}')">
                                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <img id="logo" src="${category.image ? category.image : '{{ asset('dashboard/assets/images/file.png') }}'}" width="25"
+                                                            <img src="${category.image ? category.image : '{{ asset('dashboard/assets/images/file.png') }}'}" width="25"
                                                                 style="border-radius: 5px; margin-bottom: 5px;">
                                                             <strong class="card-title my-0">${category.name}</strong>
                                                         </div>
