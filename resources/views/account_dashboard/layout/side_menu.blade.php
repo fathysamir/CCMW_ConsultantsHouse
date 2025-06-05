@@ -1,5 +1,5 @@
 <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar
-    style="background-color: black !important;">>
+    style="background-color: black !important;">
     <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
         <i class="fe fe-x"><span class="sr-only"></span></i>
     </a>

@@ -83,10 +83,25 @@
             transition: width 0.1s ease;
             /* Smooth transition for width changes */
         }
+
+        .link_kkkkk:hover {
+            background: #495057 !important;
+        }
+    </style>
+    <style>
+        body.collapsed.hover #logo {
+            width: 130px !important;
+            border: 6px solid #495057 !important;
+        }
+
+        body.collapsed:not(.hover) #logo {
+            width: 50px !important;
+            border: 3px solid #495057 !important;
+        }
     </style>
 </head>
 
-<body class="vertical  light   @if($sideBarTheme == '0') collapsed @endif">
+<body class="vertical  light   @if ($sideBarTheme == '0') collapsed @endif">
     <div class="wrapper">
         @include('dashboard.layout.header')
         @include('dashboard.layout.side_menu')
@@ -496,12 +511,28 @@
         });
     </script>
     <script>
+        function toggle2() {
+            const icon = document.getElementById('modeIcon');
+            const currentSrc = icon.getAttribute('src');
+
+            // استخرج اسم الصورة فقط (moon.png أو sun.png)
+            const fileName = currentSrc.split('/').pop();
+
+            if (fileName === 'moon.png') {
+                icon.setAttribute('src', '{{ asset('/dashboard/assets/selected_images/sun2.png') }}');
+            } else {
+                icon.setAttribute('src', '{{ asset('/dashboard/assets/selected_images/moon.png') }}');
+            }
+        }
+
         function toggleWidth() {
             const logo = document.getElementById('logo');
             const currentWidth = parseInt(logo.getAttribute('width'));
 
-            if (currentWidth === 100) {
+            if (currentWidth === 130) {
                 logo.setAttribute('width', '50');
+                logo.style.border = '3px solid #495057';
+
                 $.ajax({
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
@@ -509,10 +540,11 @@
                         // _token: $('input[name="_token"]').val(), // CSRF token
                         sideBarTheme: '0',
 
-                    }, headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            },
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
                     success: function(response) {
 
                     },
@@ -521,7 +553,9 @@
                     }
                 });
             } else {
-                logo.setAttribute('width', '100'); // Increase width
+                logo.setAttribute('width', '130'); // Increase width
+                logo.style.border = '6px solid #495057';
+
                 $.ajax({
                     url: '/change-sideBarTheme', // Adjust the route to your API endpoint
                     type: 'POST',
@@ -529,10 +563,11 @@
                         // _token: $('input[name="_token"]').val(), // CSRF token
                         sideBarTheme: '1',
 
-                    }, headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            },
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
                     success: function(response) {
 
                     },
@@ -544,7 +579,7 @@
 
         }
     </script>
-     @stack('scripts')
+    @stack('scripts')
     <!-- Global site tag (gtag.js) - Google Analytics -->
     {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>
