@@ -61,44 +61,44 @@
         /* Ensure consistent column widths */
         .table-container th:nth-child(1),
         .table-container td:nth-child(1) {
-            width: 1%;
+            width: 1% !important;
         }
 
 
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 4%;
+            width: 4% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 51%;
+            width: 51% !important;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 10%;
+            width: 10% !important;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 10%;
+            width: 10% !important;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 10%;
+            width: 10% !important;
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
-            width: 10%;
+            width: 10% !important;
         }
 
         .table-container th:nth-child(8),
         .table-container td:nth-child(8) {
-            width: 4%;
+            width: 4% !important;
         }
 
         /* Maintain styles from your original table */
