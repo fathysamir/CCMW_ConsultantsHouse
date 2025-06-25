@@ -483,7 +483,7 @@ class ExtractPowerPointController extends ApiController
         ];
 
         // Return the file as a download response
-        return response()->download($filePath, null, $headers)->deleteFileAfterSend(false);
+        return response()->download($filePath, null, $headers)->deleteFileAfterSend(true);
     }
     private function calc_days($date1, $date2)
     {
