@@ -8,7 +8,15 @@
         background-color:#fff !important;
     }
 </style>
-    <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon" class="fe fe-24 fe-chevrons-right"></span>Details of Attachment
+@php
+    $arr=[
+        '1'=>'Synopsis',
+        '2'=>'Contractual Position',
+        '3'=>'Cause-and-Effect Analysis'
+    ]
+@endphp
+    <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><a href="{{ route('switch.folder', $file_attachment->file->folder->id) }}">{{ $file_attachment->file->folder->name }}</a><span
+            class="fe fe-24 fe-chevrons-right"></span><a href="{{ route('project.file-attachments.index', ['id' => $file_attachment->file->slug, 'type' => $file_attachment->section ]) }}">{{ $file_attachment->file->name }} - {{ $arr[$file_attachment->section] }}</a><span class="fe fe-24 fe-chevrons-right"></span>Details of Attachment
         </h2>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
