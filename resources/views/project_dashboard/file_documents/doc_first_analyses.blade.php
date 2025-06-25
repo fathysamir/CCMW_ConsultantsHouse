@@ -8,7 +8,8 @@
             background-color: #fff !important;
         }
     </style>
-    <h2 id="toggleTitle" style="cursor:pointer;" class="page-title"><span id="chevronIcon"
+    <h2 style="cursor:pointer;" class="page-title"><a href="{{ route('switch.folder', $doc->file->folder->id) }}">{{ $doc->file->folder->name }}</a><span
+            class="fe fe-24 fe-chevrons-right"></span><a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a><span id="chevronIcon"
             class="fe fe-24 fe-chevrons-right"></span>Details of
         "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"</h2>
     @if (session('error'))
@@ -188,11 +189,11 @@
                                 <label for="owner" style="margin-bottom: 0.1rem !important">Narrative</label>
                                 @if ($doc->document)
                                     <div style="display: flex;cursor: pointer;">
-                                            <img id="ai_image"
-                                                src="{{ asset('/dashboard/assets/selected_images/ai.png') }}"
-                                                width="25"height="25" title="AI" style="position: relative; top: 9px; margin-right:5px;">
+                                        <img id="ai_image" src="{{ asset('/dashboard/assets/selected_images/ai.png') }}"
+                                            width="25"height="25" title="AI"
+                                            style="position: relative; top: 9px; margin-right:5px;">
                                         <a href="{{ route('project.file-documents.ocr_layer_with_path') }}"
-                                             target="_blank"><img
+                                            target="_blank"><img
                                                 src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
                                                 width="30" title="OCR" style="margin-bottom: -25px;"></a>
                                         <a href="{{ asset($doc->document->storageFile->path) }}" target="blank_"> <img
@@ -367,7 +368,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("toggleTitle").addEventListener("click", function() {
+        document.getElementById("chevronIcon").addEventListener("click", function() {
             document.getElementById("detailsCard").classList.toggle("d-none");
             let icon = document.getElementById("chevronIcon");
             icon.classList.toggle("fe-chevrons-right");

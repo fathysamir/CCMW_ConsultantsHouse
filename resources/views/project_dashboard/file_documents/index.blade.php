@@ -79,6 +79,14 @@
         }
     </style>
     <style>
+        .dot {
+            height: 25px;
+            width: 25px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
         #btn-outline-primary {
             color: blue;
         }
@@ -240,8 +248,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -260,7 +268,7 @@
     </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{ $file->folder->name }}<span id="chevronIcon"
+            <h2 class="h3 mb-0 page-title"><a href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span id="chevronIcon"
                     class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }}</h2>
         </div>
         <div class="col-auto">
@@ -663,6 +671,8 @@
                                                     <a class="dropdown-item Delete-from-CMW-btn"
                                                         href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                    <a class="dropdown-item gantt-chart" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Gantt Chart</a>
                                                 @else
                                                     <a class="dropdown-item"
                                                         href="{{ url('/project/files_file/' . $document->file->slug . '/doc/' . $document->id . '/edit/' . $document->note->slug) }}">
@@ -688,6 +698,8 @@
                                                     <a class="dropdown-item Delete-from-CMW-btn"
                                                         href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Delete from CMW</a>
+                                                    <a class="dropdown-item gantt-chart" href="javascript:void(0);"
+                                                        data-document-id="{{ $document->id }}">Gantt Chart</a>
                                                 @endif
                                                 {{-- <a class="dropdown-item for-claim-btn" href="javascript:void(0);"
                                                     data-document-id="{{ $document->id }}"
@@ -1224,6 +1236,27 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="ganttChartModal" tabindex="-1" role="dialog" aria-labelledby="ganttChartModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width:80%;max-width:80% !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ganttChartModalLabel">Gantt Chart Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="ganttChart-content">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveganttChartData">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <ul id="contextMenu" class="custom-context-menu" style="position:absolute; z-index:9999;">
         <li><a href="#" id="Preview-Document"><i class="fe fe-arrow-right"></i> Preview Document</a></li>
         <li><a href="#" id="Jump"><i class="fe fe-arrow-right"></i> Jump</a></li>
@@ -1266,8 +1299,502 @@
             }
         });
     </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         $(document).ready(function() {
+
+
+            $('.gantt-chart').on('click', function() {
+                let FD_ID = $(this).data('document-id');
+
+                $('#ganttChart-content').empty();
+                $.ajax({
+                    url: '/project/file-document/gantt-chart/' + FD_ID, // Replace with real route
+                    type: 'GET',
+                    data: {
+                        _token: $('input[name="_token"]').val() // CSRF token
+                    },
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+
+                        $('#ganttChart-content').html(response.html);
+                        flatpickr(".date2", {
+                            enableTime: false,
+                            dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                            altInput: true,
+                            altFormat: "d.M.Y",
+                        });
+
+                        flatpickr(".flatpickr-container", {
+                            enableTime: false,
+                            dateFormat: "Y-m-d",
+                            altInput: true,
+                            altFormat: "d.M.Y",
+                            allowInput: true,
+                            wrap: true, // enables `data-input`, `data-clear`
+                            clickOpens: true,
+
+                        });
+                        const plType = document.getElementById('pl_type');
+                        const plSdGroup = document.querySelector('#pl_sd').closest(
+                            '.form-group');
+                        const plFdGroup = document.querySelector('#pl_fd').closest(
+                            '.form-group');
+
+                        plType.addEventListener('change', function() {
+                            if (this.value === 'SB') {
+                                plSdGroup.classList.remove('d-none');
+                                plFdGroup.classList.remove('d-none');
+                            } else if (this.value === 'M') {
+                                plSdGroup.classList.remove('d-none');
+
+                                const plFdPickerjjj = flatpickr("#fgd", {
+                                    enableTime: false,
+                                    dateFormat: "Y-m-d",
+                                    altInput: true,
+                                    altFormat: "d.M.Y",
+                                    allowInput: true,
+                                    wrap: true, // enables `data-input`, `data-clear`
+                                    clickOpens: true
+                                });
+                                document.getElementById('pl_fd').value = '';
+                                plFdPickerjjj.clear();
+                                plFdGroup.classList.add('d-none');
+                            } else {
+                                const plFdPickerjjj = flatpickr("#fgd", {
+                                    enableTime: false,
+                                    dateFormat: "Y-m-d",
+                                    altInput: true,
+                                    altFormat: "d.M.Y",
+                                    allowInput: true,
+                                    wrap: true, // enables `data-input`, `data-clear`
+                                    clickOpens: true
+                                });
+                                document.getElementById('pl_fd').value = '';
+                                plFdPickerjjj.clear();
+                                plFdGroup.classList.add('d-none');
+                                const plFdPickerjjjj = flatpickr("#sgd", {
+                                    enableTime: false,
+                                    dateFormat: "Y-m-d",
+                                    altInput: true,
+                                    altFormat: "d.M.Y",
+                                    allowInput: true,
+                                    wrap: true, // enables `data-input`, `data-clear`
+                                    clickOpens: true
+                                });
+                                document.getElementById('pl_sd').value = '';
+                                plFdPickerjjjj.clear();
+                                plSdGroup.classList.add('d-none');
+                            }
+                        });
+
+                        const curType = document.getElementById('cur_type');
+                        const curSdGroup = document.querySelector('#cur_sd').closest(
+                            '.form-group');
+                        const curFdGroup = document.querySelector('#cur_fd').closest(
+                            '.form-group');
+                        const curColorGroup = document.querySelector('#cu_color').closest(
+                            '.form-group');
+
+                        curType.addEventListener('change', function() {
+                            const val = this.value;
+
+                            // Reset all
+                            curSdGroup.classList.add('d-none');
+                            curFdGroup.classList.add('d-none');
+                            curColorGroup.classList.add('d-none');
+                            document.querySelector('#multi-sec').classList.add(
+                                'd-none');
+
+                            // Apply logic
+                            if (val === 'SB' || val === 'DA') {
+                                curSdGroup.classList.remove('d-none');
+                                curFdGroup.classList.remove('d-none');
+                                curColorGroup.classList.remove('d-none');
+                            } else if (val === 'M' || val === 'S') {
+                                curSdGroup.classList.remove('d-none');
+                                curColorGroup.classList.remove('d-none');
+                            } else if (val === 'MS') {
+                                document.querySelector('#multi-sec').classList.remove(
+                                    'd-none')
+                            }
+                        });
+
+
+                        // Sync finish date to next section's start date
+
+                        const startInput = document.getElementById('lp_sd');
+                        const endInput = document.getElementById('lp_fd');
+
+                        const existingStart = new Date(startInput.dataset.documentSd);
+                        const existingEnd = new Date(endInput.dataset.documentFd);
+
+                        flatpickr(startInput.closest(".flatpickr-container"), {
+                            enableTime: false,
+                            dateFormat: "Y-m-d",
+                            altInput: true,
+                            altFormat: "d.M.Y",
+                            allowInput: true,
+                            wrap: true,
+                            clickOpens: true,
+                            onChange: function(selectedDates, dateStr, instance) {
+                                const selected = selectedDates[0];
+                                if (selected < existingStart || selected >=
+                                    existingEnd) {
+                                    alert(
+                                        "Start date must be ≥ document start date and < document finish date."
+                                    );
+                                    instance.setDate(
+                                        existingStart); // Reset to original
+                                }
+                            }
+                        });
+
+                        // Flatpickr instance for End Date
+                        flatpickr(endInput.closest(".flatpickr-container"), {
+                            enableTime: false,
+                            dateFormat: "Y-m-d",
+                            altInput: true,
+                            altFormat: "d.M.Y",
+                            allowInput: true,
+                            wrap: true,
+                            clickOpens: true,
+                            onChange: function(selectedDates, dateStr, instance) {
+                                const selected = selectedDates[0];
+                                if (selected <= existingStart || selected >
+                                    existingEnd) {
+                                    alert(
+                                        "Finish date must be > document start date and ≤ document finish date."
+                                    );
+                                    instance.setDate(
+                                        existingEnd); // Reset to original
+                                }
+                            }
+                        });
+
+
+                        //////////////////////////////////////////////////////
+                        function initFlatpickr() {
+                            flatpickr(".date2", {
+                                enableTime: false,
+                                dateFormat: "Y-m-d",
+                                altInput: true,
+                                altFormat: "d.M.Y",
+                                onChange: function(selectedDates, dateStr, instance) {
+                                    if (instance.input.placeholder === "F Date") {
+                                        updateNextStartDate(instance.input);
+                                    }
+                                }
+                            });
+                        }
+
+                        // Function to update next row's start date
+                        function updateNextStartDate(finishInput) {
+                            const finishDateStr = finishInput.value;
+                            if (!finishDateStr) return;
+
+                            const finishDate = new Date(finishDateStr);
+                            const currentRow = $(finishInput).closest('.multi-section')[0];
+
+                            const startInput = currentRow.querySelector(
+                                '.date2[placeholder="S Date"]');
+                            if (startInput && startInput.value) {
+                                const startDate = new Date(startInput.value);
+                                if (finishDate < startDate) {
+                                    alert("Finish date cannot be earlier than start date.");
+                                    // Revert the value
+                                    const fp = finishInput._flatpickr;
+                                    if (fp) {
+                                        fp.setDate(startInput.value, true);
+                                    } else {
+                                        finishInput.value = startInput.value;
+                                    }
+                                    return;
+                                }
+                            }
+
+                            const nextRow = currentRow.nextElementSibling;
+                            if (nextRow) {
+                                const nextFinishInput = nextRow.querySelector(
+                                    '.date2[placeholder="F Date"]');
+                                if (nextFinishInput && nextFinishInput.value) {
+                                    const nextFinishDate = new Date(nextFinishInput.value);
+                                    if (finishDate > nextFinishDate) {
+                                        alert(
+                                            "Finish date cannot be later than the next section's finish date."
+                                        );
+                                        // Revert the value
+                                        const fp = finishInput._flatpickr;
+                                        if (fp) {
+                                            fp.setDate(startInput.value, true);
+                                        } else {
+                                            finishInput.value = startInput.value;
+                                        }
+                                        return;
+                                    }
+                                }
+                            }
+
+                            // If valid, set start date in next section
+                            if (nextRow) {
+                                const nextStartInput = nextRow.querySelector(
+                                    '.date2[placeholder="S Date"]');
+                                if (nextStartInput) {
+                                    nextStartInput.value = finishDateStr;
+                                    const fp = nextStartInput._flatpickr;
+                                    if (fp) fp.setDate(finishDateStr, true);
+                                }
+                            }
+                        }
+
+                        // Initial initialization
+                        initFlatpickr();
+
+                        // Add button click handler
+                        $(document).on('click', '.add-btnooo', function() {
+                            const currentSection = $(this).closest('.multi-section');
+                            const finishDate = currentSection.find(
+                                'input.date2[placeholder="F Date"]').val();
+
+                            if (!finishDate) {
+                                alert('Please set the finish date first');
+                                return;
+                            }
+
+                            // Create the new section HTML
+                            const newSection = $(`
+                                <div style="display: flex" class="multi-section mb-2">
+                                    <div style="padding-left: 0px;padding-right: 3px;width: 35%;">
+                                        <input disabled type="date" style="background-color:#fff;" name="sections[sd]"
+                                            class="date form-control date2" placeholder="S Date" value="${finishDate}">
+                                    </div>
+                                    <div style="padding-left: 0px;padding-right: 3px;width: 35%;">
+                                        <input required type="date" style="background-color:#fff;" name="sections[fd]"
+                                            class="date form-control date2" placeholder="F Date" value="${finishDate}">
+                                    </div>
+                                    <div style="padding-left: 0px;padding-right: 3px;">
+                                        <select class="form-control" name="sections[color]">
+                                            <option value="808080" style="background-color: #808080; color: white;">■ Gray</option>
+                                            <option selected value="00008B" style="background-color: #00008B; color: white;">■ Dark Blue</option>
+                                            <option value="FF0000" style="background-color: #FF0000; color: white;">■ Red</option>
+                                            <option value="008000" style="background-color: #008000; color: white;">■ Green</option>
+                                            <option value="000000" style="background-color: #000000; color: white;">■ Black</option>
+                                            <option value="89CFF0" style="background-color: #89CFF0;">■ Baby Blue</option>
+                                            <option value="FFFF00" style="background-color: #FFFF00;">■ Yellow</option>
+                                            <option value="8B4513" style="background-color: #8B4513; color: white;">■ Brown</option>
+                                            <option value="FFFFFF" style="background-color: #FFFFFF;">■ White</option>
+                                            <option value="FFFFFF00">■ Gap</option>
+                                        </select>
+                                    </div>
+                                    <div style="padding-left: 0px;padding-right: 3px;">
+                                        <button type="button" class="btn btn-sm btn-outline-primary w-100 h-100 add-btnooo"
+                                            title="Add" style="border-color: rgb(200, 214, 238);font-size:17px;">
+                                            +
+                                        </button>
+                                    </div>
+                                    <div style="padding-left: 0px;padding-right: 0px;">
+                                        <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" title="Clear"
+                                            style="border-color: rgb(200, 214, 238)">
+                                            ✖
+                                        </button>
+                                    </div>
+                                    
+                                </div>
+                            `);
+
+                            // Insert the new section after the current one
+                            newSection.insertAfter(currentSection);
+
+                            // Remove the add button from the current section
+
+
+                            // Initialize flatpickr on the new inputs
+                            initFlatpickr();
+                        });
+
+                        // Clear button click handler
+                        $(document).on('click', '.btn-outline-danger', function() {
+                            const section = $(this).closest('.multi-section');
+                            const startDate = section.find(
+                                'input.date2[placeholder="S Date"]').val();
+                            const sections = $('.multi-section');
+
+                            if (sections.length <= 2) {
+                                alert('You must keep at least two sections');
+                                return;
+                            }
+                            const nextSection = section.next('.multi-section');
+                            section.remove();
+                            if (nextSection.length > 0) {
+                                const nextStartDate = nextSection.find(
+                                    'input.date2[placeholder="S Date"]');
+
+                                // Flatpickr requires setting both input.value and flatpickr.setDate
+                                if (nextStartDate.length > 0) {
+                                    const flatpickrInstance = nextStartDate[0]
+                                        ._flatpickr;
+                                    if (flatpickrInstance) {
+                                        flatpickrInstance.setDate(startDate,
+                                            true); // second param = triggerChange
+                                    } else {
+                                        nextStartDate.val(startDate); // fallback
+                                    }
+                                }
+                            }
+                            // Ensure last section has add button
+
+
+                        });
+
+                        // Initialize date propagation for existing sections
+                        $('.date2[placeholder="F Date"]').on('change', function() {
+
+                            updateNextStartDate(this);
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+                $('#ganttChartModal').modal('show');
+
+            });
+
+            // Add this code inside your AJAX success callback after all the flatpickr initialization
+            function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+                const hintBox = document.getElementById("hintBox");
+                hintBox.innerText = message;
+                hintBox.style.backgroundColor = bgColor;
+                hintBox.style.color = textColor;
+                hintBox.style.display = "block";
+
+                setTimeout(() => {
+                    hintBox.style.display = "none";
+                }, 3000); // Hide after 3 seconds
+            }
+            // Form submission handler
+            $('#saveganttChartData').on('click', function() {
+                // Get the form element
+                const form = document.getElementById('ganttChartForm');
+
+                // Validate multi-sections if they exist
+                if ($('#multi-sec').is(':visible')) {
+                    let isValid = true;
+                    let errorMessage = '';
+
+                    $('.multi-section').each(function(index) {
+                        const $section = $(this);
+                        const startDate = $section.find('input[placeholder="S Date"]').val();
+                        const finishDate = $section.find('input[placeholder="F Date"]').val();
+
+                        // Check if dates are empty
+                        if (!startDate || !finishDate) {
+                            isValid = false;
+                            errorMessage = 'All section dates are required';
+                            return false; // break out of loop
+                        }
+
+                        // Check if finish date is after start date
+                        if (new Date(finishDate) < new Date(startDate)) {
+                            isValid = false;
+                            errorMessage =
+                                `Section ${index + 1}: Finish date must be after start date`;
+                            return false;
+                        }
+
+                        // Check if this section's start date matches previous section's finish date
+                        if (index > 0) {
+                            const prevFinish = $('.multi-section').eq(index - 1).find(
+                                'input[placeholder="F Date"]').val();
+                            if (startDate !== prevFinish) {
+                                isValid = false;
+                                errorMessage =
+                                    `Section ${index + 1}: Start date must match previous section's finish date`;
+                                return false;
+                            }
+                        }
+                    });
+
+                    if (!isValid) {
+                        alert(errorMessage);
+                        return;
+                    }
+                }
+
+                // Validate other required fields
+                if ($('#cur_type').val() == '' || $('#cur_type').val() == null) {
+                    alert('Current Bar Type is required');
+                    return;
+                }
+                const plType = $('#pl_type').val();
+
+                // Validate based on selected type
+                if (plType === 'SB') {
+                    // Single Bar - both dates required
+                    if (!$('#pl_sd').val() || !$('#pl_fd').val()) {
+                        alert('Both start and finish dates are required for Planned Bar');
+                        return false;
+                    }
+                } else if (plType === 'M') {
+                    // Milestone - only start date required
+                    if (!$('#pl_sd').val()) {
+                        alert('Start date is required for Planned Bar');
+                        return false;
+                    }
+                }
+
+                // Collect all section data
+                const sections = [];
+                $('.multi-section').each(function() {
+                    sections.push({
+                        sd: $(this).find('input[placeholder="S Date"]').val() || null,
+                        fd: $(this).find('input[placeholder="F Date"]').val() || null,
+                        color: $(this).find('select').val() || null
+                    });
+                });
+
+                // Prepare form data - CORRECTED THIS LINE
+                const formData = new FormData(form);
+
+                // Add sections data
+                if (sections.length > 0) {
+                    formData.append('sections', JSON.stringify(sections));
+                }
+
+                // Add CSRF token for Laravel
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '/project/file-document/save-gantt-chart',
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // Important for FormData
+                    contentType: false, // Important for FormData
+                    success: function(response) {
+                        if (response.success) {
+                            $('#ganttChartModal').modal('hide');
+                            showHint('Data saved successfully');
+                            // Optional: reload or update the page
+                        } else {
+                            alert('Error: ' + (response.message || 'Failed to save data'));
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Error saving data';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg += ': ' + xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            errorMsg += ': ' + xhr.responseText;
+                        }
+                        alert(errorMsg);
+                    }
+                });
+            });
+            ///////////////////////////////////////////////////////
             $('#addNote').on('click', function() {
 
                 $('#subject').val('');
@@ -1362,8 +1889,11 @@
                     }
                 });
             });
+
+
         });
     </script>
+
     <script>
         $(document).ready(function() {
 

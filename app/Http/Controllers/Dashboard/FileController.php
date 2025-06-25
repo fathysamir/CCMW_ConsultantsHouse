@@ -9,6 +9,7 @@ use App\Models\FileDocument;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
+use App\Models\GanttChartDocData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -182,6 +183,8 @@ class FileController extends ApiController
             $file->save();
         } else {
             FileAttachment::where('file_id', $file->id)->delete();
+            $file_doc_IDs=FileDocument::where('file_id', $file->id)->pluck('id');
+            GanttChartDocData::whereIn('id',$file_doc_IDs)->delete();
             FileDocument::where('file_id', $file->id)->delete();
             $file->delete();
 

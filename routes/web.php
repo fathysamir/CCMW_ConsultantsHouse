@@ -93,7 +93,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('/switch-account/{id}', function ($id) {
         // session(['current_account_id' => $id]);
-        $user = auth()->user();
+        $user                     = auth()->user();
         $user->current_account_id = $id;
         $user->save();
 
@@ -164,7 +164,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('/switch-project/{id}', function ($id) {
         // session(['current_account_id' => $id]);
-        $user = auth()->user();
+        $user                     = auth()->user();
         $user->current_project_id = $id;
         $user->save();
 
@@ -206,11 +206,10 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
     Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
 
-
     Route::get('go-to-fileDocument/{docId}/{fileId}', function ($doc, $file) {
 
         $document = FileDocument::where('file_id', $file)->where('document_id', $doc)->first();
-        $file = ProjectFile::findOrFail($file);
+        $file     = ProjectFile::findOrFail($file);
         session(['specific_file_doc' => $document->id]);
 
         return redirect()->route('project.file-documents.index', $file->slug);
@@ -243,7 +242,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/note/update/{id}', [NoteController::class, 'update_note'])->name('project.update-note');
     Route::get('/switch-folder/{id}', function ($id) {
         // session(['current_account_id' => $id]);
-        $user = auth()->user();
+        $user                    = auth()->user();
         $user->current_folder_id = $id;
         $user->save();
 
@@ -281,6 +280,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/summarize/close', [FileDocumentController::class, 'close_summarize_pdf'])->name('project.close_summarize_pdf');
     Route::post('/ai/cleanup', [FileDocumentController::class, 'cleanupAI']);
     Route::post('/project/checkDoc_aiLayerUsed', [FileDocumentController::class, 'checkDoc_aiLayerUsed'])->name('project.file_document.checkDoc_aiLayerUsed');
+    Route::get('/project/file-document/gantt-chart/{id}', [FileDocumentController::class, 'gantt_chart'])->name('project.file_document.gantt-chart');
+    Route::post('/project/file-document/save-gantt-chart', [FileDocumentController::class, 'save_gantt_chart_data'])->name('project.file_document.save_gantt_chart_data');
 
     Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 

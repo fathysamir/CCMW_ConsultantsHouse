@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
 use App\Models\StorageFile;
+use App\Models\GanttChartDocData;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -348,6 +349,8 @@ class DocumentController extends ApiController
 
     public function delete($id)
     {
+        $file_doc_IDs=FileDocument::where('document_id', $id)->pluck('id');
+        GanttChartDocData::whereIn('id',$file_doc_IDs)->delete();
         FileDocument::where('document_id', $id)->delete();
         $doc = Document::where('id', $id)->first();
         $docs = Document::where('storage_file_id', $doc->storage_file_id)->where('id', '!=', $id)->get();
@@ -375,6 +378,8 @@ class DocumentController extends ApiController
         // Update the owner for all selected documents
         foreach ($request->document_ids as $id) {
             $doc = Document::where('id', $id)->first();
+            $file_doc_IDs=FileDocument::where('document_id', $id)->pluck('id');
+            GanttChartDocData::whereIn('id',$file_doc_IDs)->delete();
             FileDocument::where('document_id', $id)->delete();
             $docs = Document::where('storage_file_id', $doc->storage_file_id)->where('id', '!=', $id)->get();
             if (count($docs) == 0) {
