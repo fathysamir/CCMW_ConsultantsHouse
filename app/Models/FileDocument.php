@@ -58,4 +58,9 @@ class FileDocument extends Model
     {
         return $this->belongsToMany(ContractTag::class, 'file_documents_tags', 'file_document_id', 'contract_tag_id');
     }
+
+     public function gantt_chart()
+    {
+        return $this->hasOne(GanttChartDocData::class);
+    }
 }

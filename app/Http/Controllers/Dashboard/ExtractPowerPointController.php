@@ -37,8 +37,62 @@ class ExtractPowerPointController extends ApiController
         if (ob_get_length()) {
             ob_end_clean();
         }
-        $start = Carbon::createFromFormat('Y-m', $request->start_date);
-        $end   = Carbon::createFromFormat('Y-m', $request->end_date);
+        $file = ProjectFile::where('slug', $request->file)->first();
+        if ($request->timeframe == 'fixed_dates') {
+            $startTimeScale = $request->start_date;
+            $endTimeScale   = $request->end_date;
+            $lastDay        = Carbon::createFromFormat('Y-m', $endTimeScale)->endOfMonth()->day;
+            $start          = Carbon::createFromFormat('Y-m-d', $startTimeScale . '-01');
+            $end            = Carbon::createFromFormat('Y-m-d', $endTimeScale . '-' . $lastDay);
+        } elseif ($request->timeframe == 'auto') {
+            $docs = FileDocument::where('file_id', $file->id)
+                ->where('forChart', '1')
+                ->has('gantt_chart')
+                ->get()
+                ->sortBy([
+                    fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                    <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                    fn($a, $b) => $a->sn <=> $b->sn,
+                ])
+                ->values();
+
+            // Get all start and end dates
+            $startDates = $docs->map(function ($item) {
+                if ($item->document) {
+                    return $item->document->start_date;
+                } elseif ($item->note) {
+                    return $item->note->start_date;
+                }
+                return null;
+            })->filter();
+
+            $endDates = $docs->map(function ($item) {
+                if ($item->document) {
+                    return $item->document->end_date ?? $item->document->start_date;
+                } elseif ($item->note) {
+                    return $item->note->end_date ?? $item->note->start_date;
+                }
+                return null;
+            })->filter();
+
+            // Find min and max
+            $minStartDate = $startDates->min();
+            $minStartDate = date('Y-m', strtotime($minStartDate));
+
+            $maxEndDate = $endDates->max();
+            $maxEndDate = date('Y-m', strtotime($maxEndDate));
+
+            $lastDay        = Carbon::createFromFormat('Y-m', $maxEndDate)->endOfMonth()->day;
+            $start          = Carbon::createFromFormat('Y-m-d', $minStartDate . '-01');
+            $end            = Carbon::createFromFormat('Y-m-d', $maxEndDate . '-' . $lastDay);
+            $monthsDiff     = $start->diffInMonths($end);
+            $extraMonths    = (int) ceil($monthsDiff * 0.3);
+            $start          = $start->copy()->subMonths($extraMonths);
+            $end            = $end->copy()->addMonths($extraMonths);
+            $startTimeScale = $start->format('Y-m');
+            $endTimeScale   = $end->format('Y-m');
+
+        }
 
         $array_years  = [];
         $array_months = []; // Will store all months in order
@@ -47,10 +101,12 @@ class ExtractPowerPointController extends ApiController
         $pointer = $start->copy();
 
         while ($pointer <= $end) {
+
             $year         = $pointer->format('Y');
             $month        = $pointer->format('M');   // e.g., Jan, Feb, Mar...
             $monthYearKey = $pointer->format('M Y'); // e.g., "Oct 2016"
-            $daysInMonth  = $pointer->daysInMonth;
+
+            $daysInMonth = $pointer->daysInMonth;
 
             // Add month to $array_months (in order)
             $array_months[$monthYearKey] = $daysInMonth;
@@ -63,8 +119,8 @@ class ExtractPowerPointController extends ApiController
 
             // Add to total days count
             $count_days += $daysInMonth;
-
             $pointer->addMonth();
+
         }
 
         $base_day_width = 1; // pts per day
@@ -77,83 +133,222 @@ class ExtractPowerPointController extends ApiController
         $ppt = new PhpPresentation;
         $ppt->getLayout()->setCX((int) $customWidth, DocumentLayout::UNIT_PIXEL);
         $ppt->getLayout()->setCY(900, DocumentLayout::UNIT_PIXEL);
-        $slide  = $ppt->getActiveSlide();
-        $shape2 = $slide->createRichTextShape()
-            ->setHeight(30)
-            ->setWidth($customWidth - $padding)
-            ->setOffsetX(20)
-            ->setOffsetY(10);
-        $shape2->getFill()->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_NONE);
-        $shape2->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
-        $shape2->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $shape2->createTextRun('ET-04: Delay in Jewel Steel Structure Lack of Authority approval (DCCA) for New Modification')->getFont()->setBold(true)->setName($request->font_type);
+        $slide = $ppt->getActiveSlide();
+        if ($request->title_status == 'up') {
+            $shape2 = $slide->createRichTextShape()
+                ->setHeight(30)
+                ->setWidth($customWidth - $padding)
+                ->setOffsetX(20)
+                ->setOffsetY(10);
+            $shape2->getFill()->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_NONE);
+            $shape2->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+            $shape2->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $shape2->createTextRun($file->name)->getFont()->setSize(intval($request->title_font_size))->setBold(true)->setName($request->font_type);
 
-        $currentY = 40;
-        $currentX = 20; // float for precision
+            $currentY = 40;
+            $currentX = 20; // float for precision
 
-// Draw yellow year cells
-        foreach ($array_years as $year => $countDays) {
-            $w = $day_width * $countDays;
+            foreach ($array_years as $year => $countDays) {
+                $w = $day_width * $countDays;
 
-            $shape = $slide->createRichTextShape()
-                ->setHeight(20)
-                ->setWidth($w)
-                ->setOffsetX($currentX)
-                ->setOffsetY($currentY);
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(20)
+                    ->setWidth($w)
+                    ->setOffsetX($currentX)
+                    ->setOffsetY($currentY);
 
-            $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
-            $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
-            $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
 
-            $currentX += $w; // Keep float accuracy here
-        }
-        $currentY   = $$currentY+20.7;
-        $currentX   = 20;
-        $first_line = false;
+                $currentX += $w; // Keep float accuracy here
+            }
+            $currentY   = $currentY + 20.7;
+            $currentX   = 20;
+            $first_line = false;
 
-        foreach ($array_months as $month => $daysInMonth) {
-            $w = $day_width * $daysInMonth;
+            foreach ($array_months as $month => $daysInMonth) {
+                $w = $day_width * $daysInMonth;
 
-            // Add left line only once at start
-            if (! $first_line) {
-                $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                // Add left line only once at start
+                if (! $first_line) {
+                    $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                    $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                    $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                    $line->getBorder()->setLineWidth(0.75);
+                    $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                    $slide->addShape($line);
+                    $first_line = true;
+                }
+
+                // Draw month box
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(16)
+                    ->setWidth(round($w, 2))
+                    ->setOffsetX(round($currentX, 2))
+                    ->setOffsetY($currentY);
+                $shape->setInsetRight(0.0);
+                $shape->setInsetLeft(0.0);
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                // Right line for this month
+                $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
                 $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
                 $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
                 $line->getBorder()->setLineWidth(0.75);
                 $line->getBorder()->setColor(new Color('FFa9a9a9'));
                 $slide->addShape($line);
-                $first_line = true;
+
+                $currentX += $w; // float to avoid error accumulation
             }
 
-            // Draw month box
-            $shape = $slide->createRichTextShape()
-                ->setHeight(16)
-                ->setWidth(round($w, 2))
-                ->setOffsetX(round($currentX, 2))
-                ->setOffsetY($currentY);
-            $shape->setInsetRight(0.0);
-            $shape->setInsetLeft(0.0);
-            $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
-            $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
-            $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+            $currentY = 87;
+        } elseif ($request->title_status == 'down') {
 
-            // Right line for this month
-            $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
-            $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-            $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
-            $line->getBorder()->setLineWidth(0.75);
-            $line->getBorder()->setColor(new Color('FFa9a9a9'));
-            $slide->addShape($line);
+            $currentY = 10;
+            $currentX = 20; // float for precision
+            foreach ($array_years as $year => $countDays) {
+                $w = $day_width * $countDays;
 
-            $currentX += $w; // float to avoid error accumulation
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(20)
+                    ->setWidth($w)
+                    ->setOffsetX($currentX)
+                    ->setOffsetY($currentY);
+
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+
+                $currentX += $w; // Keep float accuracy here
+            }
+            $currentY   = $currentY + 20.7;
+            $currentX   = 20;
+            $first_line = false;
+
+            foreach ($array_months as $month => $daysInMonth) {
+                $w = $day_width * $daysInMonth;
+
+                // Add left line only once at start
+                if (! $first_line) {
+                    $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                    $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                    $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                    $line->getBorder()->setLineWidth(0.75);
+                    $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                    $slide->addShape($line);
+                    $first_line = true;
+                }
+
+                // Draw month box
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(16)
+                    ->setWidth(round($w, 2))
+                    ->setOffsetX(round($currentX, 2))
+                    ->setOffsetY($currentY);
+                $shape->setInsetRight(0.0);
+                $shape->setInsetLeft(0.0);
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                // Right line for this month
+                $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
+                $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                $line->getBorder()->setLineWidth(0.75);
+                $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                $slide->addShape($line);
+
+                $currentX += $w; // float to avoid error accumulation
+            }
+
+            $shape2 = $slide->createRichTextShape()
+                ->setHeight(30)
+                ->setWidth(($customWidth - $padding) - 3)
+                ->setOffsetX(22)
+                ->setOffsetY(47);
+            $shape2->setInsetRight(0.0);
+            $shape2->setInsetLeft(0.0);
+            $shape2->getFill()->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_NONE);
+            $shape2->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+            $shape2->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $shape2->createTextRun($file->name)->getFont()->setSize(intval($request->title_font_size))->setBold(true)->setName($request->font_type);
+
+            $currentY = 87;
+        } elseif ($request->title_status == 'non') {
+            $currentY = 10;
+            $currentX = 20; // float for precision
+
+            foreach ($array_years as $year => $countDays) {
+                $w = $day_width * $countDays;
+
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(20)
+                    ->setWidth($w)
+                    ->setOffsetX($currentX)
+                    ->setOffsetY($currentY);
+
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+
+                $currentX += $w; // Keep float accuracy here
+            }
+            $currentY   = $currentY + 20.7;
+            $currentX   = 20;
+            $first_line = false;
+
+            foreach ($array_months as $month => $daysInMonth) {
+                $w = $day_width * $daysInMonth;
+
+                // Add left line only once at start
+                if (! $first_line) {
+                    $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                    $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                    $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                    $line->getBorder()->setLineWidth(0.75);
+                    $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                    $slide->addShape($line);
+                    $first_line = true;
+                }
+
+                // Draw month box
+                $shape = $slide->createRichTextShape()
+                    ->setHeight(16)
+                    ->setWidth(round($w, 2))
+                    ->setOffsetX(round($currentX, 2))
+                    ->setOffsetY($currentY);
+                $shape->setInsetRight(0.0);
+                $shape->setInsetLeft(0.0);
+                $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                // Right line for this month
+                $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
+                $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                $line->getBorder()->setLineWidth(0.75);
+                $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                $slide->addShape($line);
+
+                $currentX += $w; // float to avoid error accumulation
+            }
+            $currentY = 57;
         }
 
-        $currentY = 87;
         $currentX = 20;
-        $file     = ProjectFile::where('slug', $request->file)->first();
-        $docs     = FileDocument::where('file_id', $file->id)->where('forChart', '1')
+
+        $docs = FileDocument::where('file_id', $file->id)->where('forChart', '1')
             ->get()
             ->sortBy([
                 fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
@@ -162,10 +357,223 @@ class ExtractPowerPointController extends ApiController
             ])
             ->values();
         foreach ($docs as $doc) {
+            if ($currentY > 900) {
+                $slide = $ppt->createSlide();
+                if ($request->title_status == 'up') {
+                    $shape2 = $slide->createRichTextShape()
+                        ->setHeight(30)
+                        ->setWidth($customWidth - $padding)
+                        ->setOffsetX(20)
+                        ->setOffsetY(10);
+                    $shape2->getFill()->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_NONE);
+                    $shape2->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                    $shape2->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                    $shape2->createTextRun($file->name)->getFont()->setSize(intval($request->title_font_size))->setBold(true)->setName($request->font_type);
+
+                    $currentY = 40;
+                    $currentX = 20; // float for precision
+
+                    foreach ($array_years as $year => $countDays) {
+                        $w = $day_width * $countDays;
+
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(20)
+                            ->setWidth($w)
+                            ->setOffsetX($currentX)
+                            ->setOffsetY($currentY);
+
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+
+                        $currentX += $w; // Keep float accuracy here
+                    }
+                    $currentY   = $currentY + 20.7;
+                    $currentX   = 20;
+                    $first_line = false;
+
+                    foreach ($array_months as $month => $daysInMonth) {
+                        $w = $day_width * $daysInMonth;
+
+                        // Add left line only once at start
+                        if (! $first_line) {
+                            $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                            $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                            $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                            $line->getBorder()->setLineWidth(0.75);
+                            $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                            $slide->addShape($line);
+                            $first_line = true;
+                        }
+
+                        // Draw month box
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(16)
+                            ->setWidth(round($w, 2))
+                            ->setOffsetX(round($currentX, 2))
+                            ->setOffsetY($currentY);
+                        $shape->setInsetRight(0.0);
+                        $shape->setInsetLeft(0.0);
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                        // Right line for this month
+                        $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
+                        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                        $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                        $line->getBorder()->setLineWidth(0.75);
+                        $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                        $slide->addShape($line);
+
+                        $currentX += $w; // float to avoid error accumulation
+                    }
+
+                    $currentY = 87;
+                } elseif ($request->title_status == 'down') {
+
+                    $currentY = 10;
+                    $currentX = 20; // float for precision
+                    foreach ($array_years as $year => $countDays) {
+                        $w = $day_width * $countDays;
+
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(20)
+                            ->setWidth($w)
+                            ->setOffsetX($currentX)
+                            ->setOffsetY($currentY);
+
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+
+                        $currentX += $w; // Keep float accuracy here
+                    }
+                    $currentY   = $currentY + 20.7;
+                    $currentX   = 20;
+                    $first_line = false;
+
+                    foreach ($array_months as $month => $daysInMonth) {
+                        $w = $day_width * $daysInMonth;
+
+                        // Add left line only once at start
+                        if (! $first_line) {
+                            $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                            $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                            $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                            $line->getBorder()->setLineWidth(0.75);
+                            $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                            $slide->addShape($line);
+                            $first_line = true;
+                        }
+
+                        // Draw month box
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(16)
+                            ->setWidth(round($w, 2))
+                            ->setOffsetX(round($currentX, 2))
+                            ->setOffsetY($currentY);
+                        $shape->setInsetRight(0.0);
+                        $shape->setInsetLeft(0.0);
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                        // Right line for this month
+                        $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
+                        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                        $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                        $line->getBorder()->setLineWidth(0.75);
+                        $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                        $slide->addShape($line);
+
+                        $currentX += $w; // float to avoid error accumulation
+                    }
+
+                    $shape2 = $slide->createRichTextShape()
+                        ->setHeight(30)
+                        ->setWidth(($customWidth - $padding) - 3)
+                        ->setOffsetX(22)
+                        ->setOffsetY(47);
+                    $shape2->setInsetRight(0.0);
+                    $shape2->setInsetLeft(0.0);
+                    $shape2->getFill()->setFillType(\PhpOffice\PhpPresentation\Style\Fill::FILL_NONE);
+                    $shape2->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                    $shape2->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                    $shape2->createTextRun($file->name)->getFont()->setSize(intval($request->title_font_size))->setBold(true)->setName($request->font_type);
+
+                    $currentY = 87;
+                } elseif ($request->title_status == 'non') {
+                    $currentY = 10;
+                    $currentX = 20; // float for precision
+
+                    foreach ($array_years as $year => $countDays) {
+                        $w = $day_width * $countDays;
+
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(20)
+                            ->setWidth($w)
+                            ->setOffsetX($currentX)
+                            ->setOffsetY($currentY);
+
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun($year)->getFont()->setSize(9)->setBold(false)->setName($request->font_type);
+
+                        $currentX += $w; // Keep float accuracy here
+                    }
+                    $currentY   = $currentY + 20.7;
+                    $currentX   = 20;
+                    $first_line = false;
+
+                    foreach ($array_months as $month => $daysInMonth) {
+                        $w = $day_width * $daysInMonth;
+
+                        // Add left line only once at start
+                        if (! $first_line) {
+                            $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX, 2), (int) $currentY + 16, (int) round($currentX, 2), 890);
+                            $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                            $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                            $line->getBorder()->setLineWidth(0.75);
+                            $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                            $slide->addShape($line);
+                            $first_line = true;
+                        }
+
+                        // Draw month box
+                        $shape = $slide->createRichTextShape()
+                            ->setHeight(16)
+                            ->setWidth(round($w, 2))
+                            ->setOffsetX(round($currentX, 2))
+                            ->setOffsetY($currentY);
+                        $shape->setInsetRight(0.0);
+                        $shape->setInsetLeft(0.0);
+                        $shape->getFill()->setFillType('solid')->setStartColor(new Color('FFFF00'));
+                        $shape->getBorder()->setLineWidth(1.5)->setColor(new Color(Color::COLOR_BLACK));
+                        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        $shape->createTextRun(substr($month, 0, 3))->getFont()->setSize(4)->setBold(false)->setName($request->font_type);
+
+                        // Right line for this month
+                        $line = new \PhpOffice\PhpPresentation\Shape\Line((int) round($currentX + $w, 2), (int) $currentY + 16, (int) round($currentX + $w, 2), 890);
+                        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                        $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                        $line->getBorder()->setLineWidth(0.75);
+                        $line->getBorder()->setColor(new Color('FFa9a9a9'));
+                        $slide->addShape($line);
+
+                        $currentX += $w; // float to avoid error accumulation
+                    }
+                    $currentY = 57;
+                }
+            }
             $doc_gantt_chart = GanttChartDocData::where('file_document_id', $doc->id)->first();
             if ($doc_gantt_chart) {
 
-              
                 if ($doc_gantt_chart->show_cur == '1') {
                     $sections = json_decode($doc_gantt_chart->cur_sections, true);
                     if ($doc_gantt_chart->cur_type == 'SB' || $doc_gantt_chart->cur_type == 'DA' || $doc_gantt_chart->cur_type == 'MS') {
@@ -189,9 +597,9 @@ class ExtractPowerPointController extends ApiController
                         $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? ' - ' . $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
                         $yearMonth2 = date('Y-m', strtotime($sections[count($sections) - 1]['fd']));
-                        if ($yearMonth1 >= $request->start_date && $yearMonth1 <= $request->end_date && $yearMonth2 >= $request->start_date && $yearMonth2 <= $request->end_date) {
+                        if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
 
-                            $startX = $currentX + ($day_width * $this->calc_days($request->start_date . '-01', $sections[0]['sd']));
+                            $startX = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $sections[0]['sd']));
                             $wid    = 0;
 
                             foreach ($sections as $key => $section) {
@@ -239,7 +647,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption)
-                                    ->setOffsetX(round($startXX, 2))
+                                    ->setOffsetX(round($startXX, 2) - 1)
                                     ->setOffsetY($currentY + 5);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -247,15 +655,15 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX->setInsetTop(0.0);
                                 $shapeXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
                                 $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
-                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                                 $shapeXX->createTextRun($cur_left_caption)->getFont()->setSize(intval($request->cur_font_size))->setBold(false)->setName($request->font_type);
                             }
                             if ($cur_right_caption != '') {
 
                                 $unit_pixel_cur_right_caption = 2 + $this->calc_pixels($cur_right_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $request->end_date . '-30')) - 2)) {
+                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2)) {
 
-                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $request->end_date . '-30')) - 2;
+                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2;
                                 }
                                 $startXXX = $startX + $wid + 2;
                                 $shapeXXX = $slide->createRichTextShape()
@@ -269,7 +677,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXXX->setInsetTop(0.0);
                                 $shapeXXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
                                 $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
-                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                                 $shapeXXX->createTextRun($cur_right_caption)->getFont()->setSize(intval($request->cur_font_size))->setBold(false)->setName($request->font_type);
                             }
 
@@ -293,8 +701,8 @@ class ExtractPowerPointController extends ApiController
                         $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? ' - ' . $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
 
-                        if ($yearMonth1 >= $request->start_date && $yearMonth1 <= $request->end_date) {
-                            $startXy = $currentX + ($day_width * $this->calc_days($request->start_date . '-01', $sections[0]['sd'])) - 8;
+                        if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale) {
+                            $startXy = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $sections[0]['sd'])) - 8;
                             $dd      = new AutoShape;
                             if ($doc_gantt_chart->cur_type == 'M') {
                                 $dd->setType(AutoShape::TYPE_DIAMOND);
@@ -327,17 +735,17 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX->setInsetTop(0.0);
                                 $shapeXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
                                 $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
-                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                                 $shapeXX->createTextRun($cur_left_caption)->getFont()->setSize(intval($request->cur_font_size))->setBold(false)->setName($request->font_type);
                             }
                             if ($cur_right_caption != '') {
 
                                 $unit_pixel_cur_right_caption = 2 + $this->calc_pixels($cur_right_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[0]['sd'], $request->end_date . '-30')) - 10)) {
+                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10)) {
 
-                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[0]['sd'], $request->end_date . '-30')) - 10;
+                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10;
                                 }
-                                $startXXX = $startXy + 18;
+                                $startXXX = $startXy + 19;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_right_caption)
@@ -349,14 +757,25 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXXX->setInsetTop(0.0);
                                 $shapeXXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
                                 $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
-                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                                 $shapeXXX->createTextRun($cur_right_caption)->getFont()->setSize(intval($request->cur_font_size))->setBold(false)->setName($request->font_type);
                             }
                         }
 
                     }
                 }
-                $currentY = $currentY + 36;
+
+                if ($doc_gantt_chart->show_cur == '1' || $doc_gantt_chart->show_pl == '1') {
+                    $currentY = $currentY + 36;
+                    if ($request->raw_height == '1') {
+                        $currentY += 10;
+                    } elseif ($request->raw_height == '1.5') {
+                        $currentY += 17;
+                    } elseif ($request->raw_height == '2') {
+                        $currentY += 24;
+                    }
+
+                }
 
             }
 
