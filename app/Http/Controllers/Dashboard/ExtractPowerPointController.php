@@ -858,12 +858,13 @@ class ExtractPowerPointController extends ApiController
         // $slide->addShape($dd);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // $line = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200); // from (x1, y1) to (x2, y2)
-        // $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-        // $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
-        // $line->getBorder()->setLineWidth(1);
-        // $line->getBorder()->setColor(new Color('FF0000')); // red
-        // $slide->addShape($line);
+        $line = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200); // from (x1, y1) to (x2, y2)
+        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+        $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+        $line->getBorder()->setLineWidth(1);
+        $line->getBorder()->setColor(new Color('FF0000')); // red
+        $slide->addShape($line);
+        
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // $slide2 = $ppt->createSlide();
