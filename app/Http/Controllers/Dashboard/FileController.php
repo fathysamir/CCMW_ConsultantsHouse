@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Document;
 use App\Models\FileAttachment;
 use App\Models\FileDocument;
+use App\Models\GanttChartDocData;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
-use App\Models\GanttChartDocData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -23,28 +22,28 @@ class FileController extends ApiController
     {
         $zip_file = session('zip_file');
         if ($zip_file != null) {
-            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
             session()->forget('zip_file');
         }
-        $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
-        $user = auth()->user();
-        $folder = ProjectFolder::findOrFail($user->current_folder_id);
+        $project   = Project::findOrFail(auth()->user()->current_project_id);
+        $users     = $project->assign_users;
+        $user      = auth()->user();
+        $folder    = ProjectFolder::findOrFail($user->current_folder_id);
         $all_files = ProjectFile::where('folder_id', $folder->id)->orderBy('code', 'asc')->get();
-        $folders = ProjectFolder::where('id', '!=', $folder->id)->where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
+        $folders   = ProjectFolder::where('id', '!=', $folder->id)->where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
 
         return view('project_dashboard.project_files.index', compact('all_files', 'folders', 'folder', 'users'));
     }
 
     public function create()
     {
-        $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
-        $user = auth()->user();
-        $folder = ProjectFolder::findOrFail($user->current_folder_id);
+        $project       = Project::findOrFail(auth()->user()->current_project_id);
+        $users         = $project->assign_users;
+        $user          = auth()->user();
+        $folder        = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;
 
         return view('project_dashboard.project_files.create', compact('folder', 'users', 'stake_holders'));
@@ -53,18 +52,18 @@ class FileController extends ApiController
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required', // 10MB max
+            'name'     => 'required', // 10MB max
             'owner_id' => 'required|exists:users,id',
         ]);
         do {
             $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         } while (ProjectFile::where('slug', $invitation_code)->exists());
 
-        $file = ProjectFile::create(['name' => $request->name, 'slug' => $invitation_code, 'code' => $request->code,
-            'user_id' => $request->owner_id,
-            'project_id' => auth()->user()->current_project_id, 'against_id' => $request->against_id, 'start_date' => $request->start_date,
-            'end_date' => $request->end_date, 'folder_id' => auth()->user()->current_folder_id,
-            'notes' => $request->notes]);
+        $file = ProjectFile::create(['name' => $request->name, 'slug'                           => $invitation_code, 'code'           => $request->code,
+            'user_id'                           => $request->owner_id,
+            'project_id'                        => auth()->user()->current_project_id, 'against_id' => $request->against_id, 'start_date' => $request->start_date,
+            'end_date'                          => $request->end_date, 'folder_id'                  => auth()->user()->current_folder_id,
+            'notes'                             => $request->notes]);
         if ($request->time) {
             $file->time = '1';
         }
@@ -91,12 +90,12 @@ class FileController extends ApiController
 
     public function edit($id)
     {
-        $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
-        $user = auth()->user();
-        $folder = ProjectFolder::findOrFail($user->current_folder_id);
+        $project       = Project::findOrFail(auth()->user()->current_project_id);
+        $users         = $project->assign_users;
+        $user          = auth()->user();
+        $folder        = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;
-        $file = ProjectFile::where('slug', $id)->first();
+        $file          = ProjectFile::where('slug', $id)->first();
 
         return view('project_dashboard.project_files.edit', compact('folder', 'users', 'stake_holders', 'file'));
     }
@@ -104,15 +103,15 @@ class FileController extends ApiController
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required', // 10MB max
+            'name'     => 'required', // 10MB max
             'owner_id' => 'required|exists:users,id',
         ]);
 
-        ProjectFile::where('id', $id)->update(['name' => $request->name, 'code' => $request->code,
-            'user_id' => $request->owner_id,
-            'against_id' => $request->against_id, 'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'notes' => $request->notes]);
+        ProjectFile::where('id', $id)->update(['name' => $request->name, 'code'             => $request->code,
+            'user_id'                                     => $request->owner_id,
+            'against_id'                                  => $request->against_id, 'start_date' => $request->start_date,
+            'end_date'                                    => $request->end_date,
+            'notes'                                       => $request->notes]);
         $file = ProjectFile::findOrFail($id);
         if ($request->time) {
             $file->time = '1';
@@ -152,11 +151,11 @@ class FileController extends ApiController
     public function changeOwner(Request $request)
     {
         $request->validate([
-            'file_id' => 'required|exists:project_files,id',
+            'file_id'      => 'required|exists:project_files,id',
             'new_owner_id' => 'required|exists:users,id',
         ]);
 
-        $file = ProjectFile::find($request->file_id);
+        $file          = ProjectFile::find($request->file_id);
         $file->user_id = $request->new_owner_id;
         $file->save();
 
@@ -165,8 +164,8 @@ class FileController extends ApiController
 
     public function delete($id)
     {
-        $file = ProjectFile::where('id', $id)->first();
-        $user = auth()->user();
+        $file    = ProjectFile::where('id', $id)->first();
+        $user    = auth()->user();
         $Archive = ProjectFolder::where('account_id', $user->current_account_id)
             ->where('project_id', $user->current_project_id)->where('name', 'Archive')
             ->first();
@@ -176,15 +175,15 @@ class FileController extends ApiController
         if ($file->older_folder_id == null) {
 
             $file->older_folder_id = $file->folder_id;
-            $file->folder_id = $Folder->id;
+            $file->folder_id       = $Folder->id;
             $file->save();
         } elseif ($file->folder_id == $Archive->id) {
             $file->folder_id = $Folder->id;
             $file->save();
         } else {
             FileAttachment::where('file_id', $file->id)->delete();
-            $file_doc_IDs=FileDocument::where('file_id', $file->id)->pluck('id');
-            GanttChartDocData::whereIn('id',$file_doc_IDs)->delete();
+            $file_doc_IDs = FileDocument::where('file_id', $file->id)->pluck('id');
+            GanttChartDocData::whereIn('id', $file_doc_IDs)->delete();
             FileDocument::where('file_id', $file->id)->delete();
             $file->delete();
 
@@ -196,8 +195,8 @@ class FileController extends ApiController
 
     public function archive($id)
     {
-        $file = ProjectFile::where('id', $id)->first();
-        $user = auth()->user();
+        $file   = ProjectFile::where('id', $id)->first();
+        $user   = auth()->user();
         $Folder = ProjectFolder::where('account_id', $user->current_account_id)
             ->where('project_id', $user->current_project_id)->where('name', 'Archive')
             ->first();
@@ -216,7 +215,7 @@ class FileController extends ApiController
 
         $zip_file = session('zip_file');
         if ($zip_file != null) {
-            $filePath = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$zip_file);
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
             if (File::exists($filePath)) {
                 File::deleteDirectory($filePath);
             }
@@ -225,14 +224,14 @@ class FileController extends ApiController
         $phpWord = new PhpWord;
         $section = $phpWord->addSection();
 
-        $chapter = $request->Chapter; // Dynamic chapter number
+        $chapter       = $request->Chapter; // Dynamic chapter number
         $sectionNumber = $request->Section; // Dynamic section number
         $phpWord->addNumberingStyle(
             'multilevel',
             [
-                'type' => 'multilevel',
+                'type'     => 'multilevel',
                 'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                'levels' => [
+                'levels'   => [
                     ['Heading0', 'format' => 'decimal', 'text' => '%1.', 'start' => (int) $chapter],
                     ['Heading1', 'format' => 'decimal', 'text' => '%1.%2', 'start' => (int) $sectionNumber],
                     ['Heading2', 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1],
@@ -245,9 +244,9 @@ class FileController extends ApiController
         $phpWord->addNumberingStyle(
             'multilevel2',
             [
-                'type' => 'multilevel',
+                'type'     => 'multilevel',
                 'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                'levels' => [
+                'levels'   => [
                     ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
                     ['Heading6', 'format' => 'decimal', 'text' => '%1.%2.'],
                     ['Heading7', 'format' => 'decimal', 'text' => '%1.%2.%3.'],
@@ -260,7 +259,7 @@ class FileController extends ApiController
         $phpWord->addNumberingStyle(
             'unordered',
             [
-                'type' => 'multilevel', // Use 'multilevel' for bullet points
+                'type'   => 'multilevel', // Use 'multilevel' for bullet points
                 'levels' => [
                     ['format' => 'bullet', 'text' => '•', 'alignment' => 'left'],
                     ['format' => 'bullet', 'text' => '◦', 'alignment' => 'left'],
@@ -277,143 +276,143 @@ class FileController extends ApiController
         );
         // Define styles for headings
         $GetStandardStylesH1 = [
-            'name' => 'Arial',
+            'name'      => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 24,
-            'bold' => true,
-            'italic' => false,
+            'size'      => 24,
+            'bold'      => true,
+            'italic'    => false,
             'underline' => false,
 
         ];
         $GetParagraphStyleH1 = [
-            'spaceBefore' => 0,
-            'spaceAfter' => 240,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 803.6,
-                'hanging' => 803.6,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 803.6,
+                'hanging'   => 803.6,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => true,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
         ];
         $GetStandardStylesH2 = [
-            'name' => 'Arial',
+            'name'      => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 16,
-            'bold' => true,
-            'italic' => false,
+            'size'      => 16,
+            'bold'      => true,
+            'italic'    => false,
             'underline' => false,
 
         ];
         $GetParagraphStyleH2 = [
-            'spaceBefore' => 0,
-            'spaceAfter' => 240,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 1071.6,
-                'hanging' => 1071.6,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1071.6,
+                'hanging'   => 1071.6,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => true,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
         ];
 
         $GetStandardStylesH3 = [
-            'name' => 'Arial',
+            'name'      => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 14,
-            'bold' => false,
-            'italic' => false,
+            'size'      => 14,
+            'bold'      => false,
+            'italic'    => false,
             'underline' => false,
 
         ];
         $GetParagraphStyleH3 = [
-            'spaceBefore' => 0,
-            'spaceAfter' => 240,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 1071.6,
-                'hanging' => 1071.6,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1071.6,
+                'hanging'   => 1071.6,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => true,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
         ];
 
         $GetStandardStylesSubtitle = [
-            'name' => 'Arial',
+            'name'      => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 14,
-            'bold' => true,
-            'italic' => false,
+            'size'      => 14,
+            'bold'      => true,
+            'italic'    => false,
             'underline' => false,
 
         ];
         $GetParagraphStyleSubtitle = [
-            'spaceBefore' => 0,
-            'spaceAfter' => 240,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 1071.6,
-                'hanging' => 0,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1071.6,
+                'hanging'   => 0,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => true,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
         ];
         $GetStandardStylesP = [
-            'name' => 'Arial',
+            'name'      => 'Arial',
             'alignment' => 'left', // Options: left, center, right, justify
-            'size' => 11,
-            'bold' => false,
-            'italic' => false,
+            'size'      => 11,
+            'bold'      => false,
+            'italic'    => false,
             'underline' => false,
 
         ];
 
         $phpWord->addParagraphStyle('listParagraphStyle', [
-            'spaceBefore' => 0,
-            'spaceAfter' => 240,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 1071.6,
-                'hanging' => 1071.6,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1071.6,
+                'hanging'   => 1071.6,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => false,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
-            'keepLines' => true,
-            'hyphenation' => false,
-            'pageBreakBefore' => false,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
+            'keepLines'         => true,
+            'hyphenation'       => false,
+            'pageBreakBefore'   => false,
         ]);
 
         $phpWord->addParagraphStyle('listParagraphStyle2', [
-            'spaceBefore' => 0,
-            'spaceAfter' => 10,
-            'lineHeight' => '1.5',
-            'indentation' => [
-                'left' => 1428.8,
-                'hanging' => 357.2,
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 10,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1428.8,
+                'hanging'   => 357.2,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => false,
-            'next' => true,
-            'keepNext' => true,
-            'widowControl' => true,
-            'keepLines' => true,
-            'hyphenation' => false,
-            'pageBreakBefore' => false,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
+            'keepLines'         => true,
+            'hyphenation'       => false,
+            'pageBreakBefore'   => false,
         ]);
 
         $phpWord->addTitleStyle(1, $GetStandardStylesH1, $GetParagraphStyleH1);
@@ -439,7 +438,7 @@ class FileController extends ApiController
             $section->addText($subtitle1, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
             foreach ($paragraphs as $index => $paragraph) {
                 // dd($paragraphs);
-                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                $listItemRun  = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
                 $existedList1 = false;
                 // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
                 $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
@@ -448,7 +447,7 @@ class FileController extends ApiController
                     $listItemRun->addText('____________.');
                 } else {
                     if (! $containsHtml) {
-                        $listItemRun->addText($paragraph->narrative.'.');
+                        $listItemRun->addText($paragraph->narrative . '.');
                     } else {
 
                         $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
@@ -481,16 +480,16 @@ class FileController extends ApiController
                             // dd($paragraphsArray);
                             if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
 
-                                $imgPath = $matches[1]; // Extract image path
-                                $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
-                                $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                                $imgPath       = $matches[1];                                 // Extract image path
+                                $altText       = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
+                                $fullImagePath = public_path($imgPath);                       // Convert relative path to absolute
 
                                 if ($existedList1) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 0.9,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 0.9,
                                             'lineSpacing' => 'single',
                                             'indentation' => [
                                                 'left' => 1071.6,
@@ -499,20 +498,20 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $shape = $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                               => 'left', // Options: left, center, right, justify
+                                                'size'                                    => 9,
+                                                'bold'                                    => false,
+                                                'italic'                                  => true,
+                                                'underline'                               => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -528,20 +527,20 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                                   => 'left', // Options: left, center, right, justify
+                                                'size'                                        => 9,
+                                                'bold'                                        => false,
+                                                'italic'                                      => true,
+                                                'underline'                                   => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -564,8 +563,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 1.5,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 1.5,
                                             'indentation' => [
                                                 'left' => 1071.6,
                                             ],
@@ -573,8 +572,8 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
@@ -591,8 +590,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -608,11 +607,11 @@ class FileController extends ApiController
                                 }
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                                 $phpWord->addNumberingStyle(
-                                    'multilevel_1'.$index.$index2.'1',
+                                    'multilevel_1' . $index . $index2 . '1',
                                     [
-                                        'type' => 'multilevel',
+                                        'type'     => 'multilevel',
                                         'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                                        'levels' => [
+                                        'levels'   => [
                                             ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
 
                                             // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
@@ -625,9 +624,9 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2.'1', 'listParagraphStyle2'); // Use a numbering style
-                                        // $nestedListItemRun->addText($item);
+                                                                                                                                                          // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '1', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                          // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
@@ -639,10 +638,10 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        // dd($listItems);
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
-                                        // $unNestedListItemRun->addText($item);
+                                                                                                                                // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
@@ -656,20 +655,20 @@ class FileController extends ApiController
                                     if ($existedList1) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => '1.5',
-                                            'indentation' => [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
                                                 'left' => 1071.6,
 
                                             ],
                                             'contextualSpacing' => false,
-                                            'next' => true,
-                                            'keepNext' => true,
-                                            'widowControl' => true,
-                                            'keepLines' => true,
-                                            'hyphenation' => false,
-                                            'pageBreakBefore' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
@@ -699,7 +698,7 @@ class FileController extends ApiController
                                     }
 
                                 } catch (\Exception $e) {
-                                    error_log('Error adding HTML: '.$e->getMessage());
+                                    error_log('Error adding HTML: ' . $e->getMessage());
                                 }
                             }
 
@@ -720,9 +719,9 @@ class FileController extends ApiController
 
         $paragraphs = $paragraphs->get()
             ->sortBy([
-                fn ($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
-                            <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
-                fn ($a, $b) => $a->sn <=> $b->sn,
+                fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                fn($a, $b) => $a->sn <=> $b->sn,
             ])
             ->values();
         if (count($paragraphs) > 0) {
@@ -730,21 +729,21 @@ class FileController extends ApiController
             $subtitle2 = str_replace('&', '&amp;', $subtitle2);
             $section->addText($subtitle2, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
             $GetStandardStylesFootNotes = [
-                'name' => 'Calibri',
+                'name'      => 'Calibri',
                 'alignment' => 'left', // Options: left, center, right, justify
-                'size' => 9,
-                'bold' => false,
-                'italic' => false,
+                'size'      => 9,
+                'bold'      => false,
+                'italic'    => false,
                 'underline' => false,
 
             ];
             $GetParagraphStyleFootNotes = [
                 'spaceBefore' => 0,
-                'spaceAfter' => 0,
+                'spaceAfter'  => 0,
                 'lineSpacing' => 240,
                 'indentation' => [
-                    'left' => 0,
-                    'hanging' => 0,
+                    'left'      => 0,
+                    'hanging'   => 0,
                     'firstLine' => 0,
                 ],
             ];
@@ -763,39 +762,39 @@ class FileController extends ApiController
 
                     // Add the date with a footnote
                     $listItemRun->addText($date, $GetStandardStylesP);
-                    $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-                    $Exhibit = true;
-                    $dated = true;
+                    $footnote         = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
+                    $Exhibit          = true;
+                    $dated            = true;
                     $senderAndDocType = true;
-                    $hint = '';
+                    $hint             = '';
                     if ($request->formate_type2 == 'reference') {
-                        $hint = $paragraph->document->reference.'.';
+                        $hint = $paragraph->document->reference . '.';
                     } elseif ($request->formate_type2 == 'dateAndReference') {
 
                         $date2 = date('y_m_d', strtotime($paragraph->document->start_date));
-                        $hint = preg_replace('/_/', '', $date2).' - '.$paragraph->document->reference.'.';
+                        $hint  = preg_replace('/_/', '', $date2) . ' - ' . $paragraph->document->reference . '.';
                     } elseif ($request->formate_type2 == 'formate') {
-                        $sn = $request->sn2;
-                        $prefix = $request->prefix2;
-                        $listNumber = "$prefix".str_pad($x, $sn, '0', STR_PAD_LEFT);
-                        $hint = $listNumber.': ';
-                        $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative."'s " : '';
-                        $type = $paragraph->document->docType->name;
-                        $hint .= $from.$type.' ';
+                        $sn         = $request->sn2;
+                        $prefix     = $request->prefix2;
+                        $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
+                        $hint       = $listNumber . ': ';
+                        $from       = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                        $type       = $paragraph->document->docType->name;
+                        $hint .= $from . $type . ' ';
                         if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
                             $ref_part = $request->ref_part2;
                             if ($ref_part == 'option1') {
                                 $hint .= ', ';
                             } elseif ($ref_part == 'option2') {
 
-                                $hint .= 'From: '.$paragraph->document->reference.', ';
+                                $hint .= 'From: ' . $paragraph->document->reference . ', ';
                             } elseif ($ref_part == 'option3') {
-                                $hint .= 'Ref: '.$paragraph->document->reference.', ';
+                                $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
                             }
                         } else {
-                            $hint .= 'Ref: '.$paragraph->document->reference.', ';
+                            $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
                         }
-                        $hint .= 'dated: '.$date.'.';
+                        $hint .= 'dated: ' . $date . '.';
 
                     }
                     $footnote->addText($hint, $GetStandardStylesFootNotes);
@@ -809,7 +808,7 @@ class FileController extends ApiController
                     $listItemRun->addText('____________.');
                 } else {
                     if (! $containsHtml) {
-                        $listItemRun->addText($paragraph->narrative.'.');
+                        $listItemRun->addText($paragraph->narrative . '.');
                     } else {
 
                         $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
@@ -842,16 +841,16 @@ class FileController extends ApiController
                             // dd($paragraphsArray);
                             if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
 
-                                $imgPath = $matches[1]; // Extract image path
-                                $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
-                                $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                                $imgPath       = $matches[1];                                 // Extract image path
+                                $altText       = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
+                                $fullImagePath = public_path($imgPath);                       // Convert relative path to absolute
 
                                 if ($existedList) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 0.9,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 0.9,
                                             'lineSpacing' => 'single',
                                             'indentation' => [
                                                 'left' => 1071.6,
@@ -860,20 +859,20 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $shape = $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                               => 'left', // Options: left, center, right, justify
+                                                'size'                                    => 9,
+                                                'bold'                                    => false,
+                                                'italic'                                  => true,
+                                                'underline'                               => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -889,20 +888,20 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                                   => 'left', // Options: left, center, right, justify
+                                                'size'                                        => 9,
+                                                'bold'                                        => false,
+                                                'italic'                                      => true,
+                                                'underline'                                   => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -925,8 +924,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 1.5,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 1.5,
                                             'indentation' => [
                                                 'left' => 1071.6,
                                             ],
@@ -934,8 +933,8 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
@@ -952,8 +951,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -969,11 +968,11 @@ class FileController extends ApiController
                                 }
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                                 $phpWord->addNumberingStyle(
-                                    'multilevel_1'.$index.$index2.'2',
+                                    'multilevel_1' . $index . $index2 . '2',
                                     [
-                                        'type' => 'multilevel',
+                                        'type'     => 'multilevel',
                                         'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                                        'levels' => [
+                                        'levels'   => [
                                             ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
 
                                             // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
@@ -986,9 +985,9 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2.'2', 'listParagraphStyle2'); // Use a numbering style
-                                        // $nestedListItemRun->addText($item);
+                                                                                                                                                          // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '2', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                          // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
@@ -1000,10 +999,10 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        // dd($listItems);
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
-                                        // $unNestedListItemRun->addText($item);
+                                                                                                                                // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
@@ -1017,20 +1016,20 @@ class FileController extends ApiController
                                     if ($existedList) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => '1.5',
-                                            'indentation' => [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
                                                 'left' => 1071.6,
 
                                             ],
                                             'contextualSpacing' => false,
-                                            'next' => true,
-                                            'keepNext' => true,
-                                            'widowControl' => true,
-                                            'keepLines' => true,
-                                            'hyphenation' => false,
-                                            'pageBreakBefore' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
@@ -1060,7 +1059,7 @@ class FileController extends ApiController
                                     }
 
                                 } catch (\Exception $e) {
-                                    error_log('Error adding HTML: '.$e->getMessage());
+                                    error_log('Error adding HTML: ' . $e->getMessage());
                                 }
                             }
 
@@ -1085,7 +1084,7 @@ class FileController extends ApiController
             $section->addText($subtitle3, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
             foreach ($paragraphs as $index => $paragraph) {
                 // dd($paragraphs);
-                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                $listItemRun  = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
                 $existedList2 = false;
                 // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
                 $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
@@ -1094,7 +1093,7 @@ class FileController extends ApiController
                     $listItemRun->addText('____________.');
                 } else {
                     if (! $containsHtml) {
-                        $listItemRun->addText($paragraph->narrative.'.');
+                        $listItemRun->addText($paragraph->narrative . '.');
                     } else {
 
                         $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
@@ -1127,16 +1126,16 @@ class FileController extends ApiController
                             // dd($paragraphsArray);
                             if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
 
-                                $imgPath = $matches[1]; // Extract image path
-                                $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
-                                $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                                $imgPath       = $matches[1];                                 // Extract image path
+                                $altText       = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
+                                $fullImagePath = public_path($imgPath);                       // Convert relative path to absolute
 
                                 if ($existedList2) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 0.9,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 0.9,
                                             'lineSpacing' => 'single',
                                             'indentation' => [
                                                 'left' => 1071.6,
@@ -1145,20 +1144,20 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $shape = $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                               => 'left', // Options: left, center, right, justify
+                                                'size'                                    => 9,
+                                                'bold'                                    => false,
+                                                'italic'                                  => true,
+                                                'underline'                               => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1174,20 +1173,20 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                                   => 'left', // Options: left, center, right, justify
+                                                'size'                                        => 9,
+                                                'bold'                                        => false,
+                                                'italic'                                      => true,
+                                                'underline'                                   => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1210,8 +1209,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 1.5,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 1.5,
                                             'indentation' => [
                                                 'left' => 1071.6,
                                             ],
@@ -1219,8 +1218,8 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
@@ -1237,8 +1236,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1254,11 +1253,11 @@ class FileController extends ApiController
                                 }
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                                 $phpWord->addNumberingStyle(
-                                    'multilevel_1'.$index.$index2.'3',
+                                    'multilevel_1' . $index . $index2 . '3',
                                     [
-                                        'type' => 'multilevel',
+                                        'type'     => 'multilevel',
                                         'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                                        'levels' => [
+                                        'levels'   => [
                                             ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
 
                                             // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
@@ -1271,9 +1270,9 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2.'3', 'listParagraphStyle2'); // Use a numbering style
-                                        // $nestedListItemRun->addText($item);
+                                                                                                                                                          // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '3', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                          // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
@@ -1285,10 +1284,10 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        // dd($listItems);
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
-                                        // $unNestedListItemRun->addText($item);
+                                                                                                                                // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
@@ -1302,20 +1301,20 @@ class FileController extends ApiController
                                     if ($existedList2) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => '1.5',
-                                            'indentation' => [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
                                                 'left' => 1071.6,
 
                                             ],
                                             'contextualSpacing' => false,
-                                            'next' => true,
-                                            'keepNext' => true,
-                                            'widowControl' => true,
-                                            'keepLines' => true,
-                                            'hyphenation' => false,
-                                            'pageBreakBefore' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
@@ -1345,7 +1344,7 @@ class FileController extends ApiController
                                     }
 
                                 } catch (\Exception $e) {
-                                    error_log('Error adding HTML: '.$e->getMessage());
+                                    error_log('Error adding HTML: ' . $e->getMessage());
                                 }
                             }
 
@@ -1370,7 +1369,7 @@ class FileController extends ApiController
             $section->addText($subtitle4, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
             foreach ($paragraphs as $index => $paragraph) {
                 // dd($paragraphs);
-                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                $listItemRun  = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
                 $existedList3 = false;
                 // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
                 $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
@@ -1379,7 +1378,7 @@ class FileController extends ApiController
                     $listItemRun->addText('____________.');
                 } else {
                     if (! $containsHtml) {
-                        $listItemRun->addText($paragraph->narrative.'.');
+                        $listItemRun->addText($paragraph->narrative . '.');
                     } else {
 
                         $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
@@ -1412,16 +1411,16 @@ class FileController extends ApiController
                             // dd($paragraphsArray);
                             if (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*alt=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
 
-                                $imgPath = $matches[1]; // Extract image path
-                                $altText = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
-                                $fullImagePath = public_path($imgPath); // Convert relative path to absolute
+                                $imgPath       = $matches[1];                                 // Extract image path
+                                $altText       = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
+                                $fullImagePath = public_path($imgPath);                       // Convert relative path to absolute
 
                                 if ($existedList3) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 0.9,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 0.9,
                                             'lineSpacing' => 'single',
                                             'indentation' => [
                                                 'left' => 1071.6,
@@ -1430,20 +1429,20 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $shape = $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                               => 'left', // Options: left, center, right, justify
+                                                'size'                                    => 9,
+                                                'bold'                                    => false,
+                                                'italic'                                  => true,
+                                                'underline'                               => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1459,20 +1458,20 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText.'.', ['name' => 'Calibri',
-                                                'alignment' => 'left', // Options: left, center, right, justify
-                                                'size' => 9,
-                                                'bold' => false,
-                                                'italic' => true,
-                                                'underline' => false]); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
+                                                'alignment'                                   => 'left', // Options: left, center, right, justify
+                                                'size'                                        => 9,
+                                                'bold'                                        => false,
+                                                'italic'                                      => true,
+                                                'underline'                                   => false]); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1495,8 +1494,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
                                             'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => 1.5,
+                                            'spaceAfter'  => 240,
+                                            'lineHeight'  => 1.5,
                                             'indentation' => [
                                                 'left' => 1071.6,
                                             ],
@@ -1504,8 +1503,8 @@ class FileController extends ApiController
 
                                         // Add Image
                                         $textRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
 
@@ -1522,8 +1521,8 @@ class FileController extends ApiController
                                     if (file_exists($fullImagePath)) {
                                         // Add Image
                                         $listItemRun->addImage($fullImagePath, [
-                                            'width' => 100,
-                                            'height' => 80,
+                                            'width'     => 100,
+                                            'height'    => 80,
                                             'alignment' => 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1539,11 +1538,11 @@ class FileController extends ApiController
                                 }
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
                                 $phpWord->addNumberingStyle(
-                                    'multilevel_1'.$index.$index2.'4',
+                                    'multilevel_1' . $index . $index2 . '4',
                                     [
-                                        'type' => 'multilevel',
+                                        'type'     => 'multilevel',
                                         'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                                        'levels' => [
+                                        'levels'   => [
                                             ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
 
                                             // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
@@ -1556,9 +1555,9 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1'.$index.$index2.'4', 'listParagraphStyle2'); // Use a numbering style
-                                        // $nestedListItemRun->addText($item);
+                                                                                                                                                          // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '4', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                          // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
@@ -1570,10 +1569,10 @@ class FileController extends ApiController
 
                                     // Add each list item as a nested list item
                                     foreach ($listItems as $item) {
-                                        // Add a nested list item
-                                        // dd($listItems);
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
-                                        // $unNestedListItemRun->addText($item);
+                                                                                                                                // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
@@ -1587,20 +1586,20 @@ class FileController extends ApiController
                                     if ($existedList3) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore' => 0,
-                                            'spaceAfter' => 240,
-                                            'lineHeight' => '1.5',
-                                            'indentation' => [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
                                                 'left' => 1071.6,
 
                                             ],
                                             'contextualSpacing' => false,
-                                            'next' => true,
-                                            'keepNext' => true,
-                                            'widowControl' => true,
-                                            'keepLines' => true,
-                                            'hyphenation' => false,
-                                            'pageBreakBefore' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
@@ -1630,7 +1629,7 @@ class FileController extends ApiController
                                     }
 
                                 } catch (\Exception $e) {
-                                    error_log('Error adding HTML: '.$e->getMessage());
+                                    error_log('Error adding HTML: ' . $e->getMessage());
                                 }
                             }
 
@@ -1641,21 +1640,21 @@ class FileController extends ApiController
 
             }
         }
-        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/temp';
-        $path = public_path($projectFolder);
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+        $path          = public_path($projectFolder);
         if (! file_exists($path)) {
 
             mkdir($path, 0755, true);
         }
-        $code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-        $directory = public_path('projects/'.auth()->user()->current_project_id.'/temp/'.$code);
+        $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
         if (! file_exists($directory)) {
             mkdir($directory, 0755, true); // true = create nested directories
         }
         // Save document
         // Define file path in public folder
-        $fileName = 'projects/'.auth()->user()->current_project_id.'/temp/'.$code.'/'.$file->code.'_'.$header.'.docx';
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
         $filePath = public_path($fileName);
 
         // Save document to public folder
@@ -1671,12 +1670,12 @@ class FileController extends ApiController
     public function lowercaseFirstCharOnly($html)
     {
         return preg_replace_callback(
-            '/(?:^|>)(T)/u',  // Match only "T" after start or closing tag
+            '/(?:^|>)(T)/u', // Match only "T" after start or closing tag
             function ($matches) {
                 return str_replace('T', 't', $matches[0]);
             },
             $html,
-            1 // Only first match
+            1// Only first match
         );
     }
 
@@ -1688,8 +1687,8 @@ class FileController extends ApiController
         libxml_clear_errors();
 
         $resultArray = [];
-        $xpath = new \DOMXPath($dom);
-        $elements = $xpath->query('//p | //ul | //ol'); // Select only <p>, <ul>, and <ol> elements
+        $xpath       = new \DOMXPath($dom);
+        $elements    = $xpath->query('//p | //ul | //ol'); // Select only <p>, <ul>, and <ol> elements
 
         foreach ($elements as $element) {
             $resultArray[] = $dom->saveHTML($element); // Store each element as a separate string
@@ -1705,24 +1704,24 @@ class FileController extends ApiController
         $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         libxml_clear_errors();
 
-        $xpath = new \DOMXPath($dom);
+        $xpath     = new \DOMXPath($dom);
         $pElements = $xpath->query('//p');
 
         foreach ($pElements as $p) {
-            $newNodes = [];
+            $newNodes        = [];
             $currentFragment = new \DOMDocument;
-            $newP = $dom->createElement('p'); // Use the original document to avoid Wrong Document Error
+            $newP            = $dom->createElement('p'); // Use the original document to avoid Wrong Document Error
 
             foreach (iterator_to_array($p->childNodes) as $child) {
                 if ($child->nodeName === 'img') {
                     // If the current <p> already has text, save it
                     if ($newP->hasChildNodes()) {
                         $newNodes[] = $newP;
-                        $newP = $dom->createElement('p');
+                        $newP       = $dom->createElement('p');
                     }
 
                     // Create a new <p> for the image
-                    $imgP = $dom->createElement('p');
+                    $imgP        = $dom->createElement('p');
                     $importedImg = $dom->importNode($child, true); // Import the image to avoid Wrong Document Error
                     $imgP->appendChild($importedImg);
                     $newNodes[] = $imgP;
@@ -1756,65 +1755,75 @@ class FileController extends ApiController
 
     public function copy_move_file(Request $request)
     {
-        $file = ProjectFile::where('slug', $request->file_id)->first();
+        $file    = ProjectFile::where('slug', $request->file_id)->first();
         $counter = 1;
-        $ex = '';
+        $ex      = '';
         if ($request->action_type == 'Copy') {
             do {
-                $name = $file->name.$ex;
-                $ex = ' ('.$counter.')';
+                $name = $file->name . $ex;
+                $ex   = ' (' . $counter . ')';
                 $counter++;
             } while (ProjectFile::where('name', $name)->where('folder_id', $request->folder_id)->exists());
             do {
                 $slug = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
             } while (ProjectFile::where('slug', $slug)->exists());
-            $new_file = ProjectFile::create(['name' => $name, 'slug' => $slug, 'code' => $file->code,
-                'user_id' => $file->user_id, 'project_id' => $file->project_id,
-                'against_id' => $file->against_id, 'start_date' => $file->start_date,
-                'end_date' => $file->end_date, 'folder_id' => $request->folder_id,
-                'notes' => $file->notes, 'time' => $file->time, 'prolongation_cost' => $file->prolongation_cost,
-                'disruption_cost' => $file->disruption_cost, 'variation' => $file->variation,
-                'closed' => $file->closed, 'assess_not_pursue' => $file->assess_not_pursue]);
+            $new_file = ProjectFile::create(['name' => $name, 'slug'                       => $slug, 'code'                    => $file->code,
+                'user_id'                               => $file->user_id, 'project_id'        => $file->project_id,
+                'against_id'                            => $file->against_id, 'start_date'     => $file->start_date,
+                'end_date'                              => $file->end_date, 'folder_id'        => $request->folder_id,
+                'notes'                                 => $file->notes, 'time'                => $file->time, 'prolongation_cost' => $file->prolongation_cost,
+                'disruption_cost'                       => $file->disruption_cost, 'variation' => $file->variation,
+                'closed'                                => $file->closed, 'assess_not_pursue'  => $file->assess_not_pursue]);
             $file_attachment = FileAttachment::where('file_id', $file->id)->get();
             foreach ($file_attachment as $attachment) {
                 FileAttachment::create(['file_id' => $new_file->id, 'user_id' => auth()->user()->id,
-                    'order' => $attachment->order,
-                    'narrative' => $attachment->narrative,
-                    'forClaim' => $attachment->forClaim,
-                    'section' => $attachment->section]);
+                    'order'                           => $attachment->order,
+                    'narrative'                       => $attachment->narrative,
+                    'forClaim'                        => $attachment->forClaim,
+                    'section'                         => $attachment->section]);
             }
             $file_documents = FileDocument::where('file_id', $file->id)->get();
             foreach ($file_documents as $doc) {
                 $new_doc = FileDocument::create(['file_id' => $new_file->id, 'user_id' => auth()->user()->id,
-                    'document_id' => $doc->document_id,
-                    'note_id' => $doc->note_id,
-                    'sn' => $doc->sn, 'forClaim' => $doc->forClaim, 'narrative' => $doc->narrative, 'notes1' => $doc->notes1,
-                    'forChart' => $doc->forChart, 'notes2' => $doc->notes2,
-                    'forLetter' => $doc->forLetter]);
+                    'document_id'                              => $doc->document_id,
+                    'note_id'                                  => $doc->note_id,
+                    'sn'                                       => $doc->sn, 'forClaim'     => $doc->forClaim, 'narrative' => $doc->narrative, 'notes1' => $doc->notes1,
+                    'forChart'                                 => $doc->forChart, 'notes2' => $doc->notes2,
+                    'forLetter'                                => $doc->forLetter]);
                 $ids = $doc->tags->pluck('id')->toArray();
                 if (count($ids) > 0) {
                     $new_doc->tags()->sync($ids); // Sync tags
                 }
+                $doc_gantt_chart = GanttChartDocData::where('file_document_id', $doc->id)->first();
+                if ($doc_gantt_chart) {
+                    GanttChartDocData::create(['file_document_id' => $new_doc->id,'show_cur'=>$doc_gantt_chart->show_cur,
+                                                'cur_type'=>$doc_gantt_chart->cur_type,'cur_sections'=>$doc_gantt_chart->cur_sections,
+                                                'cur_left_caption'=>$doc_gantt_chart->cur_left_caption,'cur_right_caption'=>$doc_gantt_chart->cur_right_caption,'cur_show_sd'=>$doc_gantt_chart->cur_show_sd,'cur_show_fd'=>$doc_gantt_chart->cur_show_fd,
+                                                'cur_show_ref'=>$doc_gantt_chart->cur_show_ref,'show_pl'=>$doc_gantt_chart->show_pl,'pl_type'=>$doc_gantt_chart->pl_type,'pl_sd'=>$doc_gantt_chart->pl_sd,'pl_fd'=>$doc_gantt_chart->pl_fd,
+                                                'pl_color'=>$doc_gantt_chart->pl_color,'pl_left_caption'=>$doc_gantt_chart->pl_left_caption,'pl_right_caption'=>$doc_gantt_chart->pl_right_caption,'pl_show_sd'=>$doc_gantt_chart->pl_show_sd,
+                                                'pl_show_fd'=>$doc_gantt_chart->pl_show_fd,'show_lp'=>$doc_gantt_chart->show_lp,'lp_sd'=>$doc_gantt_chart->lp_sd,'lp_fd'=>$doc_gantt_chart->lp_fd]);
+                }
+
             }
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'File Copied To Selected Folder Successfully.',
 
                 // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')
             ]);
         } elseif ($request->action_type == 'Move') {
             do {
-                $name = $file->name.$ex;
-                $ex = ' ('.$counter.')';
+                $name = $file->name . $ex;
+                $ex   = ' (' . $counter . ')';
                 $counter++;
             } while (ProjectFile::where('name', $name)->where('folder_id', $request->folder_id)->exists());
-            $file->name = $name;
+            $file->name      = $name;
             $file->folder_id = $request->folder_id;
             $file->save();
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'File Moved To Selected Folder Successfully.',
 
                 // 'redirect' => url('/project/file/' . $file_doc->file->slug . '/documents')

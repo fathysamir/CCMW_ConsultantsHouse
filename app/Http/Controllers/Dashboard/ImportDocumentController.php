@@ -10,7 +10,7 @@ use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\StakeHolder;
 use App\Models\StorageFile;
-use App\Models\User;
+use App\Models\GanttChartDocData;
 use DateTime;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -440,7 +440,25 @@ class ImportDocumentController extends ApiController
 
                 ]);
                 if ($selected_file) {
-                    FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $selected_file, 'document_id' => $doc->id]);
+                    $fileDoc=FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $selected_file, 'document_id' => $doc->id]);
+                    $start_date  = $fileDoc->document->start_date;
+                    $end_date    = $fileDoc->document->end_date;
+                    $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+                    $gantt_chart->lp_sd = $start_date;
+                    $gantt_chart->lp_fd = $end_date;
+
+                    $sections[] = [
+                        'sd'    => $start_date,
+                        'fd'    => $end_date,
+                        'color' => '00008B',
+                    ];
+
+                    $gantt_chart->cur_sections = json_encode($sections);
+                    if ($end_date == null) {
+                        $gantt_chart->cur_type = 'M';
+                    }
+                    $gantt_chart->save();
                 }
                 $importedRows['Row '.$index + 2][] = 'File with Ref: '.$reference.' is uploaded successfully';
             }

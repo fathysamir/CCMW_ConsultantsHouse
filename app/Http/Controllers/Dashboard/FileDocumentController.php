@@ -984,17 +984,42 @@ class FileDocumentController extends ApiController
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('note_id', $file_doc->note_id)->first();
                 }
                 if (! $fileDoc) {
-                    $doc = FileDocument::create(['user_id' => auth()->user()->id,
-                        'file_id'                              => $request->file_id,
-                        'narrative'                            => $file_doc->narrative,
-                        'notes1'                               => $file_doc->notes1,
-                        'notes2'                               => $file_doc->notes2,
-                        'sn'                                   => $file_doc->sn,
-                        'forClaim'                             => $file_doc->forClaim,
-                        'forChart'                             => $file_doc->forChart,
-                        'forLetter'                            => $file_doc->forLetter,
-                        'document_id'                          => $file_doc->document_id,
-                        'note_id'                              => $file_doc->note_id]);
+                    $fileDoc = FileDocument::create(['user_id' => auth()->user()->id,
+                        'file_id'                                  => $request->file_id,
+                        'narrative'                                => $file_doc->narrative,
+                        'notes1'                                   => $file_doc->notes1,
+                        'notes2'                                   => $file_doc->notes2,
+                        'sn'                                       => $file_doc->sn,
+                        'forClaim'                                 => $file_doc->forClaim,
+                        'forChart'                                 => $file_doc->forChart,
+                        'forLetter'                                => $file_doc->forLetter,
+                        'document_id'                              => $file_doc->document_id,
+                        'note_id'                                  => $file_doc->note_id]);
+                    if ($fileDoc->document) {
+                        $start_date = $fileDoc->document->start_date;
+                        $end_date   = $fileDoc->document->end_date;
+                    } else {
+                        $start_date = $fileDoc->note->start_date;
+                        $end_date   = $fileDoc->note->end_date;
+                    }
+                    $start_date  = $fileDoc->document->start_date;
+                    $end_date    = $fileDoc->document->end_date;
+                    $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+                    $gantt_chart->lp_sd = $start_date;
+                    $gantt_chart->lp_fd = $end_date;
+
+                    $sections[] = [
+                        'sd'    => $start_date,
+                        'fd'    => $end_date,
+                        'color' => '00008B',
+                    ];
+
+                    $gantt_chart->cur_sections = json_encode($sections);
+                    if ($end_date == null) {
+                        $gantt_chart->cur_type = 'M';
+                    }
+                    $gantt_chart->save();
 
                 }
 
@@ -1375,7 +1400,25 @@ class FileDocumentController extends ApiController
             'project_id'                 => auth()->user()->current_project_id,
             'start_date'                 => $request->start_date,
             'subject'                    => $request->subject]);
-        $fileDoc = FileDocument::create(['file_id' => $file->id, 'note_id' => $note->id, 'user_id' => auth()->user()->id, 'forClaim' => '1', 'forChart' => '1']);
+        $fileDoc     = FileDocument::create(['file_id' => $file->id, 'note_id' => $note->id, 'user_id' => auth()->user()->id, 'forClaim' => '1', 'forChart' => '1']);
+        $start_date  = $fileDoc->note->start_date;
+        $end_date    = $fileDoc->note->end_date;
+        $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+        $gantt_chart->lp_sd = $start_date;
+        $gantt_chart->lp_fd = $end_date;
+
+        $sections[] = [
+            'sd'    => $start_date,
+            'fd'    => $end_date,
+            'color' => '00008B',
+        ];
+
+        $gantt_chart->cur_sections = json_encode($sections);
+        if ($end_date == null) {
+            $gantt_chart->cur_type = 'M';
+        }
+        $gantt_chart->save();
         session(['specific_file_doc' => $fileDoc->id]);
 
         return response()->json([
@@ -1767,20 +1810,20 @@ class FileDocumentController extends ApiController
         if ($file_doc->document) {
             $start_date = $file_doc->document->start_date;
             $end_date   = $file_doc->document->end_date;
-            $type='d';
+            $type       = 'd';
         } else {
             $start_date = $file_doc->note->start_date;
             $end_date   = $file_doc->note->end_date;
-             $type='n';
+            $type       = 'n';
         }
         if ($gantt_chart) {
             if ($gantt_chart->cur_sections != null) {
                 $gantt_chart->cur_sections = json_decode($gantt_chart->cur_sections, true);
             }
-         
-            $html = view('project_dashboard.file_documents.edit_gantt_chart', compact('id', 'gantt_chart', 'start_date', 'end_date','type'))->render();
+
+            $html = view('project_dashboard.file_documents.edit_gantt_chart', compact('id', 'gantt_chart', 'start_date', 'end_date', 'type'))->render();
         } else {
-            $html = view('project_dashboard.file_documents.create_gantt_chart', compact('id', 'start_date', 'end_date','type'))->render();
+            $html = view('project_dashboard.file_documents.create_gantt_chart', compact('id', 'start_date', 'end_date', 'type'))->render();
         }
         return response()->json([
             'success' => true,
