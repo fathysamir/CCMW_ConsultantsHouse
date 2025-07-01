@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 // use PhpOffice\PhpPresentation\Shape\Drawing\Line;
 use PhpOffice\PhpPresentation\DocumentLayout;
 use PhpOffice\PhpPresentation\IOFactory;
@@ -25,10 +26,18 @@ class ExtractPowerPointController extends ApiController
 {
     public function uuu(Request $request)
     {
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
 
         $request->validate([
-            'start_date' => 'required|date_format:Y-m',
-            'end_date'   => 'required|date_format:Y-m|after_or_equal:start_date',
+            'start_date' => 'nullable|date_format:Y-m',
+            'end_date'   => 'nullable|date_format:Y-m|after_or_equal:start_date',
         ]);
 
         error_reporting(0);
@@ -37,7 +46,7 @@ class ExtractPowerPointController extends ApiController
         if (ob_get_length()) {
             ob_end_clean();
         }
-        $file = ProjectFile::where('slug', $request->file)->first();
+        $file = ProjectFile::where('slug', $request->file_slug)->first();
         if ($request->timeframe == 'fixed_dates') {
             $startTimeScale = $request->start_date;
             $endTimeScale   = $request->end_date;
@@ -809,31 +818,31 @@ class ExtractPowerPointController extends ApiController
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $dd = new AutoShape;
-        $dd->setType(AutoShape::TYPE_5_POINT_STAR);
-        $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(80);         // moved down
-        $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
-        $outline = $dd->getOutline();
-        $outline->getFill() // The outline's fill defines its color
-            ->setFillType(Fill::FILL_SOLID)
-            ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
-        $outline->setWidth(1);
-        // $dd->setInsetRight(0.0);
-        // $dd->setInsetLeft(0.0);
-        $slide->addShape($dd);
+        // $dd = new AutoShape;
+        // $dd->setType(AutoShape::TYPE_5_POINT_STAR);
+        // $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(80);         // moved down
+        // $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
+        // $outline = $dd->getOutline();
+        // $outline->getFill() // The outline's fill defines its color
+        //     ->setFillType(Fill::FILL_SOLID)
+        //     ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
+        // $outline->setWidth(1);
+        // // $dd->setInsetRight(0.0);
+        // // $dd->setInsetLeft(0.0);
+        // $slide->addShape($dd);
 
-        $dd = new AutoShape;
-        $dd->setType(AutoShape::TYPE_ROUND_2_SAME_RECTANGLE);
-        $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(17);         // moved down
-        $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
-        $outline = $dd->getOutline();
-        $outline->getFill() // The outline's fill defines its color
-            ->setFillType(Fill::FILL_SOLID)
-            ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
-        $outline->setWidth(1);
-        // $dd->setInsetRight(0.0);
-        // $dd->setInsetLeft(0.0);
-        $slide->addShape($dd);
+        // $dd = new AutoShape;
+        // $dd->setType(AutoShape::TYPE_ROUND_2_SAME_RECTANGLE);
+        // $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(17);         // moved down
+        // $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
+        // $outline = $dd->getOutline();
+        // $outline->getFill() // The outline's fill defines its color
+        //     ->setFillType(Fill::FILL_SOLID)
+        //     ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
+        // $outline->setWidth(1);
+        // // $dd->setInsetRight(0.0);
+        // // $dd->setInsetLeft(0.0);
+        // $slide->addShape($dd);
 
         // $dd = new AutoShape;
         // $dd->setType(AutoShape::TYPE_RECTANGLE);
@@ -849,12 +858,12 @@ class ExtractPowerPointController extends ApiController
         // $slide->addShape($dd);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        $line = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200); // from (x1, y1) to (x2, y2)
-        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-        $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
-        $line->getBorder()->setLineWidth(1);
-        $line->getBorder()->setColor(new Color('FF0000')); // red
-        $slide->addShape($line);
+        // $line = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200); // from (x1, y1) to (x2, y2)
+        // $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+        // $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+        // $line->getBorder()->setLineWidth(1);
+        // $line->getBorder()->setColor(new Color('FF0000')); // red
+        // $slide->addShape($line);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // $slide2 = $ppt->createSlide();
@@ -884,15 +893,25 @@ class ExtractPowerPointController extends ApiController
         // $slide2->addShape($line3);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+        $path          = public_path($projectFolder);
+        if (! file_exists($path)) {
 
-        $fileName = 'presentation_' . time() . '.pptx';
-        $filePath = public_path('temp/' . $fileName);
-        if (! file_exists(public_path('temp'))) {
-            mkdir(public_path('temp'), 0777, true);
+            mkdir($path, 0755, true);
         }
+        $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+        if (! file_exists($directory)) {
+            mkdir($directory, 0755, true); // true = create nested directories
+        }
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->name . '_presentation_' . time() . '.pptx';
+        $filePath = public_path($fileName);
+
         ob_clean();
         $writer = IOFactory::createWriter($ppt, 'PowerPoint2007');
         $writer->save($filePath);
+        session(['zip_file' => $code]);
         $headers = [
             'Content-Type'        => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
@@ -900,9 +919,9 @@ class ExtractPowerPointController extends ApiController
             'Pragma'              => 'no-cache',
             'Expires'             => '0',
         ];
-
+        return response()->json(['download_url' => asset($fileName)]);
         // Return the file as a download response
-        return response()->download($filePath, null, $headers)->deleteFileAfterSend(false);
+        //return response()->download($filePath, null, $headers)->deleteFileAfterSend(false);
     }
     private function calc_days($date1, $date2)
     {

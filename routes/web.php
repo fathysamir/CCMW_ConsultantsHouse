@@ -283,7 +283,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/file-document/gantt-chart/{id}', [FileDocumentController::class, 'gantt_chart'])->name('project.file_document.gantt-chart');
     Route::post('/project/file-document/save-gantt-chart', [FileDocumentController::class, 'save_gantt_chart_data'])->name('project.file_document.save_gantt_chart_data');
 
-    Route::get('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    Route::Post('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
     Route::post('/set-session', function (\Illuminate\Http\Request $request) {
         session([$request->key => $request->value]);
