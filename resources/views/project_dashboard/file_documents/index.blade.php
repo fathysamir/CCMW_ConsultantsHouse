@@ -258,8 +258,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -1994,7 +1994,10 @@
                     data: form.serialize(),
                     success: function(response) {
                         if (response.download_url) {
-                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                            const encodedUrl = encodeURIComponent(response.download_url);
+                            const oneDriveViewer =
+                                `https://view.officeapps.live.com/op/view.aspx?src=${encodedUrl}`;
+                            window.open(oneDriveViewer, '_blank');
                         }
                         $('#exportGanttChartModal').modal('hide');
                         // You can also trigger file download or redirect here
