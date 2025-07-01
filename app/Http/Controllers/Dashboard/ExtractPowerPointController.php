@@ -920,7 +920,7 @@ class ExtractPowerPointController extends ApiController
             'Pragma'              => 'no-cache',
             'Expires'             => '0',
         ];
-        dd(asset($fileName));
+       
         return response()->json(['download_url' => asset($fileName)]);
         // Return the file as a download response
         //return response()->download($filePath, null, $headers)->deleteFileAfterSend(false);
