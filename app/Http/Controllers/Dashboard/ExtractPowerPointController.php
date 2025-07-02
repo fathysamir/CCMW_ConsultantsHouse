@@ -906,7 +906,7 @@ class ExtractPowerPointController extends ApiController
         if (! file_exists($directory)) {
             mkdir($directory, 0755, true); // true = create nested directories
         }
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->name . '_presentation_' . time() . '.gdoc';
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->name . '_presentation_' . time() . '.pptx';
         $filePath = public_path($fileName);
 
         ob_clean();
