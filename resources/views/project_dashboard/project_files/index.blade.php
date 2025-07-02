@@ -2,7 +2,8 @@
 @section('title', 'Project Home - Files')
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
     <style>
         #btn-outline-primary {
             color: blue;
@@ -107,6 +108,19 @@
         }
     </style>
     <style>
+        .date {
+            background-color: #fff !important;
+        }
+
+        .datennn {
+            background-color: #fff !important;
+        }
+
+        .fghd {
+            margin-right: 2%;
+        }
+    </style>
+    <style>
         .table-container tbody::-webkit-scrollbar {
             width: 6px;
         }
@@ -135,8 +149,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                max-height:650px;
-                                                                                            } */
+                                                                                                                        max-height:650px;
+                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -269,6 +283,8 @@
                                                 @endif
                                                 <a class="dropdown-item export_file" href="javascript:void(0);"
                                                     data-file-id="{{ $file->slug }}">Export</a>
+                                                <a class="dropdown-item exportGanttChart" href="javascript:void(0);"
+                                                    data-file-id="{{ $file->slug }}">Export Gantt Chart</a>
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_file', $Project_Permissions ?? []))
                                                     <a class="dropdown-item"
                                                         href="javascript:void(0);"onclick="confirmArchive('{{ route('project.files.archive', $file->id) }}')">Archive</a>
@@ -500,11 +516,168 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportGanttChartModal" tabindex="-1" role="dialog"
+        aria-labelledby="exportGanttChartModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportGanttChartModalLabel">
+                        Expotr Gantt Chart
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportGanttChartForm">
+                        @csrf
+
+                        <input type="hidden" id="file__slugfff" name="file_slug">
+                        <div class="form-group">
+                            <label>Time Frame</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 50%;">
+                                    <input type="radio" id="auto" name="timeframe" value="auto"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="auto">Auto</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 50%;">
+                                    <input type="radio" id="fixed_dates" name="timeframe" class="custom-control-input"
+                                        value="fixed_dates">
+                                    <label class="custom-control-label" for="fixed_dates">Fixed Dates</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group d-none" id="datesGroup">
+                            <div style="display: flex;">
+                                <input type="date"style="background-color:#fff;width: 49%;" name="start_date"
+                                    id="start_date_gantt" class="form-control datennn fghd" placeholder="Start Date">
+                                <input type="date"style="background-color:#fff;width: 49%;" name="end_date"
+                                    id="end_date_gantt" class="form-control datennn" placeholder="End Date">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Title</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 33.3%;">
+                                    <input type="radio" id="title_status1" name="title_status" value="non"
+                                        class="custom-control-input">
+                                    <label class="custom-control-label" for="title_status1">Non</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="title_status2" name="title_status"
+                                        class="custom-control-input" value="up" checked>
+                                    <label class="custom-control-label" for="title_status2">Over Timescale</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="title_status3" name="title_status"
+                                        class="custom-control-input" value="down">
+                                    <label class="custom-control-label" for="title_status3">Under Timescale</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Title Font Size</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 33.3%;">
+                                    <input type="radio" id="T_font_size1" name="title_font_size" value="14"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="T_font_size1">14</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="T_font_size2" name="title_font_size"
+                                        class="custom-control-input" value="16">
+                                    <label class="custom-control-label" for="T_font_size2">16</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="T_font_size3" name="title_font_size"
+                                        class="custom-control-input" value="18">
+                                    <label class="custom-control-label" for="T_font_size3">18</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Font Size</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 33.3%;">
+                                    <input type="radio" id="cur_font_size1" name="cur_font_size" value="10"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="cur_font_size1">10</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="cur_font_size2" name="cur_font_size"
+                                        class="custom-control-input" value="12">
+                                    <label class="custom-control-label" for="cur_font_size2">12</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="cur_font_size3" name="cur_font_size"
+                                        class="custom-control-input" value="14">
+                                    <label class="custom-control-label" for="cur_font_size3">14</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Planned Font Size</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 33.3%;">
+                                    <input type="radio" id="pl_font_size1" name="pl_font_size" value="8"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="pl_font_size1">8</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="pl_font_size2" name="pl_font_size"
+                                        class="custom-control-input" value="10">
+                                    <label class="custom-control-label" for="pl_font_size2">10</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="pl_font_size3" name="pl_font_size"
+                                        class="custom-control-input" value="12">
+                                    <label class="custom-control-label" for="pl_font_size3">12</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Row Height</label>
+                            <div style="display: flex;    margin-top: -5px;">
+                                <div class="custom-control custom-radio" style="width: 33.3%;">
+                                    <input type="radio" id="d1" name="raw_height" value="1"
+                                        class="custom-control-input">
+                                    <label class="custom-control-label" for="d1">1</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="d2" name="raw_height" class="custom-control-input"
+                                        value="1.5" checked>
+                                    <label class="custom-control-label" for="d2">1.5</label>
+                                </div>
+                                <div class="custom-control custom-radio"style="width: 33.3%;">
+                                    <input type="radio" id="d3" name="raw_height" class="custom-control-input"
+                                        value="2">
+                                    <label class="custom-control-label" for="d3">2</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Font Name</label>
+                            <select class="form-control" id="font_type" name="font_type">
+                                <option value="Aptos">Aptos</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveExportGanttChart">draw</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         function updatePrefix() {
             const h1 = document.getElementById('Chapter').value;
@@ -582,6 +755,53 @@
                     },
                     error: function() {
                         alert('Failed to assign document. Please try again.');
+                    }
+                });
+            });
+            ///////////////////////////////////////////////////////
+            $('input[name="timeframe"]').on('change', function() {
+                if ($('#fixed_dates').is(':checked')) {
+                    $('#datesGroup').removeClass('d-none');
+                    $('#start_date_gantt, #end_date_gantt').attr('required', true);
+                } else {
+                    $('#datesGroup').addClass('d-none');
+                    $('#start_date_gantt, #end_date_gantt').removeAttr('required');
+                }
+            });
+
+            $('.exportGanttChart').on('click', function() {
+                var fileId_ = $(this).data('file-id');
+                $('#file__slugfff').val(fileId_);
+                $('input[name="timeframe"][value="auto"]').prop('checked', true);
+                $('#datesGroup').addClass('d-none');
+                $('#start_date_gantt, #end_date_gantt').removeAttr('required');
+                $('#exportGanttChartModal').modal('show');
+            });
+
+            $('#saveExportGanttChart').on('click', function() {
+                let form = $('#exportGanttChartForm');
+
+                // Optional: basic validation if fixed_dates is selected
+                let isFixed = $('input[name="timeframe"]:checked').val() === 'fixed_dates';
+                if (isFixed && (!$('#start_date_gantt').val() || !$('#end_date_gantt').val())) {
+                    alert("Please select both start and end dates.");
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('project.file-documents.extractPowerPoint') }}", // ✅ Replace with your route
+                    method: "POST",
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#exportGanttChartModal').modal('hide');
+                        // You can also trigger file download or redirect here
+                    },
+                    error: function(xhr) {
+                        alert("Export failed. Please try again.");
+                        console.error(xhr.responseText);
                     }
                 });
             });
@@ -812,5 +1032,30 @@
                 window.location.href = url; // Redirect to delete route
             }
         }
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            flatpickr(".date", {
+                enableTime: false,
+                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "d.M.Y",
+            });
+            flatpickr(".datennn", {
+                plugins: [
+                    new monthSelectPlugin({
+                        shorthand: true, // optional, e.g. "Jan" instead of "January"
+                        dateFormat: "Y-m", // format submitted to the server
+                        altFormat: "F Y", // format shown in the input
+                        theme: "light" // or "dark"
+                    })
+                ]
+            });
+
+        });
     </script>
 @endpush

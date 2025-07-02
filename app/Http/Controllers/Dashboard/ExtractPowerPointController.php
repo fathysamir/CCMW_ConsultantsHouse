@@ -366,7 +366,7 @@ class ExtractPowerPointController extends ApiController
             ])
             ->values();
         foreach ($docs as $doc) {
-            if ($currentY > 900) {
+            if ($currentY+36 > 900) {
                 $slide = $ppt->createSlide();
                 if ($request->title_status == 'up') {
                     $shape2 = $slide->createRichTextShape()
