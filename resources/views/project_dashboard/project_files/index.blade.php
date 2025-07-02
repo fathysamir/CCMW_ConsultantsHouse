@@ -149,8 +149,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                        max-height:650px;
-                                                                                                                    } */
+                                                                                                                                max-height:650px;
+                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -773,6 +773,19 @@
                 var fileId_ = $(this).data('file-id');
                 $('#file__slugfff').val(fileId_);
                 $('input[name="timeframe"][value="auto"]').prop('checked', true);
+                const plFdPickerjjjj = flatpickr(".datennn", {
+                    plugins: [
+                        new monthSelectPlugin({
+                            shorthand: true, // optional, e.g. "Jan" instead of "January"
+                            dateFormat: "Y-m", // format submitted to the server
+                            altFormat: "F Y", // format shown in the input
+                            theme: "light" // or "dark"
+                        })
+                    ]
+                });
+                document.getElementById('start_date_gantt').value = '';
+                document.getElementById('end_date_gantt').value = '';
+                plFdPickerjjjj.forEach(instance => instance.clear());
                 $('#datesGroup').addClass('d-none');
                 $('#start_date_gantt, #end_date_gantt').removeAttr('required');
                 $('#exportGanttChartModal').modal('show');
