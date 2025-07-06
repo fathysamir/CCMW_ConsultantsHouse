@@ -8,8 +8,8 @@ use App\Models\ProjectFile;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 // use PhpOffice\PhpPresentation\Shape\Drawing\Line;
 use PhpOffice\PhpPresentation\DocumentLayout;
 use PhpOffice\PhpPresentation\IOFactory;
@@ -366,7 +366,7 @@ class ExtractPowerPointController extends ApiController
             ])
             ->values();
         foreach ($docs as $doc) {
-            if ($currentY+36 > 900) {
+            if ($currentY + 36 > 900) {
                 $slide = $ppt->createSlide();
                 if ($request->title_status == 'up') {
                     $shape2 = $slide->createRichTextShape()
@@ -579,6 +579,7 @@ class ExtractPowerPointController extends ApiController
                     }
                     $currentY = 57;
                 }
+                $currentX = 20;
             }
             $doc_gantt_chart = GanttChartDocData::where('file_document_id', $doc->id)->first();
             if ($doc_gantt_chart) {
@@ -651,13 +652,16 @@ class ExtractPowerPointController extends ApiController
                                 $unit_pixel_cur_left_caption = 2 + $this->calc_pixels($cur_left_caption, intval($request->cur_font_size));
                                 if ($unit_pixel_cur_left_caption > (($startX - 1) - $currentX)) {
                                     $unit_pixel_cur_left_caption = ($startX - 1) - $currentX;
+                                    $space_y_cur_left_caption    = -2;
+                                } else {
+                                    $space_y_cur_left_caption = 5;
                                 }
                                 $startXX = ($startX - 1) - $unit_pixel_cur_left_caption;
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption)
                                     ->setOffsetX(round($startXX, 2) - 1)
-                                    ->setOffsetY($currentY + 5);
+                                    ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
                                 $shapeXX->setInsetBottom(0.0);
@@ -673,13 +677,16 @@ class ExtractPowerPointController extends ApiController
                                 if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2)) {
 
                                     $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2;
+                                    $space_y_cur_right_caption    = -2;
+                                } else {
+                                    $space_y_cur_right_caption = 5;
                                 }
                                 $startXXX = $startX + $wid + 2;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_right_caption)
                                     ->setOffsetX(round($startXXX, 2))
-                                    ->setOffsetY($currentY + 5);
+                                    ->setOffsetY($currentY + $space_y_cur_right_caption);
                                 $shapeXXX->setInsetRight(0.0);
                                 $shapeXXX->setInsetLeft(0.0);
                                 $shapeXXX->setInsetBottom(0.0);
@@ -731,13 +738,16 @@ class ExtractPowerPointController extends ApiController
                                 $unit_pixel_cur_left_caption = 2 + $this->calc_pixels($cur_left_caption, intval($request->cur_font_size));
                                 if ($unit_pixel_cur_left_caption > (($startXy - 1) - $currentX)) {
                                     $unit_pixel_cur_left_caption = ($startXy - 1) - $currentX;
+                                    $space_y_cur_left_caption    = -2;
+                                } else {
+                                    $space_y_cur_left_caption = 5;
                                 }
                                 $startXX = ($startXy - 1) - $unit_pixel_cur_left_caption;
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption)
                                     ->setOffsetX(round($startXX, 2))
-                                    ->setOffsetY($currentY + 5);
+                                    ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
                                 $shapeXX->setInsetBottom(0.0);
@@ -753,13 +763,16 @@ class ExtractPowerPointController extends ApiController
                                 if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10)) {
 
                                     $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10;
+                                    $space_y_cur_right_caption    = -2;
+                                } else {
+                                    $space_y_cur_right_caption = 5;
                                 }
                                 $startXXX = $startXy + 19;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_right_caption)
                                     ->setOffsetX(round($startXXX, 2))
-                                    ->setOffsetY($currentY + 5);
+                                    ->setOffsetY($currentY + $space_y_cur_right_caption);
                                 $shapeXXX->setInsetRight(0.0);
                                 $shapeXXX->setInsetLeft(0.0);
                                 $shapeXXX->setInsetBottom(0.0);
@@ -773,15 +786,172 @@ class ExtractPowerPointController extends ApiController
 
                     }
                 }
+                if ($doc_gantt_chart->show_pl == '1') {
+                    if ($doc_gantt_chart->pl_type == 'SB') {
+                        $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
+
+                        if ($doc_gantt_chart->pl_show_sd == '1') {
+                            $pl_left_caption .= ' - ' . date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
+
+                        }
+
+                        $pl_right_caption = '';
+                        if ($doc_gantt_chart->pl_show_fd == '1') {
+                            $pl_right_caption = date('d.M.y', strtotime($doc_gantt_chart->pl_fd));
+                        }
+
+                        $pl_right_caption .= $doc_gantt_chart->pl_right_caption ? ' - ' . $doc_gantt_chart->pl_right_caption : '';
+                        $yearMonth1 = date('Y-m', strtotime($doc_gantt_chart->pl_sd));
+                        $yearMonth2 = date('Y-m', strtotime($doc_gantt_chart->pl_fd));
+                        if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
+                            $startX_pl    = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $doc_gantt_chart->pl_sd));
+                            $cur_width_pl = $day_width * $this->calc_days($doc_gantt_chart->pl_sd, $doc_gantt_chart->pl_fd);
+                            $dd           = new AutoShape;
+                            $dd->setType(AutoShape::TYPE_ROUNDED_RECTANGLE);
+                            $dd->setOffsetX($startX_pl)->setOffsetY($currentY + 30)->setWidth(round($cur_width_pl, 2))->setHeight(5);
+                            $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF' . $doc_gantt_chart->pl_color)); // red
+                            $outline = $dd->getOutline();
+                            $outline->getFill() // The outline's fill defines its color
+                                ->setFillType(Fill::FILL_SOLID)
+                                ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
+                            $outline->setWidth(0.6);
+                            $slide->addShape($dd);
+                            if ($pl_left_caption != '') {
+                                $unit_pixel_pl_left_caption = 1 + $this->calc_pixels($pl_left_caption, intval($request->pl_font_size));
+                                if ($unit_pixel_pl_left_caption > (($startX_pl - 1) - $currentX)) {
+                                    $unit_pixel_pl_left_caption = ($startX_pl - 1) - $currentX;
+                                }
+                                $startXX_pl = ($startX_pl - 1) - $unit_pixel_pl_left_caption;
+                                $shapeXX    = $slide->createRichTextShape()
+                                    ->setHeight(7)
+                                    ->setWidth($unit_pixel_pl_left_caption)
+                                    ->setOffsetX(round($startXX_pl, 2) - 2)
+                                    ->setOffsetY($currentY + 28);
+                                $shapeXX->setInsetRight(0.0);
+                                $shapeXX->setInsetLeft(0.0);
+                                $shapeXX->setInsetBottom(0.0);
+                                $shapeXX->setInsetTop(0.0);
+                                $shapeXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
+                                $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                                $shapeXX->createTextRun($pl_left_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                            }
+                            if ($pl_right_caption != '') {
+
+                                $unit_pixel_pl_right_caption = 2 + $this->calc_pixels($pl_right_caption, intval($request->pl_font_size));
+                                if ($unit_pixel_pl_right_caption > (($day_width * $this->calc_days($doc_gantt_chart->pl_fd, $endTimeScale . '-30')) - 2)) {
+
+                                    $unit_pixel_pl_right_caption = ($day_width * $this->calc_days($doc_gantt_chart->pl_fd, $endTimeScale . '-30')) - 2;
+                                }
+                                $startXXX_pl = $startX_pl + $cur_width_pl + 2;
+                                $shapeXXX    = $slide->createRichTextShape()
+                                    ->setHeight(7)
+                                    ->setWidth($unit_pixel_pl_right_caption)
+                                    ->setOffsetX(round($startXXX_pl, 2))
+                                    ->setOffsetY($currentY + 28);
+                                $shapeXXX->setInsetRight(0.0);
+                                $shapeXXX->setInsetLeft(0.0);
+                                $shapeXXX->setInsetBottom(0.0);
+                                $shapeXXX->setInsetTop(0.0);
+                                $shapeXXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
+                                $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                                $shapeXXX->createTextRun($pl_right_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                            }
+                        }
+
+                    }
+                    if ($doc_gantt_chart->pl_type == 'M') {
+                        $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
+
+                        if ($doc_gantt_chart->pl_show_sd == '1') {
+                            $pl_left_caption .= ' - ' . date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
+
+                        }
+                        $pl_right_caption = $doc_gantt_chart->pl_right_caption ? $doc_gantt_chart->pl_right_caption : '';
+                        $yearMonth1       = date('Y-m', strtotime($doc_gantt_chart->pl_sd));
+
+                        if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale) {
+                            $startXy = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $doc_gantt_chart->pl_sd)) - 3;
+                            $dd      = new AutoShape;
+                            $dd->setType(AutoShape::TYPE_DIAMOND);
+                            $dd->setOffsetX($startXy)->setOffsetY($currentY + 30)->setWidth(6)->setHeight(6);                  // moved down
+                            $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF' . $doc_gantt_chart->pl_color)); // red
+                            $outline = $dd->getOutline();
+                            $outline->getFill() // The outline's fill defines its color
+                                ->setFillType(Fill::FILL_SOLID)
+                                ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
+                            $outline->setWidth(0.6);
+                            $slide->addShape($dd);
+                            if ($pl_left_caption != '') {
+                                $unit_pixel_pl_left_caption = 0.5 + $this->calc_pixels($pl_left_caption, intval($request->pl_font_size));
+                                if ($unit_pixel_pl_left_caption > (($startXy - 1) - $currentX)) {
+                                    $unit_pixel_pl_left_caption = ($startXy - 1) - $currentX;
+                                }
+                                $startXX = ($startXy - 1) - $unit_pixel_pl_left_caption;
+                                $shapeXX = $slide->createRichTextShape()
+                                    ->setHeight(7)
+                                    ->setWidth($unit_pixel_pl_left_caption)
+                                    ->setOffsetX(round($startXX, 2))
+                                    ->setOffsetY($currentY + 28);
+                                $shapeXX->setInsetRight(0.0);
+                                $shapeXX->setInsetLeft(0.0);
+                                $shapeXX->setInsetBottom(0.0);
+                                $shapeXX->setInsetTop(0.0);
+                                $shapeXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
+                                $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                                $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                                $shapeXX->createTextRun($pl_left_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                            }
+                            if ($pl_right_caption != '') {
+
+                                $unit_pixel_pl_right_caption = 2 + $this->calc_pixels($pl_right_caption, intval($request->pl_font_size));
+                                if ($unit_pixel_pl_right_caption > (($day_width * $this->calc_days($doc_gantt_chart->pl_sd, $endTimeScale . '-30')) - 10)) {
+
+                                    $unit_pixel_pl_right_caption = ($day_width * $this->calc_days($doc_gantt_chart->pl_sd, $endTimeScale . '-30')) - 10;
+                                }
+                                $startXXX = $startXy + 8;
+                                $shapeXXX = $slide->createRichTextShape()
+                                    ->setHeight(7)
+                                    ->setWidth($unit_pixel_pl_right_caption)
+                                    ->setOffsetX(round($startXXX, 2) + 1)
+                                    ->setOffsetY($currentY + 28);
+                                $shapeXXX->setInsetRight(0.0);
+                                $shapeXXX->setInsetLeft(0.0);
+                                $shapeXXX->setInsetBottom(0.0);
+                                $shapeXXX->setInsetTop(0.0);
+                                $shapeXXX->getFill()->setFillType('solid')->setStartColor(new Color('FFFFFFFF'));
+                                $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
+                                $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                                $shapeXXX->createTextRun($pl_right_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                            }
+                        }
+                    }
+                }
+                if ($doc_gantt_chart->show_lp == '1' && $doc_gantt_chart->lp_sd != null && $doc_gantt_chart->lp_fd != null) {
+
+                    $yearMonth1 = date('Y-m', strtotime($doc_gantt_chart->lp_sd));
+                    $yearMonth2 = date('Y-m', strtotime($doc_gantt_chart->lp_fd));
+                    if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
+                        $startX_lp    = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $doc_gantt_chart->lp_sd));
+                        $cur_width_lp = $day_width * $this->calc_days($doc_gantt_chart->lp_sd, $doc_gantt_chart->lp_fd);
+                        $line = new \PhpOffice\PhpPresentation\Shape\Line((int)$startX_lp, $currentY, (int)$startX_lp+(int)$cur_width_lp, $currentY); // from (x1, y1) to (x2, y2)
+                        $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
+                        //$line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
+                        $line->getBorder()->setLineWidth(3);
+                        $line->getBorder()->setColor(new Color('FFB31B1B')); // red
+                        $slide->addShape($line);
+                    }
+                }
 
                 if ($doc_gantt_chart->show_cur == '1' || $doc_gantt_chart->show_pl == '1') {
                     $currentY = $currentY + 36;
                     if ($request->raw_height == '1') {
-                        $currentY += 10;
+                        $currentY += 16;
                     } elseif ($request->raw_height == '1.5') {
-                        $currentY += 17;
+                        $currentY += 25;
                     } elseif ($request->raw_height == '2') {
-                        $currentY += 24;
+                        $currentY += 33;
                     }
 
                 }
@@ -920,7 +1090,7 @@ class ExtractPowerPointController extends ApiController
             'Pragma'              => 'no-cache',
             'Expires'             => '0',
         ];
-       
+
         return response()->json(['download_url' => asset($fileName)]);
         // Return the file as a download response
         //return response()->download($filePath, null, $headers)->deleteFileAfterSend(false);
@@ -939,7 +1109,7 @@ class ExtractPowerPointController extends ApiController
         $fontSize   = intval($font_size); // in points
         $totalWidth = 0;
         $arr1       = [
-            '8'  => 0.53,
+            '8'  => 0.55,
             '10' => 0.55,
             '12' => 0.56,
             '14' => 0.57,
