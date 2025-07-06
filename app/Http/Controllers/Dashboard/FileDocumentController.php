@@ -978,6 +978,7 @@ class FileDocumentController extends ApiController
 
         if ($request->actionType == 'copy') {
             foreach ($request->document_ids as $doc_id) {
+                $sections=[];
                 $file_doc = FileDocument::findOrFail($doc_id);
                 if ($file_doc->document) {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();

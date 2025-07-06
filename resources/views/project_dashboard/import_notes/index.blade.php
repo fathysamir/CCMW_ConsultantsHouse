@@ -1,11 +1,11 @@
 @extends('project_dashboard.layout.app')
-@section('title', 'Project Home - Import Documents from Excel')
+@section('title', 'Project Home - Import Notes from Excel')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <style>
         .uppy-Dashboard-inner {
             width: 100%;
@@ -14,8 +14,8 @@
 
         body {
             /* تحديد ارتفاع الصفحة بنسبة لحجم الشاشة
-                                                                                                overflow: hidden;
-                                                                                                /* منع التمرير */
+                                                                                                                        overflow: hidden;
+                                                                                                                        /* منع التمرير */
         }
 
         .uppy-StatusBar-actions {
@@ -25,7 +25,7 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h2 mb-0 page-title">Import Documents from Excel</h2>
+            <h2 class="h2 mb-0 page-title">Import Notes from Excel</h2>
         </div>
         <div class="col-auto">
             <a type="button" href="#" class="btn mb-2 btn-outline-primary" id="btn-outline-primary"
@@ -53,17 +53,7 @@
                         </div>
                     </div>
                     <input type="hidden" id="excel_file_id" name="excel_file_id" value="">
-                    <div class="form-group mb-3">
-                        {{-- <label for="file"></label> --}}
-                        <div class="card shadow mb-4">
-                            <div class="card-header">
-                                <strong>Upload PDF Files <span style="color: red">*</span></strong>
-                            </div>
-                            <div class="card-body">
-                                <div id="drag-drop-area"></div>
-                            </div> <!-- .card-body -->
-                        </div> <!-- .card -->
-                    </div>
+
                 </div> <!-- /.col -->
 
                 <div class="col-md-12 d-none"id="step2">
@@ -95,6 +85,7 @@
                             <option value="" disabled selected>Select File</option>
                         </select>
                     </div>
+
                     <div class="text-right" style="margin-top: 10px;">
                         <button type="button"
                             class="btn mb-2 btn-outline-secondary"onclick="window.location.href='/project'">Cancel</button>
@@ -104,25 +95,6 @@
                 </div>
 
                 <div class="col-md-12 d-none"id="step3">
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Document File Name <span style="color: red">*</span></label>
-                            </div>
-                            <div class="col-md-10">
-
-                                <select class="form-control select_header" id="doc_file_name">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
@@ -145,140 +117,16 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Type <span style="color: red">*</span></label>
-                            </div>
-
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="type">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <select class="form-control" id="typeForAll">
-                                    <option value="" disabled selected>Select Document Type</option>
-                                    @foreach ($documents_types as $type)
-                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Reference <span style="color: red">*</span></label>
+                                <label>Start Date <span style="color: red">*</span></label>
                             </div>
                             <div class="col-md-10">
-
-                                <select class="form-control select_header" id="reference">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Revision</label>
-                            </div>
-                            <div class="col-md-10">
-
-                                <select class="form-control select_header" id="revision">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>From</label>
-                            </div>
-
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="from">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <select class="form-control" id="fromForAll">
-                                    <option value="" disabled selected>Select Stakeholder</option>
-                                    @foreach ($stake_holders as $stake_holder)
-                                        <option value="{{ $stake_holder->id }}">
-                                            {{ $stake_holder->role }} - {{ $stake_holder->narrative }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>To</label>
-                            </div>
-
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="to">
-                                    <option value="" selected disabled>Select Column Name</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <select class="form-control" id="toForAll">
-                                    <option value="" disabled selected>Select Stakeholder</option>
-                                    @foreach ($stake_holders as $stake_holder)
-                                        <option value="{{ $stake_holder->id }}">
-                                            {{ $stake_holder->role }} - {{ $stake_holder->narrative }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="form-group" style="display: flex; align-items: center;">
-                        <hr style="flex: 1; margin: 0;">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Date <span style="color: red">*</span></label>
-                            </div>
-                            <div class="col-md-5">
 
                                 <select class="form-control select_header" id="start_date">
                                     <option value="" selected disabled>Select Column Name</option>
                                 </select>
 
                             </div>
-                            <div class="col-md-5">
-                                <input type="date" id="start_dateForAll" class="form-control date">
-                            </div>
                         </div>
-
 
                     </div>
                     <div class="form-group" style="display: flex; align-items: center;">
@@ -290,9 +138,47 @@
                             <div class="col-md-2">
                                 <label>Return Date</label>
                             </div>
+
+                            <div class="col-md-10">
+                                <select class="form-control select_header" id="return_date">
+                                    <option value="" selected disabled>Select Column Name</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <hr style="flex: 1; margin: 0;">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Left Caption</label>
+                            </div>
                             <div class="col-md-10">
 
-                                <select class="form-control select_header" id="end_date">
+                                <select class="form-control select_header" id="left_caption">
+                                    <option value="" selected disabled>Select Column Name</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <hr style="flex: 1; margin: 0;">
+                    </div>
+                    <div class="form-group mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Right Caption</label>
+                            </div>
+                            <div class="col-md-10">
+
+                                <select class="form-control select_header" id="right_caption">
                                     <option value="" selected disabled>Select Column Name</option>
                                 </select>
 
@@ -308,17 +194,35 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Status</label>
+                                <label>Planned Start Date</label>
+                            </div>
+                            <div class="col-md-10">
+
+                                <select class="form-control select_header" id="pl_sd">
+                                    <option value="" selected disabled>Select Column Name</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <hr style="flex: 1; margin: 0;">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Planned Finish Date</label>
                             </div>
 
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="status">
+                            <div class="col-md-10">
+                                <select class="form-control select_header" id="pl_fd">
                                     <option value="" selected disabled>Select Column Name</option>
                                 </select>
                             </div>
-                            <div class="col-md-5">
-                                <input type="text" id="statusForAll" class="form-control">
-                            </div>
+
                         </div>
 
                     </div>
@@ -329,17 +233,15 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Thread</label>
+                                <label>Longest Path Start Date</label>
                             </div>
 
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="thread">
+                            <div class="col-md-10">
+                                <select class="form-control select_header" id="lp_sd">
                                     <option value="" selected disabled>Select Column Name</option>
                                 </select>
                             </div>
-                            <div class="col-md-5">
-                                <input type="text" id="threadForAll" class="form-control">
-                            </div>
+
                         </div>
 
                     </div>
@@ -350,23 +252,31 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Note</label>
+                                <label>Longest Path Finish Date</label>
                             </div>
+                            <div class="col-md-10">
 
-                            <div class="col-md-5">
-                                <select class="form-control select_header" id="note">
+                                <select class="form-control select_header" id="lp_fd">
                                     <option value="" selected disabled>Select Column Name</option>
                                 </select>
+
                             </div>
-                            <div class="col-md-5">
-                                <input type="text" id="noteForAll" class="form-control">
-                            </div>
+
                         </div>
 
+
                     </div>
+
+
                     <div class="form-group" style="display: flex; align-items: center;">
                         <hr style="flex: 1; margin: 0;">
                     </div>
+
+
+
+
+
+
 
                     <div class="form-group mb-3">
                         <div class="row">
@@ -390,9 +300,72 @@
                     <div class="form-group" style="display: flex; align-items: center;">
                         <hr style="flex: 1; margin: 0;">
                     </div>
+                    <div class="form-group mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Current Par Color</label>
+                            </div>
+                            <div class="col-md-10">
+
+                                <select class="form-control" id="cur_color" name="cur_color">
+                                    <option value="808080" style="background-color: #808080; color: white;">■ Gray
+                                    </option>
+                                    <option selected value="00008B" style="background-color: #00008B; color: white;">■
+                                        Dark Blue
+                                    </option>
+                                    <option value="FF0000" style="background-color: #FF0000; color: white;">■ Red</option>
+                                    <option value="008000" style="background-color: #008000; color: white;">■ Green
+                                    </option>
+                                    <option value="000000" style="background-color: #000000; color: white;">■ Black
+                                    </option>
+                                    <option value="89CFF0" style="background-color: #89CFF0;">■ Baby Blue</option>
+                                    <option value="FFFF00" style="background-color: #FFFF00;">■ Yellow</option>
+                                    <option value="8B4513" style="background-color: #8B4513; color: white;">■ Brown
+                                    </option>
+                                    <option value="FFFFFF" style="background-color: #FFFFFF;">■ White</option>
+                                    <option value="FFFFFF00">■ Gap</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <hr style="flex: 1; margin: 0;">
+                    </div>
+                    <div class="form-group mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Planned Par Color</label>
+                            </div>
+                            <div class="col-md-10">
+                                <select class="form-control" id="pl_color" name="pl_color">
+                                    <option value="808080" style="background-color: #808080; color: white;">■ Gray
+                                    </option>
+                                    <option selected value="00008B" style="background-color: #00008B; color: white;">■
+                                        Dark
+                                        Blue
+                                    </option>
+                                    <option value="FF0000" style="background-color: #FF0000; color: white;">■ Red
+                                    </option>
+                                    <option value="008000" style="background-color: #008000; color: white;">■ Green
+                                    </option>
+                                    <option value="000000" style="background-color: #000000; color: white;">■ Black
+                                    </option>
+                                    <option value="89CFF0" style="background-color: #89CFF0;">■ Baby Blue</option>
+                                    <option value="FFFF00" style="background-color: #FFFF00;">■ Yellow</option>
+                                    <option value="8B4513" style="background-color: #8B4513; color: white;">■ Brown
+                                    </option>
+                                    <option value="FFFFFF" style="background-color: #FFFFFF;">■ White</option>
+                                    <option value="FFFFFF00">■ Gap</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <hr style="flex: 1; margin: 0;">
+                    </div>
 
                     <div class="custom-control custom-checkbox" style="text-align: center;">
-                        <input type="checkbox" class="custom-control-input"id="analysis_complete">
+                        <input type="checkbox" checked class="custom-control-input"id="analysis_complete">
                         <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                     </div>
 
@@ -404,7 +377,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-12 d-none"id="step4">   
+                <div class="col-md-12 d-none"id="step4">
                 </div>
 
             </div>
@@ -416,15 +389,26 @@
     <script>
         $(document).ready(function() {
             let excelUploaded = false;
-            let pdfUploaded = false;
+
 
             function checkUploadStatus() {
-                if (excelUploaded && pdfUploaded) {
+                if (excelUploaded) {
                     setTimeout(function() {
                         $('#step1').addClass('d-none');
                         $('#step2').removeClass('d-none');
                     }, 700);
 
+                }
+            }
+
+            function toggleGetHeadersButton() {
+                const sheetSelected = $('#sheets').val() !== null && $('#sheets').val() !== '';
+                const fileSelected = $('#newFile').val() !== null && $('#newFile').val() !== '';
+
+                if (sheetSelected && fileSelected) {
+                    $('#get_headers').prop('disabled', false);
+                } else {
+                    $('#get_headers').prop('disabled', true);
                 }
             }
 
@@ -451,7 +435,7 @@
                 $progress.removeClass('d-none');
 
                 $.ajax({
-                    url: '/upload-import-excel-file',
+                    url: '/notes/upload-import-excel-file',
                     type: 'POST',
                     data: formData,
                     contentType: false,
@@ -507,69 +491,10 @@
                 });
             });
 
-            var uptarg = document.getElementById('drag-drop-area');
-            if (uptarg) {
-                var uppy = Uppy.Core({
-                    restrictions: {
-                        allowedFileTypes: ['application/pdf'],
-                        maxNumberOfFiles: 100, // Optional: limit number of files
-                        // maxFileSize: 50 * 1024 * 1024 // Optional: 10MB limit
-                    }
-                }).use(Uppy.Dashboard, {
-                    inline: true,
-                    target: uptarg,
-                    proudlyDisplayPoweredByUppy: false,
-                    theme: 'dark',
-                    width: 770,
-                    height: 210,
-                    note: 'PDF files only (max 50MB each)',
-                    restrictions: {
-                        allowedFileTypes: ['application/pdf']
-                    },
-                    plugins: ['Webcam']
-                }).use(Uppy.Tus, {
-                    endpoint: 'https://master.tus.io/files/'
-                });
-                uppy.on('complete', (result) => {
-                    console.log('Upload complete! We’ve uploaded these files:', result.successful)
 
-                    const formData = new FormData();
 
-                    result.successful.forEach((file, index) => {
-                        formData.append(`files[]`, file.data); // Append each file separately
-                    });
-
-                    // Send the file data to another Laravel route (e.g., for database storage)
-                    $.ajax({
-                        url: '/upload-multi-files',
-                        type: 'POST',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-
-                        success: function(response) {
-                            if (response.success) {
-
-                                pdfUploaded = true;
-                                checkUploadStatus();
-
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Upload error:', error);
-                            alert('Failed to upload file');
-                        },
-                        complete: function() {
-                            // Hide progress bar
-
-                        }
-                    });
-                });
-            }
-            $('#sheets').change(function() {
-                $("#get_headers").prop("disabled", false);
-            })
-
+            $('#sheets').on('change', toggleGetHeadersButton);
+            $('#newFile').on('change', toggleGetHeadersButton);
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
 
@@ -603,6 +528,7 @@
                     }
                 });
             });
+
             $("#get_headers").click(function() {
                 let selectedSheet = $("#sheets").val();
                 let selectedFile = $("#newFile").val();
@@ -613,7 +539,7 @@
                 }
 
                 $.ajax({
-                    url: "/get-headers",
+                    url: "/notes/get-headers",
                     type: "POST",
                     data: {
                         sheet: selectedSheet,
@@ -651,7 +577,7 @@
                 });
             });
 
-            $(".select_header, #analyzed_By, #typeForAll,#fromForAll,#toForAll,#statusForAll,#noteForAll, #threadForAll")
+            $(".select_header, #analyzed_By, #cur_color,#pl_color")
                 .on("change input", function() {
                     checkValues();
                 });
@@ -661,26 +587,13 @@
                 if ($("#sheets").val() == '' || !$("#sheets").val()) {
                     isValid = false;
                 }
-                if ($("#doc_file_name").val() == '' || !$("#doc_file_name").val()) {
-                    isValid = false;
-                }
                 if ($("#subject").val() == '' || !$("#subject").val()) {
                     isValid = false;
                 }
-                if (($("#type").val() == '' || !$("#type").val()) && ($("#typeForAll").val() == '' || !$(
-                        "#typeForAll").val())) {
+                if ($("#start_date").val() == '' || !$("#start_date").val()) {
                     isValid = false;
                 }
-                if ($("#reference").val() == '' || !$("#reference").val()) {
-                    isValid = false;
-                }
-               
-                if (($("#start_date").val() == '' || !$("#start_date").val()) && ($("#start_dateForAll").val() == '' || !$(
-                    "#start_dateForAll").val())) {
-                    isValid = false;
-                }
-               
-                
+
                 if ($("#analyzed_By").val() == '' || !$("#analyzed_By").val()) {
                     isValid = false;
                 }
@@ -690,26 +603,17 @@
             $("#start_import").click(function() {
                 let data = {
                     sheet: $("#sheets").val(),
-
-                    doc_file_name: $("#doc_file_name").val(),
-                    subject: $("#subject").val(),
-                    type: $("#type").val(),
-                    typeForAll: $("#typeForAll").val(),
-                    reference: $("#reference").val(),
-                    revision: $("#revision").val(),
-                    from: $("#from").val(),
-                    fromForAll: $("#fromForAll").val(),
-                    to: $("#to").val(),
-                    toForAll: $("#toForAll").val(),
                     start_date: $("#start_date").val(),
-                    start_dateForAll: $("#start_dateForAll").val(),
-                    end_date: $("#end_date").val(),
-                    status: $("#status").val(),
-                    statusForAll: $("#statusForAll").val(),
-                    thread: $("#thread").val(),
-                    threadForAll: $("#threadForAll").val(),
-                    note: $("#note").val(),
-                    noteForAll: $("#noteForAll").val(),
+                    return_date: $("#return_date").val(),
+                    subject: $("#subject").val(),
+                    left_caption: $("#left_caption").val(),
+                    right_caption: $("#right_caption").val(),
+                    pl_sd: $("#pl_sd").val(),
+                    pl_fd: $("#pl_fd").val(),
+                    lp_fd: $("#lp_fd").val(),
+                    lp_sd: $("#lp_sd").val(),
+                    cur_color: $("#cur_color").val(),
+                    pl_color: $("#pl_color").val(),
                     analyzed_By: $("#analyzed_By").val(),
                     analysis_complete: $("#analysis_complete").prop("checked") ? 1 :
                     0, // Convert checkbox to boolean
@@ -719,11 +623,12 @@
 
 
                 $.ajax({
-                    url: "/start-import", // Change this to your Laravel route
+                    url: "/notes/start-import", // Change this to your Laravel route
                     type: "POST",
                     data: data,
                     success: function(response) {
                         console.log("Import Success:", response);
+
                         $('#step4').html(response.html);
                         $('#step3').addClass('d-none');
                         $('#step4').removeClass('d-none');

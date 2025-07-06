@@ -135,6 +135,14 @@
                                         from Excel</span></a>
                             </li>
                         @endif
+                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('import_documents', $Project_Permissions ?? []))
+                            <li class="nav-item">
+                                <a class="nav-link pl-3 link_kkkkk" style="font-size: 0.8rem;"
+                                    href="{{ route('import_notes_view') }}"><span class="ml-1 item-text"style="color: #e4d125;">Import
+                                        Notes
+                                        from Excel</span></a>
+                            </li>
+                        @endif
                         <li class="nav-item">
                                 <a class="nav-link pl-3 link_kkkkk" href="{{ route('project.all_documents.index') }}"><span
                                         class="ml-1 item-text"style="color: #e4d125;">All Documents</span></a>

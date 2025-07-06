@@ -1,16 +1,15 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
 use App\Models\DocType;
 use App\Models\Document;
 use App\Models\FileDocument;
+use App\Models\GanttChartDocData;
 use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\StakeHolder;
 use App\Models\StorageFile;
-use App\Models\GanttChartDocData;
 use DateTime;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -22,11 +21,11 @@ class ImportDocumentController extends ApiController
         session()->forget('extractedDataExcelFile');
         session()->forget('uploadedPDFFiles');
         session()->forget('selected_file');
-        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
-        $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
+        $folders         = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
+        $project         = Project::findOrFail(auth()->user()->current_project_id);
+        $users           = $project->assign_users;
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->get();
-        $stake_holders = $project->stakeHolders;
+        $stake_holders   = $project->stakeHolders;
 
         return view('project_dashboard.import_documents.index', compact('folders', 'users', 'project', 'documents_types', 'stake_holders'));
     }
@@ -38,21 +37,21 @@ class ImportDocumentController extends ApiController
             'file' => 'required|file|max:51200', // 10MB max
         ]);
 
-        $file = $request->file('file');
+        $file        = $request->file('file');
         $spreadsheet = IOFactory::load($file->getPathname());
 
-        $data = [];
+        $data   = [];
         $sheets = [];
         foreach ($spreadsheet->getSheetNames() as $sheetName) {
 
             $sheet = $spreadsheet->getSheetByName($sheetName);
-            $rows = $sheet->toArray();
+            $rows  = $sheet->toArray();
 
             if (empty($rows) || count($rows) < 2) {
                 continue; // Skip empty or invalid sheets
             }
-            $sheets[] = trim($sheetName);
-            $headers = array_map('trim', $rows[0]); // Extract headers
+            $sheets[]  = trim($sheetName);
+            $headers   = array_map('trim', $rows[0]); // Extract headers
             $sheetData = [];
 
             foreach ($headers as $header) {
@@ -82,15 +81,15 @@ class ImportDocumentController extends ApiController
         if ($storageFile) {
             return response()->json([
                 'success' => true,
-                'file' => $storageFile,
-                'sheets' => $sheets,
+                'file'    => $storageFile,
+                'sheets'  => $sheets,
             ]);
         }
-        $fileName = time().'_'.$file->getClientOriginalName();
+        $fileName = time() . '_' . $file->getClientOriginalName();
 
         // Create project-specific folder in public path
-        $projectFolder = 'projects/'.auth()->user()->current_project_id.'/imports/excel';
-        $path = public_path($projectFolder);
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/imports/excel';
+        $path          = public_path($projectFolder);
         if (! file_exists($path)) {
             mkdir($path, 0777, true);
         }
@@ -100,18 +99,18 @@ class ImportDocumentController extends ApiController
 
         // Save file info to database
         $storageFile = StorageFile::create([
-            'user_id' => auth()->user()->id,
+            'user_id'    => auth()->user()->id,
             'project_id' => auth()->user()->current_project_id,
-            'file_name' => $name,
-            'size' => $size,
-            'file_type' => $type,
-            'path' => $projectFolder.'/'.$fileName,
+            'file_name'  => $name,
+            'size'       => $size,
+            'file_type'  => $type,
+            'path'       => $projectFolder . '/' . $fileName,
         ]);
 
         return response()->json([
             'success' => true,
-            'file' => $storageFile,
-            'sheets' => $sheets,
+            'file'    => $storageFile,
+            'sheets'  => $sheets,
         ]);
     }
 
@@ -133,12 +132,12 @@ class ImportDocumentController extends ApiController
                 $uploadedFiles[$nameWithoutExtension] = $storageFile->id;
             } else {
                 $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $cleanedName = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
-                $fileName = time().'_'.$cleanedName.'.'.pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                $cleanedName          = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
+                $fileName             = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
 
                 // Create project-specific folder in public path
-                $projectFolder = 'projects/'.auth()->user()->current_project_id.'/documents';
-                $path = public_path($projectFolder);
+                $projectFolder = 'projects/' . auth()->user()->current_project_id . '/documents';
+                $path          = public_path($projectFolder);
                 if (! file_exists($path)) {
                     mkdir($path, 0777, true);
                 }
@@ -148,12 +147,12 @@ class ImportDocumentController extends ApiController
 
                 // Save file info to database
                 $storageFile = StorageFile::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id'    => auth()->user()->id,
                     'project_id' => auth()->user()->current_project_id,
-                    'file_name' => $name,
-                    'size' => $size,
-                    'file_type' => $type,
-                    'path' => $projectFolder.'/'.$fileName,
+                    'file_name'  => $name,
+                    'size'       => $size,
+                    'file_type'  => $type,
+                    'path'       => $projectFolder . '/' . $fileName,
                 ]);
             }
             $nameWithoutExtension = pathinfo($name, PATHINFO_FILENAME);
@@ -163,8 +162,8 @@ class ImportDocumentController extends ApiController
         session(['uploadedPDFFiles' => $uploadedFiles]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Files uploaded successfully',
+            'success'          => true,
+            'message'          => 'Files uploaded successfully',
             'uploadedPDFFiles' => $uploadedFiles,
         ]);
     }
@@ -183,9 +182,9 @@ class ImportDocumentController extends ApiController
         //         }
         //     }
         // }
-        $sheets = session('extractedDataExcelFile');
+        $sheets       = session('extractedDataExcelFile');
         $headersArray = $sheets[$sheet];
-        $headers = [];
+        $headers      = [];
         foreach ($headersArray as $key => $val) {
             $headers[] = $key;
         }
@@ -201,9 +200,9 @@ class ImportDocumentController extends ApiController
     public function formate_date($date, $formate = 'd.M.Y')
     {
 
-        $date = $date;
+        $date        = $date;
         $cleanedDate = preg_replace('/[^a-zA-Z0-9]/', '.', $date); // Replace any non-alphanumeric character with space
-        // Create DateTime object from the original format (y/m/d)
+                                                                   // Create DateTime object from the original format (y/m/d)
         $dateTime = DateTime::createFromFormat($formate, $cleanedDate);
 
         if ($dateTime) {
@@ -218,44 +217,44 @@ class ImportDocumentController extends ApiController
     public function start_import(Request $request)
     {
 
-        $sheets = session('extractedDataExcelFile');
-        $rowsCount = $sheets[$request->sheet][$request->reference];
+        $sheets         = session('extractedDataExcelFile');
+        $rowsCount      = $sheets[$request->sheet][$request->reference];
         $unImportedRows = [];
-        $importedRows = [];
+        $importedRows   = [];
 
         $uploadedFiles = session('uploadedPDFFiles');
         $selected_file = session('selected_file');
         foreach ($rowsCount as $index => $val) {
-            $success = true;
+            $success        = true;
             $storage_doc_id = null;
-            $doc_type = null;
-            $subject = null;
-            $start_date = null;
-            $reference = null;
-            $from = null;
-            $to = null;
-            $return_date = null;
-            $revision = null;
-            $status = null;
-            $notes = null;
-            $threads = null;
+            $doc_type       = null;
+            $subject        = null;
+            $start_date     = null;
+            $reference      = null;
+            $from           = null;
+            $to             = null;
+            $return_date    = null;
+            $revision       = null;
+            $status         = null;
+            $notes          = null;
+            $threads        = null;
             if ($sheets[$request->sheet][$request->doc_file_name][$index]) {
                 $x = $sheets[$request->sheet][$request->doc_file_name][$index];
                 if (array_key_exists($x, $uploadedFiles)) {
                     $existed_docu = Document::where('project_id', auth()->user()->current_project_id)->where('storage_file_id', $uploadedFiles[$x])->first();
                     if ($existed_docu) {
-                        $unImportedRows['Row '.$index + 2][] = 'PDF File "'.$x.'.pdf" Is Existed In CMW';
-                        $success = false;
+                        $unImportedRows['Row ' . $index + 2][] = 'PDF File "' . $x . '.pdf" Is Existed In CMW';
+                        $success                               = false;
                     } else {
                         $storage_doc_id = $uploadedFiles[$x];
                     }
                 } else {
-                    $unImportedRows['Row '.$index + 2][] = 'PDF File "'.$x.'.pdf" Not Uploaded';
-                    $success = false;
+                    $unImportedRows['Row ' . $index + 2][] = 'PDF File "' . $x . '.pdf" Not Uploaded';
+                    $success                               = false;
                 }
             } else {
-                $unImportedRows['Row '.$index + 2][] = '"'.$request->doc_file_name.'" is Empty';
-                $success = false;
+                $unImportedRows['Row ' . $index + 2][] = '"' . $request->doc_file_name . '" is Empty';
+                $success                               = false;
             }
             if ($request->typeForAll != null) {
                 $doc_type = $request->typeForAll;
@@ -265,18 +264,18 @@ class ImportDocumentController extends ApiController
                     if ($documents_type) {
                         $doc_type = $documents_type->id;
                     } else {
-                        $unImportedRows['Row '.$index + 2][] = '"'.$request->type.'" Not Found';
-                        $success = false;
+                        $unImportedRows['Row ' . $index + 2][] = '"' . $request->type . '" Not Found';
+                        $success                               = false;
                     }
                 } else {
-                    $unImportedRows['Row '.$index + 2][] = '"'.$request->type.'" is Empty';
-                    $success = false;
+                    $unImportedRows['Row ' . $index + 2][] = '"' . $request->type . '" is Empty';
+                    $success                               = false;
                 }
 
             }
             if ($sheets[$request->sheet][$request->subject][$index] == null) {
-                $unImportedRows['Row '.$index + 2][] = '"'.$request->subject.'" is Empty';
-                $success = false;
+                $unImportedRows['Row ' . $index + 2][] = '"' . $request->subject . '" is Empty';
+                $success                               = false;
             } else {
                 $subject = $sheets[$request->sheet][$request->subject][$index];
             }
@@ -284,8 +283,8 @@ class ImportDocumentController extends ApiController
                 $start_date = date('Y-m-d', strtotime($request->start_dateForAll));
             } else {
                 if ($sheets[$request->sheet][$request->start_date][$index] == null) {
-                    $unImportedRows['Row '.$index + 2][] = '"'.$request->start_date.'" is Empty';
-                    $success = false;
+                    $unImportedRows['Row ' . $index + 2][] = '"' . $request->start_date . '" is Empty';
+                    $success                               = false;
                 } else {
                     // $start_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->start_date][$index]));
                     $start_date = $this->formate_date($sheets[$request->sheet][$request->start_date][$index], 'd.M.Y');
@@ -293,8 +292,8 @@ class ImportDocumentController extends ApiController
             }
 
             if ($sheets[$request->sheet][$request->reference][$index] == null) {
-                $unImportedRows['Row '.$index + 2][] = '"'.$request->reference.'" is Empty';
-                $success = false;
+                $unImportedRows['Row ' . $index + 2][] = '"' . $request->reference . '" is Empty';
+                $success                               = false;
             } else {
                 $reference = $sheets[$request->sheet][$request->reference][$index];
             }
@@ -305,27 +304,27 @@ class ImportDocumentController extends ApiController
                 } else {
                     if ($request->from) {
                         if ($sheets[$request->sheet][$request->from][$index] == null) {
-                            $importedRows['Row '.$index + 2][] = '"'.$request->from.'" is Empty';
+                            $importedRows['Row ' . $index + 2][] = '"' . $request->from . '" is Empty';
                         } else {
-                            $searchName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $sheets[$request->sheet][$request->from][$index]));
+                            $searchName   = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $sheets[$request->sheet][$request->from][$index]));
                             $stakeholder1 = StakeHolder::where('project_id', auth()->user()->current_project_id)->whereRaw('LOWER(REGEXP_REPLACE(narrative, "[^a-z0-9]", "")) = ?', [$searchName])->first();
                             if ($stakeholder1) {
                                 $from = $stakeholder1->id;
                             } else {
                                 $stakeholder2 = StakeHolder::where('project_id', auth()->user()->current_project_id)->whereRaw('LOWER(REGEXP_REPLACE(role, "[^a-z0-9]", "")) = ?', [$searchName])->first();
                                 if ($stakeholder2) {
-                                    $importedRows['Row '.$index + 2][] = '"'.$request->from.'" is stored as Stakeholder with Chronology "'.$stakeholder2->narrative.'"';
-                                    $from = $stakeholder2->id;
+                                    $importedRows['Row ' . $index + 2][] = '"' . $request->from . '" is stored as Stakeholder with Chronology "' . $stakeholder2->narrative . '"';
+                                    $from                                = $stakeholder2->id;
                                 } else {
                                     $newStakeholder = StakeHolder::create([
                                         'project_id' => auth()->user()->current_project_id,
-                                        'name' => $sheets[$request->sheet][$request->from][$index],
-                                        'role' => $sheets[$request->sheet][$request->from][$index],
-                                        'narrative' => $sheets[$request->sheet][$request->from][$index],
-                                        'article' => null,
+                                        'name'       => $sheets[$request->sheet][$request->from][$index],
+                                        'role'       => $sheets[$request->sheet][$request->from][$index],
+                                        'narrative'  => $sheets[$request->sheet][$request->from][$index],
+                                        'article'    => null,
                                     ]);
-                                    $from = $newStakeholder->id;
-                                    $importedRows['Row '.$index + 2][] = 'A new stakeholder with chronology '.$newStakeholder->narrative.' has been created and store "'.$request->from.'" as it.';
+                                    $from                                = $newStakeholder->id;
+                                    $importedRows['Row ' . $index + 2][] = 'A new stakeholder with chronology ' . $newStakeholder->narrative . ' has been created and store "' . $request->from . '" as it.';
                                 }
                             }
                         }
@@ -338,27 +337,27 @@ class ImportDocumentController extends ApiController
                 } else {
                     if ($request->to) {
                         if ($sheets[$request->sheet][$request->to][$index] == null) {
-                            $importedRows['Row '.$index + 2][] = '"'.$request->to.'" is Empty';
+                            $importedRows['Row ' . $index + 2][] = '"' . $request->to . '" is Empty';
                         } else {
-                            $toSearchName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $sheets[$request->sheet][$request->to][$index]));
+                            $toSearchName   = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $sheets[$request->sheet][$request->to][$index]));
                             $toStakeholder1 = StakeHolder::where('project_id', auth()->user()->current_project_id)->whereRaw('LOWER(REGEXP_REPLACE(narrative, "[^a-z0-9]", "")) = ?', [$toSearchName])->first();
                             if ($toStakeholder1) {
                                 $to = $toStakeholder1->id;
                             } else {
                                 $toStakeholder2 = StakeHolder::where('project_id', auth()->user()->current_project_id)->whereRaw('LOWER(REGEXP_REPLACE(role, "[^a-z0-9]", "")) = ?', [$toSearchName])->first();
                                 if ($toStakeholder2) {
-                                    $importedRows['Row '.$index + 2][] = '"'.$request->to.'" is stored as Stakeholder with Chronology "'.$toStakeholder2->narrative.'"';
-                                    $to = $toStakeholder2->id;
+                                    $importedRows['Row ' . $index + 2][] = '"' . $request->to . '" is stored as Stakeholder with Chronology "' . $toStakeholder2->narrative . '"';
+                                    $to                                  = $toStakeholder2->id;
                                 } else {
                                     $toNewStakeholder = StakeHolder::create([
                                         'project_id' => auth()->user()->current_project_id,
-                                        'name' => $sheets[$request->sheet][$request->to][$index],
-                                        'role' => $sheets[$request->sheet][$request->to][$index],
-                                        'narrative' => $sheets[$request->sheet][$request->to][$index],
-                                        'article' => null,
+                                        'name'       => $sheets[$request->sheet][$request->to][$index],
+                                        'role'       => $sheets[$request->sheet][$request->to][$index],
+                                        'narrative'  => $sheets[$request->sheet][$request->to][$index],
+                                        'article'    => null,
                                     ]);
-                                    $to = $toNewStakeholder->id;
-                                    $importedRows['Row '.$index + 2][] = 'A new stakeholder with chronology '.$toNewStakeholder->narrative.' has been created and store "'.$request->to.'" as it.';
+                                    $to                                  = $toNewStakeholder->id;
+                                    $importedRows['Row ' . $index + 2][] = 'A new stakeholder with chronology ' . $toNewStakeholder->narrative . ' has been created and store "' . $request->to . '" as it.';
                                 }
                             }
                         }
@@ -366,7 +365,7 @@ class ImportDocumentController extends ApiController
                 }
                 if ($request->end_date) {
                     if ($sheets[$request->sheet][$request->end_date][$index] == null) {
-                        $importedRows['Row '.$index + 2][] = '"'.$request->end_date.'" is Empty';
+                        $importedRows['Row ' . $index + 2][] = '"' . $request->end_date . '" is Empty';
                     } else {
                         // $return_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->end_date][$index]));
                         $return_date = $this->formate_date($sheets[$request->sheet][$request->end_date][$index], 'd.M.Y');
@@ -376,7 +375,7 @@ class ImportDocumentController extends ApiController
 
                 if ($request->revision) {
                     if ($sheets[$request->sheet][$request->revision][$index] == null) {
-                        $importedRows['Row '.$index + 2][] = '"'.$request->revision.'" is Empty';
+                        $importedRows['Row ' . $index + 2][] = '"' . $request->revision . '" is Empty';
                     }
                     $revision = $sheets[$request->sheet][$request->revision][$index];
                 }
@@ -386,7 +385,7 @@ class ImportDocumentController extends ApiController
                 } else {
                     if ($request->status) {
                         if ($sheets[$request->sheet][$request->status][$index] == null) {
-                            $importedRows['Row '.$index + 2][] = '"'.$request->status.'" is Empty';
+                            $importedRows['Row ' . $index + 2][] = '"' . $request->status . '" is Empty';
                         }
                         $status = $sheets[$request->sheet][$request->status][$index];
                     }
@@ -397,7 +396,7 @@ class ImportDocumentController extends ApiController
                 } else {
                     if ($request->note) {
                         if ($sheets[$request->sheet][$request->note][$index] == null) {
-                            $importedRows['Row '.$index + 2][] = '"'.$request->note.'" is Empty';
+                            $importedRows['Row ' . $index + 2][] = '"' . $request->note . '" is Empty';
                         }
                         $notes = $sheets[$request->sheet][$request->note][$index];
                     }
@@ -409,7 +408,7 @@ class ImportDocumentController extends ApiController
                 } else {
                     if ($request->thread) {
                         if ($sheets[$request->sheet][$request->thread][$index] == null) {
-                            $importedRows['Row '.$index + 2][] = '"'.$request->thread.'" is Empty';
+                            $importedRows['Row ' . $index + 2][] = '"' . $request->thread . '" is Empty';
                         } else {
                             $threads = explode(',', $sheets[$request->sheet][$request->thread][$index]);
                         }
@@ -421,34 +420,34 @@ class ImportDocumentController extends ApiController
                 } while (Document::where('slug', $invitation_code)->exists());
 
                 $doc = Document::create([
-                    'slug' => $invitation_code,
-                    'doc_type_id' => $doc_type,
-                    'user_id' => $request->analyzed_By,
-                    'project_id' => auth()->user()->current_project_id,
-                    'subject' => $subject,
-                    'start_date' => $start_date,
-                    'end_date' => $return_date,
-                    'from_id' => intval($from),
-                    'to_id' => intval($to),
-                    'reference' => $reference,
-                    'revision' => $revision,
-                    'status' => $status,
-                    'notes' => $notes,
-                    'storage_file_id' => intval($storage_doc_id),
-                    'threads' => $threads && count($threads) > 0 ? json_encode($threads) : null,
+                    'slug'              => $invitation_code,
+                    'doc_type_id'       => $doc_type,
+                    'user_id'           => $request->analyzed_By,
+                    'project_id'        => auth()->user()->current_project_id,
+                    'subject'           => $subject,
+                    'start_date'        => $start_date,
+                    'end_date'          => $return_date,
+                    'from_id'           => intval($from),
+                    'to_id'             => intval($to),
+                    'reference'         => $reference,
+                    'revision'          => $revision,
+                    'status'            => $status,
+                    'notes'             => $notes,
+                    'storage_file_id'   => intval($storage_doc_id),
+                    'threads'           => $threads && count($threads) > 0 ? json_encode($threads) : null,
                     'analysis_complete' => $request->analysis_complete,
 
                 ]);
                 if ($selected_file) {
-                    $fileDoc=FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $selected_file, 'document_id' => $doc->id]);
+                    $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $selected_file, 'document_id' => $doc->id]);
                     $start_date  = $fileDoc->document->start_date;
                     $end_date    = $fileDoc->document->end_date;
                     $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
 
                     $gantt_chart->lp_sd = $start_date;
                     $gantt_chart->lp_fd = $end_date;
-
-                    $sections[] = [
+                    $sections           = [];
+                    $sections[]         = [
                         'sd'    => $start_date,
                         'fd'    => $end_date,
                         'color' => '00008B',
@@ -460,7 +459,7 @@ class ImportDocumentController extends ApiController
                     }
                     $gantt_chart->save();
                 }
-                $importedRows['Row '.$index + 2][] = 'File with Ref: '.$reference.' is uploaded successfully';
+                $importedRows['Row ' . $index + 2][] = 'File with Ref: ' . $reference . ' is uploaded successfully';
             }
 
         }
@@ -469,7 +468,7 @@ class ImportDocumentController extends ApiController
         return response()->json([
             'success' => true,
             'message' => 'Files Assigned successfully',
-            'html' => $html,
+            'html'    => $html,
         ]);
 
     }

@@ -343,6 +343,7 @@ class DocumentController extends ApiController
         $skippedDocs  = [];                 // To track already existing documents
 
         foreach ($request->document_ids as $documentId) {
+            $sections=[];
             $fileDoc = FileDocument::where('file_id', $request->file_id)
                 ->where('document_id', $documentId)
                 ->first();

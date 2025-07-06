@@ -239,8 +239,8 @@ class UploadGroupDocumentController extends ApiController
 
                     $gantt_chart->lp_sd = $start_date;
                     $gantt_chart->lp_fd = $end_date;
-
-                    $sections[] = [
+                    $sections           = [];
+                    $sections[]         = [
                         'sd'    => $start_date,
                         'fd'    => $end_date,
                         'color' => '00008B',

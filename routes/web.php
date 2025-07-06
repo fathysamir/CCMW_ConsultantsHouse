@@ -18,6 +18,7 @@ use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\ImportNoteController;
 use App\Models\FileDocument;
 use App\Models\ProjectFile;
 use Illuminate\Support\Facades\Route;
@@ -308,6 +309,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/upload-multi-files', [ImportDocumentController::class, 'upload_multi_files'])->name('upload_multi_files');
     Route::post('/get-headers', [ImportDocumentController::class, 'getHeaders'])->name('getHeaders');
     Route::post('/start-import', [ImportDocumentController::class, 'start_import'])->name('start_import');
+
+    Route::get('/project/notes/import-documents', [ImportNoteController::class, 'import_notes_view'])->name('import_notes_view');
+    Route::post('/notes/upload-import-excel-file', [ImportNoteController::class, 'upload_import_excel_file'])->name('notes.upload_import_excel_file');
+    Route::post('/notes/get-headers', [ImportNoteController::class, 'getHeaders'])->name('notes.getHeaders');
+    Route::post('/notes/start-import', [ImportNoteController::class, 'start_import'])->name('notes.start_import');
+
 
     Route::get('/project/upload-group-documents', [UploadGroupDocumentController::class, 'index'])->name('project.upload-group-documents');
     Route::get('/formate_date', [UploadGroupDocumentController::class, 'formate_date'])->name('formate_date');
