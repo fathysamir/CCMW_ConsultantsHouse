@@ -935,11 +935,11 @@ class ExtractPowerPointController extends ApiController
                     if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
                         $startX_lp    = $currentX + ($day_width * $this->calc_days($startTimeScale . '-01', $doc_gantt_chart->lp_sd));
                         $cur_width_lp = $day_width * $this->calc_days($doc_gantt_chart->lp_sd, $doc_gantt_chart->lp_fd);
-                        $line = new \PhpOffice\PhpPresentation\Shape\Line((int)$startX_lp, $currentY, (int)$startX_lp+(int)$cur_width_lp, $currentY); // from (x1, y1) to (x2, y2)
+                        $line         = new \PhpOffice\PhpPresentation\Shape\Line((int) $startX_lp, $currentY, (int) $startX_lp + (int) $cur_width_lp, $currentY); // from (x1, y1) to (x2, y2)
                         $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
                         //$line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
                         $line->getBorder()->setLineWidth(3);
-                        $line->getBorder()->setColor(new Color('FFB31B1B')); // red
+                        $line->getBorder()->setColor(new Color('FFFF2400')); // red
                         $slide->addShape($line);
                     }
                 }
@@ -958,109 +958,6 @@ class ExtractPowerPointController extends ApiController
             }
 
         }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // $rect = new AutoShape;
-        // $rect->setType(AutoShape::TYPE_DIAMOND);
-        // $rect->setOffsetX(100)->setOffsetY(100)->setWidth(200)->setHeight(100);
-        // $rect->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor(new Color('FFFF00'));
-        // $outline = $rect->getOutline();
-        // $outline->setWidth(3); // Border thickness
-        // $outline->getFill()
-        //     ->setFillType(Fill::FILL_SOLID)
-        //     ->setStartColor(new Color('000000')); // Black border
-        // $slide->addShape($rect);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Shape 2
-        // $frame = new AutoShape;
-        // $frame->setType(AutoShape::TYPE_RECTANGLE);
-        // $frame->setOffsetX(100)->setOffsetY(250)->setWidth(200)->setHeight(100); // moved down
-        // $frame->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor(new Color('FF0000')); // red
-        // $outline = $frame->getOutline();
-        // $outline->getFill() // The outline's fill defines its color
-        //     ->setFillType(Fill::FILL_SOLID)
-        //     ->setStartColor(new Color('FF07F270')); // Black border
-        // $outline->setWidth(4); // Border width in pixels (e.g., 2px)
-        // $slide->addShape($frame);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // $dd = new AutoShape;
-        // $dd->setType(AutoShape::TYPE_5_POINT_STAR);
-        // $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(80);         // moved down
-        // $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
-        // $outline = $dd->getOutline();
-        // $outline->getFill() // The outline's fill defines its color
-        //     ->setFillType(Fill::FILL_SOLID)
-        //     ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
-        // $outline->setWidth(1);
-        // // $dd->setInsetRight(0.0);
-        // // $dd->setInsetLeft(0.0);
-        // $slide->addShape($dd);
-
-        // $dd = new AutoShape;
-        // $dd->setType(AutoShape::TYPE_ROUND_2_SAME_RECTANGLE);
-        // $dd->setOffsetX(95)->setOffsetY(422)->setWidth(200)->setHeight(17);         // moved down
-        // $dd->getFill()->setFillType('solid')->setStartColor(new Color('FF0000FF')); // red
-        // $outline = $dd->getOutline();
-        // $outline->getFill() // The outline's fill defines its color
-        //     ->setFillType(Fill::FILL_SOLID)
-        //     ->setStartColor(new Color(Color::COLOR_BLACK)); // Black border
-        // $outline->setWidth(1);
-        // // $dd->setInsetRight(0.0);
-        // // $dd->setInsetLeft(0.0);
-        // $slide->addShape($dd);
-
-        // $dd = new AutoShape;
-        // $dd->setType(AutoShape::TYPE_RECTANGLE);
-        // $dd->setOffsetX(110)->setOffsetY(395)->setWidth(300)->setHeight(5);         // moved down
-        // $dd->getFill()->setFillType('solid')->setStartColor(new Color('FFFF0000')); // red
-        // $outline = $dd->getOutline();
-        // $outline->getFill() // The outline's fill defines its color
-        //     ->setFillType(Fill::FILL_SOLID)
-        //     ->setStartColor(new Color('000000')); // Black border
-        // $outline->setWidth(0);
-        // // $dd->setInsetRight(0.0);
-        // // $dd->setInsetLeft(0.0);
-        // $slide->addShape($dd);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // $line = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200); // from (x1, y1) to (x2, y2)
-        // $line->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-        // $line->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_DASHDOT);
-        // $line->getBorder()->setLineWidth(1);
-        // $line->getBorder()->setColor(new Color('FF0000')); // red
-        // $slide->addShape($line);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // $slide2 = $ppt->createSlide();
-        // $line2 = new \PhpOffice\PhpPresentation\Shape\Line(150, 100, 150, 200);
-
-        // // Set line style
-        // $line2->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-        // $line2->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_SOLID); // Solid line (optional)
-        // $line2->getBorder()->setLineWidth(1); // Line thickness
-        // $line2->getBorder()->setColor(new Color('FF0000')); // red
-
-        // Add an arrow at the end (head)
-        // $line2->getHeadArrow()->setLength(\PhpOffice\PhpPresentation\Style\Arrow::LENGTH_MEDIUM);
-        // $line2->getHeadArrow()->setWidth(\PhpOffice\PhpPresentation\Style\Arrow::WIDTH_MEDIUM);
-        // $line2->getHeadArrow()->setStyle(\PhpOffice\PhpPresentation\Style\Arrow::STYLE_TRIANGLE);
-        //$slide2->addShape($line2);
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // $line3 = new \PhpOffice\PhpPresentation\Shape\Line(150, 200, 300, 500);
-
-        // // Set line style
-        // $line3->getBorder()->setLineStyle(\PhpOffice\PhpPresentation\Style\Border::LINE_SINGLE);
-        // $line3->getBorder()->setDashStyle(\PhpOffice\PhpPresentation\Style\Border::DASH_SOLID); // Solid line (optional)
-        // $line3->getBorder()->setLineWidth(1); // Line thickness
-        // $line3->getBorder()->setColor(new Color('FF0000')); // red
-        // $slide2->addShape($line3);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
