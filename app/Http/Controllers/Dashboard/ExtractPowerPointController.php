@@ -953,7 +953,6 @@ class ExtractPowerPointController extends ApiController
                     } elseif ($request->raw_height == '2') {
                         $currentY += 33;
                     }
-
                 }
 
             }
