@@ -607,7 +607,7 @@ class ExtractPowerPointController extends ApiController
                             $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
                             $cur_right_caption .= $doc->document->reference;
                         }
-                        $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
+                        $cur_right_caption .= $cur_right_caption == '' || $doc_gantt_chart->cur_right_caption==null ? '' : ' - ';
                         $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
                         $yearMonth2 = date('Y-m', strtotime($sections[count($sections) - 1]['fd']));
@@ -721,7 +721,7 @@ class ExtractPowerPointController extends ApiController
                         if ($doc_gantt_chart->cur_show_ref == 'r') {
                             $cur_right_caption .= $doc->document->reference;
                         }
-                        $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
+                        $cur_right_caption .= $cur_right_caption == '' || $doc_gantt_chart->cur_right_caption==null ? '' : ' - ';
                         $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
 
@@ -799,7 +799,7 @@ class ExtractPowerPointController extends ApiController
                         $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
 
                         if ($doc_gantt_chart->pl_show_sd == '1') {
-                            $pl_left_caption .= $pl_left_caption == '' ? '' : ' - ';
+                            $pl_left_caption .= $pl_left_caption == '' || $doc_gantt_chart->pl_sd==null ? '' : ' - ';
                             $pl_left_caption .= date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
 
                         }
@@ -808,7 +808,7 @@ class ExtractPowerPointController extends ApiController
                         if ($doc_gantt_chart->pl_show_fd == '1') {
                             $pl_right_caption = date('d.M.y', strtotime($doc_gantt_chart->pl_fd));
                         }
-                        $pl_right_caption .= $pl_right_caption == '' ? '' : ' - ';
+                        $pl_right_caption .= $pl_right_caption == '' || $doc_gantt_chart->pl_right_caption==null ? '' : ' - ';
                         $pl_right_caption .= $doc_gantt_chart->pl_right_caption ? $doc_gantt_chart->pl_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($doc_gantt_chart->pl_sd));
                         $yearMonth2 = date('Y-m', strtotime($doc_gantt_chart->pl_fd));
@@ -874,7 +874,7 @@ class ExtractPowerPointController extends ApiController
                         $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
 
                         if ($doc_gantt_chart->pl_show_sd == '1') {
-                            $pl_left_caption .= $pl_left_caption == '' ? '' : ' - ';
+                            $pl_left_caption .= $pl_left_caption == '' || $doc_gantt_chart->pl_sd==null ? '' : ' - ';
                             $pl_left_caption .= date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
 
                         }
