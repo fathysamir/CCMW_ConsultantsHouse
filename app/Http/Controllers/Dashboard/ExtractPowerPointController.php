@@ -590,10 +590,12 @@ class ExtractPowerPointController extends ApiController
 
                         $cur_left_caption = $doc_gantt_chart->cur_left_caption ? $doc_gantt_chart->cur_left_caption : '';
                         if ($doc_gantt_chart->cur_show_ref == 'l') {
-                            $cur_left_caption .= ' - ' . $doc->document->reference;
+                            $cur_left_caption .= $cur_left_caption == '' ? '' : ' - ';
+                            $cur_left_caption .= $doc->document->reference;
                         }
                         if ($doc_gantt_chart->cur_show_sd == '1') {
-                            $cur_left_caption .= ' - ' . date('d.M.y', strtotime($sections[0]['sd']));
+                            $cur_left_caption .= $cur_left_caption == '' ? '' : ' - ';
+                            $cur_left_caption .= date('d.M.y', strtotime($sections[0]['sd']));
 
                         }
 
@@ -602,9 +604,11 @@ class ExtractPowerPointController extends ApiController
                             $cur_right_caption = date('d.M.y', strtotime($sections[count($sections) - 1]['fd']));
                         }
                         if ($doc_gantt_chart->cur_show_ref == 'r') {
-                            $cur_right_caption .= ' - ' . $doc->document->reference;
+                            $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
+                            $cur_right_caption .= $doc->document->reference;
                         }
-                        $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? ' - ' . $doc_gantt_chart->cur_right_caption : '';
+                        $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
+                        $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
                         $yearMonth2 = date('Y-m', strtotime($sections[count($sections) - 1]['fd']));
                         if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
@@ -659,7 +663,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXX = ($startX - 1) - $unit_pixel_cur_left_caption;
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
-                                    ->setWidth($unit_pixel_cur_left_caption)
+                                    ->setWidth($unit_pixel_cur_left_caption + 3)
                                     ->setOffsetX(round($startXX, 2) - 1)
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
@@ -684,7 +688,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXXX = $startX + $wid + 2;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
-                                    ->setWidth($unit_pixel_cur_right_caption)
+                                    ->setWidth($unit_pixel_cur_right_caption + 3)
                                     ->setOffsetX(round($startXXX, 2))
                                     ->setOffsetY($currentY + $space_y_cur_right_caption);
                                 $shapeXXX->setInsetRight(0.0);
@@ -703,10 +707,13 @@ class ExtractPowerPointController extends ApiController
                     if ($doc_gantt_chart->cur_type == 'M' || $doc_gantt_chart->cur_type == 'S') {
                         $cur_left_caption = $doc_gantt_chart->cur_left_caption ? $doc_gantt_chart->cur_left_caption : '';
                         if ($doc_gantt_chart->cur_show_ref == 'l') {
-                            $cur_left_caption .= ' - ' . $doc->document->reference;
+                            $cur_left_caption .= $cur_left_caption == '' ? '' : ' - ';
+
+                            $cur_left_caption .= $doc->document->reference;
                         }
                         if ($doc_gantt_chart->cur_show_sd == '1') {
-                            $cur_left_caption .= ' - ' . date('d.M.y', strtotime($sections[0]['sd']));
+                            $cur_left_caption .= $cur_left_caption == '' ? '' : ' - ';
+                            $cur_left_caption .= date('d.M.y', strtotime($sections[0]['sd']));
 
                         }
                         $cur_right_caption = '';
@@ -714,7 +721,8 @@ class ExtractPowerPointController extends ApiController
                         if ($doc_gantt_chart->cur_show_ref == 'r') {
                             $cur_right_caption .= $doc->document->reference;
                         }
-                        $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? ' - ' . $doc_gantt_chart->cur_right_caption : '';
+                        $cur_right_caption .= $cur_right_caption == '' ? '' : ' - ';
+                        $cur_right_caption .= $doc_gantt_chart->cur_right_caption ? $doc_gantt_chart->cur_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($sections[0]['sd']));
 
                         if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale) {
@@ -745,7 +753,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXX = ($startXy - 1) - $unit_pixel_cur_left_caption;
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
-                                    ->setWidth($unit_pixel_cur_left_caption)
+                                    ->setWidth($unit_pixel_cur_left_caption + 3)
                                     ->setOffsetX(round($startXX, 2))
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
@@ -770,7 +778,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXXX = $startXy + 19;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
-                                    ->setWidth($unit_pixel_cur_right_caption)
+                                    ->setWidth($unit_pixel_cur_right_caption + 3)
                                     ->setOffsetX(round($startXXX, 2))
                                     ->setOffsetY($currentY + $space_y_cur_right_caption);
                                 $shapeXXX->setInsetRight(0.0);
@@ -791,7 +799,8 @@ class ExtractPowerPointController extends ApiController
                         $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
 
                         if ($doc_gantt_chart->pl_show_sd == '1') {
-                            $pl_left_caption .= ' - ' . date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
+                            $pl_left_caption .= $pl_left_caption == '' ? '' : ' - ';
+                            $pl_left_caption .= date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
 
                         }
 
@@ -799,8 +808,8 @@ class ExtractPowerPointController extends ApiController
                         if ($doc_gantt_chart->pl_show_fd == '1') {
                             $pl_right_caption = date('d.M.y', strtotime($doc_gantt_chart->pl_fd));
                         }
-
-                        $pl_right_caption .= $doc_gantt_chart->pl_right_caption ? ' - ' . $doc_gantt_chart->pl_right_caption : '';
+                        $pl_right_caption .= $pl_right_caption == '' ? '' : ' - ';
+                        $pl_right_caption .= $doc_gantt_chart->pl_right_caption ? $doc_gantt_chart->pl_right_caption : '';
                         $yearMonth1 = date('Y-m', strtotime($doc_gantt_chart->pl_sd));
                         $yearMonth2 = date('Y-m', strtotime($doc_gantt_chart->pl_fd));
                         if ($yearMonth1 >= $startTimeScale && $yearMonth1 <= $endTimeScale && $yearMonth2 >= $startTimeScale && $yearMonth2 <= $endTimeScale) {
@@ -824,7 +833,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXX_pl = ($startX_pl - 1) - $unit_pixel_pl_left_caption;
                                 $shapeXX    = $slide->createRichTextShape()
                                     ->setHeight(7)
-                                    ->setWidth($unit_pixel_pl_left_caption)
+                                    ->setWidth($unit_pixel_pl_left_caption + 3)
                                     ->setOffsetX(round($startXX_pl, 2) - 2)
                                     ->setOffsetY($currentY + 28);
                                 $shapeXX->setInsetRight(0.0);
@@ -846,7 +855,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXXX_pl = $startX_pl + $cur_width_pl + 2;
                                 $shapeXXX    = $slide->createRichTextShape()
                                     ->setHeight(7)
-                                    ->setWidth($unit_pixel_pl_right_caption)
+                                    ->setWidth($unit_pixel_pl_right_caption + 3)
                                     ->setOffsetX(round($startXXX_pl, 2))
                                     ->setOffsetY($currentY + 28);
                                 $shapeXXX->setInsetRight(0.0);
@@ -865,7 +874,8 @@ class ExtractPowerPointController extends ApiController
                         $pl_left_caption = $doc_gantt_chart->pl_left_caption ? $doc_gantt_chart->pl_left_caption : '';
 
                         if ($doc_gantt_chart->pl_show_sd == '1') {
-                            $pl_left_caption .= ' - ' . date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
+                            $pl_left_caption .= $pl_left_caption == '' ? '' : ' - ';
+                            $pl_left_caption .= date('d.M.y', strtotime($doc_gantt_chart->pl_sd));
 
                         }
                         $pl_right_caption = $doc_gantt_chart->pl_right_caption ? $doc_gantt_chart->pl_right_caption : '';
@@ -891,7 +901,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXX = ($startXy - 1) - $unit_pixel_pl_left_caption;
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(7)
-                                    ->setWidth($unit_pixel_pl_left_caption)
+                                    ->setWidth($unit_pixel_pl_left_caption + 3)
                                     ->setOffsetX(round($startXX, 2))
                                     ->setOffsetY($currentY + 28);
                                 $shapeXX->setInsetRight(0.0);
@@ -913,7 +923,7 @@ class ExtractPowerPointController extends ApiController
                                 $startXXX = $startXy + 8;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(7)
-                                    ->setWidth($unit_pixel_pl_right_caption)
+                                    ->setWidth($unit_pixel_pl_right_caption + 3)
                                     ->setOffsetX(round($startXXX, 2) + 1)
                                     ->setOffsetY($currentY + 28);
                                 $shapeXXX->setInsetRight(0.0);
@@ -1032,5 +1042,5 @@ class ExtractPowerPointController extends ApiController
         }
         return round($totalWidth, 2);
     }
-    
+
 }

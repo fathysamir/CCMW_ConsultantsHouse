@@ -306,7 +306,7 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Current Par Color</label>
+                                <label>Current/Actual Bar Color</label>
                             </div>
                             <div class="col-md-10">
 
@@ -337,7 +337,7 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>Planned Par Color</label>
+                                <label>Planned Bar Color</label>
                             </div>
                             <div class="col-md-10">
                                 <select class="form-control" id="pl_color" name="pl_color">
