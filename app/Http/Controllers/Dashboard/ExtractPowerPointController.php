@@ -1008,6 +1008,7 @@ class ExtractPowerPointController extends ApiController
 
         $interval = $start->diff($end);
         $days     = $interval->days;
+        dd($days);
         return $days;
     }
     private function calc_pixels($text, $font_size)
