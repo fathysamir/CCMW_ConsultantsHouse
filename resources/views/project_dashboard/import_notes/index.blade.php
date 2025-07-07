@@ -52,7 +52,7 @@
                                 <div class="progress-bar" role="progressbar" style="width: 0%"></div>
                             </div>
                         </div>
-                        <p style="color:red;margin-bottom: -5px;">■ Use this formate for dates : "dd.mmm.yyyy" (ex: 05.Apr.2025)</p>
+                        <p style="color:red;margin-bottom: -5px;">■ Use this formate for dates : "d.mmm.yyyy" (ex: 5.Apr.2025)</p>
                         <p style="color:red;">■ don't use formulas in excel sheet</p>
                     </div>
                     <input type="hidden" id="excel_file_id" name="excel_file_id" value="">
