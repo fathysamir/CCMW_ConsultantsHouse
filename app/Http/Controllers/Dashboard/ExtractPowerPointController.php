@@ -619,7 +619,7 @@ class ExtractPowerPointController extends ApiController
                             foreach ($sections as $key => $section) {
                                
                                 $cur_width = $day_width * $this->calc_days($section['sd'], $section['fd']);
-                                 dd($this->calc_days($section['sd'], $section['fd']));
+                                
                                 $dd        = new AutoShape;
                                 if ($doc_gantt_chart->cur_type == 'SB') {
                                     $dd->setType(AutoShape::TYPE_ROUNDED_RECTANGLE);
@@ -1010,7 +1010,7 @@ class ExtractPowerPointController extends ApiController
         $end   = new DateTime($date2);
 
         $interval = $start->diff($end);
-        $days     = $interval->days;
+        $days     = $interval->days + 1;
       
         return $days;
     }
