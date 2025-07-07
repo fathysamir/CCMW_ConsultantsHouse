@@ -25,7 +25,7 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h2 mb-0 page-title">Import Notes / Activity from Excel</h2>
+            <h2 class="h2 mb-0 page-title">Import Notes / Activities from Excel</h2>
         </div>
         <div class="col-auto">
             <a type="button" href="#" class="btn mb-2 btn-outline-primary" id="btn-outline-primary"
