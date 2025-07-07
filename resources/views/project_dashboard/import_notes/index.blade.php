@@ -25,7 +25,7 @@
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h2 mb-0 page-title">Import Notes from Excel</h2>
+            <h2 class="h2 mb-0 page-title">Import Notes / Activity from Excel</h2>
         </div>
         <div class="col-auto">
             <a type="button" href="#" class="btn mb-2 btn-outline-primary" id="btn-outline-primary"
@@ -41,6 +41,7 @@
                 <div class="col-md-12 " id="step1">
                     <div class="form-group mb-3">
                         <label for="file">Upload Excel File <span style="color: red">*</span></label>
+                        
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="excelFile"
                                 accept=".xlsx, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
@@ -51,6 +52,8 @@
                                 <div class="progress-bar" role="progressbar" style="width: 0%"></div>
                             </div>
                         </div>
+                        <p style="color:red;margin-bottom: -5px;">■ Use this formate for dates : "dd.mmm.yyyy" (ex: 05.Apr.2025)</p>
+                        <p style="color:red;">■ don't use formulas in excel sheet</p>
                     </div>
                     <input type="hidden" id="excel_file_id" name="excel_file_id" value="">
 
