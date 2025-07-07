@@ -617,6 +617,7 @@ class ExtractPowerPointController extends ApiController
                             $wid    = 0;
 
                             foreach ($sections as $key => $section) {
+                                dd($section);
                                 $cur_width = $day_width * $this->calc_days($section['sd'], $section['fd']);
                                 $dd        = new AutoShape;
                                 if ($doc_gantt_chart->cur_type == 'SB') {
