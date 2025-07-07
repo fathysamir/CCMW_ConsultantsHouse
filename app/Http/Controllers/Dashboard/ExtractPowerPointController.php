@@ -664,7 +664,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption + 3)
-                                    ->setOffsetX(round($startXX, 2) - 1)
+                                    ->setOffsetX(round($startXX, 2) - 4)
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -754,7 +754,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption + 3)
-                                    ->setOffsetX(round($startXX, 2))
+                                    ->setOffsetX(round($startXX, 2)-4)
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -834,7 +834,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX    = $slide->createRichTextShape()
                                     ->setHeight(7)
                                     ->setWidth($unit_pixel_pl_left_caption + 3)
-                                    ->setOffsetX(round($startXX_pl, 2) - 2)
+                                    ->setOffsetX(round($startXX_pl, 2) - 5)
                                     ->setOffsetY($currentY + 28);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -902,7 +902,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(7)
                                     ->setWidth($unit_pixel_pl_left_caption + 3)
-                                    ->setOffsetX(round($startXX, 2))
+                                    ->setOffsetX(round($startXX, 2)-3)
                                     ->setOffsetY($currentY + 28);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
