@@ -1003,6 +1003,7 @@ class ExtractPowerPointController extends ApiController
     }
     private function calc_days($date1, $date2)
     {
+        dd($date1,$date2);
         $start = new DateTime($date1);
         $end   = new DateTime($date2);
 
