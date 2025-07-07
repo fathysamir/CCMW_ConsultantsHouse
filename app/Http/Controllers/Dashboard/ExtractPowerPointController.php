@@ -1004,13 +1004,13 @@ class ExtractPowerPointController extends ApiController
     }
     private function calc_days($date1, $date2)
     {
-        dd($date1,$date2);
+       
         $start = new DateTime($date1);
         $end   = new DateTime($date2);
 
         $interval = $start->diff($end);
         $days     = $interval->days;
-        dd($days);
+      
         return $days;
     }
     private function calc_pixels($text, $font_size)
