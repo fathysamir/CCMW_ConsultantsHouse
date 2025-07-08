@@ -222,6 +222,10 @@ class DocumentController extends ApiController
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
             $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
+            $message .= 'and and and';
+            /////////////////////////////////////////////////////////////////////////////////////////
+            $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
+            $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....).';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
