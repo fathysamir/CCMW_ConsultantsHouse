@@ -90,8 +90,9 @@ class DocumentController extends ApiController
         $size            = $file->getSize();
         $type            = $file->getMimeType();
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->pluck('description')->toArray();
-
-        $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
+        $project         = Project::findOrFail(auth()->user()->current_project_id);
+        $stake_holders   = $project->stakeHolders;
+        $storageFile     = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
 
         if (! $storageFile) {
             $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -154,13 +155,12 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-           
-                $templateId = $pdf->importPage(1);
-                $size       = $pdf->getTemplateSize($templateId);
 
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($templateId);
-          
+            $templateId = $pdf->importPage(1);
+            $size       = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
@@ -208,6 +208,12 @@ class DocumentController extends ApiController
                 $message .= '■ ' . $des . '\n';
             }
             $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $message .= 'and and and';
+            $message .= 'Provided that we have the following list of stakeholders: \n';
+            foreach ($stake_holders as $stake_holder)
+                $message .= '■ ' . $stake_holder->name . '\n';
+            }
+            $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
@@ -251,7 +257,7 @@ class DocumentController extends ApiController
                     File::deleteDirectory($filePath);
                 }
             }
-           dd($answer);
+            dd($answer);
         } else {
             $type_id = '';
         }
