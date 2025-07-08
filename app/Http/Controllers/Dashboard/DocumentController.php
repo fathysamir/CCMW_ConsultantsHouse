@@ -232,7 +232,7 @@ class DocumentController extends ApiController
                             Document_reference: ...
                             Then, if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
                             Document_threads: ...
-                            Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
+                            Do not left any reference in any line.
                             Return only the values in the keys above without additional explanation . \n';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
