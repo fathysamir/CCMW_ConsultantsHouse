@@ -228,7 +228,7 @@ class DocumentController extends ApiController
             $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
             $message .= 'then \n';
             /////////////////////////////////////////////////////////////////////////////////////////
-         $message .= ' Extract the reference from this PDF, the reference should separated by "/" . this is example:“1455/fde/5565/8542” \n';
+         $message .= ' Extract the reference from this PDF, the reference may be separated by "/" or "-" in the PDF and don\'t Extract from 2 places in PDF . this is example:“1455/fde/5565/8542” \n';
          $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             $payload = json_encode([
                 'sourceId' => $sourceId,
