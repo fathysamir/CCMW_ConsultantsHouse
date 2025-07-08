@@ -1427,7 +1427,7 @@ class FileDocumentController extends ApiController
             'success' => true,
         ]);
     }
-
+/////////////////////////////////////////////////////////////
     public function create_ai_pdf(Request $request)
     {
         $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');

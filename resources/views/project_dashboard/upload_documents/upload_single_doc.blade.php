@@ -19,7 +19,45 @@
                     <form method="post" action="{{ route('project.upload_single_doc.store') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" id="doc_id" name="doc_id" required value="">
+                        <div class="custom-control custom-checkbox" style="margin-bottom: 5px;">
+                            <input type="checkbox" class="custom-control-input"id="use_ai" checked>
+                            <label class="custom-control-label" for="use_ai" style="padding-top: 3px;">Use AI</label>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center;">
+                            <hr style="flex: 1; margin: 0;">
+                        </div>
                         <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="file">Document <span style="color: red">*</span></label>
+                                        {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
+                                            style="cursor: pointer;"></span> --}}
+                                        <div style="display: flex;cursor: pointer;">
+
+                                            <img class="d-none" id="ocr_image"
+                                                src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
+                                                width="30"height="30" title="OCR" style="margin-bottom: -20px;">
+
+                                            <img class="d-none"
+                                                src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                width="50"
+                                                style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
+                                                title="PDF">
+                                        </div>
+
+                                    </div>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile">
+                                        <label class="custom-file-label" for="customFile">Choose File</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div class="progress d-none">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Name Input -->
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
@@ -46,37 +84,6 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="form-group mb-3">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <label for="file">Document <span style="color: red">*</span></label>
-                                        {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
-                                            style="cursor: pointer;"></span> --}}
-                                        <div style="display: flex;cursor: pointer;">
-
-                                            <img class="d-none" id="ocr_image"
-                                                src="{{ asset('/dashboard/assets/selected_images/ocr.png') }}"
-                                                width="30"height="30" title="OCR" style="margin-bottom: -20px;">
-
-                                            <img class="d-none"
-                                                src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
-                                                width="50"
-                                                style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
-                                                title="PDF">
-                                        </div>
-
-                                    </div>
-                                    <div class="custom-file">
-                                        <input type="file" disabled class="custom-file-input" id="customFile">
-                                        <label class="custom-file-label" for="customFile">Choose File</label>
-                                    </div>
-                                    <div class="mt-2">
-                                        <div class="progress d-none">
-                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label for="Subject">Subject <span style="color: red">*</span></label>
@@ -270,9 +277,10 @@
             $('#customFile').on('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
-
+                let use_ai = $("#use_ai").prop("checked") ? 1 : 0
                 const formData = new FormData();
                 formData.append('file', file);
+                formData.append('use_ai', use_ai);
 
                 // Show progress bar
                 const $progress = $('.progress');
@@ -367,20 +375,20 @@
             // Initialize on page load (in case of form repopulation)
             toggleEndDate();
 
-            const typeSelect = document.getElementById("type");
-            const ownerSelect = document.getElementById("owner");
-            const fileInput = document.getElementById("customFile");
+            //const typeSelect = document.getElementById("type");
+            //const ownerSelect = document.getElementById("owner");
+            //const fileInput = document.getElementById("customFile");
 
-            function checkInputs() {
-                if (typeSelect.value !== "" && ownerSelect.value !== "") {
-                    fileInput.removeAttribute("disabled");
-                } else {
-                    fileInput.setAttribute("disabled", true);
-                }
-            }
+            //function checkInputs() {
+            //    if (typeSelect.value !== "" && ownerSelect.value !== "") {
+            //        fileInput.removeAttribute("disabled");
+            //    } else {
+            //        fileInput.setAttribute("disabled", true);
+            //    }
+            //}
 
-            typeSelect.addEventListener("change", checkInputs);
-            ownerSelect.addEventListener("change", checkInputs);
+            // typeSelect.addEventListener("change", checkInputs);
+            // ownerSelect.addEventListener("change", checkInputs);
 
 
 

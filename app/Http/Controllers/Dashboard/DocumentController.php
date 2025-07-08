@@ -14,6 +14,7 @@ use App\Models\StorageFile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use setasign\Fpdi\Fpdi;
 
 class DocumentController extends ApiController
 {
@@ -84,48 +85,177 @@ class DocumentController extends ApiController
             'file' => 'required|file|max:512000', // 10MB max
         ]);
 
-        $file = $request->file('file');
-        $name = $file->getClientOriginalName();
-        $size = $file->getSize();
-        $type = $file->getMimeType();
+        $file            = $request->file('file');
+        $name            = $file->getClientOriginalName();
+        $size            = $file->getSize();
+        $type            = $file->getMimeType();
+        $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->pluck('description')->toArray();
 
         $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
-        if ($storageFile) {
-            session(['path' => $storageFile->path]);
 
-            return response()->json([
-                'success' => true,
-                'file'    => $storageFile,
+        if (! $storageFile) {
+            $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $cleanedName          = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
+            $fileName             = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            // Create project-specific folder in public path
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/documents';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            // Move file to public folder
+            $file->move($path, $fileName);
+
+            // Save file info to database
+            $storageFile = StorageFile::create([
+                'user_id'    => auth()->user()->id,
+                'project_id' => auth()->user()->current_project_id,
+                'file_name'  => $name,
+                'size'       => $size,
+                'file_type'  => $type,
+                'path'       => $projectFolder . '/' . $fileName,
             ]);
+            session(['path' => $projectFolder . '/' . $fileName]);
+        } else {
+            session(['path' => $storageFile->path]);
         }
-        $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $cleanedName          = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
-        $fileName             = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+        if ($request->use_ai == '1') {
+            $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
+            $sourcePath    = public_path($storageFile->path);
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
 
-        // Create project-specific folder in public path
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/documents';
-        $path          = public_path($projectFolder);
-        if (! file_exists($path)) {
-            mkdir($path, 0777, true);
+                mkdir($path, 0755, true);
+            }
+            $imagick = new \Imagick();
+            $imagick->setResolution(300, 300); // زيادة الدقة
+            $imagick->readImage($sourcePath . '[0]');
+            $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
+
+            if (! file_exists($directoryeee)) {
+                mkdir($directoryeee, 0755, true); // true = create nested directories
+            }
+            $imagick->setImageFormat('pdf');
+            $imagick->setImageCompressionQuality(100);
+            $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
+            $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            $pdf        = new Fpdi;
+            $pageCount  = $pdf->setSourceFile($sourcePath);
+            $templateId = $pdf->importPage(1);
+            $size       = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
+            $pdf->Output('F', $targetPath);
+            $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
+            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
+            $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            //dd($url);
+            $payload = json_encode([
+                'url' => $url,
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => 'https://api.chatpdf.com/v1/sources/add-url',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS     => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                // handle error
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+
+            // Access sourceId from response
+            $sourceId = $data['sourceId'] ?? null;
+            $message='Provided that we have the following list of document types: \n ';
+            foreach($documents_types as $des){
+                $message .='■' . $des;
+            }
+            $message .= 'Please select from the list the document type or answer with “No Match”. \n Please limit your answer to the needed information without additional words.';
+            $payload  = json_encode([
+                'sourceId' => $sourceId,
+                'messages' => [
+                    [
+                        'role'    => 'user',
+                        'content' => $message,
+                    ],
+                ],
+            ]);
+
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => 'https://api.chatpdf.com/v1/chats/message',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS     => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
+
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+
+            // Get the response content
+            $answer = $data['content'] ?? 'No answer found';
+            if ($code != null) {
+                $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+                if (File::exists($filePath)) {
+                    File::deleteDirectory($filePath);
+                }
+            }
+dd($data,$answer);
+        } else {
+            $type_id = '';
         }
-
-        // Move file to public folder
-        $file->move($path, $fileName);
-
-        // Save file info to database
-        $storageFile = StorageFile::create([
-            'user_id'    => auth()->user()->id,
-            'project_id' => auth()->user()->current_project_id,
-            'file_name'  => $name,
-            'size'       => $size,
-            'file_type'  => $type,
-            'path'       => $projectFolder . '/' . $fileName,
-        ]);
-        session(['path' => $projectFolder . '/' . $fileName]);
-
         return response()->json([
             'success' => true,
             'file'    => $storageFile,
+            'type_id' => $type_id,
         ]);
     }
 
@@ -343,8 +473,8 @@ class DocumentController extends ApiController
         $skippedDocs  = [];                 // To track already existing documents
 
         foreach ($request->document_ids as $documentId) {
-            $sections=[];
-            $fileDoc = FileDocument::where('file_id', $request->file_id)
+            $sections = [];
+            $fileDoc  = FileDocument::where('file_id', $request->file_id)
                 ->where('document_id', $documentId)
                 ->first();
 
@@ -579,7 +709,7 @@ class DocumentController extends ApiController
 
             $gantt_chart->lp_sd = $start_date;
             $gantt_chart->lp_fd = $end_date;
- 
+
             $sections[] = [
                 'sd'    => $start_date,
                 'fd'    => $end_date,
