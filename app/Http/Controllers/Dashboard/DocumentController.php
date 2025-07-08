@@ -208,12 +208,20 @@ class DocumentController extends ApiController
                 $message .= '■ ' . $des . '\n';
             }
             $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'and and and';
             $message .= 'Provided that we have the following list of stakeholders: \n';
-            foreach ($stake_holders as $stake_holder){
-                $message .= $stake_holder->name? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            foreach ($stake_holders as $stake_holder) {
+                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
-            $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
+            $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
+            $message .= 'and and and';
+            /////////////////////////////////////////////////////////////////////////////////////////
+            $message .= 'Provided that we have the following list of stakeholders: \n';
+            foreach ($stake_holders as $stake_holder) {
+                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            }
+            $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
