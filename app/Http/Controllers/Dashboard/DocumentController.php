@@ -209,23 +209,27 @@ class DocumentController extends ApiController
             }
             $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
-            $message .= 'and and and';
+            $message .= 'and and and \n';
             $message .= 'Provided that we have the following list of stakeholders: \n';
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
             $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
-            $message .= 'and and and';
+            $message .= 'and and and \n';
             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'Provided that we have the following list of stakeholders: \n';
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
             $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
-            $message .= 'and and and';
+            $message .= 'and and and \n';
             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
-            $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....).';
+            $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
+            $message .= 'and and and \n';
+            /////////////////////////////////////////////////////////////////////////////////////////
+         $message .= ' Extract the reference from this PDF. this is example:“1455/fde/5565/8542” \n';
+         $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:.....). \n';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
