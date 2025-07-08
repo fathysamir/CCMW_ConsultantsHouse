@@ -231,7 +231,7 @@ class DocumentController extends ApiController
          $message .= ' Extract the reference from this PDF, the reference must be separated by "/" or "-" in the PDF and don\'t Extract from 2 places in PDF . this is example:“1455/fde/5565/8542” \n';
          $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
          $message .= 'then \n';
-         $message .= ' Extract other references mentioned in this PDF without Document_reference and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
+         $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
