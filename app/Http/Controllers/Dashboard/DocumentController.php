@@ -135,7 +135,7 @@ class DocumentController extends ApiController
             }
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            $imagick->readImage($sourcePath . '[0]');
+            $imagick->readImage($sourcePath);
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
