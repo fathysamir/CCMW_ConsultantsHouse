@@ -90,7 +90,7 @@ class DocumentController extends ApiController
         $size            = $file->getSize();
         $type            = $file->getMimeType();
         $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->pluck('description')->toArray();
-dd($documents_types);
+
         $storageFile = StorageFile::where('user_id', auth()->user()->id)->where('project_id', auth()->user()->current_project_id)->where('file_name', $name)->where('size', $size)->where('file_type', $type)->first();
 
         if (! $storageFile) {
@@ -202,9 +202,9 @@ dd($documents_types);
             $sourceId = $data['sourceId'] ?? null;
             $message='Provided that we have the following list of document types: \n ';
             foreach($documents_types as $des){
-                $message .='■' . $des . '\n';
+                $message .='■ ' . $des . '\n';
             }
-            $message .= 'Please select from the list the document type or answer with “No Match”. \n Please limit your answer to the needed information without additional words.';
+            $message .= 'Please select from this list the document type for that PDF. \n Please limit your answer to the needed information without additional words.';
             $payload  = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
@@ -248,7 +248,7 @@ dd($documents_types);
                     File::deleteDirectory($filePath);
                 }
             }
-dd($data,$answer);
+dd($answer);
         } else {
             $type_id = '';
         }
