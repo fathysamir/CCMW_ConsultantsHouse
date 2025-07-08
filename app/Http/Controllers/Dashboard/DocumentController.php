@@ -122,136 +122,136 @@ class DocumentController extends ApiController
             session(['path' => $storageFile->path]);
         }
         if ($request->use_ai == '1') {
-            // $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
-            // if (file_exists($path2)) {
-            //     unlink($path2);
-            // }
-            // $sourcePath    = public_path($storageFile->path);
-            // $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
-            // $path          = public_path($projectFolder);
-            // if (! file_exists($path)) {
+            $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
+            $sourcePath    = public_path($storageFile->path);
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
 
-            //     mkdir($path, 0755, true);
-            // }
-            // $imagick = new \Imagick();
-            // $imagick->setResolution(300, 300); // زيادة الدقة
-            // $imagick->readImage($sourcePath);
-            // $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
+                mkdir($path, 0755, true);
+            }
+            $imagick = new \Imagick();
+            $imagick->setResolution(300, 300); // زيادة الدقة
+            $imagick->readImage($sourcePath);
+            $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
-            // if (! file_exists($directoryeee)) {
-            //     mkdir($directoryeee, 0755, true); // true = create nested directories
-            // }
-            // $imagick->setImageFormat('pdf');
-            // $imagick->setImageCompressionQuality(100);
-            // $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
-            // $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
-            // $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-            // $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            if (! file_exists($directoryeee)) {
+                mkdir($directoryeee, 0755, true); // true = create nested directories
+            }
+            $imagick->setImageFormat('pdf');
+            $imagick->setImageCompressionQuality(100);
+            $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
+            $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
-            // if (! file_exists($directory)) {
-            //     mkdir($directory, 0755, true); // true = create nested directories
-            // }
-            // $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-            // $pdf        = new Fpdi;
-            // $pageCount  = $pdf->setSourceFile($sourcePath);
-            // for ($i = 1; $i <= 15 && $i <= $pageCount; $i++) {
-            //     $templateId = $pdf->importPage($i);
-            //     $size       = $pdf->getTemplateSize($templateId);
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            $pdf        = new Fpdi;
+            $pageCount  = $pdf->setSourceFile($sourcePath);
+            for ($i = 1; $i <= 15 && $i <= $pageCount; $i++) {
+                $templateId = $pdf->importPage($i);
+                $size       = $pdf->getTemplateSize($templateId);
 
-            //     $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            //     $pdf->useTemplate($templateId);
-            // }
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+            }
 
-            // $pdf->Output('F', $targetPath);
-            // $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            $pdf->Output('F', $targetPath);
+            $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
 
-            // if (file_exists($path2)) {
-            //     unlink($path2);
-            // }
-            // $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
-            // $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-            // //dd($url);
-            // $payload = json_encode([
-            //     'url' => $url,
-            // ]);
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
+            $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
+            $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            //dd($url);
+            $payload = json_encode([
+                'url' => $url,
+            ]);
 
-            // $ch = curl_init();
+            $ch = curl_init();
 
-            // curl_setopt_array($ch, [
-            //     CURLOPT_URL            => 'https://api.chatpdf.com/v1/sources/add-url',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_POST           => true,
-            //     CURLOPT_HTTPHEADER     => [
-            //         'x-api-key: ' . $apiKey,
-            //         'Content-Type: application/json',
-            //     ],
-            //     CURLOPT_POSTFIELDS     => $payload,
-            // ]);
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => 'https://api.chatpdf.com/v1/sources/add-url',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS     => $payload,
+            ]);
 
-            // $response = curl_exec($ch);
+            $response = curl_exec($ch);
 
-            // if (curl_errno($ch)) {
-            //     // handle error
-            //     $error = curl_error($ch);
-            //     curl_close($ch);
-            //     throw new \Exception("cURL Error: $error");
-            // }
+            if (curl_errno($ch)) {
+                // handle error
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
 
-            // curl_close($ch);
+            curl_close($ch);
 
-            // $data = json_decode($response, true);
+            $data = json_decode($response, true);
 
-            // // Access sourceId from response
-            // $sourceId = $data['sourceId'] ?? null;
-            // $message  = 'Provided that we have the following list of document types: \n ';
-            // foreach ($documents_types as $des) {
-            //     $message .= '■ ' . $des . '\n';
-            // }
-            // $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if not exist in this list. \n Please limit your answer to the needed information without additional words.';
-            // $payload = json_encode([
-            //     'sourceId' => $sourceId,
-            //     'messages' => [
-            //         [
-            //             'role'    => 'user',
-            //             'content' => $message,
-            //         ],
-            //     ],
-            // ]);
+            // Access sourceId from response
+            $sourceId = $data['sourceId'] ?? null;
+            $message  = 'Provided that we have the following list of document types: \n ';
+            foreach ($documents_types as $des) {
+                $message .= '■ ' . $des . '\n';
+            }
+            $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $payload = json_encode([
+                'sourceId' => $sourceId,
+                'messages' => [
+                    [
+                        'role'    => 'user',
+                        'content' => $message,
+                    ],
+                ],
+            ]);
 
-            // $ch = curl_init();
+            $ch = curl_init();
 
-            // curl_setopt_array($ch, [
-            //     CURLOPT_URL            => 'https://api.chatpdf.com/v1/chats/message',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_POST           => true,
-            //     CURLOPT_HTTPHEADER     => [
-            //         'x-api-key: ' . $apiKey,
-            //         'Content-Type: application/json',
-            //     ],
-            //     CURLOPT_POSTFIELDS     => $payload,
-            // ]);
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => 'https://api.chatpdf.com/v1/chats/message',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => [
+                    'x-api-key: ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS     => $payload,
+            ]);
 
-            // $response = curl_exec($ch);
+            $response = curl_exec($ch);
 
-            // if (curl_errno($ch)) {
-            //     $error = curl_error($ch);
-            //     curl_close($ch);
-            //     throw new \Exception("cURL Error: $error");
-            // }
+            if (curl_errno($ch)) {
+                $error = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception("cURL Error: $error");
+            }
 
-            // curl_close($ch);
+            curl_close($ch);
 
-            // $data = json_decode($response, true);
+            $data = json_decode($response, true);
 
-            // // Get the response content
-            // $answer = $data['content'] ?? 'No answer found';
-            // if ($code != null) {
-            //     $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
-            //     if (File::exists($filePath)) {
-            //         File::deleteDirectory($filePath);
-            //     }
-            // }
-            $type_id = '';
+            // Get the response content
+            $answer = $data['content'] ?? 'No answer found';
+            if ($code != null) {
+                $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+                if (File::exists($filePath)) {
+                    File::deleteDirectory($filePath);
+                }
+            }
+           dd($answer);
         } else {
             $type_id = '';
         }
