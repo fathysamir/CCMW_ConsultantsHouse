@@ -154,13 +154,13 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-             for ($i = 1; $i <= 15 && $i <= $pageCount; $i++) {
-            $templateId = $pdf->importPage($i);
-            $size       = $pdf->getTemplateSize($templateId);
+            for ($i = 1; $i <= 15 && $i <= $pageCount; $i++) {
+                $templateId = $pdf->importPage($i);
+                $size       = $pdf->getTemplateSize($templateId);
 
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($templateId);
-        }
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+            }
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
@@ -203,12 +203,12 @@ class DocumentController extends ApiController
 
             // Access sourceId from response
             $sourceId = $data['sourceId'] ?? null;
-            $message='Provided that we have the following list of document types: \n ';
-            foreach($documents_types as $des){
-                $message .='■ ' . $des . '\n';
+            $message  = 'Provided that we have the following list of document types: \n ';
+            foreach ($documents_types as $des) {
+                $message .= '■ ' . $des . '\n';
             }
-            $message .= 'Please select from this list the document type for that PDF. \n Please limit your answer to the needed information without additional words.';
-            $payload  = json_encode([
+            $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if not exist in this list. \n Please limit your answer to the needed information without additional words.';
+            $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
                     [
@@ -251,7 +251,7 @@ class DocumentController extends ApiController
                     File::deleteDirectory($filePath);
                 }
             }
-dd($answer);
+            $type_id = '';
         } else {
             $type_id = '';
         }
