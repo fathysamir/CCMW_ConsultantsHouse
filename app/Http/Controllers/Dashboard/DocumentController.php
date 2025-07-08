@@ -228,10 +228,15 @@ class DocumentController extends ApiController
             $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
             $message .= 'then \n';
             /////////////////////////////////////////////////////////////////////////////////////////
-         $message .= ' Extract the first reference from this PDF, the reference must be separated by "/" or "-" in the PDF and don\'t Extract from 2 places in PDF . this is example:“1455/fde/5565/8542” \n';
-         $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
-         $message .= 'then \n';
-         $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
+            $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as “1455/fde/5565/8542”. Return only this in the key:
+                            Document_reference: ...
+                            Then, if there are other reference numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",,":
+                            Document_threads: ...
+                            Do not repeat the main Document_reference in Document_threads.
+                            Return only the values in the keys above without additional explanation. \n';
+            //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
+            //  $message .= 'then \n';
+            //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
             $payload = json_encode([
                 'sourceId' => $sourceId,
                 'messages' => [
