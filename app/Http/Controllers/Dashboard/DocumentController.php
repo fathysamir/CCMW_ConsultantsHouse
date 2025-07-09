@@ -239,6 +239,8 @@ Do **NOT** consider or extract document type from any referenced threads or lett
             $message .= ' then, \n';
             $message .= 'Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
                             Document_subject: ...';
+
+            $message .= 'Don\'t make the sender the receiver or vice versa';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
             //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
