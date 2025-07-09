@@ -128,8 +128,7 @@ class DocumentController extends ApiController
                 unlink($path2);
             }
             $sourcePath    = public_path($storageFile->path);
-            $pdf2           = new Fpdi();
-            $pageCount_2     = $pdf2->setSourceFile($sourcePath);
+           
             $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
             $path          = public_path($projectFolder);
             if (! file_exists($path)) {
@@ -140,13 +139,10 @@ class DocumentController extends ApiController
 
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            if ($pageCount_2 > 1) {
-                $imagick->readImage($sourcePath . '[0-1]');
-
-            } else {
+            
                 $imagick->readImage($sourcePath);
 
-            }
+            
             dd("ddd");
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
@@ -166,23 +162,14 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-            if ($pageCount_2 > 1) {
-                for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
-                    $templateId = $pdf->importPage($i);
-                    $size       = $pdf->getTemplateSize($templateId);
-
-                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                    $pdf->useTemplate($templateId);
-                }
-
-            } else {
+          
                 $templateId = $pdf->importPage(1);
                 $size       = $pdf->getTemplateSize($templateId);
 
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                 $pdf->useTemplate($templateId);
 
-            }
+        
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
