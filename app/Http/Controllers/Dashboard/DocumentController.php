@@ -130,7 +130,6 @@ class DocumentController extends ApiController
             $sourcePath    = public_path($storageFile->path);
             $pdf           = new Fpdi();
             $pageCount     = $pdf->setSourceFile($sourcePath);
-            dd($pageCount);
             $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
             $path          = public_path($projectFolder);
             if (! file_exists($path)) {
@@ -139,7 +138,13 @@ class DocumentController extends ApiController
             }
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            $imagick->readImage($sourcePath . '[0]');
+            if ($pageCount > 1) {
+                $imagick->readImage($sourcePath . '[0-1]');
+
+            } else {
+                $imagick->readImage($sourcePath);
+
+            }
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
@@ -158,12 +163,23 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
+            if ($pageCount > 1) {
+                for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
+                    $templateId = $pdf->importPage($i);
+                    $size       = $pdf->getTemplateSize($templateId);
 
-            $templateId = $pdf->importPage(1);
-            $size       = $pdf->getTemplateSize($templateId);
+                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $pdf->useTemplate($templateId);
+                }
 
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($templateId);
+            } else {
+                $templateId = $pdf->importPage(1);
+                $size       = $pdf->getTemplateSize($templateId);
+
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+
+            }
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
