@@ -241,7 +241,8 @@ ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist
             $message .= 'Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
                             Document_subject: ...';
 
-            $message .= 'please please please Don\'t make the sender the receiver or vice versa';
+            $message .= 'please please please Don\'t make the sender the receiver or vice versa, For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter.
+Based on that and provided that we have the following list of stakeholders:';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
             //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
