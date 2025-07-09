@@ -15,7 +15,7 @@
             border-top: 5px solid blue;
             border-right: 5px solid green;
             border-bottom: 5px solid red;
-            border-left: 5px solid pink;
+            border-left: 5px solid rgb(177, 146, 6);
             width: 20px;
             height: 20px;
             -webkit-animation: spin 2s linear infinite;
