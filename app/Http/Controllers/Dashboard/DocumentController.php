@@ -135,14 +135,10 @@ class DocumentController extends ApiController
 
                 mkdir($path, 0755, true);
             }
-            $sourcePath    = public_path($storageFile->path);
 
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            
-                $imagick->readImage($sourcePath);
-
-            
+            $imagick->readImage($sourcePath . '[0-3]');
             dd("ddd");
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
@@ -162,14 +158,23 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-          
+            if ($pageCount > 1) {
+                for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
+                    $templateId = $pdf->importPage($i);
+                    $size       = $pdf->getTemplateSize($templateId);
+
+                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $pdf->useTemplate($templateId);
+                }
+
+            } else {
                 $templateId = $pdf->importPage(1);
                 $size       = $pdf->getTemplateSize($templateId);
 
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                 $pdf->useTemplate($templateId);
 
-        
+            }
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
