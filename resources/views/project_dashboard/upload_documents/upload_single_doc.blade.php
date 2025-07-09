@@ -230,7 +230,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#multi-select2').select2();
+           
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
 
