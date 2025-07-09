@@ -173,7 +173,7 @@ class DocumentController extends ApiController
             }
             $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
             $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-            //dd($url);
+            dd($url);
             $payload = json_encode([
                 'url' => $url,
             ]);
