@@ -148,7 +148,6 @@ class DocumentController extends ApiController
             $imagick->setImageCompressionQuality(100);
             $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
             $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
-            dd($sourcePath);
             $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
             $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
@@ -158,12 +157,13 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
+            for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
+                $templateId = $pdf->importPage($i);
+                $size       = $pdf->getTemplateSize($templateId);
 
-            $templateId = $pdf->importPage(1);
-            $size       = $pdf->getTemplateSize($templateId);
-
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($templateId);
+                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                $pdf->useTemplate($templateId);
+            }
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
