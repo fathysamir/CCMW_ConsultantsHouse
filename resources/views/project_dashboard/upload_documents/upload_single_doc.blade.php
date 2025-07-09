@@ -326,6 +326,7 @@
                                     window.open('/project/ocr_layer', '_blank');
                                 });
                             }
+                            console.log(response);
                             if (response.type_id) $('#type').val(response.type_id).trigger(
                                 'change');
                             if (response.sender_id) $('#from_id').val(response.sender_id)
