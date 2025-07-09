@@ -173,7 +173,7 @@ class DocumentController extends ApiController
             }
             $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
             $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-            dd($url);
+          
             $payload = json_encode([
                 'url' => $url,
             ]);
@@ -285,7 +285,7 @@ Based on that and provided that we have the following list of stakeholders:';
             curl_close($ch);
 
             $data = json_decode($response, true);
-
+dd($data);
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
             if ($code != null) {
