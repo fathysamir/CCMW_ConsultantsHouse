@@ -127,8 +127,8 @@ class DocumentController extends ApiController
             if (file_exists($path2)) {
                 unlink($path2);
             }
-            $sourcePath    = public_path($storageFile->path);
-           
+            $sourcePath = public_path($storageFile->path);
+
             $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
             $path          = public_path($projectFolder);
             if (! file_exists($path)) {
@@ -138,7 +138,7 @@ class DocumentController extends ApiController
 
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            $imagick->readImage($sourcePath . '[' . 0 . ']');
+            $imagick->readImage($sourcePath . '[0]');
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
@@ -157,14 +157,12 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-            
-                $templateId = $pdf->importPage(1);
-                $size       = $pdf->getTemplateSize($templateId);
 
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($templateId);
+            $templateId = $pdf->importPage(1);
+            $size       = $pdf->getTemplateSize($templateId);
 
-          
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
@@ -216,19 +214,21 @@ Based on that do you see that the uploaded document is a Letter? If yes respond 
 ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
-            $message .= 'Provided that we have the following list of stakeholders: \n';
-            foreach ($stake_holders as $stake_holder) {
-                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
-            }
-            $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
-            $message .= 'then \n';
-            /////////////////////////////////////////////////////////////////////////////////////////
+             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'Provided that we have the following list of stakeholders: \n';
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
             $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
             $message .= 'then \n';
+            //////////////////////////////////////////
+            $message .= 'Provided that we have the following list of stakeholders: \n';
+            foreach ($stake_holders as $stake_holder) {
+                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            }
+            $message .= 'Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
+            $message .= 'then \n';
+           
             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
             $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
