@@ -207,8 +207,7 @@ class DocumentController extends ApiController
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
             }
-            $message .= 'Please select from this list the document type for that PDF and Please identify only the document type of the uploaded PDF file based on its header, or layout.
-Do **NOT** consider or extract document type from any referenced threads or letters mentioned in the body text. or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $message .= 'Please select from this list the document type for that PDF and based on its header, or layout. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text. or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
             $message .= 'Provided that we have the following list of stakeholders: \n';
