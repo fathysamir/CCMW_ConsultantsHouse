@@ -128,20 +128,25 @@ class DocumentController extends ApiController
                 unlink($path2);
             }
             $sourcePath    = public_path($storageFile->path);
-            $pdf           = new Fpdi();
-            $pageCount_2     = $pdf->setSourceFile($sourcePath);
+            $pdf2           = new Fpdi();
+            $pageCount_2     = $pdf2->setSourceFile($sourcePath);
             $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
             $path          = public_path($projectFolder);
             if (! file_exists($path)) {
 
                 mkdir($path, 0755, true);
             }
+            $sourcePath    = public_path($storageFile->path);
+
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-          
+            if ($pageCount_2 > 1) {
+                $imagick->readImage($sourcePath . '[0-1]');
+
+            } else {
                 $imagick->readImage($sourcePath);
 
-           
+            }
             dd("ddd");
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
