@@ -346,7 +346,7 @@ Based on that and provided that we have the following list of stakeholders:';
                         }
                     }
                 } else {
-                    $sender_id = '';
+                    $receiver_id = '';
                 }
                 if (array_key_exists('Document_date', $result) && $result['Document_date'] != 'No Match') {
                     $start_date = $result['Document_date'];
