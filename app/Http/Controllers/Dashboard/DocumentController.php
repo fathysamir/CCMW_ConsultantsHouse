@@ -138,7 +138,7 @@ class DocumentController extends ApiController
 
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            $imagick->readImage($sourcePath . '[0]');
+            $imagick->readImage($sourcePath . '[0-1]');
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
@@ -148,6 +148,7 @@ class DocumentController extends ApiController
             $imagick->setImageCompressionQuality(100);
             $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
             $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            dd($sourcePath);
             $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
             $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
