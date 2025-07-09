@@ -229,10 +229,11 @@ class DocumentController extends ApiController
             $message .= 'then \n';
             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“1455/fde/5565/8542” or “145/fde/555” or “1455/fde/565/852”). Return only this in the key:
-                            Document_reference: ...
-                            Then, if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
+                            Document_reference: ...';
+            $message .='Then, ';
+            $message .='if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
                             Document_threads: ...
-                            Do not left any reference in any line.
+                            Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
