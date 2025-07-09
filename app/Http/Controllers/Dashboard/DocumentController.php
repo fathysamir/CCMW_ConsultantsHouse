@@ -218,7 +218,7 @@ ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
-            $message .= 'For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter.
+            $message .= 'For any letter, normally the sender’s name is provided in the letter’s head and / or within the signature of the letter.
 Based on that and provided that we have the following list of stakeholders. \n';
             $message .= ' Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
             $message .= 'then \n';
