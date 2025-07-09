@@ -230,6 +230,7 @@
 
     <script>
         $(document).ready(function() {
+            $('#multi-select2').select2();
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
 
@@ -338,14 +339,22 @@
                                 let fp = document.querySelector('#start_date')._flatpickr;
                                 if (fp) {
                                     fp.setDate(response.start_date,
-                                    true); // true = trigger change events
+                                        true); // true = trigger change events
                                 }
                             }
                             if (response.reference) $('#reference').val(response.reference);
                             if (response.subject) $('#Subject').val(response.subject);
 
-                            if (response.threads && response.threads.length) {
-                            console.log(response.threads);
+                            if (response.threads && response.threads.length > 0) {
+                                // Ensure options are available before setting the value
+                                response.threads.forEach(function(thread) {
+                                    if ($('#multi-select2 option[value="' + thread +
+                                            '"]').length === 0) {
+                                        $('#multi-select2').append(new Option(thread,
+                                            thread));
+                                    }
+                                });
+
                                 $('#multi-select2').val(response.threads).trigger('change');
                             }
 
