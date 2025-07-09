@@ -333,7 +333,14 @@
                                 .trigger('change');
                             if (response.receiver_id) $('#to_id').val(response.receiver_id)
                                 .trigger('change');
-                            if (response.start_date) $('#start_date').val(response.start_date);
+                            if (response.start_date) {
+                                // Get the flatpickr instance and set the date properly
+                                let fp = document.querySelector('#start_date')._flatpickr;
+                                if (fp) {
+                                    fp.setDate(response.start_date,
+                                    true); // true = trigger change events
+                                }
+                            }
                             if (response.reference) $('#reference').val(response.reference);
                             if (response.subject) $('#Subject').val(response.subject);
 
