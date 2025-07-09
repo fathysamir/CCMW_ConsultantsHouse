@@ -207,7 +207,8 @@ class DocumentController extends ApiController
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
             }
-            $message .= 'Please select from this list the document type for that PDF and Don\'t return document type of any thread or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $message .= 'Please select from this list the document type for that PDF and Please identify only the document type of the uploaded PDF file based on its header, or layout.
+Do **NOT** consider or extract document type from any referenced threads or letters mentioned in the body text. or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
             $message .= 'Provided that we have the following list of stakeholders: \n';
@@ -228,15 +229,15 @@ class DocumentController extends ApiController
             $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
             $message .= 'then \n';
             /////////////////////////////////////////////////////////////////////////////////////////
-            $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“1455/fde/5565/8542” or “145/fde/555” or “1455/fde/565/852”). Return only this in the key:
+            $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“xxx/xxx/xxx/...”). Return only this in the key:
                             Document_reference: ...';
-            $message .='Then, ';
-            $message .='if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
+            $message .= 'Then, ';
+            $message .= 'if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
                             Document_threads: ...
                             Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
-            $message .=' then, \n';
-            $message .='Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
+            $message .= ' then, \n';
+            $message .= 'Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
                             Document_subject: ...';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
