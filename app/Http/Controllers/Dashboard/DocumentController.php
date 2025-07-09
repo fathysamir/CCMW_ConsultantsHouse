@@ -129,7 +129,7 @@ class DocumentController extends ApiController
             }
             $sourcePath    = public_path($storageFile->path);
             $pdf           = new Fpdi();
-            $pageCount     = $pdf->setSourceFile($sourcePath);
+            $pageCount_2     = $pdf->setSourceFile($sourcePath);
             $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
             $path          = public_path($projectFolder);
             if (! file_exists($path)) {
@@ -138,7 +138,7 @@ class DocumentController extends ApiController
             }
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-            if ($pageCount > 1) {
+            if ($pageCount_2 > 1) {
                 $imagick->readImage($sourcePath . '[0-1]');
 
             } else {
@@ -163,7 +163,7 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-            if ($pageCount > 1) {
+            if ($pageCount_2 > 1) {
                 for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
                     $templateId = $pdf->importPage($i);
                     $size       = $pdf->getTemplateSize($templateId);
