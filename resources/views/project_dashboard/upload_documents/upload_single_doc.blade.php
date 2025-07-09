@@ -7,6 +7,41 @@
             background-color: #fff !important;
         }
     </style>
+
+    <style>
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid blue;
+            border-right: 5px solid green;
+            border-bottom: 5px solid red;
+            border-left: 5px solid pink;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
     <h2 class="page-title">Upload a New Document</h2>
 
     <div class="card shadow mb-4">
@@ -230,7 +265,7 @@
 
     <script>
         $(document).ready(function() {
-           
+
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
 
@@ -276,6 +311,9 @@
             });
 
             $('#customFile').on('change', function(e) {
+                $('.custom-file-label')
+                    .empty() // Remove any existing content
+                    .append('<div class="loader"></div>');
                 const file = e.target.files[0];
                 if (!file) return;
                 let use_ai = $("#use_ai").prop("checked") ? 1 : 0
@@ -311,6 +349,7 @@
                             const file = response.file;
 
                             // Update file label
+                            $('.custom-file-label').empty();
                             $('.custom-file-label').text(file.file_name);
                             $('#doc_id').val(file.id);
                             // Show PDF viewer icon if it's a PDF
