@@ -207,7 +207,7 @@ class DocumentController extends ApiController
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
             }
-            $message .= 'Please select from this list the document type for that PDF or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $message .= 'Please select from this list the document type for that PDF and Don\'t return document type of any thread or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
             $message .= 'Provided that we have the following list of stakeholders: \n';
@@ -235,6 +235,9 @@ class DocumentController extends ApiController
                             Document_threads: ...
                             Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
+            $message .=' then, \n';
+            $message .='Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
+                            Document_subject: ...';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
             //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
