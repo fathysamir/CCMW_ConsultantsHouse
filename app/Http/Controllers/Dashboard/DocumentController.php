@@ -157,13 +157,13 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-            for ($i = 1; $i <= 2 && $i <= $pageCount; $i++) {
-                $templateId = $pdf->importPage($i);
+            
+                $templateId = $pdf->importPage(1);
                 $size       = $pdf->getTemplateSize($templateId);
 
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                 $pdf->useTemplate($templateId);
-            }
+            
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
@@ -213,7 +213,41 @@ class DocumentController extends ApiController
             $message .= 'Letters are normally issued on a specific date and has a reference number and subject.  It should be signed at the end and most likely start with “Dear Sir” or “Dear Sirs”.
 Based on that do you see that the uploaded document is a Letter? If yes respond by “Letter” and if not  provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
 ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
-           
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            $message .= 'then \n';
+            $message .= 'Provided that we have the following list of stakeholders: \n';
+            foreach ($stake_holders as $stake_holder) {
+                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            }
+            $message .= 'For any letter, normally the sender’s name is provided in the letter’s head and / or within the signature of the letter.
+Based on that and provided that we have the following list of stakeholders. \n';
+            $message .= ' Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
+            $message .= 'then \n';
+            /////////////////////////////////////////////////////////////////////////////////////////
+            $message .= 'Provided that we have the following list of stakeholders: \n';
+            foreach ($stake_holders as $stake_holder) {
+                $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            }
+            $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
+            $message .= 'then \n';
+            /////////////////////////////////////////////////////////////////////////////////////////
+            $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
+            $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
+            $message .= 'then \n';
+            /////////////////////////////////////////////////////////////////////////////////////////
+            $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“xxx/xxx/xxx/...”). Return only this in the key:
+                            Document_reference: ...';
+            $message .= 'Then, ';
+            $message .= 'if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
+                            Document_threads: ...
+                            Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
+                            Return only the values in the keys above without additional explanation . \n';
+            $message .= ' then, \n';
+            $message .= 'Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
+                            Document_subject: ...';
+
+            $message .= 'please please please Don\'t make the sender the receiver or vice versa, For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter.
+Based on that and provided that we have the following list of stakeholders:';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
             //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
