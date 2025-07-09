@@ -157,13 +157,12 @@ class DocumentController extends ApiController
             $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
             $pdf        = new Fpdi;
             $pageCount  = $pdf->setSourceFile($sourcePath);
-            
-                $templateId = $pdf->importPage(1);
-                $size       = $pdf->getTemplateSize($templateId);
 
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($templateId);
-            
+            $templateId = $pdf->importPage(1);
+            $size       = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
 
             $pdf->Output('F', $targetPath);
             $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
@@ -173,7 +172,7 @@ class DocumentController extends ApiController
             }
             $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
             $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-          
+
             $payload = json_encode([
                 'url' => $url,
             ]);
@@ -284,7 +283,7 @@ Based on that and provided that we have the following list of stakeholders:';
             curl_close($ch);
 
             $data = json_decode($response, true);
-dd($data);
+            
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
             if ($code != null) {
@@ -293,14 +292,114 @@ dd($data);
                     File::deleteDirectory($filePath);
                 }
             }
-            dd($answer);
+            if ($answer != 'No answer found') {
+                $lines  = explode("\n", trim($answer));
+                $result = [];
+
+                foreach ($lines as $line) {
+                    $parts = explode(':', $line, 2);
+                    if (count($parts) == 2) {
+                        $key          = trim($parts[0]);
+                        $value        = trim($parts[1]);
+                        $result[$key] = $value;
+                    }
+                }
+                if (array_key_exists('Document_type', $result) && $result['Document_type'] != 'No Match') {
+                    $documents_type = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('description', trim($result['Document_type']))->first();
+                    if ($documents_type) {
+                        $type_id = $documents_type->id;
+                    } else {
+                        $type_id = '';
+                    }
+
+                } else {
+                    $type_id = '';
+                }
+                if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
+                    $sender = $stake_holders->where('name', $result['Document_sender'])->first();
+                    if ($sender) {
+                        $sender_id = $sender->id;
+                    } else {
+                        $sender = $stake_holders->where('narrative', $result['Document_sender'])->first();
+                        if ($sender) {
+                            $sender_id = $sender->id;
+                        } else {
+                            $sender_id = '';
+                        }
+                    }
+                } else {
+                    $sender_id = '';
+                }
+
+                if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
+                    $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
+                    if ($receiver) {
+                        $receiver_id = $receiver->id;
+                    } else {
+                        $receiver = $stake_holders->where('narrative', $result['Document_receiver'])->first();
+                        if ($receiver) {
+                            $receiver_id = $receiver->id;
+                        } else {
+                            $receiver_id = '';
+                        }
+                    }
+                } else {
+                    $sender_id = '';
+                }
+                if (array_key_exists('Document_date', $result) && $result['Document_date'] != 'No Match') {
+                    $start_date = $result['Document_date'];
+                } else {
+                    $start_date = '';
+                }
+
+                if (array_key_exists('Document_reference', $result) && $result['Document_reference'] != 'No Match' && $result['Document_subject'] != '') {
+                    $reference = $result['Document_reference'];
+                } else {
+                    $reference = '';
+                }
+                if (array_key_exists('Document_subject', $result) && $result['Document_subject'] != 'No Match' && $result['Document_subject'] != '') {
+                    $subject = $result['Document_subject'];
+                } else {
+                    $subject = '';
+                }
+
+                if (array_key_exists('Document_threads', $result) && $result['Document_threads'] != 'No Match' && $result['Document_subject'] != '') {
+                    $x       = $result['Document_threads'];
+                    $threads = array_map('trim', explode(',', $x));
+                } else {
+                    $threads = [];
+                }
+
+            } else {
+                $type_id     = '';
+                $sender_id   = '';
+                $receiver_id = '';
+                $start_date  = '';
+                $reference   = '';
+                $subject     = '';
+                $threads     = [];
+            }
+
         } else {
-            $type_id = '';
+            $type_id     = '';
+            $sender_id   = '';
+            $receiver_id = '';
+            $start_date  = '';
+            $reference   = '';
+            $subject     = '';
+            $threads     = [];
+
         }
         return response()->json([
-            'success' => true,
-            'file'    => $storageFile,
-            'type_id' => $type_id,
+            'success'     => true,
+            'file'        => $storageFile,
+            'type_id'     => $type_id,
+            'sender_id'   => $sender_id,
+            'receiver_id' => $receiver_id,
+            'start_date'  => $start_date,
+            'reference'   => $reference,
+            'subject'     => $subject,
+            'threads'     => $threads,
         ]);
     }
 
