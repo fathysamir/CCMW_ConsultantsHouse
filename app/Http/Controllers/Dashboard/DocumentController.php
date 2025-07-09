@@ -138,17 +138,8 @@ class DocumentController extends ApiController
 
             $imagick = new \Imagick();
             $imagick->setResolution(300, 300); // زيادة الدقة
-           // $imagick->readImage($sourcePath . '[0-1]');
-            $pageCount = $imagick->getNumberImages();
+            $imagick->readImage($sourcePath . '[0]');
 
-
-            if ($pageCount > 1) {
-                // Read only first 2 pages
-                $imagick->readImage($sourcePath . '[0-1]');
-            } else {
-                // Read the single page
-                $imagick->readImage($sourcePath);
-            }
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
