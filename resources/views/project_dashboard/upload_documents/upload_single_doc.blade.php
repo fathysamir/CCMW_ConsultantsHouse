@@ -345,6 +345,7 @@
                             if (response.subject) $('#Subject').val(response.subject);
 
                             if (response.threads && response.threads.length) {
+                            console.log(response.threads);
                                 $('#multi-select2').val(response.threads).trigger('change');
                             }
 
