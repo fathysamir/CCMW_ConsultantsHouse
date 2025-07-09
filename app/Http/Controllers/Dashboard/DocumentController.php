@@ -227,7 +227,7 @@ Based on that and provided that we have the following list of stakeholders. \n';
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
             }
-            $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender cannot be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
+            $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender is not be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
             $message .= 'then \n';
             /////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
