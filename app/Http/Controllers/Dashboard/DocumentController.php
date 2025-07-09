@@ -240,7 +240,7 @@ ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist
             $message .= 'Please provide the Subject of the letter. \n Please limit your answer to the needed information without additional words. Return only this in the key:
                             Document_subject: ...';
 
-            $message .= 'Don\'t make the sender the receiver or vice versa , sender is before receiver in document';
+            $message .= 'please please please Don\'t make the sender the receiver or vice versa';
             //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
             //  $message .= 'then \n';
             //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
