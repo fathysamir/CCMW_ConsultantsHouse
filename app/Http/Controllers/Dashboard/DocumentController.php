@@ -145,6 +145,7 @@ class DocumentController extends ApiController
                 $imagick->readImage($sourcePath);
 
             }
+            dd("ddd");
             $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
             if (! file_exists($directoryeee)) {
