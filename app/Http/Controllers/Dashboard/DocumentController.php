@@ -206,6 +206,7 @@ class DocumentController extends ApiController
 
             // Access sourceId from response
             $sourceId = $data['sourceId'] ?? null;
+            dd($sourceId,$data);
             $message  = 'Provided that we have the following list of document types: \n ';
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
@@ -292,7 +293,7 @@ Based on that and provided that we have the following list of stakeholders:';
 
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
-            dd($sourceId,$data);
+            
             if ($code != null) {
                 $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
                 if (File::exists($filePath)) {
