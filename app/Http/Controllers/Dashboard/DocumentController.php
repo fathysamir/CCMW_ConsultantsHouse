@@ -210,10 +210,15 @@ class DocumentController extends ApiController
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
             }
-            $message .= ' provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
-ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            $message .= ' Letters are normally issued on a specific date and has a reference number and subject.  It should be signed at the end and most likely start with “Dear Sir” or “Dear Sirs”.
+Based on that do you see that the uploaded document is a Letter? If yes say “Letter” .
+If it is an e-mail say “e-mail”
+If not, and provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
+ref. no. xxxx/xxxx/xxxx/xx". Please identify which of the above listed document types was mentioned in the document.
+Please provide the first match only and limit your answer to the needed information without additional words or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
+            $message .= '';
             $message .= 'Provided that we have the following list of stakeholders: \n';
             foreach ($stake_holders as $stake_holder) {
                 $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
