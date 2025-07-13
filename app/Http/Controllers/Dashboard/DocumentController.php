@@ -206,7 +206,7 @@ class DocumentController extends ApiController
 
             // Access sourceId from response
             $sourceId = $data['sourceId'] ?? null;
-            dd($sourceId,$data);
+           
             $message  = 'Provided that we have the following list of document types: \n ';
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
