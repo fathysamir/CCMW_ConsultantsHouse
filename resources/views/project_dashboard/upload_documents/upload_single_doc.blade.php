@@ -10,16 +10,33 @@
 
     <style>
         .loader {
-            border: 5px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 5px solid blue;
-            border-right: 5px solid green;
-            border-bottom: 5px solid red;
-            border-left: 5px solid rgb(251, 255, 22);
             width: 20px;
             height: 20px;
-            -webkit-animation: spin 2s linear infinite;
-            animation: spin 2s linear infinite;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top: 5px solid transparent;
+
+            background: conic-gradient(red,
+                    orange,
+                    yellow,
+                    green,
+                    cyan,
+                    blue,
+                    violet,
+                    red);
+            animation: spin 1s linear infinite;
+            mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @-webkit-keyframes spin {
