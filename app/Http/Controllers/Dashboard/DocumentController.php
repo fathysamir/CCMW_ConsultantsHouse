@@ -208,7 +208,7 @@ class DocumentController extends ApiController
             $sourceId = $data['sourceId'] ?? null;
             $message  = 'Letters are normally issued on a specific date and has a reference number and subject.  It should be signed at the end and most likely start with “Dear Sir” or “Dear Sirs”.
 Based on that do you see that the uploaded document is a Letter? If yes answer with “Letter” and stop.
-If not, and it is an e-mail formate answer with “e-mail” and stop
+If not, and if it is an e-mail formate answer with “e-mail” and stop
 If not, and provided that we have the following list of document types: \n ';
             foreach ($documents_types as $des) {
                 $message .= '■ ' . $des . '\n';
