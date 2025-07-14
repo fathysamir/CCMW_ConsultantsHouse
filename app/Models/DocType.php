@@ -19,7 +19,9 @@ class DocType extends Model
         'order',
         'description',
         'relevant_word',
-        'shortcut'
+        'shortcut',
+        'from',
+        'to'
     ];
 
     protected $allowedSorts = [
