@@ -210,8 +210,14 @@ class DocumentController extends ApiController
 Based on that do you see that the uploaded document is a Letter? If yes answer with “Letter” and stop.
 If not, and if it is an e-mail formate answer with “e-mail” and stop
 If not, and provided that we have the following list of document types: \n ';
+            $x = ["email","e-mail" ,"letter"];
             foreach ($documents_types as $des) {
-                $message .= '■ ' . $des . '\n';
+                $xxx=strtolower($des);
+                $found = array_filter($x, fn($word) => str_contains($xxx, $word));
+                if (empty($found)) {
+                    $message .= '■ ' . $des . '\n';
+                }
+
             }
             $message .= ' provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
 ref. no. xxxx/xxxx/xxxx/xx". Please identify which of the above listed document types was mentioned in the document.
@@ -291,7 +297,7 @@ Based on that and provided that we have the following list of stakeholders:';
 
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
-            
+
             if ($code != null) {
                 $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
                 if (File::exists($filePath)) {
