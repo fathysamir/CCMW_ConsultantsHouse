@@ -27,7 +27,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="from_id">From</label>
-                                    <select class="form-control" id="from_id" name="from_id">
+                                    <select class="form-control" id="from_id" name="from">
                                         <option selected disabled>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
                                             <option value="{{ $stake_holder->id }}" {{ $document_type->from == $stake_holder->id ? 'selected' : '' }}>{{ $stake_holder->narrative }} -
@@ -41,7 +41,7 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="to_id">To</label>
-                                    <select class="form-control" id="to_id" name="to_id">
+                                    <select class="form-control" id="to_id" name="to">
                                         <option selected disabled>please select</option>
                                         @foreach ($stake_holders as $stake_holder)
                                             <option value="{{ $stake_holder->id }}" {{ $document_type->to == $stake_holder->id ? 'selected' : '' }}>{{ $stake_holder->narrative }} -
