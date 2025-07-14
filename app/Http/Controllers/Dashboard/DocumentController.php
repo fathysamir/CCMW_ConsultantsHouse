@@ -206,22 +206,12 @@ class DocumentController extends ApiController
 
             // Access sourceId from response
             $sourceId = $data['sourceId'] ?? null;
-            $message  = 'A Letter is a formal written communication sent from one party to another. It is typically issued on a specific date, contains a reference number and subject, and is signed at the end by the sender. Most likely, its body begins with “Dear Sir” or “Dear Sirs.”
-Based on the above, do you consider the uploaded document to be a Letter? If yes, answer with “Letter” and stop.
-If not, If not, and if you see that the document represents an e-mail message, answer with "e-mail" and stop.
-If not, and provided that we have the following list of document types: \n ';
-            $x = ["email","e-mail" ,"letter"];
+            $message  = 'Provided that we have the following list of document types: \n ';
             foreach ($documents_types as $des) {
-                $xxx=strtolower($des);
-                $found = array_filter($x, fn($word) => str_contains($xxx, $word));
-                if (empty($found)) {
-                    $message .= '■ ' . $des . '\n';
-                }
-
+                $message .= '■ ' . $des . '\n';
             }
             $message .= ' provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
-ref. no. xxxx/xxxx/xxxx/xx". Please identify which of the above listed document types was mentioned in the document.
-Please answer with providing the first match only and limit your answer to the needed information without additional words, and if no match please answer with “No March”. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
             ///////////////////////////////////////////////////////////////////////////////////////////
             $message .= 'then \n';
             $message .= 'Provided that we have the following list of stakeholders: \n';
@@ -297,7 +287,7 @@ Based on that and provided that we have the following list of stakeholders:';
 
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
-
+            
             if ($code != null) {
                 $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
                 if (File::exists($filePath)) {
