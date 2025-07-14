@@ -21,7 +21,7 @@
                             <label for="example-description">Description</label>
                             <textarea id="example-email" rows="5" name="description" class="form-control" placeholder="Description"></textarea>
                         </div>
-<div class="row">
+                        <div class="row">
                             <!-- Name Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
