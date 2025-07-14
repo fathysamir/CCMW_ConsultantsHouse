@@ -41,4 +41,13 @@ class DocType extends Model
     {
         return $this->belongsTo(Account::class, 'account_id', 'id')->withTrashed();
     }
+
+    public function fromStakeHolder()
+    {
+        return $this->belongsTo(StakeHolder::class, 'from', 'id')->withTrashed();
+    }
+    public function toStakeHolder()
+    {
+        return $this->belongsTo(StakeHolder::class, 'to', 'id')->withTrashed();
+    }
 }

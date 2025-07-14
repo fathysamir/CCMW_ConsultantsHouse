@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard\settings;
 
 use App\Http\Controllers\ApiController;
 use App\Models\DocType;
+use App\Models\Project;
 use Illuminate\Http\Request;
 
 class DocumentTypeController extends ApiController
@@ -29,7 +30,9 @@ class DocumentTypeController extends ApiController
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return view('account_dashboard.document_types.create');
         } else {
-            return view('project_dashboard.document_types.create');
+            $project = Project::findOrFail(auth()->user()->current_project_id);
+            $stake_holders   = $project->stakeHolders;
+            return view('project_dashboard.document_types.create',compact('stake_holders'));
         }
     }
 
@@ -39,6 +42,8 @@ class DocumentTypeController extends ApiController
             'account_id' => auth()->user()->current_account_id,
             'name' => $request->name,
             'description' => $request->description,
+            'from' => $request->from,
+            'to' =>$request->to,
             'relevant_word' => $request->relevant_word,
             'order' => $request->order ? intval($request->order) : 0]);
         if ($request->shortcut) {
@@ -63,7 +68,9 @@ class DocumentTypeController extends ApiController
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return view('account_dashboard.document_types.edit', compact('document_type'));
         } else {
-            return view('project_dashboard.document_types.edit', compact('document_type'));
+            $project = Project::findOrFail(auth()->user()->current_project_id);
+            $stake_holders   = $project->stakeHolders;
+            return view('project_dashboard.document_types.edit', compact('document_type','stake_holders'));
         }
     }
 

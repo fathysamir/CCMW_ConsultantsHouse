@@ -52,6 +52,8 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Description</th>
+                                <th>From</th>
+                                <th>To</th>
                                 <th>Relevant Verb</th>
                                 <th>Order</th>
                                 <th>Action</th>
@@ -73,6 +75,8 @@
                                             {{ $type->description }}
                                         @endif
                                     </td>
+                                    <td>{{ $type->fromStakeHolder? $type->fromStakeHolder->narrative : '__' }}</td>
+                                    <td>{{ $type->toStakeHolder? $type->toStakeHolder->narrative : '__' }}</td>
                                     <td>{{ $type->relevant_word?? '__' }}</td>
                                     <td>{{ $type->order }}</td>
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
