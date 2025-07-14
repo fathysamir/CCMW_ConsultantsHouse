@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard\settings;
 
 use App\Http\Controllers\ApiController;
@@ -11,7 +10,7 @@ class DocumentTypeController extends ApiController
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user           = auth()->user();
         $document_types = DocType::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->orderBy('order', 'asc')->get();
         if (auth()->user()->current_account_id == null) {
             return view('dashboard.document_types.index', compact('document_types'));
@@ -30,22 +29,22 @@ class DocumentTypeController extends ApiController
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return view('account_dashboard.document_types.create');
         } else {
-            $project = Project::findOrFail(auth()->user()->current_project_id);
-            $stake_holders   = $project->stakeHolders;
-            return view('project_dashboard.document_types.create',compact('stake_holders'));
+            $project       = Project::findOrFail(auth()->user()->current_project_id);
+            $stake_holders = $project->stakeHolders;
+            return view('project_dashboard.document_types.create', compact('stake_holders'));
         }
     }
 
     public function store(Request $request)
     {
-        $type=DocType::create(['project_id' => auth()->user()->current_project_id,
-            'account_id' => auth()->user()->current_account_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'from' => $request->from,
-            'to' =>$request->to,
-            'relevant_word' => $request->relevant_word,
-            'order' => $request->order ? intval($request->order) : 0]);
+        $type = DocType::create(['project_id' => auth()->user()->current_project_id,
+            'account_id'                          => auth()->user()->current_account_id,
+            'name'                                => $request->name,
+            'description'                         => $request->description,
+            'from'                                => $request->from,
+            'to'                                  => $request->to,
+            'relevant_word'                       => $request->relevant_word,
+            'order'                               => $request->order ? intval($request->order) : 0]);
         if ($request->shortcut) {
             $type->shortcut = '1';
         }
@@ -68,21 +67,23 @@ class DocumentTypeController extends ApiController
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return view('account_dashboard.document_types.edit', compact('document_type'));
         } else {
-            $project = Project::findOrFail(auth()->user()->current_project_id);
-            $stake_holders   = $project->stakeHolders;
-            return view('project_dashboard.document_types.edit', compact('document_type','stake_holders'));
+            $project       = Project::findOrFail(auth()->user()->current_project_id);
+            $stake_holders = $project->stakeHolders;
+            return view('project_dashboard.document_types.edit', compact('document_type', 'stake_holders'));
         }
     }
 
     public function update(Request $request, $id)
     {
         DocType::where('id', $id)->update([
-            'name' => $request->name,
-            'description' => $request->description,
+            'name'          => $request->name,
+            'description'   => $request->description,
+            'from'          => $request->from,
+            'to'            => $request->to,
             'relevant_word' => $request->relevant_word,
-            'order' => $request->order ? intval($request->order) : 0]);
+            'order'         => $request->order ? intval($request->order) : 0]);
         $type = DocType::findOrFail($id);
-         if (! $request->shortcut) {
+        if (! $request->shortcut) {
             $type->shortcut = '0';
         } else {
             $type->shortcut = '1';
