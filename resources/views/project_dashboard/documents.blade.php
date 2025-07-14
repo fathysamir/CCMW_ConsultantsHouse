@@ -318,10 +318,15 @@
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_documents', $Project_Permissions ?? []))
                                                     <a class="dropdown-item"
                                                         href="{{ route('project.edit-document', $document->slug) }}">Edit</a>
+                                                        <a class="dropdown-item"
+                                                        href="{{ route('download', $document->slug) }}">
+                                                        Download Document
+                                                    </a>
                                                     <a id="Change_Owner_btn_{{ $document->id }}"
                                                         class="dropdown-item change-owner-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"data-document-owner-id="{{ $document->user_id }}">Change
                                                         Owner</a>
+
                                                     <a class="dropdown-item" href="">Analysis Form</a>
                                                     @php
                                                         $threads = $document->threads

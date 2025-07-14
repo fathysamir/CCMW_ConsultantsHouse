@@ -815,6 +815,34 @@ Based on that and provided that we have the following list of stakeholders:';
         return redirect()->back()->with('error', 'File not found.');
     }
 
+    public function download($id)
+    {
+        $document = Document::where('slug',$id)->first();
+        $filePath = public_path($document->storageFile->path);
+
+        if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->description)), 'email')) {
+            $sanitizedFilename = $document->fromStakeHolder->narrative . "'s e-mail dated ";
+            // $date = date('y_m_d', strtotime($document->document->start_date));
+            $date2    = date('d-M-y', strtotime($document->start_date));
+            $fileName = $sanitizedFilename . $date2 . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+        } else {
+            $sanitizedFilename = preg_replace('/[\\\\\/:*?"+.<>|{}\[\]`]/', '-', $document->reference);
+            $sanitizedFilename = trim($sanitizedFilename, '-');
+            // $date = date('y_m_d', strtotime($document->document->start_date));
+            $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+        }
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $fileName, [
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma'        => 'no-cache',
+                'Expires'       => '0',
+            ]);
+        }
+
+        return redirect()->back()->with('error', 'File not found.');
+    }
+
     public function get_assigned_files($id)
     {
         $file_doc_type = session('file_doc_type');

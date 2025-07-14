@@ -217,6 +217,8 @@ Route::group(['middleware' => ['admin']], function () {
     })->name('goToDocFile');
     Route::post('/get-files-by-document', [DocumentController::class, 'getFilesByDoc']);
     Route::get('/download-document/{id}', [DocumentController::class, 'downloadDocument'])->name('download.document');
+    Route::get('/download_document/{id}', [DocumentController::class, 'download'])->name('download');
+
     Route::get('/project/file-docs/{doc}/doc/{id}/edit', function ($doc, $id) {
         session(['current_view' => 'file_doc']);
         session(['current_file_doc' => $doc]);
