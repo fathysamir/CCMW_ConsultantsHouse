@@ -242,7 +242,7 @@ Based on that and provided that we have the following list of stakeholders. \n';
                             Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
             $message .= ' then, \n';
-            $message .= 'Please provide the Subject of the PDF it start with one of this words("Subject:","SUB:","SBJ:","subject:","sub:",etc...) . \n Please limit your answer to the needed information without additional words. Return only this in the key:
+            $message .= 'Please provide the Subject of the PDF, Subject is in key one of this words("Subject:","SUB:","SBJ:","subject:","sub:",etc...) . \n Please limit your answer to the needed information without additional words. Return only this in the key:
                             Document_subject: ...';
 
             $message .= 'please please please Don\'t make the sender the receiver or vice versa, For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter.
