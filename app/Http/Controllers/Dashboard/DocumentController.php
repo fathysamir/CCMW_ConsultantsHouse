@@ -239,8 +239,7 @@ Based on that and provided that we have the following list of stakeholders. \n';
             $message .= 'Then, ';
             $message .= 'if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key and separate it by ",":
                             Document_threads: ... \n
-                            example of threads =>"document type
-ref. no. xxxx/xxxx/xxxx/xx" Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
+                            example of thread formate =>"xxxx/xxxx/xxxx/xx" Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
             $message .= ' then, \n';
             $message .= 'Please provide the Subject of the PDF . \n Please limit your answer to the needed information without additional words. extract subject and Return only this in the key:
