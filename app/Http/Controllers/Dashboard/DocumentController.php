@@ -287,7 +287,7 @@ Based on that and provided that we have the following list of stakeholders:';
 
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
-            
+
             if ($code != null) {
                 $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
                 if (File::exists($filePath)) {
@@ -317,36 +317,43 @@ Based on that and provided that we have the following list of stakeholders:';
                 } else {
                     $type_id = '';
                 }
-                if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
-                    $sender = $stake_holders->where('name', $result['Document_sender'])->first();
-                    if ($sender) {
-                        $sender_id = $sender->id;
-                    } else {
-                        $sender = $stake_holders->where('narrative', $result['Document_sender'])->first();
+                if ($documents_type->from) {
+                    $sender_id = $documents_type->from;
+                } else {
+                    if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
+                        $sender = $stake_holders->where('name', $result['Document_sender'])->first();
                         if ($sender) {
                             $sender_id = $sender->id;
                         } else {
-                            $sender_id = '';
+                            $sender = $stake_holders->where('narrative', $result['Document_sender'])->first();
+                            if ($sender) {
+                                $sender_id = $sender->id;
+                            } else {
+                                $sender_id = '';
+                            }
                         }
-                    }
-                } else {
-                    $sender_id = '';
-                }
-
-                if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
-                    $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
-                    if ($receiver) {
-                        $receiver_id = $receiver->id;
                     } else {
-                        $receiver = $stake_holders->where('narrative', $result['Document_receiver'])->first();
+                        $sender_id = '';
+                    }
+                }
+                if ($documents_type->to) {
+                    $receiver_id = $documents_type->to;
+                } else {
+                    if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
+                        $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
                         if ($receiver) {
                             $receiver_id = $receiver->id;
                         } else {
-                            $receiver_id = '';
+                            $receiver = $stake_holders->where('narrative', $result['Document_receiver'])->first();
+                            if ($receiver) {
+                                $receiver_id = $receiver->id;
+                            } else {
+                                $receiver_id = '';
+                            }
                         }
+                    } else {
+                        $receiver_id = '';
                     }
-                } else {
-                    $receiver_id = '';
                 }
                 if (array_key_exists('Document_date', $result) && $result['Document_date'] != 'No Match') {
                     $start_date = $result['Document_date'];
@@ -817,7 +824,7 @@ Based on that and provided that we have the following list of stakeholders:';
 
     public function download($id)
     {
-        $document = Document::where('slug',$id)->first();
+        $document = Document::where('slug', $id)->first();
         $filePath = public_path($document->storageFile->path);
 
         if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->description)), 'email')) {
