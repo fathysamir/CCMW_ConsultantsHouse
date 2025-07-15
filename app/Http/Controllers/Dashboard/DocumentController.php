@@ -237,9 +237,10 @@ Based on that and provided that we have the following list of stakeholders. \n';
             $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“xxx/xxx/xxx/...”). Return only this in the key:
                             Document_reference: ...';
             $message .= 'Then, ';
-            $message .= 'if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key, separated by ",":
-                            Document_threads: ...
-                            Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
+            $message .= 'if there are other references numbers mentioned anywhere else in the document, extract them too and return them in the following key and separate it by ",":
+                            Document_threads: ... \n
+                            example of threads =>"document type
+ref. no. xxxx/xxxx/xxxx/xx" Do not left any reference in any line and Do not repeat the main Document_reference in Document_threads.
                             Return only the values in the keys above without additional explanation . \n';
             $message .= ' then, \n';
             $message .= 'Please provide the Subject of the PDF . \n Please limit your answer to the needed information without additional words. extract subject and Return only this in the key:
