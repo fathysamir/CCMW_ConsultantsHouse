@@ -9,6 +9,57 @@
         }
     </style>
     <style>
+        .loader {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 10px solid transparent;
+            border-top: 10px solid transparent;
+
+            background: conic-gradient(red,
+                    orange,
+                    yellow,
+                    green,
+                    cyan,
+                    blue,
+                    violet,
+                    red);
+            animation: spin 1s linear infinite;
+            mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <style>
         .uppy-Dashboard-inner {
             width: 100%;
             height: 360px;
@@ -206,8 +257,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                max-height:650px;
-                                                                                                                                            } */
+                                                                                                                                                    max-height:650px;
+                                                                                                                                                } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -232,6 +283,7 @@
                         <div class="card shadow mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <strong>Upload PDF Files <span style="color: red">*</span></strong>
+                                <div class="loader d-none" id="loader"></div>
                                 <div class="custom-control custom-checkbox" style="margin-bottom: 5px;">
                                     <input type="checkbox" class="custom-control-input"id="use_ai" checked>
                                     <label class="custom-control-label" for="use_ai" style="padding-top: 3px;">Use
@@ -749,6 +801,7 @@
             function checkUploadStatus() {
                 if (pdfUploaded) {
                     setTimeout(function() {
+                        document.getElementById('loader').classList.add('d-none');
                         $('#step1').addClass('d-none');
                         $('#step2').removeClass('d-none');
                     }, 700);
@@ -902,7 +955,7 @@
                         formData.append(`files[]`, file.data);
                         formData.append(`use_ai`, use_ai); // Append each file separately
                     });
-
+document.getElementById('loader').classList.remove('d-none');
                     // Send the file data to another Laravel route (e.g., for database storage)
                     $.ajax({
                         url: '/group-documents/upload-multi-files',
