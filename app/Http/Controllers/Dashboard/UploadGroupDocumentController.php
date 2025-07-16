@@ -267,6 +267,7 @@ Based on that and provided that we have the following list of stakeholders:';
                 }
                 if ($documents_type->from) {
                     $sender_id = $documents_type->from;
+                    $sender = $stake_holders->where('id', $sender_id)->first();
                 } else {
                     if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
                         $sender = $stake_holders->where('name', $result['Document_sender'])->first();
@@ -286,6 +287,8 @@ Based on that and provided that we have the following list of stakeholders:';
                 }
                 if ($documents_type->to) {
                     $receiver_id = $documents_type->to;
+                    $receiver = $stake_holders->where('id', $receiver_id)->first();
+
                 } else {
                     if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
                         $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
