@@ -4,8 +4,8 @@
 
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <style>
-        .date{
-            background-color:#fff !important;
+        .date {
+            background-color: #fff !important;
         }
     </style>
     <style>
@@ -206,8 +206,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                        max-height:650px;
-                                                                                                                                    } */
+                                                                                                                                                max-height:650px;
+                                                                                                                                            } */
     </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -230,8 +230,13 @@
                     <div class="form-group mb-3">
                         {{-- <label for="file"></label> --}}
                         <div class="card shadow mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <strong>Upload PDF Files <span style="color: red">*</span></strong>
+                                <div class="custom-control custom-checkbox" style="margin-bottom: 5px;">
+                                    <input type="checkbox" class="custom-control-input"id="use_ai" checked>
+                                    <label class="custom-control-label" for="use_ai" style="padding-top: 3px;">Use
+                                        AI</label>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div id="drag-drop-area"></div>
@@ -677,11 +682,12 @@
                     <div id="report_content">
 
                     </div>
-                    
+
                     <div class="text-right" style="margin-top: 10px;">
                         <button type="button"
                             class="btn btn-outline-secondary"onclick="window.location.href='/project'">Cancel</button>
-                        <button type="button" class="btn  btn-outline-success" onclick="window.location.href='/project/all-documents'">Close</button>
+                        <button type="button" class="btn  btn-outline-success"
+                            onclick="window.location.href='/project/all-documents'">Close</button>
 
                     </div>
                 </div>
@@ -891,9 +897,10 @@
                     console.log('Upload complete! We’ve uploaded these files:', result.successful)
 
                     const formData = new FormData();
-
+                    let use_ai = $("#use_ai").prop("checked") ? 1 : 0
                     result.successful.forEach((file, index) => {
-                        formData.append(`files[]`, file.data); // Append each file separately
+                        formData.append(`files[]`, file.data);
+                        formData.append(`use_ai`, use_ai); // Append each file separately
                     });
 
                     // Send the file data to another Laravel route (e.g., for database storage)
