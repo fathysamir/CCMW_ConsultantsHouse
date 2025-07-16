@@ -10,7 +10,9 @@ use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\StorageFile;
 use App\Models\TestDocument;
+use setasign\Fpdi\Fpdi;
 use DateTime;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
 class UploadGroupDocumentController extends ApiController
@@ -69,9 +71,57 @@ class UploadGroupDocumentController extends ApiController
             $nameWithoutExtension = pathinfo($name, PATHINFO_FILENAME);
 
             $uploadedFiles[$nameWithoutExtension]['storageFile_id'] = $storageFile->id;
+ $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
+            $sourcePath = public_path($storageFile->path);
 
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
+
+                mkdir($path, 0755, true);
+            }
+
+            $imagick = new \Imagick();
+            $imagick->setResolution(300, 300); // زيادة الدقة
+            $imagick->readImage($sourcePath . '[0-1]');
+
+            $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
+
+            if (! file_exists($directoryeee)) {
+                mkdir($directoryeee, 0755, true); // true = create nested directories
+            }
+            $imagick->setImageFormat('pdf');
+            $imagick->setImageCompressionQuality(100);
+            $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
+            $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            $pdf        = new Fpdi;
+            $pageCount  = $pdf->setSourceFile($sourcePath);
+
+            $templateId = $pdf->importPage(1);
+            $size       = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($templateId);
+
+            $pdf->Output('F', $targetPath);
+            $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+
+            if (file_exists($path2)) {
+                unlink($path2);
+            }
             $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
-            $url    = url($storageFile->path);
+            $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+
 
             $payload = json_encode([
                 'url' => $url,
@@ -185,7 +235,14 @@ Based on that and provided that we have the following list of stakeholders:';
 
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
+            if ($code != null) {
+                $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+                if (File::exists($filePath)) {
+                    File::deleteDirectory($filePath);
+                }
+            }
             if ($answer != 'No answer found') {
+                
                 $lines  = explode("\n", trim($answer));
                 $result = [];
 
