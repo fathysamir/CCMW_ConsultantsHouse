@@ -71,277 +71,274 @@ class UploadGroupDocumentController extends ApiController
             $nameWithoutExtension = pathinfo($name, PATHINFO_FILENAME);
 
             $uploadedFiles[$nameWithoutExtension]['storageFile_id'] = $storageFile->id;
-            if ($request->use_ai == '1') {
-                $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
-                if (file_exists($path2)) {
-                    unlink($path2);
-                }
-                $sourcePath = public_path($storageFile->path);
+            // if ($request->use_ai == '1') {
+            //     $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            //     if (file_exists($path2)) {
+            //         unlink($path2);
+            //     }
+            //     $sourcePath = public_path($storageFile->path);
 
-                $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
-                $path          = public_path($projectFolder);
-                if (! file_exists($path)) {
+            //     $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            //     $path          = public_path($projectFolder);
+            //     if (! file_exists($path)) {
 
-                    mkdir($path, 0755, true);
-                }
+            //         mkdir($path, 0755, true);
+            //     }
 
-                $imagick = new \Imagick();
-                $imagick->setResolution(300, 300); // زيادة الدقة
-                $imagick->readImage($sourcePath . '[0-1]');
+            //     $imagick = new \Imagick();
+            //     $imagick->setResolution(300, 300); // زيادة الدقة
+            //     $imagick->readImage($sourcePath . '[0-1]');
 
-                $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
+            //     $directoryeee = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id);
 
-                if (! file_exists($directoryeee)) {
-                    mkdir($directoryeee, 0755, true); // true = create nested directories
-                }
-                $imagick->setImageFormat('pdf');
-                $imagick->setImageCompressionQuality(100);
-                $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
-                $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
-                $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-                $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            //     if (! file_exists($directoryeee)) {
+            //         mkdir($directoryeee, 0755, true); // true = create nested directories
+            //     }
+            //     $imagick->setImageFormat('pdf');
+            //     $imagick->setImageCompressionQuality(100);
+            //     $imagick->writeImages(public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf'), true);
+            //     $sourcePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            //     $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            //     $directory  = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
-                if (! file_exists($directory)) {
-                    mkdir($directory, 0755, true); // true = create nested directories
-                }
-                $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
-                $pdf        = new Fpdi;
-                $pageCount  = $pdf->setSourceFile($sourcePath);
+            //     if (! file_exists($directory)) {
+            //         mkdir($directory, 0755, true); // true = create nested directories
+            //     }
+            //     $targetPath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            //     $pdf        = new Fpdi;
+            //     $pageCount  = $pdf->setSourceFile($sourcePath);
 
-                $templateId = $pdf->importPage(1);
-                $size       = $pdf->getTemplateSize($templateId);
+            //     $templateId = $pdf->importPage(1);
+            //     $size       = $pdf->getTemplateSize($templateId);
 
-                $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                $pdf->useTemplate($templateId);
+            //     $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            //     $pdf->useTemplate($templateId);
 
-                $pdf->Output('F', $targetPath);
-                $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
+            //     $pdf->Output('F', $targetPath);
+            //     $path2 = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . auth()->user()->id . '/' . 'cleaned_gyjt__test_11.pdf');
 
-                if (file_exists($path2)) {
-                    unlink($path2);
-                }
-                $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
-                $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
+            //     if (file_exists($path2)) {
+            //         unlink($path2);
+            //     }
+            //     $apiKey = 'sec_rKlDJdNkUf5wBSQmAqPOlzdmssUuUWJW';
+            //     $url    = url('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/extracted.pdf');
 
-                $payload = json_encode([
-                    'url' => $url,
-                ]);
+            //     $payload = json_encode([
+            //         'url' => $url,
+            //     ]);
 
-                $ch = curl_init();
+            //     $ch = curl_init();
 
-                curl_setopt_array($ch, [
-                    CURLOPT_URL            => 'https://api.chatpdf.com/v1/sources/add-url',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_POST           => true,
-                    CURLOPT_HTTPHEADER     => [
-                        'x-api-key: ' . $apiKey,
-                        'Content-Type: application/json',
-                    ],
-                    CURLOPT_POSTFIELDS     => $payload,
-                ]);
+            //     curl_setopt_array($ch, [
+            //         CURLOPT_URL            => 'https://api.chatpdf.com/v1/sources/add-url',
+            //         CURLOPT_RETURNTRANSFER => true,
+            //         CURLOPT_POST           => true,
+            //         CURLOPT_HTTPHEADER     => [
+            //             'x-api-key: ' . $apiKey,
+            //             'Content-Type: application/json',
+            //         ],
+            //         CURLOPT_POSTFIELDS     => $payload,
+            //     ]);
 
-                $response = curl_exec($ch);
+            //     $response = curl_exec($ch);
 
-                if (curl_errno($ch)) {
-                    // handle error
-                    $error = curl_error($ch);
-                    curl_close($ch);
-                    throw new \Exception("cURL Error: $error");
-                }
+            //     if (curl_errno($ch)) {
+            //         // handle error
+            //         $error = curl_error($ch);
+            //         curl_close($ch);
+            //         throw new \Exception("cURL Error: $error");
+            //     }
 
-                curl_close($ch);
+            //     curl_close($ch);
 
-                $data = json_decode($response, true);
+            //     $data = json_decode($response, true);
 
-                // Access sourceId from response
-                $sourceId        = $data['sourceId'] ?? null;
-                $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->pluck('description')->toArray();
-                $project         = Project::findOrFail(auth()->user()->current_project_id);
-                $stake_holders   = $project->stakeHolders;
-                $message         = 'Provided that we have the following list of document types: \n ';
-                foreach ($documents_types as $des) {
-                    $message .= '■ ' . $des . '\n';
-                }
-                $message .= ' provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type
-ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
-                ///////////////////////////////////////////////////////////////////////////////////////////
-                $message .= 'then \n';
-                $message .= 'Provided that we have the following list of stakeholders: \n';
-                foreach ($stake_holders as $stake_holder) {
-                    $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
-                }
-                $message .= 'For any letter, normally the sender’s name is provided in the letter’s head and / or within the signature of the letter ie exist.
-Based on that and provided that we have the following list of stakeholders. \n';
-                $message .= ' Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
-                $message .= 'then \n';
-                /////////////////////////////////////////////////////////////////////////////////////////
-                $message .= 'Provided that we have the following list of stakeholders: \n';
-                foreach ($stake_holders as $stake_holder) {
-                    $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
-                }
-                $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender is not be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
-                $message .= 'then \n';
-                /////////////////////////////////////////////////////////////////////////////////////////
-                $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
-                $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
-                $message .= 'then \n';
-                /////////////////////////////////////////////////////////////////////////////////////////
-                $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“xxx/xxx/xxx/...”). Return only this in the key:
-                            Document_reference: ...';
+            //     // Access sourceId from response
+            //     $sourceId        = $data['sourceId'] ?? null;
+            //     $documents_types = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->orderBy('order', 'asc')->pluck('description')->toArray();
+            //     $project         = Project::findOrFail(auth()->user()->current_project_id);
+            //     $stake_holders   = $project->stakeHolders;
+            //     $message         = 'Provided that we have the following list of document types: \n ';
+            //     foreach ($documents_types as $des) {
+            //         $message .= '■ ' . $des . '\n';
+            //     }
+            //     $message .= ' provided that we have the following list of document types:. Do **NOT** consider or extract document type of any referenced threads mentioned in the body text such as that : example of threads =>"document type ref. no. xxxx/xxxx/xxxx/xx". or answer with “No Match” if the type not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_type (Document_type:.....).';
+            //     ///////////////////////////////////////////////////////////////////////////////////////////
+            //     $message .= 'then \n';
+            //     $message .= 'Provided that we have the following list of stakeholders: \n';
+            //     foreach ($stake_holders as $stake_holder) {
+            //         $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            //     }
+            //     $message .= 'For any letter, normally the sender’s name is provided in the letter’s head and / or within the signature of the letter ie exist. Based on that and provided that we have the following list of stakeholders. \n';
+            //     $message .= ' Please select from this list the document sender for that PDF or answer with “No Match” if the stakeholder not exist in this list. \n Please limit your answer to the needed information without additional words and put result in key Document_sender (Document_sender:.....).';
+            //     $message .= 'then \n';
+            //     /////////////////////////////////////////////////////////////////////////////////////////
+            //     $message .= 'Provided that we have the following list of stakeholders: \n';
+            //     foreach ($stake_holders as $stake_holder) {
+            //         $message .= $stake_holder->name ? '■ ' . $stake_holder->name . '\n' : '■ ' . $stake_holder->narrative . '\n';
+            //     }
+            //     $message .= 'Please select from the list to whom this letter was addressed or answer with “No Match” if the stakeholder not exist in this list. \n Please note that the document sender is not be the stakeholder to whom the letter was addressed. \n Please limit your answer to the needed information without additional words and put result in key Document_receiver (Document_receiver:.....).';
+            //     $message .= 'then \n';
+            //     /////////////////////////////////////////////////////////////////////////////////////////
+            //     $message .= 'Please provide the Document date in the format “yyyy-mm-dd”. \n';
+            //     $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_date (Document_date:.....). \n';
+            //     $message .= 'then \n';
+            //     /////////////////////////////////////////////////////////////////////////////////////////
+            //     $message .= ' Please extract the main document reference from the top part of the PDF (e.g. near "REF. NO") that follows the format of sections separated by "/" or "-" such as(“xxx/xxx/xxx/...”). Return only this in the key:
+            //                 Document_reference: ...';
 
-                $message .= ' then, \n';
-                $message .= 'Please provide the Subject of the PDF . \n Please limit your answer to the needed information without additional words. extract subject and Return only this in the key:
-                            Document_subject: ...';
+            //     $message .= ' then, \n';
+            //     $message .= 'Please provide the Subject of the PDF . \n Please limit your answer to the needed information without additional words. extract subject and Return only this in the key:
+            //                 Document_subject: ...';
 
-                $message .= 'please please please Don\'t make the sender the receiver or vice versa, For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter.
-Based on that and provided that we have the following list of stakeholders:';
-                //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
-                //  $message .= 'then \n';
-                //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
-                $payload = json_encode([
-                    'sourceId' => $sourceId,
-                    'messages' => [
-                        [
-                            'role'    => 'user',
-                            'content' => $message,
-                        ],
-                    ],
-                ]);
+            //     $message .= 'please please please Don\'t make the sender the receiver or vice versa, For any letter, normally the sender’s name is provided in the letter head and / or within the signature of the letter. Based on that and provided that we have the following list of stakeholders:';
+            //     //  $message .= ' Please limit your answer to the needed information without additional words and put result in key Document_reference (Document_reference:....). \n';
+            //     //  $message .= 'then \n';
+            //     //  $message .= ' Extract other references mentioned in this PDF without Document_reference if exist other references and Please limit your answer to the needed information without additional words and put result in key Document_threads separated by ",,"  (Document_threads:....). \n';
+            //     $payload = json_encode([
+            //         'sourceId' => $sourceId,
+            //         'messages' => [
+            //             [
+            //                 'role'    => 'user',
+            //                 'content' => $message,
+            //             ],
+            //         ],
+            //     ]);
 
-                $ch = curl_init();
+            //     $ch = curl_init();
 
-                curl_setopt_array($ch, [
-                    CURLOPT_URL            => 'https://api.chatpdf.com/v1/chats/message',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_POST           => true,
-                    CURLOPT_HTTPHEADER     => [
-                        'x-api-key: ' . $apiKey,
-                        'Content-Type: application/json',
-                    ],
-                    CURLOPT_POSTFIELDS     => $payload,
-                ]);
+            //     curl_setopt_array($ch, [
+            //         CURLOPT_URL            => 'https://api.chatpdf.com/v1/chats/message',
+            //         CURLOPT_RETURNTRANSFER => true,
+            //         CURLOPT_POST           => true,
+            //         CURLOPT_HTTPHEADER     => [
+            //             'x-api-key: ' . $apiKey,
+            //             'Content-Type: application/json',
+            //         ],
+            //         CURLOPT_POSTFIELDS     => $payload,
+            //     ]);
 
-                $response = curl_exec($ch);
+            //     $response = curl_exec($ch);
 
-                if (curl_errno($ch)) {
-                    $error = curl_error($ch);
-                    curl_close($ch);
-                    throw new \Exception("cURL Error: $error");
-                }
+            //     if (curl_errno($ch)) {
+            //         $error = curl_error($ch);
+            //         curl_close($ch);
+            //         throw new \Exception("cURL Error: $error");
+            //     }
 
-                curl_close($ch);
+            //     curl_close($ch);
 
-                $data = json_decode($response, true);
+            //     $data = json_decode($response, true);
 
-                // Get the response content
-                $answer = $data['content'] ?? 'No answer found';
-                if ($code != null) {
-                    $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
-                    if (File::exists($filePath)) {
-                        File::deleteDirectory($filePath);
-                    }
-                }
-                if ($answer != 'No answer found') {
+            //     // Get the response content
+            //     $answer = $data['content'] ?? 'No answer found';
+            //     if ($code != null) {
+            //         $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            //         if (File::exists($filePath)) {
+            //             File::deleteDirectory($filePath);
+            //         }
+            //     }
+            //     if ($answer != 'No answer found') {
 
-                    $lines  = explode("\n", trim($answer));
-                    $result = [];
+            //         $lines  = explode("\n", trim($answer));
+            //         $result = [];
 
-                    foreach ($lines as $line) {
-                        $parts = explode(':', $line, 2);
-                        if (count($parts) == 2) {
-                            $key          = trim($parts[0]);
-                            $value        = trim($parts[1]);
-                            $result[$key] = $value;
-                        }
-                    }
-                    if (array_key_exists('Document_type', $result) && $result['Document_type'] != 'No Match') {
-                        $documents_type = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('description', trim($result['Document_type']))->first();
-                        if ($documents_type) {
-                            $type_id = $documents_type->id;
-                        } else {
-                            $type_id = '';
-                        }
+            //         foreach ($lines as $line) {
+            //             $parts = explode(':', $line, 2);
+            //             if (count($parts) == 2) {
+            //                 $key          = trim($parts[0]);
+            //                 $value        = trim($parts[1]);
+            //                 $result[$key] = $value;
+            //             }
+            //         }
+            //         if (array_key_exists('Document_type', $result) && $result['Document_type'] != 'No Match') {
+            //             $documents_type = DocType::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('description', trim($result['Document_type']))->first();
+            //             if ($documents_type) {
+            //                 $type_id = $documents_type->id;
+            //             } else {
+            //                 $type_id = '';
+            //             }
 
-                    } else {
-                        $type_id = '';
-                    }
-                    if ($documents_type->from) {
-                        $sender_id = $documents_type->from;
-                        $sender    = $stake_holders->where('id', $sender_id)->first();
-                    } else {
-                        if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
-                            $sender = $stake_holders->where('name', $result['Document_sender'])->first();
-                            if ($sender) {
-                                $sender_id = $sender->id;
-                            } else {
-                                $sender = $stake_holders->where('narrative', $result['Document_sender'])->first();
-                                if ($sender) {
-                                    $sender_id = $sender->id;
-                                } else {
-                                    $sender_id = '';
-                                }
-                            }
-                        } else {
-                            $sender_id = '';
-                        }
-                    }
-                    if ($documents_type->to) {
-                        $receiver_id = $documents_type->to;
-                        $receiver    = $stake_holders->where('id', $receiver_id)->first();
+            //         } else {
+            //             $type_id = '';
+            //         }
+            //         if ($documents_type->from) {
+            //             $sender_id = $documents_type->from;
+            //             $sender    = $stake_holders->where('id', $sender_id)->first();
+            //         } else {
+            //             if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
+            //                 $sender = $stake_holders->where('name', $result['Document_sender'])->first();
+            //                 if ($sender) {
+            //                     $sender_id = $sender->id;
+            //                 } else {
+            //                     $sender = $stake_holders->where('narrative', $result['Document_sender'])->first();
+            //                     if ($sender) {
+            //                         $sender_id = $sender->id;
+            //                     } else {
+            //                         $sender_id = '';
+            //                     }
+            //                 }
+            //             } else {
+            //                 $sender_id = '';
+            //             }
+            //         }
+            //         if ($documents_type->to) {
+            //             $receiver_id = $documents_type->to;
+            //             $receiver    = $stake_holders->where('id', $receiver_id)->first();
 
-                    } else {
-                        if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
-                            $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
-                            if ($receiver) {
-                                $receiver_id = $receiver->id;
-                            } else {
-                                $receiver = $stake_holders->where('narrative', $result['Document_receiver'])->first();
-                                if ($receiver) {
-                                    $receiver_id = $receiver->id;
-                                } else {
-                                    $receiver_id = '';
-                                }
-                            }
-                        } else {
-                            $receiver_id = '';
-                        }
-                    }
-                    if (array_key_exists('Document_date', $result) && $result['Document_date'] != 'No Match') {
-                        $start_date = $result['Document_date'];
-                    } else {
-                        $start_date = '';
-                    }
+            //         } else {
+            //             if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
+            //                 $receiver = $stake_holders->where('name', $result['Document_receiver'])->first();
+            //                 if ($receiver) {
+            //                     $receiver_id = $receiver->id;
+            //                 } else {
+            //                     $receiver = $stake_holders->where('narrative', $result['Document_receiver'])->first();
+            //                     if ($receiver) {
+            //                         $receiver_id = $receiver->id;
+            //                     } else {
+            //                         $receiver_id = '';
+            //                     }
+            //                 }
+            //             } else {
+            //                 $receiver_id = '';
+            //             }
+            //         }
+            //         if (array_key_exists('Document_date', $result) && $result['Document_date'] != 'No Match') {
+            //             $start_date = $result['Document_date'];
+            //         } else {
+            //             $start_date = '';
+            //         }
 
-                    if (array_key_exists('Document_reference', $result) && $result['Document_reference'] != 'No Match' && $result['Document_subject'] != '') {
-                        $reference = $result['Document_reference'];
-                    } else {
-                        $reference = '';
-                    }
-                    if (array_key_exists('Document_subject', $result) && $result['Document_subject'] != 'No Match' && $result['Document_subject'] != '') {
-                        $subject = $result['Document_subject'];
-                    } else {
-                        $subject = '';
-                    }
-                } else {
-                    $type_id     = '';
-                    $sender_id   = '';
-                    $receiver_id = '';
-                    $start_date  = '';
-                    $reference   = '';
-                    $subject     = '';
-                }
-                $uploadedFiles[$nameWithoutExtension]['type_id']          = $type_id;
-                $uploadedFiles[$nameWithoutExtension]['type_name']        = $type_id != null && $type_id != '' ? $documents_type->name : '';
-                $uploadedFiles[$nameWithoutExtension]['reference']        = $reference;
-                $uploadedFiles[$nameWithoutExtension]['subject']          = $subject;
-                $uploadedFiles[$nameWithoutExtension]['sender_id']        = $sender_id;
-                $uploadedFiles[$nameWithoutExtension]['sender_text']      = $sender_id != null && $sender_id != '' ? $sender->narrative . ' - ' . $sender->role : '';
-                $uploadedFiles[$nameWithoutExtension]['receiver_id']      = $receiver_id;
-                $uploadedFiles[$nameWithoutExtension]['receiver_text']    = $receiver_id != null && $receiver_id != '' ? $receiver->narrative . ' - ' . $receiver->role : '';
-                $uploadedFiles[$nameWithoutExtension]['start_date_value'] = $start_date;
-                $uploadedFiles[$nameWithoutExtension]['start_date']       = $start_date != '' ? date('d-M-y', strtotime($start_date)) : '';
+            //         if (array_key_exists('Document_reference', $result) && $result['Document_reference'] != 'No Match' && $result['Document_subject'] != '') {
+            //             $reference = $result['Document_reference'];
+            //         } else {
+            //             $reference = '';
+            //         }
+            //         if (array_key_exists('Document_subject', $result) && $result['Document_subject'] != 'No Match' && $result['Document_subject'] != '') {
+            //             $subject = $result['Document_subject'];
+            //         } else {
+            //             $subject = '';
+            //         }
+            //     } else {
+            //         $type_id     = '';
+            //         $sender_id   = '';
+            //         $receiver_id = '';
+            //         $start_date  = '';
+            //         $reference   = '';
+            //         $subject     = '';
+            //     }
+            //     $uploadedFiles[$nameWithoutExtension]['type_id']          = $type_id;
+            //     $uploadedFiles[$nameWithoutExtension]['type_name']        = $type_id != null && $type_id != '' ? $documents_type->name : '';
+            //     $uploadedFiles[$nameWithoutExtension]['reference']        = $reference;
+            //     $uploadedFiles[$nameWithoutExtension]['subject']          = $subject;
+            //     $uploadedFiles[$nameWithoutExtension]['sender_id']        = $sender_id;
+            //     $uploadedFiles[$nameWithoutExtension]['sender_text']      = $sender_id != null && $sender_id != '' ? $sender->narrative . ' - ' . $sender->role : '';
+            //     $uploadedFiles[$nameWithoutExtension]['receiver_id']      = $receiver_id;
+            //     $uploadedFiles[$nameWithoutExtension]['receiver_text']    = $receiver_id != null && $receiver_id != '' ? $receiver->narrative . ' - ' . $receiver->role : '';
+            //     $uploadedFiles[$nameWithoutExtension]['start_date_value'] = $start_date;
+            //     $uploadedFiles[$nameWithoutExtension]['start_date']       = $start_date != '' ? date('d-M-y', strtotime($start_date)) : '';
 
-            } else {
+            // } else {
                 $uploadedFiles[$nameWithoutExtension]['type_id']          = '';
                 $uploadedFiles[$nameWithoutExtension]['type_name']        = '';
                 $uploadedFiles[$nameWithoutExtension]['reference']        = '';
@@ -353,7 +350,7 @@ Based on that and provided that we have the following list of stakeholders:';
                 $uploadedFiles[$nameWithoutExtension]['start_date_value'] = '';
                 $uploadedFiles[$nameWithoutExtension]['start_date']       = '';
 
-            }
+            //}
 
         }
 
