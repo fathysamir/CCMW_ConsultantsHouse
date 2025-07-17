@@ -12,8 +12,9 @@
         <a href="{{ route('switch.folder', $doc->file->folder->id) }}">{{ $doc->file->folder->name }}</a>
         <span style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
         <a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a>
-        <span id="chevronIcon" style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
-        Details of "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"
+        <label id="chevronIcon" style="cursor: pointer;" ><span id="chevronIcon2" style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
+        Details of "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"</label>
+        
     </h4>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -373,7 +374,7 @@
     <script>
         document.getElementById("chevronIcon").addEventListener("click", function() {
             document.getElementById("detailsCard").classList.toggle("d-none");
-            let icon = document.getElementById("chevronIcon");
+            let icon = document.getElementById("chevronIcon2");
             icon.classList.toggle("fe-chevrons-right");
             icon.classList.toggle("fe-chevrons-down");
         });
