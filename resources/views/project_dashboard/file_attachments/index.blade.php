@@ -159,8 +159,8 @@
     </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title"><a href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span id="chevronIcon"
-                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }} - {{ $Type_Name[$type] }}</h2>
+            <h3 class="h3 mb-0 page-title"><a href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span id="chevronIcon"
+                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }} - {{ $Type_Name[$type] }}</h3>
         </div>
         <div class="col-auto">
             <a type="button" href="{{ route('project.file-attachments.create_attachment',['type'=>$type,'file_id'=>$file->slug]) }}"
