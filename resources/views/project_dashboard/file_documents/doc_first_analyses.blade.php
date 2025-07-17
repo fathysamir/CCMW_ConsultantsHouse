@@ -13,7 +13,7 @@
         <span style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
         <a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a>
         <label id="chevronIcon" style="cursor: pointer;" ><span id="chevronIcon2" style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
-        Details of "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"</label>
+        {{ $doc->document ? $doc->document->subject : $doc->note->subject }}</label>
         
     </h4>
     @if (session('error'))
