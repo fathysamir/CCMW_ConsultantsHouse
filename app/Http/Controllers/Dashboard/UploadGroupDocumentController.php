@@ -514,8 +514,8 @@ class UploadGroupDocumentController extends ApiController
 
                 if ($testDoc->file_id) {
                     $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $testDoc->file_id, 'document_id' => $new_doc->id]);
-                    $start_date  = $fileDoc->note->start_date;
-                    $end_date    = $fileDoc->note->end_date;
+                    $start_date  = $fileDoc->document->start_date;
+                    $end_date    = $fileDoc->document->end_date;
                     $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
 
                     $gantt_chart->lp_sd = $start_date;
