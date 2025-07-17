@@ -16,7 +16,7 @@
     ]
 @endphp
     <h4 id="toggleTitle" style="cursor:pointer;" class="page-title"><a href="{{ route('switch.folder', $file_attachment->file->folder->id) }}">{{ $file_attachment->file->folder->name }}</a><span
-            class="fe fe-24 fe-chevrons-right"></span><a href="{{ route('project.file-attachments.index', ['id' => $file_attachment->file->slug, 'type' => $file_attachment->section ]) }}">{{ $file_attachment->file->name }} - {{ $arr[$file_attachment->section] }}</a><span class="fe fe-24 fe-chevrons-right"></span>Details of Attachment
+            style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span><a href="{{ route('project.file-attachments.index', ['id' => $file_attachment->file->slug, 'type' => $file_attachment->section ]) }}">{{ $file_attachment->file->name }} - {{ $arr[$file_attachment->section] }}</a><span style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>Details of Attachment
         </h4>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"

@@ -8,10 +8,13 @@
             background-color: #fff !important;
         }
     </style>
-    <h4 style="cursor:pointer;" class="page-title"><a href="{{ route('switch.folder', $doc->file->folder->id) }}">{{ $doc->file->folder->name }}</a><span
-            class="fe fe-24 fe-chevrons-right"></span><a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a><span id="chevronIcon"
-            class="fe fe-24 fe-chevrons-right"></span>Details of
-        "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"</h4>
+    <h4 style="cursor:pointer;" class="page-title">
+        <a href="{{ route('switch.folder', $doc->file->folder->id) }}">{{ $doc->file->folder->name }}</a>
+        <span style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
+        <a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a>
+        <span id="chevronIcon" style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
+        Details of "{{ $doc->document ? $doc->document->subject : $doc->note->subject }}"
+    </h4>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
             style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">
