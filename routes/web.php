@@ -305,6 +305,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/update_file_attachment/update/{id}', [FileAttachmentController::class, 'Update_file_attachment'])->name('project.update_attachment.update');
     Route::get('/project/files_file/create-attachment/{type}/{file_id}', [FileAttachmentController::class, 'create_attachment'])->name('project.file-attachments.create_attachment');
     Route::post('/project/store_file_attachment/store', [FileAttachmentController::class, 'stor_file_attachment'])->name('project.stor_attachment.stor');
+    Route::post('/export-fill-using-AI', [FileAttachmentController::class, 'export_fill_using_AI']);
+
 
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');

@@ -23,6 +23,7 @@
             width: auto;
             max-width: 100%;
         }
+
         #btn-outline-primary {
             color: blue;
         }
@@ -113,7 +114,7 @@
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
         }
-   
+
         .table-container tbody::-webkit-scrollbar {
             width: 6px;
         }
@@ -140,7 +141,9 @@
             width: 92%;
 
         }
-                                                                                                                                                                                                                                                                                                                                        } */
+        }
+
+        */
     </style>
     <div id="hintBox"
         style="
@@ -159,18 +162,25 @@
     </div>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h3 class="h3 mb-0 page-title"><a href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span id="chevronIcon"
-                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }} - {{ $Type_Name[$type] }}</h3>
+            <h3 class="h3 mb-0 page-title"><a
+                    href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span
+                    id="chevronIcon"
+                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }} -
+                {{ $Type_Name[$type] }}</h3>
         </div>
         <div class="col-auto">
-            <a type="button" href="{{ route('project.file-attachments.create_attachment',['type'=>$type,'file_id'=>$file->slug]) }}"
-            class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Add</a>
+            <a type="button"
+                href="{{ route('project.file-attachments.create_attachment', ['type' => $type, 'file_id' => $file->slug]) }}"
+                class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Add</a>
             <button type="button" class="btn mb-2 dropdown-toggle btn-success"data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">File
                 Action</button>
             <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-allDoc">
                     Export
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-using-AI">
+                    Export Using AI
                 </a>
 
             </div>
@@ -234,8 +244,8 @@
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input row-checkbox"
-                                                    data-file-id="{{ $attachment->id }}" id="checkbox-{{ $attachment->id }}"
-                                                    value="{{ $attachment->id }}">
+                                                    data-file-id="{{ $attachment->id }}"
+                                                    id="checkbox-{{ $attachment->id }}" value="{{ $attachment->id }}">
                                                 <label class="custom-control-label"
                                                     for="checkbox-{{ $attachment->id }}"></label>
                                             </div>
@@ -283,14 +293,16 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <a class="dropdown-item"
-                                                    href="{{ route('project.file-attachments.attachment' , $attachment->id) }}">
+                                                    href="{{ route('project.file-attachments.attachment', $attachment->id) }}">
                                                     Edit
                                                 </a>
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                    data-attachment-id="{{ $attachment->id }}" data-action-type="Copy">Copy
+                                                    data-attachment-id="{{ $attachment->id }}"
+                                                    data-action-type="Copy">Copy
                                                     To another File</a>
                                                 <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
-                                                    data-attachment-id="{{ $attachment->id }}" data-action-type="Move">Move
+                                                    data-attachment-id="{{ $attachment->id }}"
+                                                    data-action-type="Move">Move
                                                     To another File</a>
                                                 <a class="dropdown-item Delete-btn" href="javascript:void(0);"
                                                     data-attachment-id="{{ $attachment->id }}">Delete</a>
@@ -419,6 +431,43 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportUsingAIModal" tabindex="-1" role="dialog"
+        aria-labelledby="exportUsingAIModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportUsingAIModalLabel">
+                        Please select the claimant
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportUsingAIForm">
+                        @csrf
+                        <input type="hidden" id="fileSlug" name="fileSlug">
+                        <div class="form-group">
+                            <label for="folder_id2">Select Claimant</label>
+                            <select class="form-control" id="claimant" name="claimant" required>
+                                <option value="" disabled selected>Select claimant</option>
+                                <option value="Claimant">Claimant</option>
+                                <option value="Contractor">Contractor</option>
+                                <option value="Subcontractor">Subcontractor</option>
+                                <option value="Employer">Employer</option>
+                                <option value="Respondent">Respondent</option>
+                            </select>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveExportUsingAI">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -472,6 +521,47 @@
                     error: function(xhr) {
                         console.error(xhr.responseText);
                         alert('Failed to process. Please try again.');
+                    }
+                });
+            });
+
+            $('#export-using-AI').on('click', function() {
+                const fileId = $(this).data('file-id');
+                $('#fileSlug').val(fileId);
+                $('#exportUsingAIModal').modal('show');
+            });
+
+            $('#saveExportUsingAI').on('click', function() {
+                // Get the claimant value
+                let claimant = $('#claimant').val();
+                let fileSlug = $('#fileSlug').val(); // Optional hidden input
+
+                // Validate claimant
+                if (!claimant) {
+                    alert('Please select a claimant.');
+                    return;
+                }
+
+                // Send AJAX request
+                $.ajax({
+                    url: '/export-fill-using-AI', // Replace with your actual route
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        claimant: claimant,
+                        fileSlug: fileSlug
+                    },
+                    success: function(response) {
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        // Optionally hide the modal
+                        $('#exportUsingAIModal').modal('hide');
+                        // You can show a success message or refresh part of the page
+                    },
+                    error: function(xhr) {
+                        console.error('Error:', xhr.responseText);
+                        alert('Something went wrong. Please try again.');
                     }
                 });
             });
@@ -866,7 +956,7 @@
                         if (!event.target.closest('.dropdown')) {
                             actionList.style.display = 'none';
                         }
-                        
+
                     });
                 }
             }
@@ -932,7 +1022,7 @@
                 }, 3000); // Hide after 3 seconds
             }
 
-           
+
             $('.copyForAllBtn').on('click', function() {
                 // Get all checked checkboxes
 
@@ -959,7 +1049,7 @@
                 let fileDropdown = $('#newFile2');
                 fileDropdown.closest('.form-group').addClass(
                     'd-none');
-                    document.getElementById('copyToForAllModalLabel').innerHTML =
+                document.getElementById('copyToForAllModalLabel').innerHTML =
                     `<spam id="type2">${action_type2}</spam> Selected Attachments To another File`;
                 $('#copyToForAllModal').modal('show');
             });
@@ -1090,7 +1180,7 @@
                                         forClaimLabel.style.backgroundColor =
                                             'rgb(169, 169, 169)';
                                     }
-                                } 
+                                }
 
                             }
                         });
@@ -1107,12 +1197,12 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const filters = {
-               
+
                 all_for_claim: false,
-              
+
                 all_blue_flag: false,
                 all_red_flag: false
-               
+
             };
 
             function applyFilters() {
@@ -1131,7 +1221,7 @@
                 filters[id] = !filters[id];
                 const label = document.getElementById(id);
 
-               if (id === 'all_red_flag') {
+                if (id === 'all_red_flag') {
                     label.innerHTML = filters[id] ? `<i class="fa-solid fa-flag"style="color: #ff0000;"></i>` :
                         `<i class="fa-regular fa-flag"></i>`;
                 } else if (id === 'all_blue_flag') {
@@ -1146,13 +1236,13 @@
             }
 
             document.getElementById("all_for_claim").addEventListener("click", () => toggleFilter("all_for_claim"));
-            
+
             document.getElementById("all_red_flag").addEventListener("click", () => toggleFilter(
                 "all_red_flag"));
             document.getElementById("all_blue_flag").addEventListener("click", () => toggleFilter(
                 "all_blue_flag"));
 
-           
+
         });
     </script>
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
@@ -1185,7 +1275,7 @@
             flatpickr(".date", {
                 enableTime: false,
                 dateFormat: "Y-m-d", // Format: YYYY-MM-DD
-                altInput: true, 
+                altInput: true,
                 altFormat: "d.M.Y",
             });
 
