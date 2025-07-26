@@ -1329,6 +1329,7 @@ class FileAttachmentController extends ApiController
             Based on the above rules please provide a synopsis about the Causes that delayed the ' . $request->claimant . ', and based on the following chronology of events:';
         $formattedText;
         $chatGPT_APIkey = config('openai.api_key');
+        dd($chatGPT_APIkey);
         $ch             = curl_init('https://api.openai.com/v1/chat/completions');
 
         $data = json_encode([
