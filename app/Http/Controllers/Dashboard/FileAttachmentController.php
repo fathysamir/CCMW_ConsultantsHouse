@@ -1358,7 +1358,7 @@ class FileAttachmentController extends ApiController
 
         $response = Http::withHeaders([
             'Content-Type'   => 'application/json',
-            'X-goog-api-key' => config('openai.api_key2'), // Replace with your actual Gemini API key
+            'X-goog-api-key' => config('openai.api_key_2'), // Replace with your actual Gemini API key
         ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', [
             'contents' => [
                 [
