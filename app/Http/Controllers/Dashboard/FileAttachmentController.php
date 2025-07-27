@@ -11,6 +11,7 @@ use App\Models\ProjectFolder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
@@ -1328,32 +1329,48 @@ class FileAttachmentController extends ApiController
             3 - Provide key dates in the format “D MMMM YYYY”.
             Based on the above rules please provide a synopsis about the Causes that delayed the ' . $request->claimant . ', and based on the following chronology of events:';
         $formattedText;
-        $chatGPT_APIkey = config('openai.api_key');
-        $ch             = curl_init('https://api.openai.com/v1/chat/completions');
+        // $chatGPT_APIkey = config('openai.api_key');
+        // $ch             = curl_init('https://api.openai.com/v1/chat/completions');
 
-        $data = json_encode([
-            'model'    => 'gpt-4o',
-            'messages' => [
+        // $data = json_encode([
+        //     'model'    => 'gpt-4o',
+        //     'messages' => [
 
-                ['role' => 'user', 'content' => $formattedText],
+        //         ['role' => 'user', 'content' => $formattedText],
+        //     ],
+        // ]);
+
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Content-Type: application/json',
+        //     'Authorization: Bearer ' . $chatGPT_APIkey,
+        // ]);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $response = curl_exec($ch);
+        // curl_close($ch);
+        // if ($response === false) {
+
+        //     dd(curl_error($ch));
+        // } else {
+        //     dd($response);
+        // }
+
+        $response = Http::withHeaders([
+            'Content-Type'   => 'application/json',
+            'X-goog-api-key' => config('openai.api_key2'), // Replace with your actual Gemini API key
+        ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $formattedText],
+                    ],
+                ],
             ],
         ]);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $chatGPT_APIkey,
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-        if ($response === false) {
-
-            dd(curl_error($ch));
-        } else {
-            dd($response);
-        }
+        $data = $response->json();
+        dd($data);
 
     }
 }
