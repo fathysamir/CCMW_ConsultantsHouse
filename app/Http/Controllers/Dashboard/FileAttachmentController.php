@@ -1370,7 +1370,7 @@ class FileAttachmentController extends ApiController
         ]);
 
         $data = $response->json();
-        dd($data);
+        dd($data['candidates'][0]['content']['parts'][0]['text']);
 
     }
 }
