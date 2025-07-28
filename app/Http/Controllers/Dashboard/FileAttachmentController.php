@@ -8,6 +8,7 @@ use App\Models\FileAttachmentFlag;
 use App\Models\FileDocument;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
@@ -382,14 +383,6 @@ class FileAttachmentController extends ApiController
 
                     $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
 
-                    // preg_match('/<ol>.*?<\/ol>/s', $paragraph_, $olMatches);
-                    // $olContent = $olMatches[0] ?? ''; // Get the <ol> content if it exists
-                    // preg_match('/<ul>.*?<\/ul>/s', $paragraph_, $ulMatches);
-                    // $ulContent = $ulMatches[0] ?? ''; // Get the <ol> content if it exists
-
-                    // Step 2: Remove the <ol> content from the main paragraph
-                    // $paragraphWithoutOl = preg_replace('/<ol>.*?<\/ol>/s', '', $paragraph);
-                    // $paragraphWithoutOlUl = preg_replace('/<ul>.*?<\/ul>/s', '', $paragraphWithoutOl);
                     $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
 
                     // Step 2: Remove empty <p></p> tags
@@ -397,10 +390,6 @@ class FileAttachmentController extends ApiController
 
                     $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
 
-                    // Step 3: Split into an array of <p> tags
-                    // $paragraphsArray = preg_split('/(?=<p>)|(?<=<\/p>)/', $paragraphWithoutEmptyParagraphs);
-
-                    // Step 4: Filter out empty elements
                     $paragraphsArray = array_filter($paragraphsArray, function ($item) {
                         return ! empty(trim($item));
                     });
@@ -1079,283 +1068,440 @@ class FileAttachmentController extends ApiController
         // Header (Level 1 Outline)
         $header = $file->name;
         $header = str_replace('&', '&amp;', $header);
+        if ($request->type == 1) {
+            $paragraphs = FileDocument::with(['document', 'note'])
+                ->where('file_id', $file->id)->where('forClaim', '1');
 
-        $paragraphs = FileDocument::with(['document', 'note'])
-            ->where('file_id', $file->id)->where('forClaim', '1');
+            $paragraphs = $paragraphs->get()
+                ->sortBy([
+                    fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                    <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                    fn($a, $b) => $a->sn <=> $b->sn,
+                ])
+                ->values();
 
-        $paragraphs = $paragraphs->get()
-            ->sortBy([
-                fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
-                <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
-                fn($a, $b) => $a->sn <=> $b->sn,
-            ])
-            ->values();
+            $GetStandardStylesFootNotes = [
+                'name'      => 'Calibri',
+                'alignment' => 'left', // Options: left, center, right, justify
+                'size'      => 9,
+                'bold'      => false,
+                'italic'    => false,
+                'underline' => false,
 
-        $GetStandardStylesFootNotes = [
-            'name'      => 'Calibri',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 9,
-            'bold'      => false,
-            'italic'    => false,
-            'underline' => false,
+            ];
+            $GetParagraphStyleFootNotes = [
+                'spaceBefore' => 0,
+                'spaceAfter'  => 0,
+                'lineSpacing' => 240,
+                'indentation' => [
+                    'left'      => 0,
+                    'hanging'   => 0,
+                    'firstLine' => 0,
+                ],
+            ];
+            $x = 1;
+            foreach ($paragraphs as $index => $paragraph) {
+                // dd($paragraphs);
+                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                $existedList = false;
+                // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
+                $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
+                if ($paragraph->document) {
+                    $date = date('d F Y', strtotime($paragraph->document->start_date));
 
-        ];
-        $GetParagraphStyleFootNotes = [
-            'spaceBefore' => 0,
-            'spaceAfter'  => 0,
-            'lineSpacing' => 240,
-            'indentation' => [
-                'left'      => 0,
-                'hanging'   => 0,
-                'firstLine' => 0,
-            ],
-        ];
-        $x = 1;
-        foreach ($paragraphs as $index => $paragraph) {
-            // dd($paragraphs);
-            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
-            $existedList = false;
-            // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
-            $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
-            if ($paragraph->document) {
-                $date = date('d F Y', strtotime($paragraph->document->start_date));
+                    // Add the main sentence
+                    $listItemRun->addText('On ', $GetStandardStylesP);
 
-                // Add the main sentence
-                $listItemRun->addText('On ', $GetStandardStylesP);
+                    // Add the date with a footnote
+                    $listItemRun->addText($date, $GetStandardStylesP);
+                    $footnote   = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
+                    $hint       = '';
+                    $sn         = 2;
+                    $prefix     = 'Exhibit 1.0.';
+                    $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
+                    $hint       = $listNumber . ': ';
+                    $from       = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                    $type       = $paragraph->document->docType->name;
+                    $hint .= $from . $type . ' ';
+                    if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
 
-                // Add the date with a footnote
-                $listItemRun->addText($date, $GetStandardStylesP);
-                $footnote   = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-                $hint       = '';
-                $sn         = 2;
-                $prefix     = 'Exhibit 1.0.';
-                $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
-                $hint       = $listNumber . ': ';
-                $from       = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                $type       = $paragraph->document->docType->name;
-                $hint .= $from . $type . ' ';
-                if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
+                        $hint .= ', ';
 
-                    $hint .= ', ';
+                    } else {
+                        $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                    }
+                    $hint .= 'dated: ' . $date . '.';
 
+                    $footnote->addText($hint, $GetStandardStylesFootNotes);
+                    $listItemRun->addText(', ', $GetStandardStylesP);
+                    $x++;
                 } else {
-                    $hint .= 'Ref: ' . $paragraph->document->reference . ', ';
+                    $listItemRun->addText('Note: ', $GetStandardStylesP);
                 }
-                $hint .= 'dated: ' . $date . '.';
 
-                $footnote->addText($hint, $GetStandardStylesFootNotes);
-                $listItemRun->addText(', ', $GetStandardStylesP);
-                $x++;
-            } else {
-                $listItemRun->addText('Note: ', $GetStandardStylesP);
-            }
-
-            if ($paragraph->narrative == null) {
-                $listItemRun->addText('____________.', $GetStandardStylesP);
-            } else {
-                if (! $containsHtml) {
-                    $listItemRun->addText($paragraph->narrative . '.');
+                if ($paragraph->narrative == null) {
+                    $listItemRun->addText('____________.', $GetStandardStylesP);
                 } else {
+                    if (! $containsHtml) {
+                        $listItemRun->addText($paragraph->narrative . '.');
+                    } else {
 
-                    $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
+                        $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
 
-                    $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
+                        $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
 
-                    // Step 2: Remove empty <p></p> tags
-                    $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
+                        // Step 2: Remove empty <p></p> tags
+                        $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
 
-                    $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
+                        $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
 
-                    $paragraphsArray = array_filter($paragraphsArray, function ($item) {
-                        return ! empty(trim($item));
-                    });
+                        $paragraphsArray = array_filter($paragraphsArray, function ($item) {
+                            return ! empty(trim($item));
+                        });
 
-                    foreach ($paragraphsArray as $index2 => $pTag) {
-                        // dd($paragraphsArray);
-                        if (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
-                            $phpWord->addNumberingStyle(
-                                'multilevel_1' . $index . $index2,
-                                [
-                                    'type'     => 'multilevel',
-                                    'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
-                                    'levels'   => [
-                                        ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
+                        foreach ($paragraphsArray as $index2 => $pTag) {
+                            // dd($paragraphsArray);
+                            if (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
+                                $phpWord->addNumberingStyle(
+                                    'multilevel_1' . $index . $index2,
+                                    [
+                                        'type'     => 'multilevel',
+                                        'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
+                                        'levels'   => [
+                                            ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
 
-                                        // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
-                                        // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
-                                    ],
-                                ]
-                            );
-                            if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
-                                $listItems = $liMatches[1] ?? [];
-
-                                // Add each list item as a nested list item
-                                foreach ($listItems as $item) {
-                                                                                                                                                // Add a nested list item
-                                    $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2, 'listParagraphStyle2'); // Use a numbering style
-                                                                                                                                                // $nestedListItemRun->addText($item);
-                                    $item = str_replace('&', '&amp;', $item);
-                                    $item = '<span style="font-size:11pt;">' . $item . '</span>';
-                                    Html::addHtml($nestedListItemRun, $item, false, false);
-                                }
-                            }
-                            $existedList = true;
-                        } elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
-                            if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
-                                $listItems = $liMatches[1] ?? [];
-
-                                // Add each list item as a nested list item
-                                foreach ($listItems as $item) {
-                                                                                                                            // Add a nested list item
-                                                                                                                            // dd($listItems);
-                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
-                                                                                                                            // $unNestedListItemRun->addText($item);
-                                    $item = str_replace('&', '&amp;', $item);
-                                    $item = '<span style="font-size:11pt;">' . $item . '</span>';
-
-                                    Html::addHtml($unNestedListItemRun, $item, false, false);
-                                }
-                            }
-
-                            $existedList = true;
-                        } else {
-
-                            // If the paragraph contains only text (including <span>, <strong>, etc.)
-                            try {
-                                if ($existedList) {
-
-                                    $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                        'spaceBefore'       => 0,
-                                        'spaceAfter'        => 240,
-                                        'lineHeight'        => '1.5',
-                                        'indentation'       => [
-                                            'left' => 1071.6,
-
+                                            // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
+                                            // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
                                         ],
-                                        'contextualSpacing' => false,
-                                        'next'              => true,
-                                        'keepNext'          => true,
-                                        'widowControl'      => true,
-                                        'keepLines'         => true,
-                                        'hyphenation'       => false,
-                                        'pageBreakBefore'   => false,
-                                    ]);
-                                    $pTag = $this->lowercaseFirstCharOnly($pTag);
-                                    $pTag = str_replace('&', '&amp;', $pTag);
-                                    $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
-                                    Html::addHtml($listItemRun2, $pTag, false, false);
-                                    if ($index2 < count($paragraphsArray) - 1) {
+                                    ]
+                                );
+                                if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
+                                    $listItems = $liMatches[1] ?? [];
 
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
-
-                                            $listItemRun2->addTextBreak();
-                                        }
-
+                                    // Add each list item as a nested list item
+                                    foreach ($listItems as $item) {
+                                                                                                                                                    // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2, 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                    // $nestedListItemRun->addText($item);
+                                        $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:11pt;">' . $item . '</span>';
+                                        Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
-                                } else {
-                                    // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
-                                    $pTag = $this->lowercaseFirstCharOnly($pTag);
-                                    $pTag = str_replace('&', '&amp;', $pTag);
-                                    $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
-                                    Html::addHtml($listItemRun, $pTag, false, false);
+                                }
+                                $existedList = true;
+                            } elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
+                                if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
+                                    $listItems = $liMatches[1] ?? [];
 
-                                    if ($index2 < count($paragraphsArray) - 1) {
+                                    // Add each list item as a nested list item
+                                    foreach ($listItems as $item) {
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
+                                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                // $unNestedListItemRun->addText($item);
+                                        $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:11pt;">' . $item . '</span>';
 
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
-
-                                            $listItemRun->addTextBreak();
-                                        }
-
+                                        Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
                                 }
 
-                            } catch (\Exception $e) {
-                                error_log('Error adding HTML: ' . $e->getMessage());
+                                $existedList = true;
+                            } else {
+
+                                // If the paragraph contains only text (including <span>, <strong>, etc.)
+                                try {
+                                    if ($existedList) {
+
+                                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
+                                                'left' => 1071.6,
+
+                                            ],
+                                            'contextualSpacing' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
+                                        ]);
+                                        $pTag = $this->lowercaseFirstCharOnly($pTag);
+                                        $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
+                                        Html::addHtml($listItemRun2, $pTag, false, false);
+                                        if ($index2 < count($paragraphsArray) - 1) {
+
+                                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
+                                                $listItemRun2->addTextBreak();
+                                            }
+
+                                        }
+                                    } else {
+                                        // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+                                        $pTag = $this->lowercaseFirstCharOnly($pTag);
+                                        $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
+                                        Html::addHtml($listItemRun, $pTag, false, false);
+
+                                        if ($index2 < count($paragraphsArray) - 1) {
+
+                                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
+                                                $listItemRun->addTextBreak();
+                                            }
+
+                                        }
+                                    }
+
+                                } catch (\Exception $e) {
+                                    error_log('Error adding HTML: ' . $e->getMessage());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
-        $path          = public_path($projectFolder);
-        if (! file_exists($path)) {
 
-            mkdir($path, 0755, true);
-        }
-        $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
-        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
 
-        if (! file_exists($directory)) {
-            mkdir($directory, 0755, true); // true = create nested directories
-        }
-        // Save document
-        // Define file path in public folder
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
-        $filePath = public_path($fileName);
+                mkdir($path, 0755, true);
+            }
+            $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
 
-        // Save document to public folder
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($filePath);
-        session(['zip_file' => $code]);
-        $phpWord2 = IOFactory::load($filePath, 'Word2007');
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            // Save document
+            // Define file path in public folder
+            $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
+            $filePath = public_path($fileName);
 
-        $text = '';
-        foreach ($phpWord2->getSections() as $section) {
-            $elements = $section->getElements();
-            foreach ($elements as $element) {
-                if (method_exists($element, 'getText')) {
-                    if ($element->getText() != 'Note: ____________.') {
-                        $text .= $element->getText() . "\n";
+            // Save document to public folder
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($filePath);
+            session(['zip_file' => $code]);
+            $phpWord2 = IOFactory::load($filePath, 'Word2007');
 
+            $text = '';
+            foreach ($phpWord2->getSections() as $section) {
+                $elements = $section->getElements();
+                foreach ($elements as $element) {
+                    if (method_exists($element, 'getText')) {
+                        if ($element->getText() != 'Note: ____________.') {
+                            $text .= $element->getText() . "\n";
+
+                        }
                     }
                 }
             }
-        }
 
-// Match all sections starting with "On dd Month yyyy" or "Note:"
-        $pattern = '/(?=On\s\d{2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4},)|(?=Note:\s)/';
+            $pattern = '/(?=On\s\d{2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4},)|(?=Note:\s)/';
 
-// Split text into parts
-        $documents = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+            $documents = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-// Rejoin with 3 line breaks between each part
-        $formattedText = implode("\n\n\n", array_map('trim', $documents));
+            $formattedText = implode("\n\n\n", array_map('trim', $documents));
 
-        $formattedText .= "\n\n\n\n\n\n";
-        $formattedText .= 'Please follow the following rules in your response:
+            $formattedText .= "\n\n\n\n\n\n";
+            $formattedText .= 'Please follow the following rules in your response:
             1 - Provide your response in paragraphs. Do not use bullet points.
             2 - Make your response as short as possible.
             3 - Provide key dates in the format “D MMMM YYYY”.
             Based on the above rules please provide a synopsis about the Causes that delayed the ' . $request->claimant . ', and based on the following chronology of events:';
-        $formattedText;
-        // $chatGPT_APIkey = config('openai.api_key');
-        // $ch             = curl_init('https://api.openai.com/v1/chat/completions');
+        } elseif ($request->type == 2) {
+            $paragraphs = FileAttachment::where('section', '1')
+                ->where('file_id', $file->id)->where('forClaim', '1');
 
-        // $data = json_encode([
-        //     'model'    => 'gpt-4o',
-        //     'messages' => [
+            $paragraphs = $paragraphs->orderBy('order', 'asc')->get();
 
-        //         ['role' => 'user', 'content' => $formattedText],
-        //     ],
-        // ]);
+            foreach ($paragraphs as $index => $paragraph) {
+                // dd($paragraphs);
+                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                $existedList = false;
+                // Generate list item number dynamically (e.g., "4.1.1", "4.1.2", etc.)
+                $containsHtml = strip_tags($paragraph->narrative) !== $paragraph->narrative;
 
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        //     'Content-Type: application/json',
-        //     'Authorization: Bearer ' . $chatGPT_APIkey,
-        // ]);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                if ($paragraph->narrative == null) {
+                    $listItemRun->addText('____________.');
+                } else {
+                    if (! $containsHtml) {
+                        $listItemRun->addText($paragraph->narrative . '.');
+                    } else {
 
-        // $response = curl_exec($ch);
-        // curl_close($ch);
-        // if ($response === false) {
+                        $paragraph_ = $this->fixParagraphsWithImages($paragraph->narrative);
 
-        //     dd(curl_error($ch));
-        // } else {
-        //     dd($response);
-        // }
+                        $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
 
+                        // Step 2: Remove empty <p></p> tags
+                        $paragraphWithoutEmptyParagraphs = preg_replace('/<p>\s*<\/p>/i', '', $paragraphWithoutImagesAndBreaks);
+
+                        $paragraphsArray = $this->splitHtmlToArray($paragraphWithoutEmptyParagraphs);
+
+                        $paragraphsArray = array_filter($paragraphsArray, function ($item) {
+                            return ! empty(trim($item));
+                        });
+
+                        // Step 5: Add each <p> tag to the document with a newline after it
+                        foreach ($paragraphsArray as $index2 => $pTag) {
+                            // dd($paragraphsArray);
+                            if (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
+                                $phpWord->addNumberingStyle(
+                                    'multilevel_1' . $index . $index2,
+                                    [
+                                        'type'     => 'multilevel',
+                                        'listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_NUMBER_NESTED,
+                                        'levels'   => [
+                                            ['Heading5', 'format' => 'decimal', 'text' => '%1.'],
+
+                                            // array_merge([$this->paragraphStyleName => 'Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.'], $this->PageParagraphFontStyle),
+                                            // array_merge(['format' => 'decimal', 'text' =>   '%1.%2.%3.'], $this->PageParagraphFontStyle),
+                                        ],
+                                    ]
+                                );
+                                if (preg_match_all('/<li>(.*?)<\/li>/', $olMatches[1], $liMatches)) {
+                                    $listItems = $liMatches[1] ?? [];
+
+                                    // Add each list item as a nested list item
+                                    foreach ($listItems as $item) {
+                                                                                                                                                    // Add a nested list item
+                                        $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2, 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                                    // $nestedListItemRun->addText($item);
+                                        $item = str_replace('&', '&amp;', $item);
+                                        Html::addHtml($nestedListItemRun, $item, false, false);
+                                    }
+                                }
+                                $existedList = true;
+                            } elseif (preg_match('/<ul>(.*?)<\/ul>/is', $pTag, $ulMatches)) {
+                                if (preg_match_all('/<li>(.*?)<\/li>/', $ulMatches[1], $liMatches)) {
+                                    $listItems = $liMatches[1] ?? [];
+
+                                    // Add each list item as a nested list item
+                                    foreach ($listItems as $item) {
+                                                                                                                                // Add a nested list item
+                                                                                                                                // dd($listItems);
+                                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                                                                                                                // $unNestedListItemRun->addText($item);
+                                        $item = str_replace('&', '&amp;', $item);
+                                        Html::addHtml($unNestedListItemRun, $item, false, false);
+                                    }
+                                }
+
+                                $existedList = true;
+                            } else {
+
+                                // If the paragraph contains only text (including <span>, <strong>, etc.)
+                                try {
+                                    if ($existedList) {
+
+                                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                            'spaceBefore'       => 0,
+                                            'spaceAfter'        => 240,
+                                            'lineHeight'        => '1.5',
+                                            'indentation'       => [
+                                                'left' => 1071.6,
+
+                                            ],
+                                            'contextualSpacing' => false,
+                                            'next'              => true,
+                                            'keepNext'          => true,
+                                            'widowControl'      => true,
+                                            'keepLines'         => true,
+                                            'hyphenation'       => false,
+                                            'pageBreakBefore'   => false,
+                                        ]);
+                                        $pTag = $this->lowercaseFirstCharOnly($pTag);
+                                        $pTag = str_replace('&', '&amp;', $pTag);
+                                        Html::addHtml($listItemRun2, $pTag, false, false);
+                                        if ($index2 < count($paragraphsArray) - 1) {
+
+                                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
+                                                $listItemRun2->addTextBreak();
+                                            }
+
+                                        }
+                                    } else {
+                                        // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+                                        $pTag = $this->lowercaseFirstCharOnly($pTag);
+                                        $pTag = str_replace('&', '&amp;', $pTag);
+                                        Html::addHtml($listItemRun, $pTag, false, false);
+
+                                        if ($index2 < count($paragraphsArray) - 1) {
+
+                                            if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
+
+                                                $listItemRun->addTextBreak();
+                                            }
+
+                                        }
+                                    }
+
+                                } catch (\Exception $e) {
+                                    error_log('Error adding HTML: ' . $e->getMessage());
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
+
+                mkdir($path, 0755, true);
+            }
+            $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            // Save document
+            // Define file path in public folder
+            $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
+            $filePath = public_path($fileName);
+
+            // Save document to public folder
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($filePath);
+            session(['zip_file' => $code]);
+            $phpWord2 = IOFactory::load($filePath, 'Word2007');
+
+            $text = '';
+            foreach ($phpWord2->getSections() as $section) {
+                $elements = $section->getElements();
+                foreach ($elements as $element) {
+                    if (method_exists($element, 'getText')) {
+                        if ($element->getText() != 'Note: ____________.') {
+                            $text .= $element->getText() . "\n";
+
+                        }
+                    }
+                }
+            }
+
+            $pattern = '/(?=On\s\d{2}\s(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4},)|(?=Note:\s)/';
+
+            $documents = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+            $Text = implode("\n\n\n", array_map('trim', $documents));
+            $current_project = Project::where('id',auth()->user()->current_project_id)->first();
+            $formattedText='Given that the Conditions of Contract of this Construction Project is ';
+            $formattedText .='"' . $current_project->condation_contract . '",';
+            $formattedText .='and the ' . $request->claimant . 'was delayed due to a Delay Event, which was beyond his control as explained in the following synopsis about the Delay Event: \n';
+            $formattedText .= $Text . ' \n\n';
+            $formattedText .= 'Please provide the contractual position of this claimant supporting his entitlement to Extension of Time for Completion and the associated cost.';
+        }
         $response = Http::withHeaders([
             'Content-Type'   => 'application/json',
             'X-goog-api-key' => config('openai.api_key_2'), // Replace with your actual Gemini API key

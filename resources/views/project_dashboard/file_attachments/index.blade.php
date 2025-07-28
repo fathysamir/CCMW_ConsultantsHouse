@@ -447,6 +447,8 @@
                     <form id="exportUsingAIForm">
                         @csrf
                         <input type="hidden" id="fileSlug" name="fileSlug">
+                        <input type="hidden" id="typee" name="attach_type" value="{{ $type }}">
+
                         <div class="form-group">
                             <label for="folder_id2">Select Claimant</label>
                             <select class="form-control" id="claimant" name="claimant" required>
@@ -463,7 +465,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveExportUsingAI">Save</button>
+                    <button type="button" class="btn btn-primary" id="saveExportUsingAI">Run</button>
                 </div>
             </div>
         </div>
@@ -535,6 +537,7 @@
                 // Get the claimant value
                 let claimant = $('#claimant').val();
                 let fileSlug = $('#fileSlug').val(); // Optional hidden input
+                let type = $('#typee').val();
 
                 // Validate claimant
                 if (!claimant) {
@@ -549,7 +552,8 @@
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
                         claimant: claimant,
-                        fileSlug: fileSlug
+                        fileSlug: fileSlug,
+                        type: type
                     },
                     success: function(response) {
                         if (response.download_url) {
