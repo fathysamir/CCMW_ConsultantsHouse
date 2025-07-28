@@ -1369,8 +1369,66 @@ class FileAttachmentController extends ApiController
             ],
         ]);
 
-        $data = $response->json();
-        dd($data['candidates'][0]['content']['parts'][0]['text']);
+        $data     = $response->json();
+        $result   = $data['candidates'][0]['content']['parts'][0]['text'];
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
 
+        $phpWord                   = new PhpWord;
+        $section                   = $phpWord->addSection();
+        $GetStandardStylesSubtitle = [
+            'name'      => 'Arial',
+            'alignment' => 'left', // Options: left, center, right, justify
+            'size'      => 14,
+            'bold'      => true,
+            'italic'    => false,
+            'underline' => false,
+
+        ];
+        $GetParagraphStyleSubtitle = [
+            'spaceBefore'       => 0,
+            'spaceAfter'        => 240,
+            'lineHeight'        => '1.5',
+            'indentation'       => [
+                'left'      => 1071.6,
+                'hanging'   => 0,
+                'firstLine' => 0,
+            ],
+            'contextualSpacing' => true,
+            'next'              => true,
+            'keepNext'          => true,
+            'widowControl'      => true,
+        ];
+        $result = str_replace('&', '&amp;', $result);
+        $section->addText($result, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+        $path          = public_path($projectFolder);
+        if (! file_exists($path)) {
+
+            mkdir($path, 0755, true);
+        }
+        $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+        if (! file_exists($directory)) {
+            mkdir($directory, 0755, true); // true = create nested directories
+        }
+        // Save document
+        // Define file path in public folder
+        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
+        $filePath = public_path($fileName);
+
+        // Save document to public folder
+        $writer = IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($filePath);
+        session(['zip_file' => $code]);
+
+        return response()->json(['download_url' => asset($fileName)]);
     }
 }
