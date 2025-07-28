@@ -180,7 +180,7 @@
                     Export
                 </a>
                 <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-using-AI">
-                    Export Using AI
+                    Propose Using AI
                 </a>
 
             </div>
