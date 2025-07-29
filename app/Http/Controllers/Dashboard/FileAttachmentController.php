@@ -1498,9 +1498,10 @@ class FileAttachmentController extends ApiController
             $current_project = Project::where('id',auth()->user()->current_project_id)->first();
             $formattedText='Given that the Conditions of Contract of this Construction Project is ';
             $formattedText .='"' . $current_project->condation_contract . '",';
-            $formattedText .='and the ' . $request->claimant . 'was delayed due to a Delay Event, which was beyond his control as explained in the following synopsis about the Delay Event: \n';
+            $formattedText .='and the ' . $request->claimant . ' was delayed due to a Delay Event, which was beyond his control as explained in the following synopsis about the Delay Event: \n';
             $formattedText .= $Text . ' \n\n';
-            $formattedText .= 'Please provide the contractual position of this claimant supporting his entitlement to Extension of Time for Completion and the associated cost.';
+            $formattedText .= 'Please provide the contractual position of the ' . $request->claimant . ' supporting his entitlement to Extension of Time for Completion and the associated cost. \n';
+            $formattedText .='Please provide your answer without introduction or padding';
         }
         $response = Http::withHeaders([
             'Content-Type'   => 'application/json',
