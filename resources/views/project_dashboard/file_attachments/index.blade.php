@@ -397,7 +397,7 @@
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"checked id="forclaimdocs"
                                 name="forclaimdocs">
-                            <label class="custom-control-label" for="forclaimdocs">For Claim Attachments</label>
+                            <label class="custom-control-label" for="forclaimdocs">For Claim Only</label>
                         </div>
                         <hr>
 
