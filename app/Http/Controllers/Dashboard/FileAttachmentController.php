@@ -638,7 +638,7 @@ class FileAttachmentController extends ApiController
             $pTag        = str_replace('&', '&amp;', $pTag);
 
             Html::addHtml($listItemRun, $pTag, false, false);
-            $listItemRun->addTextBreak();
+           
             $tags_array = $request->tags;
             $documents  = FileDocument::whereHas('document')
                 ->where('file_id', $file->id)->
@@ -651,21 +651,21 @@ class FileAttachmentController extends ApiController
                 ->values();
 
             if (count($documents) > 0) {
-                $fontStyle = ['name' => 'Courier New', 'size' => 10];
+                $table = $section->addTable();
 
-                // Header row
-                $header = str_pad("Reference", 50) . str_pad("Date", 20);
-                $listItemRun->addText($header, $fontStyle);
-                $listItemRun->addTextBreak();
+// Add header row
+                $table->addRow();
+                $table->addCell(5000)->addText('Reference', ['name' => 'Arial', 'size' => 10, 'bold' => true],$GetParagraphStyleSubtitle);
+                $table->addCell(3000)->addText('Date', ['name' => 'Arial', 'size' => 10, 'bold' => true],$GetParagraphStyleSubtitle);
 
+// Add data rows
                 foreach ($documents as $doc) {
                     $ref  = str_replace('&', '&amp;', $doc->document->reference);
                     $date = date('d.M.Y', strtotime($doc->document->start_date));
 
-                    // Pad reference to 50 characters, then add the date
-                    $line = str_pad($ref, 50) . str_pad($date, 20);
-                    $listItemRun->addText($line, $fontStyle);
-                    $listItemRun->addTextBreak();
+                    $table->addRow();
+                    $table->addCell(5000)->addText($ref, ['name' => 'Arial', 'size' => 10],$GetParagraphStyleSubtitle);
+                    $table->addCell(3000)->addText($date, ['name' => 'Arial', 'size' => 10],$GetParagraphStyleSubtitle);
                 }
             }
 
