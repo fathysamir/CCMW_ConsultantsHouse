@@ -179,9 +179,12 @@
                 <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-allDoc">
                     Export
                 </a>
-                <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}" id="export-using-AI">
-                    Propose Using AI
-                </a>
+                @if ($type == 1 || $type == 2)
+                    <a class="dropdown-item" href="javascript:void(0);" data-file-id="{{ $file->slug }}"
+                        id="export-using-AI">
+                        Propose Using AI
+                    </a>
+                @endif
 
             </div>
         </div>
