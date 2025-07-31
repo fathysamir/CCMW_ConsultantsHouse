@@ -165,7 +165,7 @@
             <h3 class="h3 mb-0 page-title"><a
                     href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span
                     id="chevronIcon"
-                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>{{ $file->name }} -
+                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span><a href="{{ route('project.file-documents.index', $file->slug) }}">{{ $file->name }}</a> -
                 {{ $Type_Name[$type] }}</h3>
         </div>
         <div class="col-auto">
