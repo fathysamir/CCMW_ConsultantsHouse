@@ -164,8 +164,8 @@
         <div class="col">
             <h3 class="h3 mb-0 page-title"><a
                     href="{{ route('switch.folder', $file->folder->id) }}">{{ $file->folder->name }}</a><span
-                    id="chevronIcon"
-                    class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span><a href="{{ route('project.file-documents.index', $file->slug) }}">{{ $file->name }}</a> -
+                    id="chevronIcon" class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span><a
+                    href="{{ route('project.file-documents.index', $file->slug) }}">{{ $file->name }}</a> -
                 {{ $Type_Name[$type] }}</h3>
         </div>
         <div class="col-auto">
@@ -404,8 +404,8 @@
                                 style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
                                 <input type="checkbox" class="custom-control-input" id="add_note" name="add_note">
                                 <label class="custom-control-label" for="add_note" style="margin-bottom: 0;width:100%">
-                                    <input type="text" name="note" class="form-control" id="kkk"
-                                        value="The Claimant has complied with the Contract Requirements and issued the following notices:"style="padding-top: 0px;height: 25px;padding-bottom: 0px;">
+
+                                    <textarea rows="3" class="form-control" name="note" id="kkk">The Claimant has complied with the Contract Requirements and issued the following notices:</textarea>
                                 </label>
                             </div>
 
