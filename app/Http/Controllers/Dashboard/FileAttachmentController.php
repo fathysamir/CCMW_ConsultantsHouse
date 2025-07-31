@@ -2,13 +2,14 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
+use App\Models\ContractTag;
 use App\Models\Document;
 use App\Models\FileAttachment;
 use App\Models\FileAttachmentFlag;
 use App\Models\FileDocument;
+use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
-use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
@@ -22,6 +23,7 @@ class FileAttachmentController extends ApiController
 {
     public function index($id, $type)
     {
+        $user     = auth()->user();
         $zip_file = session('zip_file');
         if ($zip_file != null) {
             $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
@@ -39,8 +41,9 @@ class FileAttachmentController extends ApiController
         $array_red_flags  = FileAttachmentFlag::where('user_id', auth()->user()->id)->where('flag', 'red')->pluck('file_attachment_id')->toArray();
         $array_blue_flags = FileAttachmentFlag::where('user_id', auth()->user()->id)->where('flag', 'blue')->pluck('file_attachment_id')->toArray();
         $Type_Name        = ['1' => 'Synopsis', '2' => 'Contractual Position', '3' => 'Cause-and-Effect Analysis'];
+        $tags             = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->orderBy('order', 'asc')->get();
 
-        return view('project_dashboard.file_attachments.index', compact('Type_Name', 'type', 'array_red_flags', 'array_blue_flags', 'attachments', 'folders', 'file', 'specific_file_attach'));
+        return view('project_dashboard.file_attachments.index', compact('tags', 'Type_Name', 'type', 'array_red_flags', 'array_blue_flags', 'attachments', 'folders', 'file', 'specific_file_attach'));
     }
 
     public function create_attachment($type, $file_id)
@@ -137,7 +140,6 @@ class FileAttachmentController extends ApiController
 
     public function exportWordClaimAttachments(Request $request)
     {
-
         $zip_file = session('zip_file');
         if ($zip_file != null) {
             $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
@@ -602,6 +604,7 @@ class FileAttachmentController extends ApiController
                                     }
                                 } else {
                                     // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
+
                                     $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
                                     Html::addHtml($listItemRun, $pTag, false, false);
@@ -623,6 +626,46 @@ class FileAttachmentController extends ApiController
 
                     }
 
+                }
+            }
+
+        }
+        if (count($paragraphs) > 0 && $request->attach_type == 2 && $request->add_note == 'on') {
+            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+            $existedList = false;
+            $pTag        = "<p>" . $request->note . "</p>";
+            $pTag        = $this->lowercaseFirstCharOnly($pTag);
+            $pTag        = str_replace('&', '&amp;', $pTag);
+
+            Html::addHtml($listItemRun, $pTag, false, false);
+            $listItemRun->addTextBreak();
+            $tags_array = $request->tags;
+            $documents  = FileDocument::whereHas('document')
+                ->where('file_id', $file->id)->
+                with('tags')->whereHas('tags', function ($query) use ($tags_array) {
+                $query->whereIn('contract_tag_id', $tags_array);
+            })->get()->sortBy([
+                fn($a, $b) => ($a->document->start_date ?? '9999-12-31') <=> ($b->document->start_date ?? '9999-12-31'),
+                fn($a, $b) => $a->sn <=> $b->sn,
+            ])
+                ->values();
+
+            if (count($documents) > 0) {
+                $fontStyle = ['name' => 'Courier New', 'size' => 10];
+
+                // Header row
+                $header = str_pad("Reference", 50) . str_pad("Date", 20);
+                $listItemRun->addText($header, $fontStyle);
+                $listItemRun->addTextBreak();
+
+                foreach ($documents as $doc) {
+                    $ref  = str_replace('&', '&amp;', $doc->document->reference);
+                    $date = date('d.M.Y', strtotime($doc->document->start_date));
+
+                    // Pad reference to 50 characters, then add the date
+                    $line = str_pad($ref, 50) . str_pad($date, 20);
+                    $listItemRun->addText($line, $fontStyle);
+                    $listItemRun->addTextBreak();
                 }
             }
 
@@ -1494,14 +1537,14 @@ class FileAttachmentController extends ApiController
 
             $documents = preg_split($pattern, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-            $Text = implode("\n\n\n", array_map('trim', $documents));
-            $current_project = Project::where('id',auth()->user()->current_project_id)->first();
-            $formattedText='Given that the Conditions of Contract of this Construction Project is ';
-            $formattedText .='"' . $current_project->condation_contract . '",';
-            $formattedText .='and the ' . $request->claimant . ' was delayed due to a Delay Event, which was beyond his control as explained in the following synopsis about the Delay Event: \n';
+            $Text            = implode("\n\n\n", array_map('trim', $documents));
+            $current_project = Project::where('id', auth()->user()->current_project_id)->first();
+            $formattedText   = 'Given that the Conditions of Contract of this Construction Project is ';
+            $formattedText .= '"' . $current_project->condation_contract . '",';
+            $formattedText .= 'and the ' . $request->claimant . ' was delayed due to a Delay Event, which was beyond his control as explained in the following synopsis about the Delay Event: \n';
             $formattedText .= $Text . ' \n\n';
             $formattedText .= 'Please provide the contractual position of the ' . $request->claimant . ' supporting his entitlement to Extension of Time for Completion and the associated cost. \n';
-            $formattedText .='Please provide your answer without introduction or padding';
+            $formattedText .= 'Please provide your answer without introduction or padding';
         }
         $response = Http::withHeaders([
             'Content-Type'   => 'application/json',

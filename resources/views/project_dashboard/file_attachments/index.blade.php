@@ -399,6 +399,27 @@
                                 name="forclaimdocs">
                             <label class="custom-control-label" for="forclaimdocs">For Claim Only</label>
                         </div>
+                        @if ($type == 2)
+                            <div class="custom-control custom-checkbox mb-3"
+                                style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+                                <input type="checkbox" class="custom-control-input" id="add_note" name="add_note">
+                                <label class="custom-control-label" for="add_note" style="margin-bottom: 0;width:100%">
+                                    <input type="text" name="note" class="form-control" id="kkk"
+                                        value="The Claimant has complied with the Contract Requirements and issued the following notices:"style="padding-top: 0px;height: 25px;padding-bottom: 0px;">
+                                </label>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="Revision">Tags</label>
+                                <select class="form-control select2-multi" id="multi-select2" name="tags[]"multiple>
+
+                                    @foreach ($tags as $tag)
+                                        <option value="{{ $tag->id }}">
+                                            {{ $tag->name }} ({{ $tag->sub_clause }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                         <hr>
 
 
