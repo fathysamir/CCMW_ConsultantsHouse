@@ -446,6 +446,16 @@ Based on that and provided that we have the following list of stakeholders:';
         if ($request->doc_type) {
             $all_documents->where('doc_type_id', $request->doc_type);
         }
+        if ($request->authUser == 'on') {
+            $all_documents->where('user_id', auth()->user()->id);
+        }
+
+        if ($request->analysis_complete == '0') {
+            $all_documents->where('analysis_complete', '0');
+        }
+        if($request->not_assignment =='on'){
+            $all_documents->whereDoesntHave('files');
+        }
         $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         // dd($all_documents);
         $stake_holders = $project->stakeHolders;

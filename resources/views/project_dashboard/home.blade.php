@@ -17,7 +17,7 @@
             border-radius: 5px;
             width: 100%;
             padding: 10px;
-            
+
         }
 
         .row_d {
@@ -60,7 +60,7 @@
 
         .green {
             background-color: #39ab19;
-            
+
         }
 
         .red {
@@ -130,46 +130,46 @@
             {{ session('success') }}
         </div>
     @endif
-   
-            <div style="display: flex; width:100%;">
-                <div class="col-md-4">
-                    <div class="chart-container">
-                        <div class="row_d">
-                            <div class="label">My Documents</div>
-                            <div class="count-box blue" id="count-main">{{ $allUserDocuments }}</div>
-                            <div class="bar-container">
-                                <div class="bar blue" id="bar-main"></div>
-                            </div>
-                        </div>
 
-                        <div class="row_d">
-                            <div class="label">Pending Analysis</div>
-                            <div class="count-box green" id="count-analysis">{{ $allPendingAnalysisUserDocuments }}</div>
-                            <div class="bar-container">
-                                <div class="bar green" id="bar-analysis"></div>
-                            </div>
-                        </div>
-
-                        <div class="row_d">
-                            <div class="label">Pending Assignment</div>
-                            <div class="count-box red" id="count-assignment">{{ $allPendingAssignmentUserDocuments }}</div>
-                            <div class="bar-container">
-                                <div class="bar red" id="bar-assignment"></div>
-                            </div>
-                        </div>
-
-                        <div class="row_d">
-                            <div class="label">Need Narrative</div>
-                            <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
-                            <div class="bar-container">
-                                <div class="bar brown" id="bar-narrative"></div>
-                            </div>
-                        </div>
+    <div style="display: flex; width:100%;">
+        <div class="col-md-4">
+            <div class="chart-container">
+                <div class="row_d">
+                    <div class="label">My Documents</div>
+                    <div class="count-box blue" id="count-main">{{ $allUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar blue" id="bar-main"></div>
                     </div>
                 </div>
-                <div class="col-md-6"></div>
+
+                <div class="row_d">
+                    <div class="label">Pending Analysis</div>
+                    <div class="count-box green" id="count-analysis">{{ $allPendingAnalysisUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar green" id="bar-analysis"></div>
+                    </div>
+                </div>
+
+                <div class="row_d">
+                    <div class="label">Pending Assignment</div>
+                    <div class="count-box red" id="count-assignment">{{ $allPendingAssignmentUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar red" id="bar-assignment"></div>
+                    </div>
+                </div>
+
+                <div class="row_d">
+                    <div class="label">Need Narrative</div>
+                    <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar brown" id="bar-narrative"></div>
+                    </div>
+                </div>
             </div>
-       
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+
 
 @endsection
 @push('scripts')
@@ -201,5 +201,16 @@
         document.getElementById("bar-analysis").style.width = `${(values.analysis / max) * 100}%`;
         document.getElementById("bar-assignment").style.width = `${(values.assignment / max) * 100}%`;
         document.getElementById("bar-narrative").style.width = `${(values.narrative / max) * 100}%`;
+    </script>
+    <script>
+        document.getElementById("count-main").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on";
+        });
+         document.getElementById("count-analysis").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&analysis_complete=0";
+        });
+         document.getElementById("count-assignment").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&not_assignment=on";
+        });
     </script>
 @endpush
