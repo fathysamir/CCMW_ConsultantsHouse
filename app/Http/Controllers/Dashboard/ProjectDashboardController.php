@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\ApiController;
 use App\Models\Account;
 use App\Models\Project;
+use App\Models\Document;
+use App\Models\FileDocument;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 
@@ -20,7 +22,14 @@ class ProjectDashboardController extends ApiController
         $project = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
 
-        return view('project_dashboard.home', compact('users', 'project', 'assigned_users'));
+        $allUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->count();
+        $allPendingAnalysisUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->where('analysis_complete','0')->count();
+        $allPendingAssignmentUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->whereDoesntHave('files')->count();
+        $allNeedNarrativeUserDocuments=FileDocument::whereHas('document',function($q) use($user){
+            $q->where('user_id',$user->id)
+            ->where('project_id',$user->current_project_id);
+        })->where('narrative',null)->count();
+        return view('project_dashboard.home', compact('users', 'allUserDocuments','allPendingAnalysisUserDocuments','allPendingAssignmentUserDocuments','allNeedNarrativeUserDocuments','project', 'assigned_users'));
 
     }
 

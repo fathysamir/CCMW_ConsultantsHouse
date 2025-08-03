@@ -11,6 +11,66 @@
             /* Change text color to white on hover */
         }
     </style>
+    <style>
+        .chart-container {
+            border: 1px solid #eea303;
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            
+        }
+
+        .row_d {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .label {
+            width: 140px;
+            font-weight: bold;
+        }
+
+        .count-box {
+            width: 40px;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 14px;
+            padding: 2px 0;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .bar-container {
+            height: 12px;
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+        }
+
+        .blue {
+            background-color: #3d73c5;
+        }
+
+        .green {
+            background-color: #39ab19;
+            
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .brown {
+            background-color: #b5662c;
+        }
+    </style>
 
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
@@ -39,9 +99,11 @@
                         @csrf
                         <div class="form-group mb-3">
                             <label for="multi-select2">Select Users</label>
-                            <select class="form-control select2-multi xxx" id="multi-select2" name="assigned_users[]"multiple>
+                            <select class="form-control select2-multi xxx" id="multi-select2"
+                                name="assigned_users[]"multiple>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}" @if(in_array($user->id, $assigned_users)) selected @endif>{{ $user->name? $user->name . ' - ' . $user->email : $user->email }}</option>
+                                    <option value="{{ $user->id }}" @if (in_array($user->id, $assigned_users)) selected @endif>
+                                        {{ $user->name ? $user->name . ' - ' . $user->email : $user->email }}</option>
                                 @endforeach
                             </select>
                         </div> <!-- form-group -->
@@ -68,11 +130,46 @@
             {{ session('success') }}
         </div>
     @endif
-    <div class="row">
+   
+            <div style="display: flex; width:100%;">
+                <div class="col-md-4">
+                    <div class="chart-container">
+                        <div class="row_d">
+                            <div class="label">My Documents</div>
+                            <div class="count-box blue" id="count-main">{{ $allUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar blue" id="bar-main"></div>
+                            </div>
+                        </div>
 
-        <div class="col-md-9">
-        </div> <!-- .col -->
-    </div>
+                        <div class="row_d">
+                            <div class="label">Pending Analysis</div>
+                            <div class="count-box green" id="count-analysis">{{ $allPendingAnalysisUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar green" id="bar-analysis"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Pending Assignment</div>
+                            <div class="count-box red" id="count-assignment">{{ $allPendingAssignmentUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar red" id="bar-assignment"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Need Narrative</div>
+                            <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar brown" id="bar-narrative"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6"></div>
+            </div>
+       
 
 @endsection
 @push('scripts')
@@ -86,5 +183,23 @@
             }, 4000); // 4 seconds
         });
     </script>
-   
+
+    <script>
+        // Values
+        const values = {
+            main: {{ $allUserDocuments }},
+            analysis: {{ $allPendingAnalysisUserDocuments }},
+            assignment: {{ $allPendingAssignmentUserDocuments }},
+            narrative: {{ $allNeedNarrativeUserDocuments }},
+        };
+
+        // Get max value for scaling
+        const max = Math.max(...Object.values(values));
+
+        // Set bar widths as percentage of max
+        document.getElementById("bar-main").style.width = `${(values.main / max) * 100}%`;
+        document.getElementById("bar-analysis").style.width = `${(values.analysis / max) * 100}%`;
+        document.getElementById("bar-assignment").style.width = `${(values.assignment / max) * 100}%`;
+        document.getElementById("bar-narrative").style.width = `${(values.narrative / max) * 100}%`;
+    </script>
 @endpush
