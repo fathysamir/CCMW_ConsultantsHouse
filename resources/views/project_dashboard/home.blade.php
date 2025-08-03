@@ -10,6 +10,10 @@
             color: white;
             /* Change text color to white on hover */
         }
+
+        .my-4 {
+            margin-bottom: 1rem !important;
+        }
     </style>
     <style>
         .chart-container {
@@ -23,11 +27,11 @@
         .row_d {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin: 0px 0 7px 0;
         }
 
         .label {
-            width: 140px;
+            width: 160px;
             font-weight: bold;
         }
 
@@ -69,6 +73,58 @@
 
         .brown {
             background-color: #b5662c;
+        }
+    </style>
+    <style>
+        .summary-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #eea303;
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .info-label {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .count-box {
+            padding: 2px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .total-docs {
+            background-color: #0f4d6b;
+        }
+
+        .active-docs {
+            background-color: #39ab19;
+
+        }
+
+        .not-pursue {
+            background-color: red;
+        }
+
+        canvas {
+            width: 80px;
+            height: 80px;
         }
     </style>
 
@@ -132,11 +188,29 @@
     @endif
 
     <div style="display: flex; width:100%;">
-        <div class="col-md-4">
-            <div class="chart-container">
+        <div class="col-md-4" style="padding-right:0px !important">
+            <div class="summary-box">
+                <div class="info">
+                    <div class="info-row">
+                        <div class="label">Total Documents</div>
+                        <div class="count-box total-docs" id="total-docs">{{ $allUserDocuments }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">Active Documents</div>
+                        <div class="count-box active-docs" id="active-docs">{{ $allActiveUserDocuments }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">Assessed Not To Pursue</div>
+                        <div class="count-box not-pursue" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
+                    </div>
+                </div>
+                <canvas id="pieChart" width="80" height="80"></canvas>
+                
+            </div>
+            <div class="chart-container" style="margin-top: 10px;">
                 <div class="row_d">
-                    <div class="label">My Documents</div>
-                    <div class="count-box blue" id="count-main">{{ $allUserDocuments }}</div>
+                    <div class="label">Active Documents</div>
+                    <div class="count-box blue" id="active-docs2">{{ $allActiveUserDocuments }}</div>
                     <div class="bar-container">
                         <div class="bar blue" id="bar-main"></div>
                     </div>
@@ -157,6 +231,26 @@
                         <div class="bar red" id="bar-assignment"></div>
                     </div>
                 </div>
+            </div>
+
+        </div>
+        <div class="col-md-4"style="padding-right:0px !important">
+            <div class="chart-container">
+                <div class="row_d">
+                    <div class="label">Assignment Documents</div>
+                    <div class="count-box blue" id="assignment_docs">{{ $allAssignmentUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar blue" id="bar-assignment-docs"></div>
+                    </div>
+                </div>
+
+                <div class="row_d">
+                    <div class="label">For Claim</div>
+                    <div class="count-box green" id="forClaim_docs">{{ $allForClaimUserDocuments }}</div>
+                    <div class="bar-container">
+                        <div class="bar green" id="bar-forClaim-docs"></div>
+                    </div>
+                </div>
 
                 <div class="row_d">
                     <div class="label">Need Narrative</div>
@@ -167,7 +261,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6"></div>
     </div>
 
 
@@ -187,7 +280,7 @@
     <script>
         // Values
         const values = {
-            main: {{ $allUserDocuments }},
+            main: {{ $allActiveUserDocuments }},
             analysis: {{ $allPendingAnalysisUserDocuments }},
             assignment: {{ $allPendingAssignmentUserDocuments }},
             narrative: {{ $allNeedNarrativeUserDocuments }},
@@ -201,16 +294,74 @@
         document.getElementById("bar-analysis").style.width = `${(values.analysis / max) * 100}%`;
         document.getElementById("bar-assignment").style.width = `${(values.assignment / max) * 100}%`;
         document.getElementById("bar-narrative").style.width = `${(values.narrative / max) * 100}%`;
+
+         const valuesBox2 = {
+            main: {{ $allAssignmentUserDocuments }},
+            forClaim: {{ $allForClaimUserDocuments }},
+            narrative: {{ $allNeedNarrativeUserDocuments }},
+        };
+        const max2 = Math.max(...Object.values(valuesBox2));
+
+        // Set bar widths as percentage of max
+        document.getElementById("bar-assignment-docs").style.width = `${(valuesBox2.main / max2) * 100}%`;
+        document.getElementById("bar-forClaim-docs").style.width = `${(valuesBox2.forClaim / max2) * 100}%`;
+        document.getElementById("bar-narrative").style.width = `${(valuesBox2.narrative / max2) * 100}%`;
     </script>
     <script>
-        document.getElementById("count-main").addEventListener("click", function() {
+        document.getElementById("total-docs").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on";
         });
-         document.getElementById("count-analysis").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&analysis_complete=0";
+        document.getElementById("active-docs").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&active_docs=1";
         });
-         document.getElementById("count-assignment").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&not_assignment=on";
+         document.getElementById("active-docs2").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&active_docs=1";
+        });
+        document.getElementById("not-pursue").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&active_docs=0";
+        });
+        document.getElementById("count-analysis").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&analysis_complete=0&active_docs=1";
+        });
+        document.getElementById("count-assignment").addEventListener("click", function() {
+            window.location.href = "/project/all-documents?authUser=on&not_assignment=on&active_docs=1";
         });
     </script>
+
+    <script>
+        const ctx = document.getElementById('pieChart').getContext('2d');
+
+
+        const active = {{ $allActiveUserDocuments }};
+        const notPursue = {{ $allInactiveUserDocuments }};
+
+
+        const data = {
+
+            datasets: [{
+                data: [active, notPursue],
+                backgroundColor: ['#39ab19', 'red'],
+                borderWidth: 0,
+            }],
+        };
+
+        const pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: data,
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+            }
+        });
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endpush

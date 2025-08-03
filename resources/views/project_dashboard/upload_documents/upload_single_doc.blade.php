@@ -267,6 +267,11 @@
                                 name="analysis_complete">
                             <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                         </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"id="assess_not_pursue"
+                                name="assess_not_pursue">
+                            <label class="custom-control-label" for="assess_not_pursue">Assessed Not To Pursue</label>
+                        </div>
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
                             style="margin-top: 10px;">Create</button>
                     </form>

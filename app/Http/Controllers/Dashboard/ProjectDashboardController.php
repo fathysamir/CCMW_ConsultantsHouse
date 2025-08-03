@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Account;
-use App\Models\Project;
 use App\Models\Document;
 use App\Models\FileDocument;
+use App\Models\Project;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 
@@ -15,21 +14,34 @@ class ProjectDashboardController extends ApiController
     public function index()
     {
 
-        $user = auth()->user();
+        $user    = auth()->user();
         $account = Account::findOrFail($user->current_account_id);
-        $users = $account->users;
+        $users   = $account->users;
 
-        $project = Project::findOrFail($user->current_project_id);
+        $project        = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
 
-        $allUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->count();
-        $allPendingAnalysisUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->where('analysis_complete','0')->count();
-        $allPendingAssignmentUserDocuments=Document::where('user_id',$user->id)->where('project_id',$user->current_project_id)->whereDoesntHave('files')->count();
-        $allNeedNarrativeUserDocuments=FileDocument::whereHas('document',function($q) use($user){
-            $q->where('user_id',$user->id)
-            ->where('project_id',$user->current_project_id);
-        })->where('narrative',null)->count();
-        return view('project_dashboard.home', compact('users', 'allUserDocuments','allPendingAnalysisUserDocuments','allPendingAssignmentUserDocuments','allNeedNarrativeUserDocuments','project', 'assigned_users'));
+        $allUserDocuments                  = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->count();
+        $allActiveUserDocuments            = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->count();
+        $allInactiveUserDocuments          = $allUserDocuments - $allActiveUserDocuments;
+        $allPendingAnalysisUserDocuments   = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->where('analysis_complete', '0')->count();
+        $allPendingAssignmentUserDocuments = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereDoesntHave('files')->count();
+        $allAssignmentUserDocuments        = FileDocument::whereHas('document', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('project_id', $user->current_project_id);
+        })->count();
+        $allNeedNarrativeUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('project_id', $user->current_project_id);
+        })->where('narrative', null)->count();
+        $allForClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('project_id', $user->current_project_id);
+        })->where('forClaim', '1')->count();
+        return view('project_dashboard.home', compact('allForClaimUserDocuments','allAssignmentUserDocuments', 'allActiveUserDocuments',
+                                                     'allInactiveUserDocuments', 'users', 'allUserDocuments', 
+                                                    'allPendingAnalysisUserDocuments', 'allPendingAssignmentUserDocuments',
+                                                     'allNeedNarrativeUserDocuments', 'project', 'assigned_users'));
 
     }
 

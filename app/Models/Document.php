@@ -30,6 +30,7 @@ class Document extends Model
         'analyzed',
         'threads',
         'analysis_complete',
+        'assess_not_pursue'
     ];
 
     protected $allowedSorts = [

@@ -242,6 +242,11 @@
                                 name="analysis_complete"{{ $document->analysis_complete ? 'checked' : '' }}>
                             <label class="custom-control-label" for="analysis_complete">Analysis Complete</label>
                         </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"id="assess_not_pursue"
+                                name="assess_not_pursue"{{ $document->assess_not_pursue ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="assess_not_pursue">Assessed Not To Pursue</label>
+                        </div>
                         <input type="hidden" name="action" id="formAction" value="save">
                         <div class="text-right" style="margin-top: 10px;">
                             <button type="submit"

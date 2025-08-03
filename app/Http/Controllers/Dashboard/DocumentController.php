@@ -69,6 +69,9 @@ class DocumentController extends ApiController
         if ($request->analysis_complete) {
             $doc->analysis_complete = '1';
         }
+        if ($request->assess_not_pursue) {
+            $doc->assess_not_pursue = '1';
+        }
         $doc->save();
         if ($request->file_id) {
             FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $request->file_id, 'document_id' => $doc->id]);
@@ -453,8 +456,14 @@ Based on that and provided that we have the following list of stakeholders:';
         if ($request->analysis_complete == '0') {
             $all_documents->where('analysis_complete', '0');
         }
-        if($request->not_assignment =='on'){
+        if ($request->not_assignment == 'on') {
             $all_documents->whereDoesntHave('files');
+        }
+        if($request->active_docs=='1'){
+            $all_documents->where('assess_not_pursue','0');
+        }
+        if($request->active_docs=='0'){
+            $all_documents->where('assess_not_pursue','1');
         }
         $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         // dd($all_documents);
@@ -522,6 +531,11 @@ Based on that and provided that we have the following list of stakeholders:';
             $doc->analysis_complete = '1';
         } else {
             $doc->analysis_complete = '0';
+        }
+        if ($request->assess_not_pursue) {
+            $doc->assess_not_pursue = '1';
+        } else {
+            $doc->assess_not_pursue = '0';
         }
         $doc->save();
         if ($request->file_id) {
