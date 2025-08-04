@@ -29,19 +29,49 @@ class ProjectDashboardController extends ApiController
         $allAssignmentUserDocuments        = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
                 ->where('project_id', $user->current_project_id);
+        })->whereHas('file', function ($f) {
+            $f->whereHas('folder', function ($d) {
+                $d->where('potential_impact', '1');
+            });
         })->count();
         $allNeedNarrativeUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
                 ->where('project_id', $user->current_project_id);
+        })->whereHas('file', function ($f) {
+            $f->whereHas('folder', function ($d) {
+                $d->where('potential_impact', '1');
+            });
         })->where('narrative', null)->count();
         $allForClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
                 ->where('project_id', $user->current_project_id);
+        })->whereHas('file', function ($f) {
+            $f->whereHas('folder', function ($d) {
+                $d->where('potential_impact', '1');
+            });
         })->where('forClaim', '1')->count();
-        return view('project_dashboard.home', compact('allForClaimUserDocuments','allAssignmentUserDocuments', 'allActiveUserDocuments',
-                                                     'allInactiveUserDocuments', 'users', 'allUserDocuments', 
-                                                    'allPendingAnalysisUserDocuments', 'allPendingAssignmentUserDocuments',
-                                                     'allNeedNarrativeUserDocuments', 'project', 'assigned_users'));
+        $allHaveConTagsUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('project_id', $user->current_project_id);
+        })->whereHas('file', function ($f) {
+            $f->whereHas('folder', function ($d) {
+                $d->where('potential_impact', '1');
+            });
+        })->whereHas('tags')->count();
+        $allHaveConTagsNoticeClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('project_id', $user->current_project_id);
+        })->whereHas('file', function ($f) {
+            $f->whereHas('folder', function ($d) {
+                $d->where('potential_impact', '1');
+            });
+        })->whereHas('tags', function ($t) {
+            $t->where('is_notice', '1');
+        })->count();
+        return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
+            'allInactiveUserDocuments', 'users', 'allUserDocuments',
+            'allPendingAnalysisUserDocuments', 'allPendingAssignmentUserDocuments',
+            'allNeedNarrativeUserDocuments', 'project', 'assigned_users'));
 
     }
 

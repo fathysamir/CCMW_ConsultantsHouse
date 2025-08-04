@@ -27,7 +27,7 @@
         .row_d {
             display: flex;
             align-items: center;
-            margin: 0px 0 7px 0;
+            margin: 0px 0 5.42px 0;
         }
 
         .label {
@@ -110,7 +110,7 @@
         }
 
         .total-docs {
-            background-color: #0f4d6b;
+            background-color: #3d73c5;
         }
 
         .active-docs {
@@ -191,7 +191,7 @@
         <div class="col-md-4" style="padding-right:0px !important">
             <div class="summary-box">
                 <div class="info">
-                    <div class="info-row">
+                    <div class="info-row" style="margin-top: 0px;">
                         <div class="label">Total Documents</div>
                         <div class="count-box total-docs" id="total-docs">{{ $allUserDocuments }}</div>
                     </div>
