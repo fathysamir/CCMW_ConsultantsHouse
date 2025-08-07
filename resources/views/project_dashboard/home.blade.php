@@ -303,7 +303,7 @@
                 <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important; height:500px;">
                     <div class="chart-container" style="text-align: center; height:100%">
                         <div style="height: 23%">
-                            <div class="label" style="width:100%;">Active Documents Pending Analysis</div>
+                            <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis</div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-pending-analysis" style="display: inline-block">
                                     {{ $allPendingAnalysisUserDocuments }}
@@ -312,7 +312,7 @@
                         </div>
 
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 20%;">Active Documents Pending Assignments
+                            <div class="label"style="width:100%;padding-top: 10%;">Active Documents Pending Assignments
                             </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
@@ -323,7 +323,7 @@
 
                         <hr style="border-top: 3px solid #168bff;">
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;">Active Open Claim Files Need 1 Claim Notice</div>
+                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need 1 Claim Notice</div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
@@ -331,7 +331,7 @@
                             </div>
                         </div>
                         <div style="height: 23%">
-                            <div class="label"style="width:100%; padding-top: 20%;">Active Open Claim Files Need Further
+                            <div class="label"style="width:100%; padding-top: 10%;">Active Open Claim Files Need Further
                                 Notice</div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
