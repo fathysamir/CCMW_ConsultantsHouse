@@ -29,56 +29,56 @@ class ProjectDashboardController extends ApiController
         $allPendingAnalysisUserDocuments   = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->where('analysis_complete', '0')->count();
         $allPendingAssignmentUserDocuments = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereDoesntHave('files')->count();
         $allAssignmentUserDocuments        = FileDocument::whereHas('document', function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id)
+            $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) {
+        })->whereHas('file', function ($f) use($user) {
             $f->where('assess_not_pursue', '0')
                 ->where('closed', '0')
+                ->where('user_id', $user->id)
                 ->whereHas('folder', function ($d) {
                     $d->where('potential_impact', '1');
                 });
         })->count();
         $allNeedNarrativeUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id)
+            $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) {
+        })->whereHas('file', function ($f)use($user) {
             $f->where('assess_not_pursue', '0')
                 ->where('closed', '0')
+                ->where('user_id', $user->id)
                 ->whereHas('folder', function ($d) {
                     $d->where('potential_impact', '1');
                 });
         })->where('narrative', null)->count();
         $allForClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id)
+            $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) {
+        })->whereHas('file', function ($f)use($user) {
             $f->where('assess_not_pursue', '0')
                 ->where('closed', '0')
+                ->where('user_id', $user->id)
                 ->whereHas('folder', function ($d) {
                     $d->where('potential_impact', '1');
                 });
         })->where('forClaim', '1')->count();
         $allHaveConTagsUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id)
+            $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) {
+        })->whereHas('file', function ($f)use($user) {
             $f->where('assess_not_pursue', '0')
                 ->where('closed', '0')
+                ->where('user_id', $user->id)
                 ->whereHas('folder', function ($d) {
                     $d->where('potential_impact', '1');
                 });
         })->whereHas('tags')->count();
         $allHaveConTagsNoticeClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id)
+            $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) {
+        })->whereHas('file', function ($f)use($user) {
             $f->where('assess_not_pursue', '0')
                 ->where('closed', '0')
+                ->where('user_id', $user->id)
                 ->whereHas('folder', function ($d) {
                     $d->where('potential_impact', '1');
                 });
