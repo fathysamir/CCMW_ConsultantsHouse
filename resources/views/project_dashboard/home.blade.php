@@ -83,6 +83,16 @@
         .Barbel {
             background-color: #850bcb;
         }
+
+        .orange{
+            background-color: #ef8607;
+        }
+        .darkolivegreen {
+            background-color: #556b2f;
+        }
+        .foshia{
+            background-color: #915c83
+        }
     </style>
     <style>
         .summary-box {
@@ -394,35 +404,35 @@
 
                         <div class="row_d">
                             <div class="label">Need Chronology</div>
-                            <div class="count-box green" id="needChronology">{{ $needChronology }}
+                            <div class="count-box Barbel" id="needChronology">{{ $needChronology }}
                             </div>
                             <div class="bar-container">
-                                <div class="bar green" id="bar-needChronology"></div>
+                                <div class="bar Barbel" id="bar-needChronology"></div>
                             </div>
                         </div>
 
                         <div class="row_d">
                             <div class="label">Need Synopsis</div>
-                            <div class="count-box red" id="needSynopsis">
+                            <div class="count-box orange" id="needSynopsis">
                                 {{ $needSynopsis }}</div>
                             <div class="bar-container">
-                                <div class="bar red" id="bar-needSynopsis"></div>
+                                <div class="bar orange" id="bar-needSynopsis"></div>
                             </div>
                         </div>
                         <div class="row_d">
                             <div class="label">Need Contractual A</div>
-                            <div class="count-box brown" id="needContractualA">
+                            <div class="count-box darkolivegreen" id="needContractualA">
                                 {{ $needContractualA }}</div>
                             <div class="bar-container">
-                                <div class="bar brown" id="bar-needContractualA"></div>
+                                <div class="bar darkolivegreen" id="bar-needContractualA"></div>
                             </div>
                         </div>
                         <div class="row_d">
                             <div class="label">Need Cause & Effect A</div>
-                            <div class="count-box black" id="needCauseEffectA">
+                            <div class="count-box foshia" id="needCauseEffectA">
                                 {{ $needCauseEffectA }}</div>
                             <div class="bar-container">
-                                <div class="bar black" id="bar-needCauseEffectA"></div>
+                                <div class="bar foshia" id="bar-needCauseEffectA"></div>
                             </div>
                         </div>
 
