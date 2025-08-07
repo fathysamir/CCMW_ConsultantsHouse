@@ -1,6 +1,7 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home')
 @section('content')
+
     <style>
         #btn-outline-primary {
             color: blue;
@@ -27,7 +28,7 @@
         .row_d {
             display: flex;
             align-items: center;
-            margin: 0px 0 5.42px 0;
+            margin: 0px 0 10.8px 0;
         }
 
         .label {
@@ -74,6 +75,14 @@
         .brown {
             background-color: #b5662c;
         }
+
+        .black {
+            background-color: #000000;
+        }
+
+        .Barbel {
+            background-color: #850bcb;
+        }
     </style>
     <style>
         .summary-box {
@@ -93,7 +102,7 @@
         .info-row {
             display: flex;
             align-items: center;
-            margin: 5px 0;
+            margin: 10px 0;
         }
 
         .info-label {
@@ -101,13 +110,7 @@
             font-size: 14px;
         }
 
-        .count-box {
-            padding: 2px 10px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
+
 
         .total-docs {
             background-color: #3d73c5;
@@ -118,16 +121,29 @@
 
         }
 
-        .not-pursue {
-            background-color: red;
-        }
+
 
         canvas {
             width: 80px;
             height: 80px;
         }
     </style>
+    <style>
+        .chart-container2 {
+            width: 100%;
+            margin: auto;
+            text-align: center;
 
+
+
+        }
+
+        h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #0b3a4b;
+        }
+    </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $project->name }}</h2>
@@ -188,85 +204,421 @@
     @endif
 
     <div style="display: flex; width:100%;">
-        <div class="col-md-4" style="padding-right:0px !important">
-            <div class="summary-box">
-                <div class="info">
-                    <div class="info-row" style="margin-top: 0px;">
-                        <div class="label">Total Documents</div>
-                        <div class="count-box total-docs" id="total-docs">{{ $allUserDocuments }}</div>
+        <div class="col-md-6" style="padding-right:0px !important;padding-left:0px !important">
+            <div style="display: flex; width:100%;">
+                <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
+                    <div class="summary-box">
+                        <div class="info">
+                            <div class="info-row" style="margin-top: 0px;">
+                                <div class="label">Total Documents</div>
+                                <div class="count-box total-docs" id="total-docs">{{ $allUserDocuments }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="label">Active Documents</div>
+                                <div class="count-box active-docs" id="active-docs">{{ $allActiveUserDocuments }}</div>
+                            </div>
+                            <div class="info-row" style="margin-bottom: 0px;">
+                                <div class="label">Assessed Not To Pursue</div>
+                                <div class="count-box red" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
+                            </div>
+                        </div>
+                        <canvas id="pieChart" width="80" height="80"></canvas>
+
                     </div>
-                    <div class="info-row">
-                        <div class="label">Active Documents</div>
-                        <div class="count-box active-docs" id="active-docs">{{ $allActiveUserDocuments }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="label">Assessed Not To Pursue</div>
-                        <div class="count-box not-pursue" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
+                    <div class="chart-container" style="margin-top: 5px;">
+                        <div class="row_d">
+                            <div class="label">Chronology Documents</div>
+                            <div class="count-box blue" id="assignment_docs">{{ $allAssignmentUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar blue" id="bar-assignment-docs"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">For Claim</div>
+                            <div class="count-box green" id="forClaim_docs">{{ $allForClaimUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar green" id="bar-forClaim-docs"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Need Narrative</div>
+                            <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar brown" id="bar-narrative"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Have Contractual Tag</div>
+                            <div class="count-box red" id="count-have-tags">{{ $allHaveConTagsUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar red" id="bar-have-tags"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Notice Of Claim</div>
+                            <div class="count-box Barbel" id="count-have-tags-noticed">
+                                {{ $allHaveConTagsNoticeClaimUserDocuments }}</div>
+                            <div class="bar-container">
+                                <div class="bar Barbel" id="bar-have-tags-noticed"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <canvas id="pieChart" width="80" height="80"></canvas>
-                
+                <div class="col-md-4" style="padding-right:0px !important;">
+                    <div class="chart-container">
+                        <div class="chart-container2">
+                            <div class="label" style="width:100%;">Analysis 35% Complete of the Open Claim Files</div>
+                            <canvas id="gaugeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="margin-top: 5px;">
+                        <div class="chart-container2">
+                            <div class="label" style="width:100%;">Window Analysis 0% Complete</div>
+                            <canvas id="gaugeChart2"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="chart-container" style="margin-top: 10px;">
-                <div class="row_d">
-                    <div class="label">Active Documents</div>
-                    <div class="count-box blue" id="active-docs2">{{ $allActiveUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar blue" id="bar-main"></div>
-                    </div>
-                </div>
-
-                <div class="row_d">
-                    <div class="label">Pending Analysis</div>
-                    <div class="count-box green" id="count-analysis">{{ $allPendingAnalysisUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar green" id="bar-analysis"></div>
-                    </div>
-                </div>
-
-                <div class="row_d">
-                    <div class="label">Pending Assignment</div>
-                    <div class="count-box red" id="count-assignment">{{ $allPendingAssignmentUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar red" id="bar-assignment"></div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-        <div class="col-md-4"style="padding-right:0px !important">
-            <div class="chart-container">
-                <div class="row_d">
-                    <div class="label">Assignment Documents</div>
-                    <div class="count-box blue" id="assignment_docs">{{ $allAssignmentUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar blue" id="bar-assignment-docs"></div>
-                    </div>
-                </div>
+        <div class="col-md-6"style="padding-right:0px !important">
+            <div style="display: flex; width:100%;">
+                <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important;">
+                    <div class="chart-container" style="text-align: center;">
+                        <div class="label" style="width:100%;">Active Documents Pending Analysis</div>
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; height: 100%; margin-bottom:76.8px;">
+                            <div class="count-box green" id="count-pending-analysis">
+                                {{ $allPendingAnalysisUserDocuments }}
+                            </div>
+                        </div>
 
-                <div class="row_d">
-                    <div class="label">For Claim</div>
-                    <div class="count-box green" id="forClaim_docs">{{ $allForClaimUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar green" id="bar-forClaim-docs"></div>
-                    </div>
-                </div>
+                        <div class="label"style="width:100%;">Active Documents Pending Assignments</div>
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; height: 100%;margin-bottom:20px;">
+                            <div class="count-box Barbel" id="count-pending-assignment">
+                                {{ $allPendingAssignmentUserDocuments }}
+                            </div>
+                        </div>
+                        <hr style="border-top: 3px solid #168bff;">
+                        <div class="label"style="width:100%;">Active Open Claim Files Need 1 Claim Notice</div>
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; height: 100%; margin-bottom:76.8px;">
+                            <div class="count-box green" id="count-need-1-claim-notice">
+                                {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
+                            </div>
+                        </div>
 
-                <div class="row_d">
-                    <div class="label">Need Narrative</div>
-                    <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
-                    <div class="bar-container">
-                        <div class="bar brown" id="bar-narrative"></div>
+                        <div class="label"style="width:100%;">Active Open Claim Files Need Further Notice</div>
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; height: 100%;margin-bottom:20px;">
+                            <div class="count-box Barbel" id="count-pending-assignment">
+                                {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-8" style="padding-right:0px !important;">
+                    <div class="chart-container">
+                        <div class="row_d">
+                            <div class="label">Active Claim Files</div>
+                            <div class="count-box blue" id="ActiveClaimFile">{{ $ActiveClaimFile }}</div>
+                            <div class="bar-container">
+                                <div class="bar blue" id="bar-ActiveClaimFile"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Open Claim Files</div>
+                            <div class="count-box green" id="ActiveOpenClaimFile">{{ $ActiveOpenClaimFile }}</div>
+                            <div class="bar-container">
+                                <div class="bar green" id="bar-ActiveOpenClaimFile"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Closed Claim Files</div>
+                            <div class="count-box red" id="ActiveClosedClaimFile">{{ $ActiveClosedClaimFile }}</div>
+                            <div class="bar-container">
+                                <div class="bar red" id="bar-ActiveClosedClaimFile"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="chart-container" style="margin-top: 5px;">
+                        <div class="row_d">
+                            <div class="label">Active Open Claim Files</div>
+                            <div class="count-box blue" id="ActiveOpenClaimFile2">{{ $ActiveOpenClaimFile }}</div>
+                            <div class="bar-container">
+                                <div class="bar blue" id="bar-ActiveOpenClaimFile2"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Time</div>
+                            <div class="count-box green" id="ActiveOpenClaimFileTime">{{ $ActiveOpenClaimFileTime }}
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar green" id="bar-ActiveOpenClaimFileTime"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Prolongation Cost</div>
+                            <div class="count-box red" id="ActiveOpenClaimFileProlongationCost">
+                                {{ $ActiveOpenClaimFileProlongationCost }}</div>
+                            <div class="bar-container">
+                                <div class="bar red" id="bar-ActiveOpenClaimFileProlongationCost"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Variation</div>
+                            <div class="count-box brown" id="ActiveOpenClaimFileVariation">
+                                {{ $ActiveOpenClaimFileVariation }}</div>
+                            <div class="bar-container">
+                                <div class="bar brown" id="bar-ActiveOpenClaimFileVariation"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Disruption</div>
+                            <div class="count-box black" id="ActiveOpenClaimFileDisruption">
+                                {{ $ActiveOpenClaimFileDisruption }}</div>
+                            <div class="bar-container">
+                                <div class="bar black" id="bar-ActiveOpenClaimFileDisruption"></div>
+                            </div>
+                        </div>
+
+                        <hr style="border-top: 3px solid #168bff;">
+
+                        <div class="row_d">
+                            <div class="label">Need Chronology</div>
+                            <div class="count-box green" id="needChronology">{{ $needChronology }}
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar green" id="bar-needChronology"></div>
+                            </div>
+                        </div>
+
+                        <div class="row_d">
+                            <div class="label">Need Synopsis</div>
+                            <div class="count-box red" id="needSynopsis">
+                                {{ $needSynopsis }}</div>
+                            <div class="bar-container">
+                                <div class="bar red" id="bar-needSynopsis"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Need Contractual A</div>
+                            <div class="count-box brown" id="needContractualA">
+                                {{ $needContractualA }}</div>
+                            <div class="bar-container">
+                                <div class="bar brown" id="bar-needContractualA"></div>
+                            </div>
+                        </div>
+                        <div class="row_d">
+                            <div class="label">Need Cause & Effect A</div>
+                            <div class="count-box black" id="needCauseEffectA">
+                                {{ $needCauseEffectA }}</div>
+                            <div class="bar-container">
+                                <div class="bar black" id="bar-needCauseEffectA"></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
 
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        const ctx = document.getElementById('gaugeChart').getContext('2d');
+
+        const segmentSizes = [10, 15, 20, 25, 30]; // must sum to 100
+        const segmentColors = ['#39ab19', '#9cd323', '#fbc02d', '#ff8000', '#d32f2f'];
+        let startThickness = [];
+        let endThickness = [];
+        startThickness[0] = 1; // px
+        endThickness[0] = 2; // px
+        startThickness[1] = 2; // px
+        endThickness[1] = 4; // px
+        startThickness[2] = 4; // px
+        endThickness[2] = 7; // px
+        startThickness[3] = 7; // px
+        endThickness[3] = 11; // px
+        startThickness[4] = 11; // px
+        endThickness[4] = 12.5; // px
+        const taperedArcPlugin = {
+            id: 'taperedArc',
+            beforeDatasetsDraw(chart) {
+                const {
+                    ctx,
+                    chartArea,
+                    chartArea: {
+                        top,
+                        bottom,
+                        left,
+                        right
+                    }
+                } = chart;
+                const cx = left + (right - left) / 2;
+                const cy = bottom;
+                const radius = Math.min(right - left, bottom - top) / 1.2;
+
+                const total = segmentSizes.reduce((a, b) => a + b, 0);
+                let startAngle = Math.PI;
+
+                for (let i = 0; i < segmentSizes.length; i++) {
+                    const segAngle = (segmentSizes[i] / total) * Math.PI;
+                    const endAngle = startAngle + segAngle;
+
+                    // Draw with taper from startThickness → endThickness within the segment
+                    ctx.beginPath();
+                    ctx.strokeStyle = segmentColors[i];
+                    ctx.lineCap = 'butt';
+
+                    // We draw tiny arcs from start to end, increasing thickness gradually
+                    const steps = 50;
+                    for (let s = 0; s < steps; s++) {
+                        const t1 = s / steps;
+                        const t2 = (s + 1) / steps;
+                        const angle1 = startAngle + (segAngle * t1);
+                        const angle2 = startAngle + (segAngle * t2);
+
+                        const thickness1 = startThickness[i] + (endThickness[i] - startThickness[i]) * t1;
+                        const thickness2 = startThickness[i] + (endThickness[i] - startThickness[i]) * t2;
+
+                        // Draw arc segment with average thickness
+                        const avgThickness = (thickness1 + thickness2) / 2;
+                        ctx.lineWidth = avgThickness;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy - 8, radius - avgThickness / 2, angle1, angle2);
+                        ctx.stroke();
+                    }
+
+                    startAngle = endAngle;
+                }
+            }
+        };
+
+        // Fixed thickness for each segment
+
+        const needlePlugin = {
+            id: 'needle',
+            afterDraw(chart) {
+                const {
+                    ctx,
+                    chartArea,
+                    options
+                } = chart;
+                const percentage = options.needleValue || 0; // 👈 use the dynamic value
+
+                const cx = (chartArea.left + chartArea.right) / 2;
+                const cy = chartArea.bottom;
+                const outerRadius = Math.min(chartArea.width, chartArea.height * 2) / 2 - 10;
+
+                const angle = Math.PI + (percentage / 100) * Math.PI;
+
+                ctx.save();
+                ctx.translate(cx, cy - 8);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.lineTo(outerRadius - 6, 0);
+                ctx.lineTo(0, 3);
+                ctx.closePath();
+                ctx.fillStyle = '#0b3a4b';
+                ctx.fill();
+                ctx.restore();
+
+                // Center dot
+                ctx.beginPath();
+                ctx.arc(cx, cy - 8, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#0b3a4b';
+                ctx.fill();
+
+                // Text
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#0b3a4b';
+                ctx.textAlign = 'center';
+                ctx.fillText(percentage + '%', cx, cy - outerRadius / 2 + 0);
+            }
+        };
+
+
+
+
+        let percentage = 35; // your dynamic value
+
+        const gaugeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Very Low', 'Low', 'Medium', 'High', 'Critical'],
+                datasets: [{
+                    data: segmentSizes,
+                    backgroundColor: ['transparent'], // hide default arcs
+                    borderWidth: 0,
+                    circumference: 180,
+                    rotation: 270
+                }]
+            },
+            options: {
+                responsive: true,
+                aspectRatio: 2,
+                needleValue: percentage, // 👈 pass value here
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            },
+            plugins: [taperedArcPlugin, needlePlugin]
+        });
+    </script>
+    <script>
+        const ctx2 = document.getElementById('gaugeChart2').getContext('2d');
+
+        let percentage2 = 0; // your dynamic value
+
+        const gaugeChart2 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Very Low', 'Low', 'Medium', 'High', 'Critical'],
+                datasets: [{
+                    data: segmentSizes,
+                    backgroundColor: ['transparent'], // hide default arcs
+                    borderWidth: 0,
+                    circumference: 180,
+                    rotation: 270
+                }]
+            },
+            options: {
+                responsive: true,
+                aspectRatio: 2,
+                needleValue: percentage2, // 👈 pass value here
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            },
+            plugins: [taperedArcPlugin, needlePlugin]
+        });
+    </script>
     <script>
         $(document).ready(function() {
 
@@ -278,27 +630,51 @@
     </script>
 
     <script>
-        // Values
-        const values = {
-            main: {{ $allActiveUserDocuments }},
-            analysis: {{ $allPendingAnalysisUserDocuments }},
-            assignment: {{ $allPendingAssignmentUserDocuments }},
-            narrative: {{ $allNeedNarrativeUserDocuments }},
-        };
+        const valuesBox4 = {
+            main: {{ $ActiveOpenClaimFile }},
+            time: {{ $ActiveOpenClaimFileTime }},
+            ProlongationCost: {{ $ActiveOpenClaimFileProlongationCost }},
+            Variation: {{ $ActiveOpenClaimFileVariation }},
+            Disruption: {{ $ActiveOpenClaimFileDisruption }},
+            needChronology: {{ $needChronology }},
+            needSynopsis: {{ $needSynopsis }},
+            needContractualA: {{ $needContractualA }},
+            needCauseEffectA: {{ $needCauseEffectA }},
 
-        // Get max value for scaling
-        const max = Math.max(...Object.values(values));
+        };
+        const max4 = Math.max(...Object.values(valuesBox4));
 
         // Set bar widths as percentage of max
-        document.getElementById("bar-main").style.width = `${(values.main / max) * 100}%`;
-        document.getElementById("bar-analysis").style.width = `${(values.analysis / max) * 100}%`;
-        document.getElementById("bar-assignment").style.width = `${(values.assignment / max) * 100}%`;
-        document.getElementById("bar-narrative").style.width = `${(values.narrative / max) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFile2").style.width = `${(valuesBox4.main / max4) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFileTime").style.width = `${(valuesBox4.time / max4) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFileProlongationCost").style.width =
+            `${(valuesBox4.ProlongationCost / max4) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFileVariation").style.width = `${(valuesBox4.Variation / max4) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFileDisruption").style.width =
+            `${(valuesBox4.Disruption / max4) * 100}%`;
+        document.getElementById("bar-needChronology").style.width = `${(valuesBox4.needChronology / max4) * 100}%`;
+        document.getElementById("bar-needSynopsis").style.width = `${(valuesBox4.needSynopsis / max4) * 100}%`;
+        document.getElementById("bar-needContractualA").style.width = `${(valuesBox4.needContractualA / max4) * 100}%`;
+        document.getElementById("bar-needCauseEffectA").style.width = `${(valuesBox4.needCauseEffectA / max4) * 100}%`;
+        const valuesBox3 = {
+            main: {{ $ActiveClaimFile }},
+            openClaim: {{ $ActiveOpenClaimFile }},
+            closedClaim: {{ $ActiveClosedClaimFile }},
 
-         const valuesBox2 = {
+        };
+        const max3 = Math.max(...Object.values(valuesBox3));
+
+        // Set bar widths as percentage of max
+        document.getElementById("bar-ActiveClaimFile").style.width = `${(valuesBox3.main / max3) * 100}%`;
+        document.getElementById("bar-ActiveOpenClaimFile").style.width = `${(valuesBox3.openClaim / max3) * 100}%`;
+        document.getElementById("bar-ActiveClosedClaimFile").style.width = `${(valuesBox3.closedClaim / max3) * 100}%`;
+
+        const valuesBox2 = {
             main: {{ $allAssignmentUserDocuments }},
             forClaim: {{ $allForClaimUserDocuments }},
             narrative: {{ $allNeedNarrativeUserDocuments }},
+            haveTags: {{ $allHaveConTagsUserDocuments }},
+            haveTagsNoticed: {{ $allHaveConTagsNoticeClaimUserDocuments }},
         };
         const max2 = Math.max(...Object.values(valuesBox2));
 
@@ -306,6 +682,8 @@
         document.getElementById("bar-assignment-docs").style.width = `${(valuesBox2.main / max2) * 100}%`;
         document.getElementById("bar-forClaim-docs").style.width = `${(valuesBox2.forClaim / max2) * 100}%`;
         document.getElementById("bar-narrative").style.width = `${(valuesBox2.narrative / max2) * 100}%`;
+        document.getElementById("bar-have-tags").style.width = `${(valuesBox2.haveTags / max2) * 100}%`;
+        document.getElementById("bar-have-tags-noticed").style.width = `${(valuesBox2.haveTagsNoticed / max2) * 100}%`;
     </script>
     <script>
         document.getElementById("total-docs").addEventListener("click", function() {
@@ -314,22 +692,19 @@
         document.getElementById("active-docs").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&active_docs=1";
         });
-         document.getElementById("active-docs2").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&active_docs=1";
-        });
         document.getElementById("not-pursue").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&active_docs=0";
         });
-        document.getElementById("count-analysis").addEventListener("click", function() {
+        document.getElementById("count-pending-analysis").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&analysis_complete=0&active_docs=1";
         });
-        document.getElementById("count-assignment").addEventListener("click", function() {
+        document.getElementById("count-pending-assignment").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&not_assignment=on&active_docs=1";
         });
     </script>
 
     <script>
-        const ctx = document.getElementById('pieChart').getContext('2d');
+        const ctx3 = document.getElementById('pieChart').getContext('2d');
 
 
         const active = {{ $allActiveUserDocuments }};
@@ -345,7 +720,7 @@
             }],
         };
 
-        const pieChart = new Chart(ctx, {
+        const pieChart = new Chart(ctx3, {
             type: 'pie',
             data: data,
             options: {

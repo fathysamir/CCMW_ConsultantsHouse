@@ -6,7 +6,9 @@ use App\Models\Account;
 use App\Models\Document;
 use App\Models\FileDocument;
 use App\Models\Project;
+use App\Models\ProjectFile;
 use App\Models\ProjectUser;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProjectDashboardController extends ApiController
@@ -28,50 +30,136 @@ class ProjectDashboardController extends ApiController
         $allPendingAssignmentUserDocuments = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereDoesntHave('files')->count();
         $allAssignmentUserDocuments        = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id);
+                ->where('project_id', $user->current_project_id)
+                ->where('assess_not_pursue', '0');
         })->whereHas('file', function ($f) {
-            $f->whereHas('folder', function ($d) {
-                $d->where('potential_impact', '1');
-            });
+            $f->where('assess_not_pursue', '0')
+                ->where('closed', '0')
+                ->whereHas('folder', function ($d) {
+                    $d->where('potential_impact', '1');
+                });
         })->count();
         $allNeedNarrativeUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id);
+                ->where('project_id', $user->current_project_id)
+                ->where('assess_not_pursue', '0');
         })->whereHas('file', function ($f) {
-            $f->whereHas('folder', function ($d) {
-                $d->where('potential_impact', '1');
-            });
+            $f->where('assess_not_pursue', '0')
+                ->where('closed', '0')
+                ->whereHas('folder', function ($d) {
+                    $d->where('potential_impact', '1');
+                });
         })->where('narrative', null)->count();
         $allForClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id);
+                ->where('project_id', $user->current_project_id)
+                ->where('assess_not_pursue', '0');
         })->whereHas('file', function ($f) {
-            $f->whereHas('folder', function ($d) {
-                $d->where('potential_impact', '1');
-            });
+            $f->where('assess_not_pursue', '0')
+                ->where('closed', '0')
+                ->whereHas('folder', function ($d) {
+                    $d->where('potential_impact', '1');
+                });
         })->where('forClaim', '1')->count();
         $allHaveConTagsUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id);
+                ->where('project_id', $user->current_project_id)
+                ->where('assess_not_pursue', '0');
         })->whereHas('file', function ($f) {
-            $f->whereHas('folder', function ($d) {
-                $d->where('potential_impact', '1');
-            });
+            $f->where('assess_not_pursue', '0')
+                ->where('closed', '0')
+                ->whereHas('folder', function ($d) {
+                    $d->where('potential_impact', '1');
+                });
         })->whereHas('tags')->count();
         $allHaveConTagsNoticeClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('user_id', $user->id)
-                ->where('project_id', $user->current_project_id);
+                ->where('project_id', $user->current_project_id)
+                ->where('assess_not_pursue', '0');
         })->whereHas('file', function ($f) {
-            $f->whereHas('folder', function ($d) {
-                $d->where('potential_impact', '1');
-            });
+            $f->where('assess_not_pursue', '0')
+                ->where('closed', '0')
+                ->whereHas('folder', function ($d) {
+                    $d->where('potential_impact', '1');
+                });
         })->whereHas('tags', function ($t) {
             $t->where('is_notice', '1');
         })->count();
+        $ActiveOpenClaimFilesNeed1ClaimNotice = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereDoesntHave('fileDocuments', function ($d) use ($user) {
+            $d->whereHas('tags', function ($t) {
+                $t->where('is_notice', '1');
+            })
+                ->whereHas('document', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+        })->count();
+        $ActiveOpenClaimFilesNeedFurtherNotice = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereHas('fileDocuments', function ($d) use ($user) {
+            $d->whereHas('tags', function ($t) {
+                $t->where('is_notice', '1');
+            })
+                ->whereHas('document', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0')
+                        ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
+                });
+        })->count();
+
+        $ActiveClaimFile = ProjectFile::where('user_id', $user->id)->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveOpenClaimFile = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveClosedClaimFile = ProjectFile::where('user_id', $user->id)->where('closed', '1')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveOpenClaimFileTime = ProjectFile::where('user_id', $user->id)->where('time', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveOpenClaimFileProlongationCost = ProjectFile::where('user_id', $user->id)->where('prolongation_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveOpenClaimFileVariation = ProjectFile::where('user_id', $user->id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+        $ActiveOpenClaimFileDisruption = ProjectFile::where('user_id', $user->id)->where('disruption_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->count();
+
+        $needChronology = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereDoesntHave('fileDocuments')->count();
+        $needSynopsis = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereDoesntHave('fileAttachment', function ($a) {
+            $a->where('section', '1');
+        })->count();
+        $needContractualA = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereDoesntHave('fileAttachment', function ($a) {
+            $a->where('section', '2');
+        })->count();
+        $needCauseEffectA = ProjectFile::where('user_id', $user->id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+            $f->where('potential_impact', '1');
+        })->whereDoesntHave('fileAttachment', function ($a) {
+            $a->where('section', '3');
+        })->count();
+
         return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
             'allInactiveUserDocuments', 'users', 'allUserDocuments',
+            'ActiveClaimFile', 'ActiveOpenClaimFile', 'ActiveClosedClaimFile',
+            'ActiveOpenClaimFileTime', 'ActiveOpenClaimFileProlongationCost', 'ActiveOpenClaimFileVariation', 'ActiveOpenClaimFileDisruption',
+            'needChronology', 'needSynopsis', 'needContractualA', 'needCauseEffectA',
             'allPendingAnalysisUserDocuments', 'allPendingAssignmentUserDocuments',
-            'allNeedNarrativeUserDocuments', 'project', 'assigned_users'));
+            'allNeedNarrativeUserDocuments', 'project', 'assigned_users',
+            'allHaveConTagsUserDocuments', 'allHaveConTagsNoticeClaimUserDocuments', 'ActiveOpenClaimFilesNeed1ClaimNotice', 'ActiveOpenClaimFilesNeedFurtherNotice'));
 
     }
 

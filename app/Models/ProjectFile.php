@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectFile extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'project_files';
 
@@ -68,4 +67,18 @@ class ProjectFile extends Model
     {
         return $this->belongsToMany(Document::class, 'file_documents', 'file_id', 'document_id');
     }
+    public function notes()
+    {
+        return $this->belongsToMany(Note::class, 'file_documents', 'file_id', 'note_id');
+    }
+    public function fileDocuments()
+    {
+        return $this->hasMany(FileDocument::class, 'file_id');
+    }
+
+     public function fileAttachment()
+    {
+        return $this->hasMany(FileAttachment::class, 'file_id');
+    }
+
 }
