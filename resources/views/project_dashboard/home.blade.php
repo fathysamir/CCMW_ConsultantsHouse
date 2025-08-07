@@ -285,13 +285,13 @@
                 <div class="col-md-4" style="padding-right:0px !important; height:100%;">
                     <div class="chart-container" style="height: 49%;">
                         <div class="chart-container2">
-                            <div class="label" style="width:100%;">Analysis 35% Complete of the Open Claim Files</div>
+                            <div class="label" style="width:100%;">Analysis % Complete of the Open Claim Files</div>
                             <canvas id="gaugeChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-container" style="margin-top: 5px;height: 49%;">
                         <div class="chart-container2">
-                            <div class="label" style="width:100%;">Window Analysis 0% Complete</div>
+                            <div class="label" style="width:100%;">Window Analysis % Complete</div>
                             <canvas id="gaugeChart2"></canvas>
                         </div>
                     </div>
