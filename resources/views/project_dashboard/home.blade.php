@@ -3,6 +3,13 @@
 @section('content')
 
     <style>
+        body {
+            height: 100vh;
+            /* تحديد ارتفاع الصفحة بنسبة لحجم الشاشة */
+            overflow: hidden;
+            /* منع التمرير */
+        }
+
         #btn-outline-primary {
             color: blue;
         }
@@ -15,8 +22,7 @@
         .my-4 {
             margin-bottom: 1rem !important;
         }
-    </style>
-    <style>
+
         .chart-container {
             border: 1px solid #eea303;
             border-radius: 5px;
@@ -95,8 +101,7 @@
         .foshia {
             background-color: #915c83
         }
-    </style>
-    <style>
+
         .summary-box {
             display: flex;
             align-items: center;
@@ -139,8 +144,7 @@
             width: 80px;
             height: 80px;
         }
-    </style>
-    <style>
+
         .chart-container2 {
             width: 100%;
             margin: auto;
@@ -217,7 +221,7 @@
 
     <div style="display: flex; width:100%;">
         <div class="col-md-6" style="padding-right:0px !important;padding-left:0px !important">
-            <div style="display: flex; width:100%;">
+            <div style="display: flex; width:100%; height:324px;">
                 <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
                     <div class="summary-box">
                         <div class="info">
@@ -278,14 +282,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4" style="padding-right:0px !important;">
-                    <div class="chart-container">
+                <div class="col-md-4" style="padding-right:0px !important; height:100%;">
+                    <div class="chart-container" style="height: 49%;">
                         <div class="chart-container2">
                             <div class="label" style="width:100%;">Analysis 35% Complete of the Open Claim Files</div>
                             <canvas id="gaugeChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-container" style="margin-top: 5px;">
+                    <div class="chart-container" style="margin-top: 5px;height: 49%;">
                         <div class="chart-container2">
                             <div class="label" style="width:100%;">Window Analysis 0% Complete</div>
                             <canvas id="gaugeChart2"></canvas>
@@ -295,45 +299,51 @@
             </div>
         </div>
         <div class="col-md-6"style="padding-right:0px !important">
-            <div style="display: flex; width:100%;">
-                <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important;">
-                    <div class="chart-container" style="text-align: center;">
-                        <div class="label" style="width:100%;">Active Documents Pending Analysis</div>
-                        <div
-                            style="display: flex; justify-content: center; align-items: center; height: 100%; margin-bottom:76.8px;">
-                            <div class="count-box green" id="count-pending-analysis">
-                                {{ $allPendingAnalysisUserDocuments }}
+            <div style="display: flex; width:100%;max-height:500px;">
+                <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important; height:500px;">
+                    <div class="chart-container" style="text-align: center; height:100%">
+                        <div style="height: 23%">
+                            <div class="label" style="width:100%;">Active Documents Pending Analysis</div>
+                            <div style="display: block; justify-content: center; align-items: center;">
+                                <div class="count-box green" id="count-pending-analysis" style="display: inline-block">
+                                    {{ $allPendingAnalysisUserDocuments }}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="label"style="width:100%;">Active Documents Pending Assignments</div>
-                        <div
-                            style="display: flex; justify-content: center; align-items: center; height: 100%;margin-bottom:20px;">
-                            <div class="count-box Barbel" id="count-pending-assignment">
-                                {{ $allPendingAssignmentUserDocuments }}
+                        <div style="height: 23%">
+                            <div class="label"style="width:100%;padding-top: 20%;">Active Documents Pending Assignments</div>
+                            <div style="display: block; justify-content: center; align-items: center;">
+                                <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
+                                    {{ $allPendingAssignmentUserDocuments }}
+                                </div>
                             </div>
                         </div>
+
                         <hr style="border-top: 3px solid #168bff;">
-                        <div class="label"style="width:100%;">Active Open Claim Files Need 1 Claim Notice</div>
-                        <div
-                            style="display: flex; justify-content: center; align-items: center; height: 100%; margin-bottom:76.8px;">
-                            <div class="count-box green" id="count-need-1-claim-notice">
-                                {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
+                        <div style="height: 23%">
+                            <div class="label"style="width:100%;">Active Open Claim Files Need 1 Claim Notice</div>
+                            <div style="display: block; justify-content: center; align-items: center;">
+                                <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
+                                    {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height: 23%">
+                            <div class="label"style="width:100%; padding-top: 20%;">Active Open Claim Files Need Further Notice</div>
+                            <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
+                                <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
+                                    {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="label"style="width:100%;">Active Open Claim Files Need Further Notice</div>
-                        <div
-                            style="display: flex; justify-content: center; align-items: center; height: 100%;margin-bottom:20px;">
-                            <div class="count-box Barbel" id="count-pending-assignment">
-                                {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
-                            </div>
-                        </div>
+
                     </div>
 
                 </div>
-                <div class="col-md-8" style="padding-right:0px !important;">
-                    <div class="chart-container">
+                <div class="col-md-8" style="padding-right:0px !important;height:500px;">
+                    <div class="chart-container" style="height: 25%;">
                         <div class="row_d">
                             <div class="label">Active Claim Files</div>
                             <div class="count-box blue" id="ActiveClaimFile">{{ $ActiveClaimFile }}</div>
@@ -359,7 +369,7 @@
                         </div>
 
                     </div>
-                    <div class="chart-container" style="margin-top: 5px;">
+                    <div class="chart-container" style="margin-top: 5px;height: 74%;">
                         <div class="row_d">
                             <div class="label">Active Open Claim Files</div>
                             <div class="count-box blue" id="ActiveOpenClaimFile2">{{ $ActiveOpenClaimFile }}</div>
