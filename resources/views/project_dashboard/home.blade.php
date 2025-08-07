@@ -312,7 +312,8 @@
                         </div>
 
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 20%;">Active Documents Pending Assignments</div>
+                            <div class="label"style="width:100%;padding-top: 20%;">Active Documents Pending Assignments
+                            </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
                                     {{ $allPendingAssignmentUserDocuments }}
@@ -330,7 +331,8 @@
                             </div>
                         </div>
                         <div style="height: 23%">
-                            <div class="label"style="width:100%; padding-top: 20%;">Active Open Claim Files Need Further Notice</div>
+                            <div class="label"style="width:100%; padding-top: 20%;">Active Open Claim Files Need Further
+                                Notice</div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
@@ -735,7 +737,7 @@
             window.location.href = "/project/all-documents?authUser=on&not_assignment=on&active_docs=1";
         });
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx3 = document.getElementById('pieChart').getContext('2d');
 
@@ -771,5 +773,4 @@
     </script>
 
     <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endpush
