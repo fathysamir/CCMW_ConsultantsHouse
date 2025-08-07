@@ -84,13 +84,15 @@
             background-color: #850bcb;
         }
 
-        .orange{
+        .orange {
             background-color: #ef8607;
         }
+
         .darkolivegreen {
             background-color: #556b2f;
         }
-        .foshia{
+
+        .foshia {
             background-color: #915c83
         }
     </style>
@@ -456,16 +458,27 @@
         const segmentColors = ['#39ab19', '#9cd323', '#fbc02d', '#ff8000', '#d32f2f'];
         let startThickness = [];
         let endThickness = [];
-        startThickness[0] = 1; // px
-        endThickness[0] = 2; // px
-        startThickness[1] = 2; // px
-        endThickness[1] = 4; // px
-        startThickness[2] = 4; // px
-        endThickness[2] = 7; // px
-        startThickness[3] = 7; // px
-        endThickness[3] = 11; // px
-        startThickness[4] = 11; // px
-        endThickness[4] = 12.5; // px
+        const minThickness = 1;
+        const maxThickness = 12.5;
+        const steps = 5;
+
+        // Linearly spaced values between min and max
+        const thicknessStep = (maxThickness - minThickness) / steps;
+
+        startThickness[0] = minThickness;
+        endThickness[0] = minThickness + thicknessStep;
+
+        startThickness[1] = endThickness[0];
+        endThickness[1] = startThickness[1] + thicknessStep;
+
+        startThickness[2] = endThickness[1];
+        endThickness[2] = startThickness[2] + thicknessStep;
+
+        startThickness[3] = endThickness[2];
+        endThickness[3] = startThickness[3] + thicknessStep;
+
+        startThickness[4] = endThickness[3];
+        endThickness[4] = maxThickness;
         const taperedArcPlugin = {
             id: 'taperedArc',
             beforeDatasetsDraw(chart) {
