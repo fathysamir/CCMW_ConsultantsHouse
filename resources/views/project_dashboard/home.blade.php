@@ -42,6 +42,13 @@
             font-weight: bold;
         }
 
+        .label2 {
+            padding-top: 5px;
+            padding-bottom: 6.5px;
+            width: 85%;
+            font-size: 12px;
+        }
+
         .count-box {
             width: 40px;
             color: #fff;
@@ -129,17 +136,6 @@
 
 
 
-        .total-docs {
-            background-color: #3d73c5;
-        }
-
-        .active-docs {
-            background-color: #39ab19;
-
-        }
-
-
-
         canvas {
             width: 80px;
             height: 80px;
@@ -158,6 +154,15 @@
             font-size: 14px;
             margin-bottom: 5px;
             color: #0b3a4b;
+        }
+
+        .chart-container_G {
+            position: relative;
+            height: 97%;
+            width: 100%;
+
+
+
         }
     </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -227,11 +232,11 @@
                         <div class="info">
                             <div class="info-row" style="margin-top: 0px;">
                                 <div class="label">Total Documents</div>
-                                <div class="count-box total-docs" id="total-docs">{{ $allUserDocuments }}</div>
+                                <div class="count-box blue" id="total-docs">{{ $allUserDocuments }}</div>
                             </div>
                             <div class="info-row">
                                 <div class="label">Active Documents</div>
-                                <div class="count-box active-docs" id="active-docs">{{ $allActiveUserDocuments }}</div>
+                                <div class="count-box green" id="active-docs">{{ $allActiveUserDocuments }}</div>
                             </div>
                             <div class="info-row" style="margin-bottom: 0px;">
                                 <div class="label">Assessed Not To Pursue</div>
@@ -297,13 +302,56 @@
                     </div>
                 </div>
             </div>
+
+            <div class="chart-container" style="margin-top: 5px; height:295px;">
+                <div style="display: flex; width:100%;">
+                    <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
+                        <div class="row_d" style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">T - Total Variation Files</div>
+                            <div class="count-box blue" id="">{{ $ActiveOpenClaimFileVariation }}</div>
+                        </div>
+                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">1 - Need {{ $FileVariation1['label'] }}</div>
+                            <div class="count-box blue" id="">{{ $FileVariation1['value'] }}</div>
+                        </div>
+                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">2 - Need {{ $FileVariation2['label'] }}</div>
+                            <div class="count-box blue" id="">{{ $FileVariation2['value'] }}</div>
+                        </div>
+                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">3 - Need {{ $FileVariation3['label'] }}</div>
+                            <div class="count-box blue" id="">{{ $FileVariation3['value'] }}</div>
+                        </div>
+                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">4 - Need {{ $FileVariation4['label'] }}</div>
+                            <div class="count-box blue" id="">{{ $FileVariation4['value'] }}</div>
+                        </div>
+                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                            <div class="label2">5 - Need {{ $FileVariation5['label'] }}</div>
+                            <div class="count-box blue" id="">{{ $FileVariation5['value'] }}</div>
+                        </div>
+                        @if ($FileVariation6['label'] != '')
+                            <div class="row_d"style="margin-bottom:16px;">
+                                <div class="label2">6 - Need {{ $FileVariation6['label'] }}</div>
+                                <div class="count-box blue" id="">{{ $FileVariation6['value'] }}</div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important">
+                        <div class="chart-container_G">
+                            <canvas id="documentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-6"style="padding-right:0px !important">
             <div style="display: flex; width:100%;max-height:500px;">
                 <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important; height:500px;">
                     <div class="chart-container" style="text-align: center; height:100%">
                         <div style="height: 23%">
-                            <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis</div>
+                            <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis
+                            </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-pending-analysis" style="display: inline-block">
                                     {{ $allPendingAnalysisUserDocuments }}
@@ -323,7 +371,8 @@
 
                         <hr style="border-top: 3px solid #168bff;">
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need 1 Claim Notice</div>
+                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need 1 Claim
+                                Notice</div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
@@ -345,33 +394,26 @@
 
                 </div>
                 <div class="col-md-8" style="padding-right:0px !important;height:500px;">
-                    <div class="chart-container" style="height: 25%;">
-                        <div class="row_d">
-                            <div class="label">Active Claim Files</div>
-                            <div class="count-box blue" id="ActiveClaimFile">{{ $ActiveClaimFile }}</div>
-                            <div class="bar-container">
-                                <div class="bar blue" id="bar-ActiveClaimFile"></div>
-                            </div>
-                        </div>
 
-                        <div class="row_d">
-                            <div class="label">Open Claim Files</div>
-                            <div class="count-box green" id="ActiveOpenClaimFile">{{ $ActiveOpenClaimFile }}</div>
-                            <div class="bar-container">
-                                <div class="bar green" id="bar-ActiveOpenClaimFile"></div>
+                    <div class="summary-box">
+                        <div class="info">
+                            <div class="info-row" style="margin-top: 0px;">
+                                <div class="label">Active Claim Files</div>
+                                <div class="count-box blue" id="ActiveClaimFile">{{ $ActiveClaimFile }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="label">Open Claim Files</div>
+                                <div class="count-box green" id="ActiveOpenClaimFile">{{ $ActiveOpenClaimFile }}</div>
+                            </div>
+                            <div class="info-row" style="margin-bottom: 0px;">
+                                <div class="label">Closed Claim Files</div>
+                                <div class="count-box red" id="ActiveClosedClaimFile">{{ $ActiveClosedClaimFile }}</div>
                             </div>
                         </div>
-
-                        <div class="row_d">
-                            <div class="label">Closed Claim Files</div>
-                            <div class="count-box red" id="ActiveClosedClaimFile">{{ $ActiveClosedClaimFile }}</div>
-                            <div class="bar-container">
-                                <div class="bar red" id="bar-ActiveClosedClaimFile"></div>
-                            </div>
-                        </div>
+                        <canvas id="pieChart2" width="80" height="80"></canvas>
 
                     </div>
-                    <div class="chart-container" style="margin-top: 5px;height: 74%;">
+                    <div class="chart-container" style="margin-top: 5px;height: 75.7%;">
                         <div class="row_d">
                             <div class="label">Active Open Claim Files</div>
                             <div class="count-box blue" id="ActiveOpenClaimFile2">{{ $ActiveOpenClaimFile }}</div>
@@ -453,6 +495,7 @@
                     </div>
                 </div>
             </div>
+            <div class="chart-container" style="margin-top: 5px; height:119px;"></div>
         </div>
 
     </div>
@@ -460,6 +503,114 @@
 
 @endsection
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('documentChart').getContext('2d');
+
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 119, 204, 1)');
+            gradient.addColorStop(1, 'rgba(0, 204, 255, 0.4)');
+
+            let labels = ['T', '5', '4', '3', '2', '1'];
+            let values = [
+                {{ $ActiveOpenClaimFileVariation }},
+                {{ $FileVariation5['value'] }},
+                {{ $FileVariation4['value'] }},
+                {{ $FileVariation3['value'] }},
+                {{ $FileVariation2['value'] }},
+                {{ $FileVariation1['value'] }}
+            ];
+
+            if ("{{ $FileVariation6['label'] }}" !== '') {
+                labels.splice(1, 0, '6'); // insert '6' after 'T'
+                values.splice(1, 0, {{ $FileVariation6['value'] }}); // insert value after 'T'
+            }
+
+
+
+            // Chart data - replace with your actual data
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Files',
+                    data: values,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(0, 119, 204, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: 'rgba(0, 119, 204, 0.9)',
+                    barThickness: 17, // Fixed width in pixels
+                    // OR
+                    maxBarThickness: 20 // Maximum width in pixels
+                }]
+            };
+
+            // Chart configuration
+            const config = {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' files';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                stepSize: 5
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuad'
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -548,19 +699,31 @@
 
         const needlePlugin = {
             id: 'needle',
+            beforeInit(chart) {
+                chart._needleValue = 0; // Start from 0
+            },
             afterDraw(chart) {
                 const {
                     ctx,
                     chartArea,
                     options
                 } = chart;
-                const percentage = options.needleValue || 0; // 👈 use the dynamic value
+                const target = options.needleValue || 0;
 
                 const cx = (chartArea.left + chartArea.right) / 2;
                 const cy = chartArea.bottom;
                 const outerRadius = Math.min(chartArea.width, chartArea.height * 2) / 2 - 10;
 
-                const angle = Math.PI + (percentage / 100) * Math.PI;
+                // Speed control: smaller value = slower animation
+                const speed = 0.005;
+
+                if (Math.abs(chart._needleValue - target) > speed) {
+                    chart._needleValue += (target > chart._needleValue ? speed : -speed);
+                } else {
+                    chart._needleValue = target;
+                }
+
+                const angle = Math.PI + (chart._needleValue / 100) * Math.PI;
 
                 ctx.save();
                 ctx.translate(cx, cy - 8);
@@ -584,14 +747,23 @@
                 ctx.font = 'bold 16px Arial';
                 ctx.fillStyle = '#0b3a4b';
                 ctx.textAlign = 'center';
-                ctx.fillText(percentage + '%', cx, cy - outerRadius / 2 + 0);
+                ctx.fillText(Math.round(chart._needleValue) + '%', cx, cy - outerRadius / 2 + 0);
+
+                // Continue animation
+                if (chart._needleValue !== target) {
+                    window.requestAnimationFrame(() => chart.draw());
+                }
             }
         };
 
 
+        // Register plugin
+        Chart.register(needlePlugin);
 
 
-        let percentage = 35; // your dynamic value
+
+
+        let percentage = {{ $percent1 }}; // your dynamic value
 
         const gaugeChart = new Chart(ctx, {
             type: 'doughnut',
@@ -691,18 +863,6 @@
         document.getElementById("bar-needSynopsis").style.width = `${(valuesBox4.needSynopsis / max4) * 100}%`;
         document.getElementById("bar-needContractualA").style.width = `${(valuesBox4.needContractualA / max4) * 100}%`;
         document.getElementById("bar-needCauseEffectA").style.width = `${(valuesBox4.needCauseEffectA / max4) * 100}%`;
-        const valuesBox3 = {
-            main: {{ $ActiveClaimFile }},
-            openClaim: {{ $ActiveOpenClaimFile }},
-            closedClaim: {{ $ActiveClosedClaimFile }},
-
-        };
-        const max3 = Math.max(...Object.values(valuesBox3));
-
-        // Set bar widths as percentage of max
-        document.getElementById("bar-ActiveClaimFile").style.width = `${(valuesBox3.main / max3) * 100}%`;
-        document.getElementById("bar-ActiveOpenClaimFile").style.width = `${(valuesBox3.openClaim / max3) * 100}%`;
-        document.getElementById("bar-ActiveClosedClaimFile").style.width = `${(valuesBox3.closedClaim / max3) * 100}%`;
 
         const valuesBox2 = {
             main: {{ $allAssignmentUserDocuments }},
@@ -741,11 +901,13 @@
     <script>
         const ctx3 = document.getElementById('pieChart').getContext('2d');
 
+        const ctx4 = document.getElementById('pieChart2').getContext('2d');
 
         const active = {{ $allActiveUserDocuments }};
         const notPursue = {{ $allInactiveUserDocuments }};
 
-
+        const open = {{ $ActiveOpenClaimFile }};
+        const close = {{ $ActiveClosedClaimFile }};
         const data = {
 
             datasets: [{
@@ -754,10 +916,33 @@
                 borderWidth: 0,
             }],
         };
+        const data2 = {
+
+            datasets: [{
+                data: [open, close],
+                backgroundColor: ['#39ab19', 'red'],
+                borderWidth: 0,
+            }],
+        };
 
         const pieChart = new Chart(ctx3, {
             type: 'pie',
             data: data,
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+            }
+        });
+        const pieChart2 = new Chart(ctx4, {
+            type: 'pie',
+            data: data2,
             options: {
                 responsive: false,
                 plugins: {

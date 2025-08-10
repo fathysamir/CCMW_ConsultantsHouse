@@ -23,7 +23,6 @@ use PhpOffice\PhpWord\Shared\Html;
 use setasign\Fpdi\Fpdi;
 use ZipArchive;
 
-
 // /////////////////////////////////////////////////////////////////////////
 
 class FileDocumentController extends ApiController
@@ -946,7 +945,10 @@ class FileDocumentController extends ApiController
 
         // Assign tags (assuming many-to-many relationship)
         if ($request->has('tags')) {
-            $doc->tags()->sync($request->tags); // Sync tags
+            $doc->tags()->sync($request->tags ?? []);
+        } else {
+            // Remove all old tags if no tags are sent
+            $doc->tags()->sync([]);
         }
         if ($request->action == 'save') {
             return redirect('/project/file-document-first-analyses/' . $doc->id)->with('success', $doc->document ? 'analyses for "' . $doc->document->subject . '" document saved successfully.' : 'analyses for "' . $doc->note->subject . '" document saved successfully.');
@@ -978,7 +980,7 @@ class FileDocumentController extends ApiController
 
         if ($request->actionType == 'copy') {
             foreach ($request->document_ids as $doc_id) {
-                $sections=[];
+                $sections = [];
                 $file_doc = FileDocument::findOrFail($doc_id);
                 if ($file_doc->document) {
                     $fileDoc = FileDocument::where('file_id', $request->file_id)->where('document_id', $file_doc->document_id)->first();

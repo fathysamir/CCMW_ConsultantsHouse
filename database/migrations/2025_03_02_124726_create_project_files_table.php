@@ -29,6 +29,7 @@ return new class extends Migration
             $table->unsignedBigInteger('older_folder_id')->nullable();
             $table->foreign('older_folder_id')->references('id')->on('project_folders')->onDelete('cascade');
             $table->longText('notes')->nullable();
+            $table->integer('analyses_complete')->nullable();
 
             $table->enum('time', ['0', '1'])->default('0');
             $table->enum('prolongation_cost', ['0', '1'])->default('0');

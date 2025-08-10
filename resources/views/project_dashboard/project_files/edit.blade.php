@@ -1,11 +1,11 @@
 @extends('project_dashboard.layout.app')
 @section('title', 'Project Home - Update File')
 @section('content')
-<style>
-    .date{
-        background-color:#fff !important;
-    }
-</style>
+    <style>
+        .date {
+            background-color: #fff !important;
+        }
+    </style>
     <h2 class="page-title">Update File</h2>
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -14,15 +14,15 @@
 
 
                 <div class="col-md-12">
-                    <form method="post" action="{{ route('project.files.update',$file->id) }}" enctype="multipart/form-data">
+                    <form method="post" action="{{ route('project.files.update', $file->id) }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <!-- Name Input -->
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="code">File #</label>
-                                    <input type="text" name="code" id="code" class="form-control"
-                                        placeholder="File ID"value="{{ old('code',$file->code) }}">
+                                    <input type="number" name="code" id="code" class="form-control"
+                                        placeholder="File ID"value="{{ old('code', $file->code) }}">
                                 </div>
                             </div>
 
@@ -31,7 +31,7 @@
                                 <div class="form-group mb-3">
                                     <label for="simpleinputName">Name <span style="color: red">*</span></label>
                                     <input required type="text" name="name" required id="simpleinputName"
-                                        class="form-control" placeholder="Name"value="{{ old('name',$file->name) }}">
+                                        class="form-control" placeholder="Name"value="{{ old('name', $file->name) }}">
                                 </div>
                             </div>
 
@@ -44,12 +44,13 @@
                             <select class="form-control" id="owner" required name="owner_id">
                                 <option value="" selected disabled>please select</option>
                                 @foreach ($users as $user)
-                                    <option value="{{ $user->id }}" @if($file->user_id == $user->id) selected @endif>{{ $user->name }}</option>
+                                    <option value="{{ $user->id }}" @if ($file->user_id == $user->id) selected @endif>
+                                        {{ $user->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="against_id">{{$folder->label1}}</label>
+                            <label for="against_id">{{ $folder->label1 }}</label>
                             <select class="form-control" id="against_id" name="against_id">
                                 <option value="" selected disabled>please select</option>
                                 @foreach ($stake_holders as $stake_holder)
@@ -63,7 +64,7 @@
                             <!-- Name Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="start_date">{{$folder->label2}}</label>
+                                    <label for="start_date">{{ $folder->label2 }}</label>
                                     <input type="date"style="background-color:#fff;" name="start_date" id="start_date"
                                         class="form-control date"
                                         placeholder="Start Date"value="{{ old('start_date', $file->start_date) }}">
@@ -73,7 +74,7 @@
                             <!-- Email Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="end_date">{{$folder->label3}}</label>
+                                    <label for="end_date">{{ $folder->label3 }}</label>
                                     <input type="date"style="background-color:#fff;" name="end_date" id="end_date"
                                         class="form-control date"
                                         placeholder="End Date"value="{{ old('end_date', $file->end_date) }}">
@@ -84,33 +85,36 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="Note">Note</label>
-                            <textarea name="notes" rows="7" id="Note" class="form-control" placeholder="Note">{{ old('notes',$file->notes) }}</textarea>
+                            <textarea name="notes" rows="7" id="Note" class="form-control" placeholder="Note">{{ old('notes', $file->notes) }}</textarea>
                         </div>
 
-                       
+
                         <div class="col-md-12">
                             @if ($folder->potential_impact == '1')
                                 <div class="row">
                                     <p style="margin-right: 10px;">Potential Impact : </p>
                                     <div class="custom-control custom-checkbox" style="margin-right: 20px;">
-                                        <input type="checkbox" class="custom-control-input" name="time"id="time"@if($file->time == '1') checked @endif>
+                                        <input type="checkbox" class="custom-control-input" name="time"id="time"
+                                            @if ($file->time == '1') checked @endif>
                                         <label class="custom-control-label" for="time">Time</label>
                                     </div>
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;">
                                         <input type="checkbox" class="custom-control-input"
-                                            name="prolongation_cost"id="prolongation_cost"@if($file->prolongation_cost == '1') checked @endif>
+                                            name="prolongation_cost"id="prolongation_cost"
+                                            @if ($file->prolongation_cost == '1') checked @endif>
                                         <label class="custom-control-label" for="prolongation_cost">Prolongation
                                             Cost</label>
                                     </div>
                                     <div class="custom-control custom-checkbox"style="margin-right: 20px;">
                                         <input type="checkbox" class="custom-control-input"
-                                            name="disruption_cost"id="disruption_cost"@if($file->disruption_cost == '1') checked @endif>
+                                            name="disruption_cost"id="disruption_cost"
+                                            @if ($file->disruption_cost == '1') checked @endif>
                                         <label class="custom-control-label" for="disruption_cost">Disruption
                                             Cost</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input"
-                                            name="variation"id="variation"@if($file->variation == '1') checked @endif>
+                                        <input type="checkbox" class="custom-control-input" name="variation"id="variation"
+                                            @if ($file->variation == '1') checked @endif>
                                         <label class="custom-control-label" for="variation">Variation</label>
                                     </div>
                                 </div>
@@ -118,23 +122,36 @@
                         </div>
 
                         <!-- Email Input -->
-                        
 
 
-                   
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="custom-control custom-checkbox"style="margin-right: 20px;">
-                                    <input type="checkbox" class="custom-control-input" name="closed"id="closed"@if($file->closed == '1') checked @endif>
-                                    <label class="custom-control-label" for="closed">Closed</label>
+
+                        <div style="display: flex; width:100%;">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="custom-control custom-checkbox"style="margin-right: 20px;">
+                                        <input type="checkbox" class="custom-control-input" name="closed"id="closed"
+                                            @if ($file->closed == '1') checked @endif>
+                                        <label class="custom-control-label" for="closed">Closed</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="assess_not_pursue"id="assess_not_pursue"
+                                            @if ($file->assess_not_pursue == '1') checked @endif>
+                                        <label class="custom-control-label" for="assess_not_pursue">Assessed Not To
+                                            Pursue</label>
+                                    </div>
+
                                 </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input"
-                                        name="assess_not_pursue"id="assess_not_pursue"@if($file->assess_not_pursue == '1') checked @endif>
-                                    <label class="custom-control-label" for="assess_not_pursue">Assessed Not To
-                                        Pursue</label>
-                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <p style="margin-bottom:0px;">Percentage Analysis Complete : </p>
+                                    <input type="number" name="Percentage_Analysis_Complete"
+                                        class="form-control"value="{{ $file->analyses_complete }}" style="width: 30%;margin-left:2%; margin-top:-5px;"
+                                        min="1" max="100"
+                                        oninput="this.value = Math.min(Math.max(1, this.value), 100)">
 
+                                </div>
                             </div>
                         </div>
 

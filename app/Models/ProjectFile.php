@@ -23,6 +23,7 @@ class ProjectFile extends Model
         'folder_id',
         'older_folder_id',
         'notes',
+        'analyses_complete',
 
         'time',
         'prolongation_cost',

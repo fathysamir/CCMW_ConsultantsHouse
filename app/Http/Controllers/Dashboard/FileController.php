@@ -59,11 +59,14 @@ class FileController extends ApiController
             $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         } while (ProjectFile::where('slug', $invitation_code)->exists());
 
-        $file = ProjectFile::create(['name' => $request->name, 'slug'                           => $invitation_code, 'code'           => $request->code,
+        $file = ProjectFile::create(['name' => $request->name,
+            'slug'                              => $invitation_code,
+            'code'                              => $request->code,
             'user_id'                           => $request->owner_id,
             'project_id'                        => auth()->user()->current_project_id, 'against_id' => $request->against_id, 'start_date' => $request->start_date,
             'end_date'                          => $request->end_date, 'folder_id'                  => auth()->user()->current_folder_id,
-            'notes'                             => $request->notes]);
+            'notes'                             => $request->notes,
+            'analyses_complete'                 => intval($request->Percentage_Analysis_Complete)]);
         if ($request->time) {
             $file->time = '1';
         }
@@ -111,7 +114,8 @@ class FileController extends ApiController
             'user_id'                                     => $request->owner_id,
             'against_id'                                  => $request->against_id, 'start_date' => $request->start_date,
             'end_date'                                    => $request->end_date,
-            'notes'                                       => $request->notes]);
+            'notes'                                       => $request->notes,
+            'analyses_complete'                           => intval($request->Percentage_Analysis_Complete)]);
         $file = ProjectFile::findOrFail($id);
         if ($request->time) {
             $file->time = '1';
@@ -1796,12 +1800,12 @@ class FileController extends ApiController
                 }
                 $doc_gantt_chart = GanttChartDocData::where('file_document_id', $doc->id)->first();
                 if ($doc_gantt_chart) {
-                    GanttChartDocData::create(['file_document_id' => $new_doc->id,'show_cur'=>$doc_gantt_chart->show_cur,
-                                                'cur_type'=>$doc_gantt_chart->cur_type,'cur_sections'=>$doc_gantt_chart->cur_sections,
-                                                'cur_left_caption'=>$doc_gantt_chart->cur_left_caption,'cur_right_caption'=>$doc_gantt_chart->cur_right_caption,'cur_show_sd'=>$doc_gantt_chart->cur_show_sd,'cur_show_fd'=>$doc_gantt_chart->cur_show_fd,
-                                                'cur_show_ref'=>$doc_gantt_chart->cur_show_ref,'show_pl'=>$doc_gantt_chart->show_pl,'pl_type'=>$doc_gantt_chart->pl_type,'pl_sd'=>$doc_gantt_chart->pl_sd,'pl_fd'=>$doc_gantt_chart->pl_fd,
-                                                'pl_color'=>$doc_gantt_chart->pl_color,'pl_left_caption'=>$doc_gantt_chart->pl_left_caption,'pl_right_caption'=>$doc_gantt_chart->pl_right_caption,'pl_show_sd'=>$doc_gantt_chart->pl_show_sd,
-                                                'pl_show_fd'=>$doc_gantt_chart->pl_show_fd,'show_lp'=>$doc_gantt_chart->show_lp,'lp_sd'=>$doc_gantt_chart->lp_sd,'lp_fd'=>$doc_gantt_chart->lp_fd]);
+                    GanttChartDocData::create(['file_document_id' => $new_doc->id, 'show_cur'                                => $doc_gantt_chart->show_cur,
+                        'cur_type'                                    => $doc_gantt_chart->cur_type, 'cur_sections'              => $doc_gantt_chart->cur_sections,
+                        'cur_left_caption'                            => $doc_gantt_chart->cur_left_caption, 'cur_right_caption' => $doc_gantt_chart->cur_right_caption, 'cur_show_sd'    => $doc_gantt_chart->cur_show_sd, 'cur_show_fd'     => $doc_gantt_chart->cur_show_fd,
+                        'cur_show_ref'                                => $doc_gantt_chart->cur_show_ref, 'show_pl'               => $doc_gantt_chart->show_pl, 'pl_type'                  => $doc_gantt_chart->pl_type, 'pl_sd'               => $doc_gantt_chart->pl_sd, 'pl_fd' => $doc_gantt_chart->pl_fd,
+                        'pl_color'                                    => $doc_gantt_chart->pl_color, 'pl_left_caption'           => $doc_gantt_chart->pl_left_caption, 'pl_right_caption' => $doc_gantt_chart->pl_right_caption, 'pl_show_sd' => $doc_gantt_chart->pl_show_sd,
+                        'pl_show_fd'                                  => $doc_gantt_chart->pl_show_fd, 'show_lp'                 => $doc_gantt_chart->show_lp, 'lp_sd'                    => $doc_gantt_chart->lp_sd, 'lp_fd'                 => $doc_gantt_chart->lp_fd]);
                 }
 
             }
