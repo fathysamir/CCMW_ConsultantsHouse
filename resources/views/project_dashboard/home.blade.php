@@ -545,8 +545,8 @@
                 </div>
             </div>
             <div class="chart-container" style="margin-top: 5px; height:119px;">
-                <button class="{{ $project_dashboard_class_name }}">Project Dashboard</button>
-                <button class="{{ $my_dashboard_class_name }}" style="margin-top: 10px;">My Dashboard</button>
+                <button class="{{ $project_dashboard_class_name }}"onclick="window.location.href='{{ url('/project') }}'">Project Dashboard</button>
+                <button class="{{ $my_dashboard_class_name }}" style="margin-top: 10px;"onclick="window.location.href='{{ url('/project?user=' . auth()->user()->code) }}'">My Dashboard</button>
             </div>
 
         </div>

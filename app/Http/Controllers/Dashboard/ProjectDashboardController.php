@@ -538,12 +538,14 @@ class ProjectDashboardController extends ApiController
             $analysis_complete_value->where('user_id', $selected_user->id);
 
             }
-            $analysis_complete_value->where('assess_not_pursue', '0')
+            $analysis_complete_value=$analysis_complete_value->where('assess_not_pursue', '0')
             ->whereHas('folder', function ($f) {
                 $f->where('potential_impact', '1');
             })
             ->avg(DB::raw('COALESCE(analyses_complete, 0)')) ?? 0;
+           
         $percent1 = $ActiveOpenClaimFile > 0 ? $analysis_complete_value : 0;
+        
         return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
             'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1',
             'ActiveClaimFile', 'ActiveOpenClaimFile', 'ActiveClosedClaimFile',
