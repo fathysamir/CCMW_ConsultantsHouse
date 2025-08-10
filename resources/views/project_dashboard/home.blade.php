@@ -164,6 +164,55 @@
 
 
         }
+
+        .fancy-btn {
+            background: linear-gradient(135deg, #2398ff, #00f2fe);
+            color: white;
+            border: none;
+            padding-top: 3px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+            width: 100%;
+            height: 27%;
+        }
+
+        .fancy-btn:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(79, 172, 254, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .fancy-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .fancy-btn2 {
+            background: linear-gradient(135deg, #4a4a4a, #bbb5b5);
+            color: white;
+            border: none;
+            padding-top: 3px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            height: 27%;
+        }
+
+        .fancy-btn2:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(100, 100, 100, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .fancy-btn2:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
     </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
@@ -306,34 +355,34 @@
             <div class="chart-container" style="margin-top: 5px; height:295px;">
                 <div style="display: flex; width:100%;">
                     <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
-                        <div class="row_d" style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d" style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">T - Total Variation Files</div>
-                            <div class="count-box blue" id="">{{ $ActiveOpenClaimFileVariation }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $ActiveOpenClaimFileVariation }}</div>
                         </div>
-                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">1 - Need {{ $FileVariation1['label'] }}</div>
-                            <div class="count-box blue" id="">{{ $FileVariation1['value'] }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $FileVariation1['value'] }}</div>
                         </div>
-                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">2 - Need {{ $FileVariation2['label'] }}</div>
-                            <div class="count-box blue" id="">{{ $FileVariation2['value'] }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $FileVariation2['value'] }}</div>
                         </div>
-                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">3 - Need {{ $FileVariation3['label'] }}</div>
-                            <div class="count-box blue" id="">{{ $FileVariation3['value'] }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $FileVariation3['value'] }}</div>
                         </div>
-                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">4 - Need {{ $FileVariation4['label'] }}</div>
-                            <div class="count-box blue" id="">{{ $FileVariation4['value'] }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $FileVariation4['value'] }}</div>
                         </div>
-                        <div class="row_d"style="@if($FileVariation6['label'] == '') margin-bottom:19px; @endif">
+                        <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">5 - Need {{ $FileVariation5['label'] }}</div>
-                            <div class="count-box blue" id="">{{ $FileVariation5['value'] }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $FileVariation5['value'] }}</div>
                         </div>
                         @if ($FileVariation6['label'] != '')
                             <div class="row_d"style="margin-bottom:16px;">
                                 <div class="label2">6 - Need {{ $FileVariation6['label'] }}</div>
-                                <div class="count-box blue" id="">{{ $FileVariation6['value'] }}</div>
+                                <div class="count-box darkolivegreen" id="">{{ $FileVariation6['value'] }}</div>
                             </div>
                         @endif
                     </div>
@@ -495,7 +544,11 @@
                     </div>
                 </div>
             </div>
-            <div class="chart-container" style="margin-top: 5px; height:119px;"></div>
+            <div class="chart-container" style="margin-top: 5px; height:119px;">
+                <button class="{{ $project_dashboard_class_name }}">Project Dashboard</button>
+                <button class="{{ $my_dashboard_class_name }}" style="margin-top: 10px;">My Dashboard</button>
+            </div>
+
         </div>
 
     </div>
@@ -508,10 +561,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('documentChart').getContext('2d');
 
-            // Create gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(0, 119, 204, 1)');
-            gradient.addColorStop(1, 'rgba(0, 204, 255, 0.4)');
+            // Lightened green gradient with RGBA
+            const gradient = ctx.createLinearGradient(0, 0, 400, 400);
+            gradient.addColorStop(0, 'rgba(85, 107, 47, 1)'); // light olive green
+            gradient.addColorStop(1, 'rgba(180, 211, 178, 0.2)'); // soft pale green
 
             let labels = ['T', '5', '4', '3', '2', '1'];
             let values = [
@@ -524,30 +577,25 @@
             ];
 
             if ("{{ $FileVariation6['label'] }}" !== '') {
-                labels.splice(1, 0, '6'); // insert '6' after 'T'
-                values.splice(1, 0, {{ $FileVariation6['value'] }}); // insert value after 'T'
+                labels.splice(1, 0, '6');
+                values.splice(1, 0, {{ $FileVariation6['value'] }});
             }
 
-
-
-            // Chart data - replace with your actual data
             const chartData = {
                 labels: labels,
                 datasets: [{
                     label: 'Files',
                     data: values,
                     backgroundColor: gradient,
-                    borderColor: 'rgba(0, 119, 204, 1)',
+                    borderColor: 'rgba(85, 107, 47, 1)',
                     borderWidth: 1,
                     borderRadius: 6,
-                    hoverBackgroundColor: 'rgba(0, 119, 204, 0.9)',
-                    barThickness: 17, // Fixed width in pixels
-                    // OR
-                    maxBarThickness: 20 // Maximum width in pixels
+                    hoverBackgroundColor: 'rgba(200, 230, 200, 1)',
+                    barThickness: 17,
+                    maxBarThickness: 20
                 }]
             };
 
-            // Chart configuration
             const config = {
                 type: 'bar',
                 data: chartData,
@@ -611,6 +659,7 @@
             new Chart(ctx, config);
         });
     </script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>

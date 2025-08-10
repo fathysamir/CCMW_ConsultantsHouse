@@ -9,13 +9,14 @@ use App\Models\FileDocument;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectUser;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProjectDashboardController extends ApiController
 {
-    public function index()
+    public function index(Request $request)
     {
 
         $user    = auth()->user();
@@ -25,234 +26,519 @@ class ProjectDashboardController extends ApiController
         $project        = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
 
-        $allUserDocuments                  = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->count();
-        $allActiveUserDocuments            = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->count();
-        $allInactiveUserDocuments          = $allUserDocuments - $allActiveUserDocuments;
-        $allPendingAnalysisUserDocuments   = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->where('analysis_complete', '0')->count();
-        $allPendingAssignmentUserDocuments = Document::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereDoesntHave('files')->count();
-        $allAssignmentUserDocuments        = FileDocument::whereHas('document', function ($q) use ($user) {
+        if ($request->user) {
+            if ($request->user == $user->code) {
+                $project_dashboard_class_name = 'fancy-btn2';
+                $my_dashboard_class_name      = 'fancy-btn';
+                $user_dashboard_class_name    = 'fancy-btn2';
+            } else {
+                $project_dashboard_class_name = 'fancy-btn2';
+                $my_dashboard_class_name      = 'fancy-btn2';
+                $user_dashboard_class_name    = 'fancy-btn';
+            }
+            $selected_user = User::where('code', $request->user)->first();
+        } else {
+            $project_dashboard_class_name = 'fancy-btn';
+            $my_dashboard_class_name      = 'fancy-btn2';
+            $user_dashboard_class_name    = 'fancy-btn2';
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allUserDocuments = Document::where('project_id', $user->current_project_id);
+        if ($request->user) {
+            $allUserDocuments->where('user_id', $selected_user->id);
+        }
+        $allUserDocuments = $allUserDocuments->count();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allActiveUserDocuments = Document::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0');
+        if ($request->user) {
+            $allActiveUserDocuments->where('user_id', $selected_user->id);
+        }
+        $allActiveUserDocuments = $allActiveUserDocuments->count();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allInactiveUserDocuments = $allUserDocuments - $allActiveUserDocuments;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allPendingAnalysisUserDocuments = Document::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->where('analysis_complete', '0');
+        if ($request->user) {
+            $allPendingAnalysisUserDocuments->where('user_id', $selected_user->id);
+        }
+        $allPendingAnalysisUserDocuments = $allPendingAnalysisUserDocuments->count();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allPendingAssignmentUserDocuments = Document::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereDoesntHave('files');
+        if ($request->user) {
+            $allPendingAssignmentUserDocuments->where('user_id', $selected_user->id);
+        }
+        $allPendingAssignmentUserDocuments = $allPendingAssignmentUserDocuments->count();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $allAssignmentUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) use ($user) {
-            $f->where('assess_not_pursue', '0')
-                ->where('closed', '0')
-                ->where('user_id', $user->id)
-                ->whereHas('folder', function ($d) {
-                    $d->where('potential_impact', '1');
-                });
-        })->count();
+        });
+        if ($request->user) {
+            $allAssignmentUserDocuments->whereHas('file', function ($f) use ($selected_user) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->where('user_id', $selected_user->id)
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        } else {
+            $allAssignmentUserDocuments->whereHas('file', function ($f) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        }
+        $allAssignmentUserDocuments = $allAssignmentUserDocuments->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
         $allNeedNarrativeUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) use ($user) {
-            $f->where('assess_not_pursue', '0')
-                ->where('closed', '0')
-                ->where('user_id', $user->id)
-                ->whereHas('folder', function ($d) {
-                    $d->where('potential_impact', '1');
-                });
-        })->where('narrative', null)->count();
+        });
+        if ($request->user) {
+            $allNeedNarrativeUserDocuments->whereHas('file', function ($f) use ($selected_user) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->where('user_id', $selected_user->id)
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        } else {
+            $allNeedNarrativeUserDocuments->whereHas('file', function ($f) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        }
+        $allNeedNarrativeUserDocuments = $allNeedNarrativeUserDocuments->where('narrative', null)->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
         $allForClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) use ($user) {
-            $f->where('assess_not_pursue', '0')
-                ->where('closed', '0')
-                ->where('user_id', $user->id)
-                ->whereHas('folder', function ($d) {
-                    $d->where('potential_impact', '1');
-                });
-        })->where('forClaim', '1')->count();
+        });
+        if ($request->user) {
+            $allForClaimUserDocuments->whereHas('file', function ($f) use ($selected_user) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->where('user_id', $selected_user->id)
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        } else {
+            $allForClaimUserDocuments->whereHas('file', function ($f) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        }
+        $allForClaimUserDocuments = $allForClaimUserDocuments->where('forClaim', '1')->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         $allHaveConTagsUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) use ($user) {
-            $f->where('assess_not_pursue', '0')
-                ->where('closed', '0')
-                ->where('user_id', $user->id)
-                ->whereHas('folder', function ($d) {
-                    $d->where('potential_impact', '1');
-                });
-        })->whereHas('tags')->count();
+        });
+        if ($request->user) {
+            $allHaveConTagsUserDocuments->whereHas('file', function ($f) use ($selected_user) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->where('user_id', $selected_user->id)
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        } else {
+            $allHaveConTagsUserDocuments->whereHas('file', function ($f) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        }
+        $allHaveConTagsUserDocuments = $allHaveConTagsUserDocuments->whereHas('tags')->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
         $allHaveConTagsNoticeClaimUserDocuments = FileDocument::whereHas('document', function ($q) use ($user) {
             $q->where('project_id', $user->current_project_id)
                 ->where('assess_not_pursue', '0');
-        })->whereHas('file', function ($f) use ($user) {
-            $f->where('assess_not_pursue', '0')
-                ->where('closed', '0')
-                ->where('user_id', $user->id)
-                ->whereHas('folder', function ($d) {
-                    $d->where('potential_impact', '1');
-                });
-        })->whereHas('tags', function ($t) {
+        });
+        if ($request->user) {
+            $allHaveConTagsNoticeClaimUserDocuments->whereHas('file', function ($f) use ($selected_user) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->where('user_id', $selected_user->id)
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+        } else {
+            $allHaveConTagsNoticeClaimUserDocuments->whereHas('file', function ($f) {
+                $f->where('assess_not_pursue', '0')
+                    ->where('closed', '0')
+                    ->whereHas('folder', function ($d) {
+                        $d->where('potential_impact', '1');
+                    });
+            });
+
+        }
+        $allHaveConTagsNoticeClaimUserDocuments = $allHaveConTagsNoticeClaimUserDocuments->whereHas('tags', function ($t) {
             $t->where('is_notice', '1');
         })->count();
-        $ActiveOpenClaimFilesNeed1ClaimNotice = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFilesNeed1ClaimNotice = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->where(function ($query) use ($user) {
-            // No file documents at all
-            $query->whereDoesntHave('fileDocuments')
-            // Or file documents without the notice tag
-                ->orWhereDoesntHave('fileDocuments', function ($d) use ($user) {
-                    $d->whereHas('tags', function ($t) {
-                        $t->where('is_notice', '1');
-                    })
-                        ->whereHas('document', function ($q) use ($user) {
-                            $q->where('user_id', $user->id)
-                                ->where('project_id', $user->current_project_id)
-                                ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFilesNeed1ClaimNotice->where('user_id', $selected_user->id)
+                ->where(function ($query) use ($user, $selected_user) {
+                    // No file documents at all
+                    $query->whereDoesntHave('fileDocuments')
+                    // Or file documents without the notice tag
+                        ->orWhereDoesntHave('fileDocuments', function ($d) use ($user, $selected_user) {
+                            $d->whereHas('tags', function ($t) {
+                                $t->where('is_notice', '1');
+                            })
+                                ->whereHas('document', function ($q) use ($user, $selected_user) {
+                                    $q->where('user_id', $selected_user->id)
+                                        ->where('project_id', $user->current_project_id)
+                                        ->where('assess_not_pursue', '0');
+                                });
                         });
                 });
-        })->count();
-
-        $ActiveOpenClaimFilesNeedFurtherNotice = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        } else {
+            $ActiveOpenClaimFilesNeed1ClaimNotice->where(function ($query) use ($user) {
+                // No file documents at all
+                $query->whereDoesntHave('fileDocuments')
+                // Or file documents without the notice tag
+                    ->orWhereDoesntHave('fileDocuments', function ($d) use ($user) {
+                        $d->whereHas('tags', function ($t) {
+                            $t->where('is_notice', '1');
+                        })
+                            ->whereHas('document', function ($q) use ($user) {
+                                $q->where('project_id', $user->current_project_id)
+                                    ->where('assess_not_pursue', '0');
+                            });
+                    });
+            });
+        }
+        $ActiveOpenClaimFilesNeed1ClaimNotice = $ActiveOpenClaimFilesNeed1ClaimNotice->count();
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFilesNeedFurtherNotice = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->where('is_notice', '1');
-            })
-                ->whereHas('document', function ($q) use ($user) {
-                    $q->where('user_id', $user->id)
-                        ->where('project_id', $user->current_project_id)
-                        ->where('assess_not_pursue', '0')
-                        ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
-                });
-        })->count();
-
-        $ActiveClaimFile = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFilesNeedFurtherNotice->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->where('is_notice', '1');
+                })
+                    ->whereHas('document', function ($q) use ($user, $selected_user) {
+                        $q->where('user_id', $selected_user->id)
+                            ->where('project_id', $user->current_project_id)
+                            ->where('assess_not_pursue', '0')
+                            ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
+                    });
+            });
+        } else {
+            $ActiveOpenClaimFilesNeedFurtherNotice->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->where('is_notice', '1');
+                })
+                    ->whereHas('document', function ($q) use ($user) {
+                        $q->where('project_id', $user->current_project_id)
+                            ->where('assess_not_pursue', '0')
+                            ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
+                    });
+            });
+        }
+        $ActiveOpenClaimFilesNeedFurtherNotice = $ActiveOpenClaimFilesNeedFurtherNotice->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveClaimFile = ProjectFile::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveOpenClaimFile = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveClaimFile->where('user_id', $selected_user->id);
+        }
+        $ActiveClaimFile = $ActiveClaimFile->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFile = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveClosedClaimFile = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '1')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFile->where('user_id', $selected_user->id);
+        }
+        $ActiveOpenClaimFile = $ActiveOpenClaimFile->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveClosedClaimFile = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '1')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveOpenClaimFileTime = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('time', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveClosedClaimFile->where('user_id', $selected_user->id);
+        }
+        $ActiveClosedClaimFile = $ActiveClosedClaimFile->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFileTime = ProjectFile::where('project_id', $user->current_project_id)->where('time', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveOpenClaimFileProlongationCost = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('prolongation_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFileTime->where('user_id', $selected_user->id);
+        }
+        $ActiveOpenClaimFileTime = $ActiveOpenClaimFileTime->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFileProlongationCost = ProjectFile::where('project_id', $user->current_project_id)->where('prolongation_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveOpenClaimFileVariation = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFileProlongationCost->where('user_id', $selected_user->id);
+        }
+        $ActiveOpenClaimFileProlongationCost = $ActiveOpenClaimFileProlongationCost->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFileVariation = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-        $ActiveOpenClaimFileDisruption = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('disruption_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFileVariation->where('user_id', $selected_user->id);
+        }
+        $ActiveOpenClaimFileVariation = $ActiveOpenClaimFileVariation->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        $ActiveOpenClaimFileDisruption = ProjectFile::where('project_id', $user->current_project_id)->where('disruption_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->count();
-
-        $needChronology = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $ActiveOpenClaimFileDisruption->where('user_id', $selected_user->id);
+        }
+        $ActiveOpenClaimFileDisruption = $ActiveOpenClaimFileDisruption->count();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+        $needChronology = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->whereDoesntHave('fileDocuments')->count();
-        $needSynopsis = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $needChronology->where('user_id', $selected_user->id);
+        }
+        $needChronology = $needChronology->whereDoesntHave('fileDocuments')->count();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $needSynopsis = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
-        })->whereDoesntHave('fileAttachment', function ($a) {
+        });
+        if ($request->user) {
+            $needSynopsis->where('user_id', $selected_user->id);
+        }
+        $needSynopsis = $needSynopsis->whereDoesntHave('fileAttachment', function ($a) {
             $a->where('section', '1');
         })->count();
-        $needContractualA = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $needContractualA = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
         })->whereDoesntHave('fileAttachment', function ($a) {
             $a->where('section', '2');
-        })->count();
-        $needCauseEffectA = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        });
+        if ($request->user) {
+            $needContractualA->where('user_id', $selected_user->id);
+        }
+        $needContractualA = $needContractualA->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+        $needCauseEffectA = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
         })->whereDoesntHave('fileAttachment', function ($a) {
             $a->where('section', '3');
-        })->count();
+        });
+        if ($request->user) {
+            $needCauseEffectA->where('user_id', $selected_user->id);
+        }
+        $needCauseEffectA = $needCauseEffectA->count();
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         $con1                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 1)->first();
         $FileVariation1['label'] = $con1 ? $con1->name : '';
-        $FileVariation1['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation1_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [1, 2, 3, 4, 5, 6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation1_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [1, 2, 3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation1['value'] = $ActiveOpenClaimFileVariation - $FileVariation1['value'];
+        } else {
+            $FileVariation1_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [1, 2, 3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+
+        $FileVariation1_value    = $FileVariation1_value->count();
+        $FileVariation1['value'] = $ActiveOpenClaimFileVariation - $FileVariation1_value;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         $con2                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 2)->first();
         $FileVariation2['label'] = $con2 ? $con2->name : '';
-        $FileVariation2['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation2_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [2, 3, 4, 5, 6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation2_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [2, 3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation2['value'] = $ActiveOpenClaimFileVariation - $FileVariation2['value'];
+        } else {
+            $FileVariation2_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [2, 3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+
+        $FileVariation2_value    = $FileVariation2_value->count();
+        $FileVariation2['value'] = $ActiveOpenClaimFileVariation - $FileVariation2_value;
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         $con3                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 3)->first();
         $FileVariation3['label'] = $con3 ? $con3->name : '';
-        $FileVariation3['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation3_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [3, 4, 5, 6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation3_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation3['value'] = $ActiveOpenClaimFileVariation - $FileVariation3['value'];
+        } else {
+            $FileVariation3_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [3, 4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+
+        $FileVariation3_value    = $FileVariation3_value->count();
+        $FileVariation3['value'] = $ActiveOpenClaimFileVariation - $FileVariation3_value;
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         $con4                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 4)->first();
         $FileVariation4['label'] = $con4 ? $con4->name : '';
-        $FileVariation4['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation4_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [4, 5, 6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation4_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation4['value'] = $ActiveOpenClaimFileVariation - $FileVariation4['value'];
+        } else {
+            $FileVariation4_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [4, 5, 6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+
+        $FileVariation4_value    = $FileVariation4_value->count();
+        $FileVariation4['value'] = $ActiveOpenClaimFileVariation - $FileVariation4_value;
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         $con5                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 5)->first();
         $FileVariation5['label'] = $con5 ? $con5->name : '';
-        $FileVariation5['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation5_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [5, 6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation5_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [5, 6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation5['value'] = $ActiveOpenClaimFileVariation - $FileVariation5['value'];
+        } else {
+            $FileVariation5_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [5, 6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+
+        $FileVariation5_value    = $FileVariation5_value->count();
+        $FileVariation5['value'] = $ActiveOpenClaimFileVariation - $FileVariation5_value;
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         $con6                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 6)->first();
         $FileVariation6['label'] = $con6 ? $con6->name : '';
-        $FileVariation6['value'] = ProjectFile::where('user_id', $user->id)->where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
+        $FileVariation6_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
 
-        })->whereHas('fileDocuments', function ($d) use ($user) {
-            $d->whereHas('tags', function ($t) {
-                $t->whereIn('var_process', [6]);
-            })->whereHas('document', function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->where('project_id', $user->current_project_id)
-                    ->where('assess_not_pursue', '0');
+        });
+        if ($request->user) {
+            $FileVariation6_value->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [6]);
+                })->whereHas('document', function ($q) use ($user, $selected_user) {
+                    $q->where('user_id', $selected_user->id)
+                        ->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
             });
-        })->count();
-        $FileVariation6['value'] = $ActiveOpenClaimFileVariation - $FileVariation6['value'];
-        $analysis_complete_value = ProjectFile::where('user_id', $user->id)
-            ->where('project_id', $user->current_project_id)
-            ->where('closed', '0')
-            ->where('assess_not_pursue', '0')
+        } else {
+            $FileVariation6_value->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->whereIn('var_process', [6]);
+                })->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0');
+                });
+            });
+        }
+        $FileVariation6_value    = $FileVariation6_value->count();
+        $FileVariation6['value'] = $ActiveOpenClaimFileVariation - $FileVariation6_value;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        $analysis_complete_value = ProjectFile::where('project_id', $user->current_project_id)
+            ->where('closed', '0');
+            if($request->user){
+            $analysis_complete_value->where('user_id', $selected_user->id);
+
+            }
+            $analysis_complete_value->where('assess_not_pursue', '0')
             ->whereHas('folder', function ($f) {
                 $f->where('potential_impact', '1');
             })
@@ -266,10 +552,10 @@ class ProjectDashboardController extends ApiController
             'allPendingAnalysisUserDocuments', 'allPendingAssignmentUserDocuments',
             'allNeedNarrativeUserDocuments', 'project', 'assigned_users',
             'allHaveConTagsUserDocuments', 'allHaveConTagsNoticeClaimUserDocuments', 'ActiveOpenClaimFilesNeed1ClaimNotice', 'ActiveOpenClaimFilesNeedFurtherNotice',
-            'FileVariation1', 'FileVariation2', 'FileVariation3', 'FileVariation4', 'FileVariation5', 'FileVariation6'));
+            'FileVariation1', 'FileVariation2', 'FileVariation3', 'FileVariation4', 'FileVariation5', 'FileVariation6',
+            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name'));
 
     }
-
     public function assign_users(Request $request)
     {
         $user = auth()->user();
