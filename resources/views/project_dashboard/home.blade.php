@@ -273,7 +273,7 @@
         </div>
     @endif
 
-    <div style="display: flex; width:100%;">
+    <div style="display: flex; width:100%; margin-top:-15px;">
         <div class="col-md-6" style="padding-right:0px !important;padding-left:0px !important">
             <div style="display: flex; width:100%; height:324px;">
                 <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
