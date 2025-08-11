@@ -420,7 +420,7 @@
 
                         <hr style="border-top: 3px solid #168bff;">
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need 1 Claim
+                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First Claim
                                 Notice</div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
