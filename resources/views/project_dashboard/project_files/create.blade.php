@@ -138,8 +138,9 @@
                                 <div class="row">
                                     <p style="margin-bottom:0px;">Percentage Analysis Complete : </p>
                                     <input type="number" name="Percentage_Analysis_Complete" class="form-control"value="0"
-                                        style="width: 30%;margin-left:2%; margin-top:-5px;" min="1" max="100"
+                                        style="width: 12%;margin-left:2%; margin-top:-5px;" min="1" max="100"
                                         oninput="this.value = Math.min(Math.max(1, this.value), 100)">
+                                        <p style="margin-left:3px;">%</p>
 
                                 </div>
                             </div>

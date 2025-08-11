@@ -214,6 +214,50 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
     </style>
+    <style>
+        .label-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 8px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 999;
+            bottom: 125%;
+            /* position above the label */
+            left: 60%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            /* Arrow points down */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+        }
+
+        .label-wrapper:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
             <h2 class="h3 mb-0 page-title">{{ $project->name }}</h2>
@@ -280,15 +324,24 @@
                     <div class="summary-box">
                         <div class="info">
                             <div class="info-row" style="margin-top: 0px;">
-                                <div class="label">Total Documents</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Total Documents</div>
+                                    <span class="tooltip-text">{!! $labels['allUserDocuments'] !!}</span>
+                                </div>
                                 <div class="count-box blue" id="total-docs">{{ $allUserDocuments }}</div>
                             </div>
                             <div class="info-row">
-                                <div class="label">Active Documents</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Active Documents</div>
+                                    <span class="tooltip-text">{!! $labels['allActiveUserDocuments'] !!}</span>
+                                </div>
                                 <div class="count-box green" id="active-docs">{{ $allActiveUserDocuments }}</div>
                             </div>
                             <div class="info-row" style="margin-bottom: 0px;">
-                                <div class="label">Assessed Not To Pursue</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Assessed Not To Pursue</div>
+                                    <span class="tooltip-text"><spam>{!! $labels['allInactiveUserDocuments'] !!}</span>
+                                </div>
                                 <div class="count-box red" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
                             </div>
                         </div>

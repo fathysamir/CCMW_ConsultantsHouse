@@ -25,22 +25,35 @@ class ProjectDashboardController extends ApiController
 
         $project        = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
-        $project_users   = $project->assign_users;
+        $project_users  = $project->assign_users;
         if ($request->user) {
             if ($request->user == $user->code) {
-                $project_dashboard_class_name = 'fancy-btn2';
-                $my_dashboard_class_name      = 'fancy-btn';
-                $user_dashboard_class_name    = 'fancy-btn2';
+                $project_dashboard_class_name       = 'fancy-btn2';
+                $my_dashboard_class_name            = 'fancy-btn';
+                $user_dashboard_class_name          = 'fancy-btn2';
+                $selected_user                      = User::where('code', $request->user)->first();
+                $labels['allUserDocuments']         = '<spam>All documents uploaded by me</spam>';
+                $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded by me</spam>';
+                $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded by me</spam>';
+
             } else {
-                $project_dashboard_class_name = 'fancy-btn2';
-                $my_dashboard_class_name      = 'fancy-btn2';
-                $user_dashboard_class_name    = 'fancy-btn';
+                $project_dashboard_class_name       = 'fancy-btn2';
+                $my_dashboard_class_name            = 'fancy-btn2';
+                $user_dashboard_class_name          = 'fancy-btn';
+                $selected_user                      = User::where('code', $request->user)->first();
+                $labels['allUserDocuments']         = '<spam>All documents uploaded by ' . $selected_user->name . '</spam';
+                $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded by ' . $selected_user->name . '</spam';
+                $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded by ' . $selected_user->name . '</spam';
+
             }
-            $selected_user = User::where('code', $request->user)->first();
         } else {
-            $project_dashboard_class_name = 'fancy-btn';
-            $my_dashboard_class_name      = 'fancy-btn2';
-            $user_dashboard_class_name    = 'fancy-btn2';
+            $project_dashboard_class_name       = 'fancy-btn';
+            $my_dashboard_class_name            = 'fancy-btn2';
+            $user_dashboard_class_name          = 'fancy-btn2';
+            $labels['allUserDocuments']         = '<spam>All documents uploaded in project</spam>';
+            $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded in project</spam>';
+            $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded in project</spam>';
+
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $allUserDocuments = Document::where('project_id', $user->current_project_id);
@@ -534,20 +547,20 @@ class ProjectDashboardController extends ApiController
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $analysis_complete_value = ProjectFile::where('project_id', $user->current_project_id)
             ->where('closed', '0');
-            if($request->user){
+        if ($request->user) {
             $analysis_complete_value->where('user_id', $selected_user->id);
 
-            }
-            $analysis_complete_value=$analysis_complete_value->where('assess_not_pursue', '0')
+        }
+        $analysis_complete_value = $analysis_complete_value->where('assess_not_pursue', '0')
             ->whereHas('folder', function ($f) {
                 $f->where('potential_impact', '1');
             })
             ->avg(DB::raw('COALESCE(analyses_complete, 0)')) ?? 0;
-           
+
         $percent1 = $ActiveOpenClaimFile > 0 ? $analysis_complete_value : 0;
-        
+
         return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
-            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1','project_users',
+            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1', 'project_users',
             'ActiveClaimFile', 'ActiveOpenClaimFile', 'ActiveClosedClaimFile',
             'ActiveOpenClaimFileTime', 'ActiveOpenClaimFileProlongationCost', 'ActiveOpenClaimFileVariation', 'ActiveOpenClaimFileDisruption',
             'needChronology', 'needSynopsis', 'needContractualA', 'needCauseEffectA',
@@ -555,7 +568,7 @@ class ProjectDashboardController extends ApiController
             'allNeedNarrativeUserDocuments', 'project', 'assigned_users',
             'allHaveConTagsUserDocuments', 'allHaveConTagsNoticeClaimUserDocuments', 'ActiveOpenClaimFilesNeed1ClaimNotice', 'ActiveOpenClaimFilesNeedFurtherNotice',
             'FileVariation1', 'FileVariation2', 'FileVariation3', 'FileVariation4', 'FileVariation5', 'FileVariation6',
-            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name'));
+            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name', 'labels'));
 
     }
     public function assign_users(Request $request)
