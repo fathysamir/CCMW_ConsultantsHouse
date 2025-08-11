@@ -25,7 +25,7 @@ class ProjectDashboardController extends ApiController
 
         $project        = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
-
+        $project_users   = $project->assign_users;
         if ($request->user) {
             if ($request->user == $user->code) {
                 $project_dashboard_class_name = 'fancy-btn2';
@@ -547,7 +547,7 @@ class ProjectDashboardController extends ApiController
         $percent1 = $ActiveOpenClaimFile > 0 ? $analysis_complete_value : 0;
         
         return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
-            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1',
+            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1','project_users',
             'ActiveClaimFile', 'ActiveOpenClaimFile', 'ActiveClosedClaimFile',
             'ActiveOpenClaimFileTime', 'ActiveOpenClaimFileProlongationCost', 'ActiveOpenClaimFileVariation', 'ActiveOpenClaimFileDisruption',
             'needChronology', 'needSynopsis', 'needContractualA', 'needCauseEffectA',

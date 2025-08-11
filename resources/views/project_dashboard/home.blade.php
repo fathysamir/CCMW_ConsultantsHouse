@@ -357,7 +357,8 @@
                     <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
                         <div class="row_d" style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">T - Total Variation Files</div>
-                            <div class="count-box darkolivegreen" id="">{{ $ActiveOpenClaimFileVariation }}</div>
+                            <div class="count-box darkolivegreen" id="">{{ $ActiveOpenClaimFileVariation }}
+                            </div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
                             <div class="label2">1 - Need {{ $FileVariation1['label'] }}</div>
@@ -420,7 +421,8 @@
 
                         <hr style="border-top: 3px solid #168bff;">
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First Claim
+                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First
+                                Claim
                                 Notice</div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
@@ -545,8 +547,24 @@
                 </div>
             </div>
             <div class="chart-container" style="margin-top: 5px; height:119px;">
-                <button class="{{ $project_dashboard_class_name }}"onclick="window.location.href='{{ url('/project') }}'">Project Dashboard</button>
-                <button class="{{ $my_dashboard_class_name }}" style="margin-top: 10px;"onclick="window.location.href='{{ url('/project?user=' . auth()->user()->code) }}'">My Dashboard</button>
+                <button
+                    class="{{ $project_dashboard_class_name }}"onclick="window.location.href='{{ url('/project') }}'">Project
+                    Dashboard</button>
+                <button class="{{ $my_dashboard_class_name }}"
+                    style="margin-top: 8px;"onclick="window.location.href='{{ url('/project?user=' . auth()->user()->code) }}'">My
+                    Dashboard</button>
+                <div style="display: flex;margin-top: 8px; width:100%">
+                    <select class="form-control" id="owner" style="width: 80%;">
+                        <option value="" selected disabled>select User</option>
+                        @foreach ($project_users as $user)
+                            <option value="{{ $user->code }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                    <button id="dashboardBtn" class="{{ $user_dashboard_class_name }}" disabled
+                        style="margin-left:5px;">
+                        Dashboard
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -659,7 +677,23 @@
             new Chart(ctx, config);
         });
     </script>
+    <script>
+        const selectOwner = document.getElementById('owner');
+        const dashboardBtn = document.getElementById('dashboardBtn');
 
+        // Enable button when selection changes
+        selectOwner.addEventListener('change', function() {
+            dashboardBtn.disabled = !this.value;
+        });
+
+        // Redirect on click
+        dashboardBtn.addEventListener('click', function() {
+            const selectedUser = selectOwner.value;
+            if (selectedUser) {
+                window.location.href = "{{ url('/project') }}" + "?user=" + encodeURIComponent(selectedUser);
+            }
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
