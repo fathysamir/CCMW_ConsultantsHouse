@@ -5,7 +5,7 @@
     <nav class="vertnav navbar navbar-light">
         <!-- nav bar -->
         <div class="w-100 mb-4 d-flex">
-            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{{ asset(url('/project')) }}">
+            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{{ asset(url('/project?user=' . auth()->user()->code)) }}">
                 <img id="logo" src="{{ asset('dashboard/assets/images/logo.png') }}"
                     @if ($sideBarTheme == '0') width="50" @else width="130" @endif style="border-radius: 50%;border: 6px solid #495057 ;">
 
@@ -18,7 +18,7 @@
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item">
 
-                <a class="nav-link pl-3 link_kkkkk" href="{{ route('project.home') }}"style="padding-left: 0.5rem !important;"><img src="{{ asset('/dashboard/assets/selected_images/home.ico') }}" width="22"><span class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
+                <a class="nav-link pl-3 link_kkkkk" href="{{ url('/project?user=' . auth()->user()->code) }}"style="padding-left: 0.5rem !important;"><img src="{{ asset('/dashboard/assets/selected_images/home.ico') }}" width="22"><span class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
                         Home</span></a>
             </li>
             <li class="nav-item dropdown">

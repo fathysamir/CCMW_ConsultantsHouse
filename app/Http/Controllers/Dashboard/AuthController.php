@@ -39,7 +39,7 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')], $remember)) {
             $user = auth()->user();
             if ($request->last_project && $user->current_project_id != null) {
-                return redirect('/project');
+                return redirect('/project?user=' . $user->code);
             }
 
             return redirect('/accounts');

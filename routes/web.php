@@ -169,7 +169,7 @@ Route::group(['middleware' => ['admin']], function () {
         $user->current_project_id = $id;
         $user->save();
 
-        return redirect()->route('project.home');
+        return redirect(url('/project?user=' . $user->code));
     })->where('id', '[0-9]+')->name('switch.project');
     Route::get('/project', [ProjectDashboardController::class, 'index'])->where('id', '[0-9]+')->name('project.home');
     Route::get('/project/contract-tags', [ContractTagController::class, 'index'])->name('project.contract-tags');
