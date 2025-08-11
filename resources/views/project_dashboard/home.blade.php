@@ -239,7 +239,7 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        
+
 
         .tooltip-text::after {
             content: "";
@@ -340,7 +340,9 @@
                             <div class="info-row" style="margin-bottom: 0px;">
                                 <div class="label-wrapper">
                                     <div class="label">Assessed Not To Pursue</div>
-                                    <span class="tooltip-text"><spam>{!! $labels['allInactiveUserDocuments'] !!}</span>
+                                    <span class="tooltip-text">
+                                        {!! $labels['allInactiveUserDocuments'] !!}
+                                    </span>
                                 </div>
                                 <div class="count-box red" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
                             </div>
