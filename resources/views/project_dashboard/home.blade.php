@@ -657,7 +657,7 @@
             const chartData = {
                 labels: labels,
                 datasets: [{
-                    label: 'Files',
+                    label: ' ',
                     data: values,
                     backgroundColor: gradient,
                     borderColor: 'rgba(85, 107, 47, 1)',
