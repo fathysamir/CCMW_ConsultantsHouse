@@ -617,7 +617,7 @@
                     </select>
                     <button id="dashboardBtn" class="{{ $user_dashboard_class_name }}" disabled
                         style="margin-left:5px;">
-                        Dashboard
+                        Selected User Dashboard
                     </button>
                 </div>
             </div>
