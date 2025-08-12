@@ -32,27 +32,27 @@ class ProjectDashboardController extends ApiController
                 $my_dashboard_class_name            = 'fancy-btn';
                 $user_dashboard_class_name          = 'fancy-btn2';
                 $selected_user                      = User::where('code', $request->user)->first();
-                $labels['allUserDocuments']         = '<spam>All documents uploaded by me</spam>';
-                $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded by me</spam>';
-                $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded by me</spam>';
+                $labels['allUserDocuments']         = '<spam>Documents assigned to me</spam>';
+                $labels['allActiveUserDocuments']   = '<spam>Active documents assigned to me</spam>';
+                $labels['allInactiveUserDocuments'] = '<spam>Inactive documents assigned to me</spam>';
 
             } else {
                 $project_dashboard_class_name       = 'fancy-btn2';
                 $my_dashboard_class_name            = 'fancy-btn2';
                 $user_dashboard_class_name          = 'fancy-btn';
                 $selected_user                      = User::where('code', $request->user)->first();
-                $labels['allUserDocuments']         = '<spam>All documents uploaded by ' . $selected_user->name . '</spam';
-                $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded by ' . $selected_user->name . '</spam';
-                $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded by ' . $selected_user->name . '</spam';
+                $labels['allUserDocuments']         = '<spam>Documents assigned to ' . $selected_user->name . '</spam';
+                $labels['allActiveUserDocuments']   = '<spam>Active documents assigned to ' . $selected_user->name . '</spam';
+                $labels['allInactiveUserDocuments'] = '<spam>Inactive documents assigned to ' . $selected_user->name . '</spam';
 
             }
         } else {
             $project_dashboard_class_name       = 'fancy-btn';
             $my_dashboard_class_name            = 'fancy-btn2';
             $user_dashboard_class_name          = 'fancy-btn2';
-            $labels['allUserDocuments']         = '<spam>All documents uploaded in project</spam>';
-            $labels['allActiveUserDocuments']   = '<spam>All active documents uploaded in project</spam>';
-            $labels['allInactiveUserDocuments'] = '<spam>All inactive documents uploaded in project</spam>';
+            $labels['allUserDocuments']         = '<spam>All documents in project</spam>';
+            $labels['allActiveUserDocuments']   = '<spam>All active documents in project</spam>';
+            $labels['allInactiveUserDocuments'] = '<spam>All inactive documents in project</spam>';
 
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
