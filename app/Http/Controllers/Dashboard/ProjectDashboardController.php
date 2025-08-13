@@ -26,34 +26,94 @@ class ProjectDashboardController extends ApiController
         $project        = Project::findOrFail($user->current_project_id);
         $assigned_users = $project->assign_users()->pluck('users.id')->toArray();
         $project_users  = $project->assign_users;
+        $con1           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 1)->first();
+        $con2           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 2)->first();
+        $con3           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 3)->first();
+        $con4           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 4)->first();
+        $con5           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 5)->first();
+        $con6           = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 6)->first();
+
         if ($request->user) {
             if ($request->user == $user->code) {
-                $project_dashboard_class_name       = 'fancy-btn2';
-                $my_dashboard_class_name            = 'fancy-btn';
-                $user_dashboard_class_name          = 'fancy-btn2';
-                $selected_user                      = User::where('code', $request->user)->first();
-                $labels['allUserDocuments']         = '<spam>Documents assigned to me</spam>';
-                $labels['allActiveUserDocuments']   = '<spam>Active documents assigned to me</spam>';
-                $labels['allInactiveUserDocuments'] = '<spam>Inactive documents assigned to me</spam>';
+                $project_dashboard_class_name                     = 'fancy-btn2';
+                $my_dashboard_class_name                          = 'fancy-btn';
+                $user_dashboard_class_name                        = 'fancy-btn2';
+                $selected_user                                    = User::where('code', $request->user)->first();
+                $labels['allUserDocuments']                       = 'Documents assigned to me';
+                $labels['allActiveUserDocuments']                 = 'Active documents assigned to me';
+                $labels['allInactiveUserDocuments']               = 'Inactive documents assigned to me';
+                $labels['allAssignmentUserDocuments']             = 'Active documents assigned to my active open claim files';
+                $labels['allForClaimUserDocuments']               = 'Chronology documents checked for claim';
+                $labels['allNeedNarrativeUserDocuments']          = 'Chronology documents need narrative';
+                $labels['allHaveConTagsUserDocuments']            = 'Chronology documents have contractual tag';
+                $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'Chronology documents and notice of claim';
+                $labels['percent1']                               = 'Average percent of analysis complete for active open claim files assigned to my';
+                $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files assigned to my';
+                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files with variation assigned to me';
+                $labels['FileVariation1']                         = 'Active open claim files assigned to me which need ' . ($con1 ? $con1->name : '');
+                $labels['FileVariation2']                         = 'Active open claim files assigned to me which need ' . ($con2 ? $con2->name : '');
+                $labels['FileVariation3']                         = 'Active open claim files assigned to me which need ' . ($con3 ? $con3->name : '');
+                $labels['FileVariation4']                         = 'Active open claim files assigned to me which need ' . ($con4 ? $con4->name : '');
+                $labels['FileVariation5']                         = 'Active open claim files assigned to me which need ' . ($con5 ? $con5->name : '');
+                $labels['FileVariation6']                         = 'Active open claim files assigned to me which need ' . ($con6 ? $con6->name : '');
+                $labels['allPendingAnalysisUserDocuments']        = 'Active documents need analysis assigned to me';
+                $labels['allPendingAssignmentUserDocuments']      = 'Active documents assigned to me which not assigned to any file';
+                $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'Active open claim files assigned to me which need first claim notice';
+                $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to me which need further notice';
 
             } else {
-                $project_dashboard_class_name       = 'fancy-btn2';
-                $my_dashboard_class_name            = 'fancy-btn2';
-                $user_dashboard_class_name          = 'fancy-btn';
-                $selected_user                      = User::where('code', $request->user)->first();
-                $labels['allUserDocuments']         = '<spam>Documents assigned to ' . $selected_user->name . '</spam';
-                $labels['allActiveUserDocuments']   = '<spam>Active documents assigned to ' . $selected_user->name . '</spam';
-                $labels['allInactiveUserDocuments'] = '<spam>Inactive documents assigned to ' . $selected_user->name . '</spam';
+                $project_dashboard_class_name                     = 'fancy-btn2';
+                $my_dashboard_class_name                          = 'fancy-btn2';
+                $user_dashboard_class_name                        = 'fancy-btn';
+                $selected_user                                    = User::where('code', $request->user)->first();
+                $labels['allUserDocuments']                       = 'Documents assigned to ' . $selected_user->name;
+                $labels['allActiveUserDocuments']                 = 'Active documents assigned to ' . $selected_user->name;
+                $labels['allInactiveUserDocuments']               = 'Inactive documents assigned to ' . $selected_user->name;
+                $labels['allAssignmentUserDocuments']             = 'Active documents assigned to ' . $selected_user->name . '\'s active open claim files';
+                $labels['allForClaimUserDocuments']               = 'Chronology documents checked for claim';
+                $labels['allNeedNarrativeUserDocuments']          = 'Chronology documents need narrative';
+                $labels['allHaveConTagsUserDocuments']            = 'Chronology documents have contractual tag';
+                $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'Chronology documents and notice of claim';
+                $labels['percent1']                               = 'Average percent of analysis complete for active open claim files assigned to ' . $selected_user->name;
+                $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files with variation assigned to ' . $selected_user->name;
+                $labels['FileVariation1']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con1 ? $con1->name : '');
+                $labels['FileVariation2']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con2 ? $con2->name : '');
+                $labels['FileVariation3']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con3 ? $con3->name : '');
+                $labels['FileVariation4']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con4 ? $con4->name : '');
+                $labels['FileVariation5']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con5 ? $con5->name : '');
+                $labels['FileVariation6']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con6 ? $con6->name : '');
+                $labels['allPendingAnalysisUserDocuments']        = 'Active documents need analysis assigned to ' . $selected_user->name;
+                $labels['allPendingAssignmentUserDocuments']      = 'Active documents assigned to ' . $selected_user->name . ' which not assigned to any file';
+                $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'Active open claim files assigned to ' . $selected_user->name . ' which need first claim notice';
+                $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to ' . $selected_user->name . ' which need further notice';
 
             }
         } else {
-            $project_dashboard_class_name       = 'fancy-btn';
-            $my_dashboard_class_name            = 'fancy-btn2';
-            $user_dashboard_class_name          = 'fancy-btn2';
-            $labels['allUserDocuments']         = '<spam>All documents in project</spam>';
-            $labels['allActiveUserDocuments']   = '<spam>All active documents in project</spam>';
-            $labels['allInactiveUserDocuments'] = '<spam>All inactive documents in project</spam>';
-
+            $project_dashboard_class_name                     = 'fancy-btn';
+            $my_dashboard_class_name                          = 'fancy-btn2';
+            $user_dashboard_class_name                        = 'fancy-btn2';
+            $labels['allUserDocuments']                       = 'All documents in project';
+            $labels['allActiveUserDocuments']                 = 'All active documents in project';
+            $labels['allInactiveUserDocuments']               = 'All inactive documents in project';
+            $labels['allAssignmentUserDocuments']             = 'All active documents assigned to active open claim files in project';
+            $labels['allForClaimUserDocuments']               = 'ALL chronology documents checked for claim';
+            $labels['allNeedNarrativeUserDocuments']          = 'All chronology documents need narrative';
+            $labels['allHaveConTagsUserDocuments']            = 'All chronology documents have contractual tag';
+            $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'All chronology documents and notice of claim';
+            $labels['percent1']                               = 'Average percent of analysis complete for active open claim files in project';
+            $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files in project';
+            $labels['ActiveOpenClaimFileVariation']           = 'All active open claim files with variation in project';
+            $labels['FileVariation1']                         = 'All active open claim files in project which need ' . ($con1 ? $con1->name : '');
+            $labels['FileVariation2']                         = 'All active open claim files in project which need ' . ($con2 ? $con2->name : '');
+            $labels['FileVariation3']                         = 'All active open claim files in project which need ' . ($con3 ? $con3->name : '');
+            $labels['FileVariation4']                         = 'All active open claim files in project which need ' . ($con4 ? $con4->name : '');
+            $labels['FileVariation5']                         = 'All active open claim files in project which need ' . ($con5 ? $con5->name : '');
+            $labels['FileVariation6']                         = 'All active open claim files in project which need ' . ($con6 ? $con6->name : '');
+            $labels['allPendingAnalysisUserDocuments']        = 'All active documents need analysis in project';
+            $labels['allPendingAssignmentUserDocuments']      = 'All active documents in project which not assigned to any file';
+            $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'All active open claim files in project which need first claim notice';
+            $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'All active open claim files in project which need further notice';
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $allUserDocuments = Document::where('project_id', $user->current_project_id);
@@ -209,68 +269,40 @@ class ProjectDashboardController extends ApiController
             $f->where('potential_impact', '1');
         });
         if ($request->user) {
-            $ActiveOpenClaimFilesNeed1ClaimNotice->where('user_id', $selected_user->id)
-                ->where(function ($query) use ($user, $selected_user) {
-                    // No file documents at all
-                    $query->whereDoesntHave('fileDocuments')
-                    // Or file documents without the notice tag
-                        ->orWhereDoesntHave('fileDocuments', function ($d) use ($user, $selected_user) {
-                            $d->whereHas('tags', function ($t) {
-                                $t->where('is_notice', '1');
-                            })
-                                ->whereHas('document', function ($q) use ($user, $selected_user) {
-                                    $q->where('user_id', $selected_user->id)
-                                        ->where('project_id', $user->current_project_id)
-                                        ->where('assess_not_pursue', '0');
-                                });
+            $ActiveOpenClaimFilesNeed1ClaimNotice->where('user_id', $selected_user->id);
+
+        }
+        $ActiveOpenClaimFilesNeed1ClaimNotice = $ActiveOpenClaimFilesNeed1ClaimNotice->where(function ($query) use ($user) {
+            // No file documents at all
+            $query->whereDoesntHave('fileDocuments')
+            // Or file documents without the notice tag
+                ->orWhereDoesntHave('fileDocuments', function ($d) use ($user) {
+                    $d->whereHas('tags', function ($t) {
+                        $t->where('is_notice', '1');
+                    })
+                        ->whereHas('document', function ($q) use ($user) {
+                            $q->where('project_id', $user->current_project_id)
+                                ->where('assess_not_pursue', '0');
                         });
                 });
-        } else {
-            $ActiveOpenClaimFilesNeed1ClaimNotice->where(function ($query) use ($user) {
-                // No file documents at all
-                $query->whereDoesntHave('fileDocuments')
-                // Or file documents without the notice tag
-                    ->orWhereDoesntHave('fileDocuments', function ($d) use ($user) {
-                        $d->whereHas('tags', function ($t) {
-                            $t->where('is_notice', '1');
-                        })
-                            ->whereHas('document', function ($q) use ($user) {
-                                $q->where('project_id', $user->current_project_id)
-                                    ->where('assess_not_pursue', '0');
-                            });
-                    });
-            });
-        }
-        $ActiveOpenClaimFilesNeed1ClaimNotice = $ActiveOpenClaimFilesNeed1ClaimNotice->count();
+        })->count();
         /////////////////////////////////////////////////////////////////////////////////////////////////
         $ActiveOpenClaimFilesNeedFurtherNotice = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
         });
         if ($request->user) {
-            $ActiveOpenClaimFilesNeedFurtherNotice->where('user_id', $selected_user->id)->whereHas('fileDocuments', function ($d) use ($user, $selected_user) {
-                $d->whereHas('tags', function ($t) {
-                    $t->where('is_notice', '1');
-                })
-                    ->whereHas('document', function ($q) use ($user, $selected_user) {
-                        $q->where('user_id', $selected_user->id)
-                            ->where('project_id', $user->current_project_id)
-                            ->where('assess_not_pursue', '0')
-                            ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
-                    });
-            });
-        } else {
-            $ActiveOpenClaimFilesNeedFurtherNotice->whereHas('fileDocuments', function ($d) use ($user) {
-                $d->whereHas('tags', function ($t) {
-                    $t->where('is_notice', '1');
-                })
-                    ->whereHas('document', function ($q) use ($user) {
-                        $q->where('project_id', $user->current_project_id)
-                            ->where('assess_not_pursue', '0')
-                            ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
-                    });
-            });
+            $ActiveOpenClaimFilesNeedFurtherNotice->where('user_id', $selected_user->id);
         }
-        $ActiveOpenClaimFilesNeedFurtherNotice = $ActiveOpenClaimFilesNeedFurtherNotice->count();
+        $ActiveOpenClaimFilesNeedFurtherNotice = $ActiveOpenClaimFilesNeedFurtherNotice->whereHas('fileDocuments', function ($d) use ($user) {
+            $d->whereHas('tags', function ($t) {
+                $t->where('is_notice', '1');
+            })
+                ->whereHas('document', function ($q) use ($user) {
+                    $q->where('project_id', $user->current_project_id)
+                        ->where('assess_not_pursue', '0')
+                        ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
+                });
+        })->count();
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         $ActiveClaimFile = ProjectFile::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
@@ -366,7 +398,6 @@ class ProjectDashboardController extends ApiController
         }
         $needCauseEffectA = $needCauseEffectA->count();
         ///////////////////////////////////////////////////////////////////////////////////////////////////
-        $con1                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 1)->first();
         $FileVariation1['label'] = $con1 ? $con1->name : '';
         $FileVariation1_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
@@ -396,7 +427,6 @@ class ProjectDashboardController extends ApiController
         $FileVariation1_value    = $FileVariation1_value->count();
         $FileVariation1['value'] = $ActiveOpenClaimFileVariation - $FileVariation1_value;
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        $con2                    = ContractTag::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id)->where('var_process', 2)->first();
         $FileVariation2['label'] = $con2 ? $con2->name : '';
         $FileVariation2_value    = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->whereHas('folder', function ($f) {
             $f->where('potential_impact', '1');
@@ -558,9 +588,10 @@ class ProjectDashboardController extends ApiController
             ->avg(DB::raw('COALESCE(analyses_complete, 0)')) ?? 0;
 
         $percent1 = $ActiveOpenClaimFile > 0 ? $analysis_complete_value : 0;
+        $percent2 = 0;
 
         return view('project_dashboard.home', compact('allForClaimUserDocuments', 'allAssignmentUserDocuments', 'allActiveUserDocuments',
-            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1', 'project_users',
+            'allInactiveUserDocuments', 'users', 'allUserDocuments', 'percent1', 'percent2', 'project_users',
             'ActiveClaimFile', 'ActiveOpenClaimFile', 'ActiveClosedClaimFile',
             'ActiveOpenClaimFileTime', 'ActiveOpenClaimFileProlongationCost', 'ActiveOpenClaimFileVariation', 'ActiveOpenClaimFileDisruption',
             'needChronology', 'needSynopsis', 'needContractualA', 'needCauseEffectA',

@@ -45,7 +45,7 @@
         .label2 {
             padding-top: 5px;
             padding-bottom: 6.5px;
-            width: 85%;
+            
             font-size: 12px;
         }
 
@@ -234,7 +234,7 @@
             /* position above the label */
             left: 60%;
             transform: translateX(-50%);
-            white-space: nowrap;
+            /* white-space: nowrap; */
             font-size: 12px;
             opacity: 0;
             transition: opacity 0.3s;
@@ -256,6 +256,7 @@
         .label-wrapper:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
+            width: 200px !important;
         }
     </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
@@ -326,23 +327,30 @@
                             <div class="info-row" style="margin-top: 0px;">
                                 <div class="label-wrapper">
                                     <div class="label">Total Documents</div>
-                                    <span class="tooltip-text">{!! $labels['allUserDocuments'] !!}</span>
+                                    <div class="tooltip-text">
+                                        <span>{!! $labels['allUserDocuments'] !!}</span>
+                                    </div>
+
                                 </div>
                                 <div class="count-box blue" id="total-docs">{{ $allUserDocuments }}</div>
                             </div>
                             <div class="info-row">
                                 <div class="label-wrapper">
                                     <div class="label">Active Documents</div>
-                                    <span class="tooltip-text">{!! $labels['allActiveUserDocuments'] !!}</span>
+                                    <div class="tooltip-text">
+                                        <span>{!! $labels['allActiveUserDocuments'] !!}</span>
+                                    </div>
                                 </div>
                                 <div class="count-box green" id="active-docs">{{ $allActiveUserDocuments }}</div>
                             </div>
                             <div class="info-row" style="margin-bottom: 0px;">
                                 <div class="label-wrapper">
                                     <div class="label">Assessed Not To Pursue</div>
-                                    <span class="tooltip-text">
-                                        {!! $labels['allInactiveUserDocuments'] !!}
-                                    </span>
+                                    <div class="tooltip-text">
+                                        <span style="width:100% !important;">
+                                            {!! $labels['allInactiveUserDocuments'] !!}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div class="count-box red" id="not-pursue">{{ $allInactiveUserDocuments }}</div>
                             </div>
@@ -352,7 +360,14 @@
                     </div>
                     <div class="chart-container" style="margin-top: 5px;">
                         <div class="row_d">
-                            <div class="label">Chronology Documents</div>
+
+                            <div class="label-wrapper">
+                                <div class="label">Chronology Documents</div>
+                                <div class="tooltip-text">
+                                    <span>{!! $labels['allAssignmentUserDocuments'] !!}</span>
+                                </div>
+
+                            </div>
                             <div class="count-box blue" id="assignment_docs">{{ $allAssignmentUserDocuments }}</div>
                             <div class="bar-container">
                                 <div class="bar blue" id="bar-assignment-docs"></div>
@@ -360,7 +375,14 @@
                         </div>
 
                         <div class="row_d">
-                            <div class="label">For Claim</div>
+
+                            <div class="label-wrapper">
+                                <div class="label">For Claim</div>
+                                <div class="tooltip-text">
+                                    <span>{!! $labels['allForClaimUserDocuments'] !!}</span>
+                                </div>
+
+                            </div>
                             <div class="count-box green" id="forClaim_docs">{{ $allForClaimUserDocuments }}</div>
                             <div class="bar-container">
                                 <div class="bar green" id="bar-forClaim-docs"></div>
@@ -368,21 +390,41 @@
                         </div>
 
                         <div class="row_d">
-                            <div class="label">Need Narrative</div>
+
+                            <div class="label-wrapper">
+                                <div class="label">Need Narrative</div>
+                                <div class="tooltip-text">
+                                    <span>{!! $labels['allNeedNarrativeUserDocuments'] !!}</span>
+                                </div>
+
+                            </div>
                             <div class="count-box brown" id="count-narrative">{{ $allNeedNarrativeUserDocuments }}</div>
                             <div class="bar-container">
                                 <div class="bar brown" id="bar-narrative"></div>
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Have Contractual Tag</div>
+
+                            <div class="label-wrapper">
+                                <div class="label">Have Contractual Tag</div>
+                                <div class="tooltip-text">
+                                    <span>{!! $labels['allHaveConTagsUserDocuments'] !!}</span>
+                                </div>
+
+                            </div>
                             <div class="count-box red" id="count-have-tags">{{ $allHaveConTagsUserDocuments }}</div>
                             <div class="bar-container">
                                 <div class="bar red" id="bar-have-tags"></div>
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Notice Of Claim</div>
+                            <div class="label-wrapper">
+                                <div class="label">Notice Of Claim</div>
+                                <div class="tooltip-text">
+                                    <span>{!! $labels['allHaveConTagsNoticeClaimUserDocuments'] !!}</span>
+                                </div>
+
+                            </div>
                             <div class="count-box Barbel" id="count-have-tags-noticed">
                                 {{ $allHaveConTagsNoticeClaimUserDocuments }}</div>
                             <div class="bar-container">
@@ -394,13 +436,27 @@
                 <div class="col-md-4" style="padding-right:0px !important; height:100%;">
                     <div class="chart-container" style="height: 49%;">
                         <div class="chart-container2">
-                            <div class="label" style="width:100%;">Analysis % Complete of the Open Claim Files</div>
+                            <div class="label-wrapper">
+                                <div class="label"style="width:100%;">Analysis % Complete of the Open Claim Files</div>
+                                <div class="tooltip-text"style=" width: 450px !important;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <canvas id="gaugeChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-container" style="margin-top: 5px;height: 49%;">
                         <div class="chart-container2">
-                            <div class="label" style="width:100%;">Window Analysis % Complete</div>
+                            <div class="label-wrapper">
+                                <div class="label" style="width:100%;">Window Analysis % Complete</div>
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent2'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <canvas id="gaugeChart2"></canvas>
                         </div>
                     </div>
@@ -411,33 +467,83 @@
                 <div style="display: flex; width:100%;">
                     <div class="col-md-8" style="padding-right:0px !important;padding-left:0px !important">
                         <div class="row_d" style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">T - Total Variation Files</div>
-                            <div class="count-box darkolivegreen" id="">{{ $ActiveOpenClaimFileVariation }}
+                            <div class="label-wrapper" style="width: 85%;">
+                                <div class="label2">T - Total Variation Files</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['ActiveOpenClaimFileVariation'] !!}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="count-box darkolivegreen" id="">
+                                {{ $ActiveOpenClaimFileVariation }}
                             </div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">1 - Need {{ $FileVariation1['label'] }}</div>
+                            <div class="label-wrapper"style="width: 85%;">
+                                <div class="label2">1 - Need {{ $FileVariation1['label'] }}</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['FileVariation1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="">{{ $FileVariation1['value'] }}</div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">2 - Need {{ $FileVariation2['label'] }}</div>
+                            <div class="label-wrapper"style="width: 85%;">
+                                <div class="label2">2 - Need {{ $FileVariation2['label'] }}</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['FileVariation2'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="">{{ $FileVariation2['value'] }}</div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">3 - Need {{ $FileVariation3['label'] }}</div>
+                            <div class="label-wrapper"style="width: 85%;">
+                                <div class="label2">3 - Need {{ $FileVariation3['label'] }}</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['FileVariation3'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="">{{ $FileVariation3['value'] }}</div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">4 - Need {{ $FileVariation4['label'] }}</div>
+                            <div class="label-wrapper"style="width: 85%;">
+                                <div class="label2">4 - Need {{ $FileVariation4['label'] }}</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['FileVariation4'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="">{{ $FileVariation4['value'] }}</div>
                         </div>
                         <div class="row_d"style="@if ($FileVariation6['label'] == '') margin-bottom:19px; @endif">
-                            <div class="label2">5 - Need {{ $FileVariation5['label'] }}</div>
+                            <div class="label-wrapper"style="width: 85%;">
+                                <div class="label2">5 - Need {{ $FileVariation5['label'] }}</div>
+                                <div class="tooltip-text"style="left: 30%;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['FileVariation5'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="">{{ $FileVariation5['value'] }}</div>
                         </div>
                         @if ($FileVariation6['label'] != '')
                             <div class="row_d"style="margin-bottom:16px;">
-                                <div class="label2">6 - Need {{ $FileVariation6['label'] }}</div>
+                                <div class="label-wrapper"style="width: 85%;">
+                                    <div class="label2">6 - Need {{ $FileVariation6['label'] }}</div>
+                                    <div class="tooltip-text" style="left: 30%;">
+                                        <span style="width:100% !important;">
+                                            {!! $labels['FileVariation6'] !!}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="count-box darkolivegreen" id="">{{ $FileVariation6['value'] }}</div>
                             </div>
                         @endif
@@ -455,7 +561,15 @@
                 <div class="col-md-4" style="padding-right:0px !important;padding-left:0px !important; height:500px;">
                     <div class="chart-container" style="text-align: center; height:100%">
                         <div style="height: 23%">
-                            <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis
+
+                            <div class="label-wrapper">
+                                <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis
+                                </div>
+                                <div class="tooltip-text" style="width: 370px !important;">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['allPendingAnalysisUserDocuments'] !!}
+                                    </span>
+                                </div>
                             </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-pending-analysis" style="display: inline-block">
@@ -465,7 +579,16 @@
                         </div>
 
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 10%;">Active Documents Pending Assignments
+
+                            <div class="label-wrapper">
+                                <div class="label"style="width:100%;padding-top: 10%;">Active Documents Pending
+                                    Assignments
+                                </div>
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['allPendingAssignmentUserDocuments'] !!}
+                                    </span>
+                                </div>
                             </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
@@ -476,9 +599,17 @@
 
                         <hr style="border-top: 3px solid #168bff;">
                         <div style="height: 23%">
-                            <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First
-                                Claim
-                                Notice</div>
+
+                            <div class="label-wrapper">
+                                <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First
+                                    Claim
+                                    Notice</div>
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['ActiveOpenClaimFilesNeed1ClaimNotice'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div style="display: block; justify-content: center; align-items: center;">
                                 <div class="count-box green" id="count-need-1-claim-notice"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeed1ClaimNotice }}
@@ -486,8 +617,17 @@
                             </div>
                         </div>
                         <div style="height: 23%">
-                            <div class="label"style="width:100%; padding-top: 10%;">Active Open Claim Files Need Further
-                                Notice</div>
+
+                            <div class="label-wrapper">
+                                <div class="label"style="width:100%; padding-top: 10%;">Active Open Claim Files Need
+                                    Further
+                                    Notice</div>
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['ActiveOpenClaimFilesNeedFurtherNotice'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
                                 <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
@@ -504,15 +644,39 @@
                     <div class="summary-box">
                         <div class="info">
                             <div class="info-row" style="margin-top: 0px;">
-                                <div class="label">Active Claim Files</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Active Claim Files</div>
+
+                                    <div class="tooltip-text">
+                                        <span style="width:100% !important;">
+                                            {!! $labels['percent1'] !!}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="count-box blue" id="ActiveClaimFile">{{ $ActiveClaimFile }}</div>
                             </div>
                             <div class="info-row">
-                                <div class="label">Open Claim Files</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Open Claim Files</div>
+
+                                    <div class="tooltip-text">
+                                        <span style="width:100% !important;">
+                                            {!! $labels['percent1'] !!}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="count-box green" id="ActiveOpenClaimFile">{{ $ActiveOpenClaimFile }}</div>
                             </div>
                             <div class="info-row" style="margin-bottom: 0px;">
-                                <div class="label">Closed Claim Files</div>
+                                <div class="label-wrapper">
+                                    <div class="label">Closed Claim Files</div>
+
+                                    <div class="tooltip-text">
+                                        <span style="width:100% !important;">
+                                            {!! $labels['percent1'] !!}
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="count-box red" id="ActiveClosedClaimFile">{{ $ActiveClosedClaimFile }}</div>
                             </div>
                         </div>
@@ -521,7 +685,15 @@
                     </div>
                     <div class="chart-container" style="margin-top: 5px;height: 75.7%;">
                         <div class="row_d">
-                            <div class="label">Active Open Claim Files</div>
+                            <div class="label-wrapper">
+                                <div class="label">Active Open Claim Files</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box blue" id="ActiveOpenClaimFile2">{{ $ActiveOpenClaimFile }}</div>
                             <div class="bar-container">
                                 <div class="bar blue" id="bar-ActiveOpenClaimFile2"></div>
@@ -529,7 +701,15 @@
                         </div>
 
                         <div class="row_d">
-                            <div class="label">Time</div>
+                            <div class="label-wrapper">
+                                <div class="label">Time</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box green" id="ActiveOpenClaimFileTime">{{ $ActiveOpenClaimFileTime }}
                             </div>
                             <div class="bar-container">
@@ -538,7 +718,15 @@
                         </div>
 
                         <div class="row_d">
-                            <div class="label">Prolongation Cost</div>
+                            <div class="label-wrapper">
+                                <div class="label">Prolongation Cost</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box red" id="ActiveOpenClaimFileProlongationCost">
                                 {{ $ActiveOpenClaimFileProlongationCost }}</div>
                             <div class="bar-container">
@@ -546,7 +734,15 @@
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Variation</div>
+                            <div class="label-wrapper">
+                                <div class="label">Variation</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['ActiveOpenClaimFileVariation'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box brown" id="ActiveOpenClaimFileVariation">
                                 {{ $ActiveOpenClaimFileVariation }}</div>
                             <div class="bar-container">
@@ -554,7 +750,15 @@
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Disruption</div>
+                            <div class="label-wrapper">
+                                <div class="label">Disruption</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box black" id="ActiveOpenClaimFileDisruption">
                                 {{ $ActiveOpenClaimFileDisruption }}</div>
                             <div class="bar-container">
@@ -565,7 +769,15 @@
                         <hr style="border-top: 3px solid #168bff;">
 
                         <div class="row_d">
-                            <div class="label">Need Chronology</div>
+                            <div class="label-wrapper">
+                                <div class="label">Need Chronology</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box Barbel" id="needChronology">{{ $needChronology }}
                             </div>
                             <div class="bar-container">
@@ -574,7 +786,15 @@
                         </div>
 
                         <div class="row_d">
-                            <div class="label">Need Synopsis</div>
+                            <div class="label-wrapper">
+                                <div class="label">Need Synopsis</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box orange" id="needSynopsis">
                                 {{ $needSynopsis }}</div>
                             <div class="bar-container">
@@ -582,7 +802,15 @@
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Need Contractual A</div>
+                            <div class="label-wrapper">
+                                <div class="label">Need Contractual A</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box darkolivegreen" id="needContractualA">
                                 {{ $needContractualA }}</div>
                             <div class="bar-container">
@@ -590,7 +818,15 @@
                             </div>
                         </div>
                         <div class="row_d">
-                            <div class="label">Need Cause & Effect A</div>
+                            <div class="label-wrapper">
+                                <div class="label">Need Cause & Effect A</div>
+
+                                <div class="tooltip-text">
+                                    <span style="width:100% !important;">
+                                        {!! $labels['percent1'] !!}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="count-box foshia" id="needCauseEffectA">
                                 {{ $needCauseEffectA }}</div>
                             <div class="bar-container">
@@ -934,7 +1170,7 @@
     <script>
         const ctx2 = document.getElementById('gaugeChart2').getContext('2d');
 
-        let percentage2 = 0; // your dynamic value
+        let percentage2 = {{ $percent2 }}; // your dynamic value
 
         const gaugeChart2 = new Chart(ctx2, {
             type: 'doughnut',
