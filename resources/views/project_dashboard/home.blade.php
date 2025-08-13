@@ -774,7 +774,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['needChronology'] !!}
                                     </span>
                                 </div>
                             </div>
@@ -791,7 +791,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['needSynopsis'] !!}
                                     </span>
                                 </div>
                             </div>
@@ -807,7 +807,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['needContractualA'] !!}
                                     </span>
                                 </div>
                             </div>
@@ -823,7 +823,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['needCauseEffectA'] !!}
                                     </span>
                                 </div>
                             </div>

@@ -66,6 +66,10 @@ class ProjectDashboardController extends ApiController
                 $labels['ActiveOpenClaimFileTime']                = 'Active open claim files have time impact assigned to me';
                 $labels['ActiveOpenClaimFileProlongationCost']    = 'Active open claim files have prolongation cost impact assigned to me';
                 $labels['ActiveOpenClaimFileDisruption']          = 'Active open claim files have disruption impact assigned to me';
+                $labels['needChronology']                         = 'Active open claim files need chronology assigned to me';
+                $labels['needSynopsis']                           = 'Active open claim files need synopsis assigned to me';
+                $labels['needContractualA']                       = 'Active open claim files need contractual position assigned to me';
+                $labels['needCauseEffectA']                       = 'Active open claim files need cause-and-effect analysis assigned to me';
 
             } else {
                 $project_dashboard_class_name                     = 'fancy-btn2';
@@ -99,6 +103,10 @@ class ProjectDashboardController extends ApiController
                 $labels['ActiveOpenClaimFileTime']                = 'Active open claim files have time impact assigned to ' . $selected_user->name;
                 $labels['ActiveOpenClaimFileProlongationCost']    = 'Active open claim files have prolongation cost impact assigned to ' . $selected_user->name;
                 $labels['ActiveOpenClaimFileDisruption']          = 'Active open claim files have disruption impact assigned to ' . $selected_user->name;
+                $labels['needChronology']                         = 'Active open claim files need chronology assigned to ' . $selected_user->name;
+                $labels['needSynopsis']                           = 'Active open claim files need synopsis assigned to ' . $selected_user->name;
+                $labels['needContractualA']                       = 'Active open claim files need contractual position assigned to ' . $selected_user->name;
+                $labels['needCauseEffectA']                       = 'Active open claim files need cause-and-effect analysis assigned to ' . $selected_user->name;
 
             }
         } else {
@@ -132,6 +140,10 @@ class ProjectDashboardController extends ApiController
             $labels['ActiveOpenClaimFileTime']                = 'All active open claim files have time impact in project';
             $labels['ActiveOpenClaimFileProlongationCost']    = 'All active open claim files have prolongation cost impact in project';
             $labels['ActiveOpenClaimFileDisruption']          = 'All active open claim files have disruption impact in project';
+            $labels['needChronology']                         = 'All active open claim files need chronology in project';
+            $labels['needSynopsis']                           = 'All active open claim files need synopsis in project';
+            $labels['needContractualA']                       = 'All active open claim files need contractual position in project';
+            $labels['needCauseEffectA']                       = 'All active open claim files need cause-and-effect analysis in project';
 
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
