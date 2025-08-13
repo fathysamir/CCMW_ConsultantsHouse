@@ -565,7 +565,7 @@
                             <div class="label-wrapper">
                                 <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis
                                 </div>
-                                <div class="tooltip-text" style="width: 400px !important;bottom: 47px !important;">
+                                <div class="tooltip-text" style="bottom: 47px !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['allPendingAnalysisUserDocuments'] !!}
                                     </span>
