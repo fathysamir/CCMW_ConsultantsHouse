@@ -723,7 +723,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['ActiveOpenClaimFileProlongationCost'] !!}
                                     </span>
                                 </div>
                             </div>
@@ -755,7 +755,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['ActiveOpenClaimFileDisruption'] !!}
                                     </span>
                                 </div>
                             </div>

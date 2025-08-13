@@ -49,7 +49,7 @@ class ProjectDashboardController extends ApiController
                 $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'Chronology documents and notice of claim';
                 $labels['percent1']                               = 'Average percent of analysis complete for active open claim files assigned to my';
                 $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files assigned to my';
-                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files with variation assigned to me';
+                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files include variation assigned to me';
                 $labels['FileVariation1']                         = 'Active open claim files assigned to me which need ' . ($con1 ? $con1->name : '');
                 $labels['FileVariation2']                         = 'Active open claim files assigned to me which need ' . ($con2 ? $con2->name : '');
                 $labels['FileVariation3']                         = 'Active open claim files assigned to me which need ' . ($con3 ? $con3->name : '');
@@ -62,8 +62,10 @@ class ProjectDashboardController extends ApiController
                 $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to me which need further notice';
                 $labels['ActiveClaimFile']                        = 'Active claim files assigned to me';
                 $labels['ActiveOpenClaimFile']                    = 'Active open claim files assigned to me';
-                $labels['ActiveClosedClaimFile'] ='Active close claim files assigned to me';
-                $labels['ActiveOpenClaimFileTime'] = '';
+                $labels['ActiveClosedClaimFile']                  = 'Active close claim files assigned to me';
+                $labels['ActiveOpenClaimFileTime']                = 'Active open claim files have time impact assigned to me';
+                $labels['ActiveOpenClaimFileProlongationCost']    = 'Active open claim files have prolongation cost impact assigned to me';
+                $labels['ActiveOpenClaimFileDisruption']          = 'Active open claim files have disruption impact assigned to me';
 
             } else {
                 $project_dashboard_class_name                     = 'fancy-btn2';
@@ -80,7 +82,7 @@ class ProjectDashboardController extends ApiController
                 $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'Chronology documents and notice of claim';
                 $labels['percent1']                               = 'Average percent of analysis complete for active open claim files assigned to ' . $selected_user->name;
                 $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files assigned to ' . $selected_user->name;
-                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files with variation assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFileVariation']           = 'Active open claim files include variation assigned to ' . $selected_user->name;
                 $labels['FileVariation1']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con1 ? $con1->name : '');
                 $labels['FileVariation2']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con2 ? $con2->name : '');
                 $labels['FileVariation3']                         = 'Active open claim files assigned to ' . $selected_user->name . ' which need ' . ($con3 ? $con3->name : '');
@@ -93,9 +95,10 @@ class ProjectDashboardController extends ApiController
                 $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to ' . $selected_user->name . ' which need further notice';
                 $labels['ActiveClaimFile']                        = 'Active claim files assigned to ' . $selected_user->name;
                 $labels['ActiveOpenClaimFile']                    = 'Active open claim files assigned to ' . $selected_user->name;
-                $labels['ActiveClosedClaimFile']='Active close claim files assigned to ' . $selected_user->name;
-                                $labels['ActiveOpenClaimFileTime'] = '';
-
+                $labels['ActiveClosedClaimFile']                  = 'Active close claim files assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFileTime']                = 'Active open claim files have time impact assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFileProlongationCost']    = 'Active open claim files have prolongation cost impact assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFileDisruption']          = 'Active open claim files have disruption impact assigned to ' . $selected_user->name;
 
             }
         } else {
@@ -112,7 +115,7 @@ class ProjectDashboardController extends ApiController
             $labels['allHaveConTagsNoticeClaimUserDocuments'] = 'All chronology documents and notice of claim';
             $labels['percent1']                               = 'Average percent of analysis complete for active open claim files in project';
             $labels['percent2']                               = 'Average percent of window analysis complete for active open claim files in project';
-            $labels['ActiveOpenClaimFileVariation']           = 'All active open claim files with variation in project';
+            $labels['ActiveOpenClaimFileVariation']           = 'All active open claim files include variation in project';
             $labels['FileVariation1']                         = 'All active open claim files in project which need ' . ($con1 ? $con1->name : '');
             $labels['FileVariation2']                         = 'All active open claim files in project which need ' . ($con2 ? $con2->name : '');
             $labels['FileVariation3']                         = 'All active open claim files in project which need ' . ($con3 ? $con3->name : '');
@@ -125,8 +128,10 @@ class ProjectDashboardController extends ApiController
             $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'All active open claim files in project which need further notice';
             $labels['ActiveClaimFile']                        = 'All active claim files in project';
             $labels['ActiveOpenClaimFile']                    = 'All active open claim files in project';
-            $labels['ActiveClosedClaimFile']='All active close claim files in project';
-                            $labels['ActiveOpenClaimFileTime'] = 'All active open claim files in project ';
+            $labels['ActiveClosedClaimFile']                  = 'All active close claim files in project';
+            $labels['ActiveOpenClaimFileTime']                = 'All active open claim files have time impact in project';
+            $labels['ActiveOpenClaimFileProlongationCost']    = 'All active open claim files have prolongation cost impact in project';
+            $labels['ActiveOpenClaimFileDisruption']          = 'All active open claim files have disruption impact in project';
 
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
