@@ -60,6 +60,10 @@ class ProjectDashboardController extends ApiController
                 $labels['allPendingAssignmentUserDocuments']      = 'Active documents assigned to me which not assigned to any file';
                 $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'Active open claim files assigned to me which need first claim notice';
                 $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to me which need further notice';
+                $labels['ActiveClaimFile']                        = 'Active claim files assigned to me';
+                $labels['ActiveOpenClaimFile']                    = 'Active open claim files assigned to me';
+                $labels['ActiveClosedClaimFile'] ='Active close claim files assigned to me';
+                $labels['ActiveOpenClaimFileTime'] = '';
 
             } else {
                 $project_dashboard_class_name                     = 'fancy-btn2';
@@ -87,6 +91,11 @@ class ProjectDashboardController extends ApiController
                 $labels['allPendingAssignmentUserDocuments']      = 'Active documents assigned to ' . $selected_user->name . ' which not assigned to any file';
                 $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'Active open claim files assigned to ' . $selected_user->name . ' which need first claim notice';
                 $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'Active open claim files assigned to ' . $selected_user->name . ' which need further notice';
+                $labels['ActiveClaimFile']                        = 'Active claim files assigned to ' . $selected_user->name;
+                $labels['ActiveOpenClaimFile']                    = 'Active open claim files assigned to ' . $selected_user->name;
+                $labels['ActiveClosedClaimFile']='Active close claim files assigned to ' . $selected_user->name;
+                                $labels['ActiveOpenClaimFileTime'] = '';
+
 
             }
         } else {
@@ -114,6 +123,11 @@ class ProjectDashboardController extends ApiController
             $labels['allPendingAssignmentUserDocuments']      = 'All active documents in project which not assigned to any file';
             $labels['ActiveOpenClaimFilesNeed1ClaimNotice']   = 'All active open claim files in project which need first claim notice';
             $labels['ActiveOpenClaimFilesNeedFurtherNotice']  = 'All active open claim files in project which need further notice';
+            $labels['ActiveClaimFile']                        = 'All active claim files in project';
+            $labels['ActiveOpenClaimFile']                    = 'All active open claim files in project';
+            $labels['ActiveClosedClaimFile']='All active close claim files in project';
+                            $labels['ActiveOpenClaimFileTime'] = 'All active open claim files in project ';
+
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $allUserDocuments = Document::where('project_id', $user->current_project_id);

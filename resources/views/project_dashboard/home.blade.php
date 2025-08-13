@@ -565,7 +565,7 @@
                             <div class="label-wrapper">
                                 <div class="label" style="width:100%;padding-top: 10%;">Active Documents Pending Analysis
                                 </div>
-                                <div class="tooltip-text" style="width: 370px !important;">
+                                <div class="tooltip-text" style="width: 400px !important;bottom: 47px !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['allPendingAnalysisUserDocuments'] !!}
                                     </span>
@@ -584,7 +584,7 @@
                                 <div class="label"style="width:100%;padding-top: 10%;">Active Documents Pending
                                     Assignments
                                 </div>
-                                <div class="tooltip-text">
+                                <div class="tooltip-text" style="bottom: 47px !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['allPendingAssignmentUserDocuments'] !!}
                                     </span>
@@ -604,7 +604,7 @@
                                 <div class="label"style="width:100%;padding-top: 10%;">Active Open Claim Files Need First
                                     Claim
                                     Notice</div>
-                                <div class="tooltip-text">
+                                <div class="tooltip-text" style="bottom: 47px !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFilesNeed1ClaimNotice'] !!}
                                     </span>
@@ -618,11 +618,11 @@
                         </div>
                         <div style="height: 23%">
 
-                            <div class="label-wrapper">
+                            <div class="label-wrapper" >
                                 <div class="label"style="width:100%; padding-top: 10%;">Active Open Claim Files Need
                                     Further
                                     Notice</div>
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="bottom: 47px !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFilesNeedFurtherNotice'] !!}
                                     </span>
@@ -649,7 +649,7 @@
 
                                     <div class="tooltip-text">
                                         <span style="width:100% !important;">
-                                            {!! $labels['percent1'] !!}
+                                            {!! $labels['ActiveClaimFile'] !!}
                                         </span>
                                     </div>
                                 </div>
@@ -661,7 +661,7 @@
 
                                     <div class="tooltip-text">
                                         <span style="width:100% !important;">
-                                            {!! $labels['percent1'] !!}
+                                            {!! $labels['ActiveOpenClaimFile'] !!}
                                         </span>
                                     </div>
                                 </div>
@@ -673,7 +673,7 @@
 
                                     <div class="tooltip-text">
                                         <span style="width:100% !important;">
-                                            {!! $labels['percent1'] !!}
+                                            {!! $labels['ActiveClosedClaimFile'] !!}
                                         </span>
                                     </div>
                                 </div>
@@ -690,7 +690,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['ActiveOpenClaimFile'] !!}
                                     </span>
                                 </div>
                             </div>
@@ -706,7 +706,7 @@
 
                                 <div class="tooltip-text">
                                     <span style="width:100% !important;">
-                                        {!! $labels['percent1'] !!}
+                                        {!! $labels['ActiveOpenClaimFileTime'] !!}
                                     </span>
                                 </div>
                             </div>
