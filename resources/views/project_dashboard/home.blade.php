@@ -704,7 +704,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Time</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text" style="left: 10% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFileTime'] !!}
                                     </span>
@@ -721,7 +721,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Prolongation Cost</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text" style="left: 25% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFileProlongationCost'] !!}
                                     </span>
@@ -737,7 +737,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Variation</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="left: 20% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFileVariation'] !!}
                                     </span>
@@ -753,7 +753,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Disruption</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="left: 20% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['ActiveOpenClaimFileDisruption'] !!}
                                     </span>
@@ -772,7 +772,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Need Chronology</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text" style="left: 40% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['needChronology'] !!}
                                     </span>
@@ -789,7 +789,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Need Synopsis</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="left: 40% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['needSynopsis'] !!}
                                     </span>
@@ -805,7 +805,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Need Contractual A</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="left: 40% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['needContractualA'] !!}
                                     </span>
@@ -821,7 +821,7 @@
                             <div class="label-wrapper">
                                 <div class="label">Need Cause & Effect A</div>
 
-                                <div class="tooltip-text">
+                                <div class="tooltip-text"style="left: 40% !important;">
                                     <span style="width:100% !important;">
                                         {!! $labels['needCauseEffectA'] !!}
                                     </span>
