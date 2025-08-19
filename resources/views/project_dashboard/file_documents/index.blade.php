@@ -649,6 +649,8 @@
                                                         Edit Document
                                                     </a>
                                                     <a class="dropdown-item"
+                                                        href="{{ route('project.documents.document_analysis', $document->document->slug) }}" target="_blink">Document Analysis</a>
+                                                    <a class="dropdown-item"
                                                         href="{{ route('project.file-document-first-analyses', $document->id) }}">Chronology</a>
                                                     <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"

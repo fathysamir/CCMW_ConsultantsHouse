@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FileDocument extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'file_documents';
 
@@ -24,7 +23,7 @@ class FileDocument extends Model
         'forClaim',
         'forLetter',
         'forChart',
-        'ai_layer'
+        'ai_layer',
 
     ];
 
@@ -59,7 +58,7 @@ class FileDocument extends Model
         return $this->belongsToMany(ContractTag::class, 'file_documents_tags', 'file_document_id', 'contract_tag_id');
     }
 
-     public function gantt_chart()
+    public function gantt_chart()
     {
         return $this->hasOne(GanttChartDocData::class);
     }

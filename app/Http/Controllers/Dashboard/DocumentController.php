@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\ApiController;
 use App\Models\DocType;
 use App\Models\Document;
+use App\Models\DocumentAnalysis;
 use App\Models\FileDocument;
 use App\Models\GanttChartDocData;
 use App\Models\Note;
@@ -459,11 +460,11 @@ Based on that and provided that we have the following list of stakeholders:';
         if ($request->not_assignment == 'on') {
             $all_documents->whereDoesntHave('files');
         }
-        if($request->active_docs=='1'){
-            $all_documents->where('assess_not_pursue','0');
+        if ($request->active_docs == '1') {
+            $all_documents->where('assess_not_pursue', '0');
         }
-        if($request->active_docs=='0'){
-            $all_documents->where('assess_not_pursue','1');
+        if ($request->active_docs == '0') {
+            $all_documents->where('assess_not_pursue', '1');
         }
         $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
         // dd($all_documents);
@@ -498,6 +499,93 @@ Based on that and provided that we have the following list of stakeholders:';
         return view('project_dashboard.upload_documents.edit_document', compact('documents_types', 'users', 'stake_holders', 'document', 'threads', 'folders'));
     }
 
+    public function document_analysis($id)
+    {
+        $project  = Project::findOrFail(auth()->user()->current_project_id);
+        $users    = $project->assign_users;
+        $document = Document::where('slug', $id)->first();
+        $analysis = DocumentAnalysis::where('document_id', $document->id)->first();
+        if (! $analysis) {
+            $analysis = DocumentAnalysis::create(['document_id' => $document->id]);
+        }
+        $threads = Document::where('project_id', auth()->user()->current_project_id)->where('id', '!=', $document->id)->pluck('reference');
+        $folders = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
+        return view('project_dashboard.upload_documents.edit_document_analysis', compact('users', 'document', 'analysis', 'threads', 'folders'));
+    }
+
+    public function update_analysis(Request $request, $id)
+    {
+        $document = Document::where('slug', $id)->first();
+        $analysis = DocumentAnalysis::where('document_id', $document->id)->first();
+        if ($request->analysis_complete) {
+            $document->analysis_complete = '1';
+        } else {
+            $document->analysis_complete = '0';
+        }
+        if ($request->assess_not_pursue) {
+            $document->assess_not_pursue = '1';
+        } else {
+            $document->assess_not_pursue = '0';
+
+        }
+        $document->user_id = $request->user_id;
+        $document->save();
+        if ($request->time_prolongation_cost) {
+            $analysis->time_prolongation_cost = '1';
+        } else {
+            $analysis->time_prolongation_cost = '0';
+        }
+        if ($request->disruption_cost) {
+            $analysis->disruption_cost = '1';
+        } else {
+            $analysis->disruption_cost = '0';
+        }
+        if ($request->variation) {
+            $analysis->variation = '1';
+        } else {
+            $analysis->variation = '0';
+        }
+        if ($this->hasContent($request->impacted_zone)) {
+            $impacted_zone = $request->impacted_zone;
+        } else {
+            $impacted_zone = null;
+        }
+        $analysis->impacted_zone = $impacted_zone;
+        if ($this->hasContent($request->concerned_part)) {
+            $concerned_part = $request->concerned_part;
+        } else {
+            $concerned_part = null;
+        }
+        $analysis->concerned_part = $concerned_part;
+        if ($this->hasContent($request->why_need_analysis)) {
+            $why_need_analysis = $request->why_need_analysis;
+        } else {
+            $why_need_analysis = null;
+        }
+        $analysis->why_need_analysis = $why_need_analysis;
+        if ($this->hasContent($request->affected_works)) {
+            $affected_works = $request->affected_works;
+        } else {
+            $affected_works = null;
+        }
+        $analysis->affected_works = $affected_works;
+        $analysis->analysis_date  = $request->analysis_date;
+        $analysis->save();
+        if ($request->action == 'save') {
+            return redirect('/project/document/' . $document->slug . '/document-analysis')->with('success', 'Document Analysis Updated successfully.');
+        }
+    }
+    private function hasContent($narrative)
+    {
+        // Remove all HTML tags except text content
+        $text = strip_tags($narrative);
+
+        // Remove extra spaces & line breaks
+        $text = trim($text);
+
+        // Check if there's any actual content
+        return ! empty($text);
+    }
     public function update_document(Request $request, $id)
     {
         // dd($request->all());

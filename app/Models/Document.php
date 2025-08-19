@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Document extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'documents';
 
@@ -30,7 +29,7 @@ class Document extends Model
         'analyzed',
         'threads',
         'analysis_complete',
-        'assess_not_pursue'
+        'assess_not_pursue',
     ];
 
     protected $allowedSorts = [
@@ -72,5 +71,10 @@ class Document extends Model
     public function files()
     {
         return $this->belongsToMany(ProjectFile::class, 'file_documents', 'document_id', 'file_id');
+    }
+
+    public function doc_analysis()
+    {
+        return $this->hasOne(DocumentAnalysis::class);
     }
 }

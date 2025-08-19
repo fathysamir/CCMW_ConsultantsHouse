@@ -214,8 +214,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -318,10 +318,13 @@
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('edit_documents', $Project_Permissions ?? []))
                                                     <a class="dropdown-item"
                                                         href="{{ route('project.edit-document', $document->slug) }}">Edit</a>
-                                                        <a class="dropdown-item"
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.documents.document_analysis', $document->slug) }}" target="_blink">Document Analysis</a>
+                                                    <a class="dropdown-item"
                                                         href="{{ route('download', $document->slug) }}">
                                                         Download Document
                                                     </a>
+
                                                     <a id="Change_Owner_btn_{{ $document->id }}"
                                                         class="dropdown-item change-owner-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}"data-document-owner-id="{{ $document->user_id }}">Change
@@ -343,9 +346,11 @@
                                                     <a class="dropdown-item assigne-to-btn" href="javascript:void(0);"
                                                         data-document-id="{{ $document->id }}">Assigne To File</a>
                                                     <a class="dropdown-item check_assignment" href="javascript:void(0);"
-                                                    data-document-id="{{ $document->slug }}"data-type="document">Check
+                                                        data-document-id="{{ $document->slug }}"data-type="document">Check
                                                         Assignment</a>
-                                                    <a class="dropdown-item" href="{{ route('project.file-documents.ocr_layer',$document->slug) }}" target="_blank">OCR</a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('project.file-documents.ocr_layer', $document->slug) }}"
+                                                        target="_blank">OCR</a>
                                                 @endif
                                                 @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('delete_documents', $Project_Permissions ?? []))
                                                     <a class="dropdown-item text-danger"
@@ -906,14 +911,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '
                             : '') .
                             ($canDelete
                                 ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `

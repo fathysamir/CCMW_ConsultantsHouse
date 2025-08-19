@@ -12,9 +12,10 @@
         <a href="{{ route('switch.folder', $doc->file->folder->id) }}">{{ $doc->file->folder->name }}</a>
         <span style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
         <a href="{{ route('project.file-documents.index', $doc->file->slug) }}">{{ $doc->file->name }}</a>
-        <label id="chevronIcon" style="cursor: pointer;" ><span id="chevronIcon2" style="position: relative; top: 3px;" class="fe fe-23 fe-chevrons-right"></span>
-        {{ $doc->document ? $doc->document->subject : $doc->note->subject }}</label>
-        
+        <label id="chevronIcon" style="cursor: pointer;"><span id="chevronIcon2" style="position: relative; top: 3px;"
+                class="fe fe-23 fe-chevrons-right"></span>
+            {{ $doc->document ? $doc->document->subject : $doc->note->subject }}</label>
+
     </h4>
     @if (session('error'))
         <div id="errorAlert" class="alert alert-danger"
@@ -106,7 +107,7 @@
 
                         </div>
                         <div class="row">
-                            <div class="col-md-11">
+                            <div class="col-md-9">
                                 <div class="form-group mb-3">
                                     <label for="Note">Note</label>
                                     <input type="text" id="Note" class="form-control" placeholder="Note" disabled
@@ -116,7 +117,17 @@
                             <div class="col-md-1">
                                 <div class="form-group mb-3">
                                     <button type="button" class="btn mt-4 btn-success"
+                                        style="width: 100%;margin-top: 1.88rem !important;"
                                         onclick="window.location.href='/project/file-docs/<?php echo $doc->id; ?>/doc/<?php echo $doc->document->slug; ?>/edit'">Edit</button>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-3">
+                                    <button type="button" class="btn mt-4 btn-success"
+                                        style="width: 100%; margin-top: 1.88rem !important;"
+                                        onclick="window.open('/project/document/{{ $doc->document->slug }}/document-analysis', '_blank')">
+                                        Document Analysis
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -127,8 +138,8 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label for="Type">Type</label>
-                                    <input type="text" id="Type" class="form-control" placeholder="Type" disabled
-                                        value="Note/Activity">
+                                    <input type="text" id="Type" class="form-control" placeholder="Type"
+                                        disabled value="Note/Activity">
                                 </div>
                             </div>
                             <div class="col-md-5">

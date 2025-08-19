@@ -9,6 +9,7 @@ use App\Http\Controllers\Dashboard\FileAttachmentController;
 use App\Http\Controllers\Dashboard\FileController;
 use App\Http\Controllers\Dashboard\FileDocumentController;
 use App\Http\Controllers\Dashboard\ImportDocumentController;
+use App\Http\Controllers\Dashboard\ImportNoteController;
 use App\Http\Controllers\Dashboard\NoteController;
 use App\Http\Controllers\Dashboard\ProjectController;
 use App\Http\Controllers\Dashboard\ProjectDashboardController;
@@ -18,7 +19,6 @@ use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Dashboard\ImportNoteController;
 use App\Models\FileDocument;
 use App\Models\ProjectFile;
 use Illuminate\Support\Facades\Route;
@@ -206,6 +206,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/document/assign-document-bySlug', [DocumentController::class, 'assignDocumentbyslug'])->name('project.document.assign-document-slug');
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
     Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
+    Route::get('/project/document/{id}/document-analysis', [DocumentController::class, 'document_analysis'])->name('project.documents.document_analysis');
+    Route::post('/project/document/{id}/update-document-analysis', [DocumentController::class, 'update_analysis'])->name('project.update-document-analysis');
 
     Route::get('go-to-fileDocument/{docId}/{fileId}', function ($doc, $file) {
 
@@ -307,7 +309,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/store_file_attachment/store', [FileAttachmentController::class, 'stor_file_attachment'])->name('project.stor_attachment.stor');
     Route::post('/export-fill-using-AI', [FileAttachmentController::class, 'export_fill_using_AI']);
 
-
     Route::get('/project/import-documents', [ImportDocumentController::class, 'import_docs_view'])->name('import_docs_view');
     Route::post('/upload-import-excel-file', [ImportDocumentController::class, 'upload_import_excel_file'])->name('upload_import_excel_file');
     Route::post('/upload-multi-files', [ImportDocumentController::class, 'upload_multi_files'])->name('upload_multi_files');
@@ -318,7 +319,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/notes/upload-import-excel-file', [ImportNoteController::class, 'upload_import_excel_file'])->name('notes.upload_import_excel_file');
     Route::post('/notes/get-headers', [ImportNoteController::class, 'getHeaders'])->name('notes.getHeaders');
     Route::post('/notes/start-import', [ImportNoteController::class, 'start_import'])->name('notes.start_import');
-
 
     Route::get('/project/upload-group-documents', [UploadGroupDocumentController::class, 'index'])->name('project.upload-group-documents');
     Route::get('/formate_date', [UploadGroupDocumentController::class, 'formate_date'])->name('formate_date');
