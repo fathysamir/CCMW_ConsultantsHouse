@@ -31,6 +31,7 @@ class User extends Authenticatable
         'current_folder_id',
         'password',
         'sideBarTheme',
+        'country_code'
     ];
 
     /**
@@ -52,7 +53,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
+  protected $appends = ['image'];
     public function projects()
     {
         return $this->hasMany(Project::class, 'user_id');
@@ -72,4 +73,8 @@ class User extends Authenticatable
     // {
     //     return $this->belongsToMany(FileDocument::class,'flags', 'user_id', 'file_document_id')->withPivot('flag');
     // }
+     public function getImageAttribute()
+    {
+        return getFirstMediaUrl($this, $this->imageCollection, true);
+    }
 }

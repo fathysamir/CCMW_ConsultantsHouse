@@ -30,12 +30,12 @@
                 class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink"
                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span style="color:white" class="avatar avatar-sm mt-2">
-                    <img @if (getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) != null) src="{{ getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) }}" @else src="{{ asset('dashboard/assets/avatars/user_avatar.png') }}" @endif
-                        alt="..." class="avatar-img rounded-circle">
+                    <img @if (getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) != null) src="{{ getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection,true) }}" @else src="{{ asset('dashboard/assets/avatars/user_avatar.png') }}" @endif
+                        alt="..." class="avatar-img rounded-circle" width=35 height=35>
                 </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                <a class="dropdown-item" href="#">Profile</a>
+                <a class="dropdown-item" href="#" id="UpdateUserProfileInfoLink">Profile</a>
                 <a class="dropdown-item" href="#">Settings</a>
                 <a class="dropdown-item" href="{{ route('account.home') }}">Account Details</a>
                 <a class="dropdown-item" href="{{ route('home') }}">Admin Dashboard</a>

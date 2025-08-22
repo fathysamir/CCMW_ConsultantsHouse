@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
@@ -25,7 +24,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
 
-            'email' => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email'],
             'password' => ['required', 'string', 'min:8'],
 
         ]);
@@ -54,7 +53,7 @@ class AuthController extends Controller
     public function register_view(Request $request)
     {
         if ($request->invitation) {
-            $invitation = Invitation::where('code', $request->invitation)->first();
+            $invitation         = Invitation::where('code', $request->invitation)->first();
             $invitation->status = 'accepted';
             $invitation->save();
             $user = User::where('id', $invitation->user_id)->first();
@@ -75,13 +74,13 @@ class AuthController extends Controller
     {
         if ($request->filled('country_code') && $request->filled('phone')) {
             $request->merge([
-                'phone' => $request->country_code.$request->phone,
+                'phone' => $request->country_code . $request->phone,
             ]);
         }
         $validator = Validator::make($request->all(), [
 
-            'name' => 'required|string|max:255',
-            'email' => [
+            'name'     => 'required|string|max:255',
+            'email'    => [
                 'required',
                 'string',
                 'email',
@@ -89,7 +88,7 @@ class AuthController extends Controller
 
             ],
             'password' => 'required|string|min:5|confirmed',
-            'phone' => [
+            'phone'    => [
                 'nullable',
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
             ],
@@ -102,9 +101,10 @@ class AuthController extends Controller
         }
         $user = User::where('email', $request->email)->first();
         if ($user) {
-            $user->name = $request->name;
-            $user->password = Hash::make($request->password);
-            $user->phone = $request->phone;
+            $user->name         = $request->name;
+            $user->password     = Hash::make($request->password);
+            $user->phone        = $request->phone;
+            $user->country_code = $request->country_code;
             $user->save();
         } else {
             do {
@@ -112,11 +112,12 @@ class AuthController extends Controller
             } while (User::where('code', $code2)->exists());
             $user = User::create([
 
-                'name' => $request->name,
-                'code' => $code2,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
+                'name'         => $request->name,
+                'code'         => $code2,
+                'email'        => $request->email,
+                'password'     => Hash::make($request->password),
+                'phone'        => $request->phone,
+                'country_code' => $request->country_code,
 
             ]);
             $user_role = Role::where('name', 'User')->first();
@@ -141,11 +142,80 @@ class AuthController extends Controller
 
     public function change_sideBarTheme(Request $request)
     {
-        $user = auth()->user();
+        $user               = auth()->user();
         $user->sideBarTheme = $request->sideBarTheme;
         $user->save();
 
         return response()->json(['success' => true]);
 
+    }
+
+    public function updateProfile(Request $request)
+    {
+        if ($request->filled('country_code') && $request->filled('phone')) {
+            $request->merge([
+                'phone' => $request->country_code . $request->phone,
+            ]);
+        }
+        $user = Auth::user();
+
+        $request->validate([
+            'name'             => 'required|string|max:255',
+            'phone'            => 'nullable|unique:users,phone,' . $user->id,
+            'country_code'     => 'nullable|string',
+            'fileProfileImage' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        // Update basic info
+        $user->name         = $request->name;
+        $user->country_code = $request->country_code;
+        $user->phone        = $request->country_code . $request->phone; // combine again
+        $user->save();
+
+        // Handle profile image
+
+        if ($request->hasFile('fileProfileImage')) {
+            $image = getFirstMediaUrl($user, $user->avatarCollection);
+            if ($image != null) {
+                deleteMedia($user, $user->avatarCollection);
+            }
+            uploadMedia($request->fileProfileImage, $user->avatarCollection, $user);
+
+        } elseif ($request->removed == 'on') {
+            $image = getFirstMediaUrl($user, $user->avatarCollection);
+            if ($image != null) {
+                deleteMedia($user, $user->avatarCollection);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully',
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:8|confirmed', // requires password_confirmation
+        ]);
+
+        if (! Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The old password is incorrect.',
+            ], 422);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully.',
+        ]);
     }
 }

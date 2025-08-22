@@ -52,6 +52,8 @@ Route::get('/', function () {
     }
 });
 Route::group(['middleware' => ['admin']], function () {
+    Route::post('/user/update-profile', [AuthController::class, 'updateProfile'])->name('user.updateProfile');
+    Route::post('/user/change-password', [AuthController::class, 'changePassword'])->name('user.changePassword');
     Route::get('/accounts', [AccountController::class, 'index'])->name('home');
     Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
     Route::post('/accounts/store', [AccountController::class, 'store'])->name('accounts.store');

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('email');
             $table->string('phone')->nullable();
+            $table->string('country_code')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->unsignedBigInteger('current_account_id')->nullable();
