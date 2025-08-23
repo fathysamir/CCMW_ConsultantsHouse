@@ -43,27 +43,17 @@
             color: #1900fd
         }
     </style>
-    <style>
-        .otp-input {
-            width: 45px;
-            height: 50px;
-            font-size: 24px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-    </style>
 </head>
 
 <body class="light">
     <div class="wrapper vh-100">
         <div id="background-div" class="row align-items-center h-100"
             style="background-image: url('{{ asset('dashboard/assets/images/bg3.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center;">
-            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('forgot-password.checkOtp') }}"
-                method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem" id="otpForm">
+            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('save.new-password') }}"
+                method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
-
+                
                 <div class="form-group mt-3">
                     <img src="{{ asset('dashboard/assets/images/logo.png') }}" style="border-radius: 12px;width:100%;">
                 </div>
@@ -76,27 +66,24 @@
                             {{ $errors->first('msg') }}</p>
                     @endif
                 @endif
-                @if (session('success'))
-                    <div id="successAlert"
-                        class="alert alert-success"style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:green;border-radius: 20px; color:beige;">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                <div class="form-group d-flex justify-content-between mt-3">
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
-                    <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
-                        required>
+                
+                <div class="form-group">
+                    <input type="password" id="inputPassword" name="password" class="form-control form-control-lg"
+                        placeholder="Password" required>
+                    @if ($errors->has('password'))
+                        <p class="text-error more-info-err" style="color: red;">
+                            {{ $errors->first('password') }}</p>
+                    @endif
                 </div>
-
+                <div class="form-group">
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-control-lg"
+                        placeholder="Confirm Password" required>
+                    @if ($errors->has('password_confirmation'))
+                        <p class="text-error more-info-err" style="color: red;">
+                            {{ $errors->first('password_confirmation') }}</p>
+                    @endif
+                </div>
+                <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Save</button>
 
             </form>
         </div>
@@ -126,27 +113,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             setTimeout(function() {
-                $('.alert').fadeOut('fast');
+                $('#alert').fadeOut('fast');
             }, 5000);
-        });
-    </script>
-    <script>
-        const inputs = document.querySelectorAll(".otp-input");
-        inputs.forEach((input, index) => {
-            input.addEventListener("input", () => {
-                if (input.value.length === 1 && index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                } else if (index === inputs.length - 1 && input.value.length === 1) {
-                    document.getElementById("otpForm").submit();
-                }
-            });
-
-            // Handle backspace
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Backspace" && !input.value && index > 0) {
-                    inputs[index - 1].focus();
-                }
-            });
         });
     </script>
     <script>

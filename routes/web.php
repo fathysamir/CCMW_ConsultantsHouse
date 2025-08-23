@@ -47,6 +47,10 @@ Route::get('/forget-password',[AuthController::class, 'email_view'])->name('forg
 Route::post('/forgot-password', [AuthController::class, 'sendOtp'])->name('forgot-password.sendOtp');
 Route::get('/ccmw/OTP',[AuthController::class, 'otp_view'])->name('forgot-password.otp-view');
 Route::post('/forgot-password/checkOtp', [AuthController::class, 'checkOtp'])->name('forgot-password.checkOtp');
+Route::get('/ccmw/password_reset_form',[AuthController::class, 'password_reset_form'])->name('password.reset.form');
+Route::post('/ccmw/save_new_password', [AuthController::class, 'save_new_password'])->name('save.new-password');
+
+
 
 Route::get('/', function () {
 

@@ -254,7 +254,66 @@ class AuthController extends Controller
         return view('dashboard.change_password.otp_view');
     }
 
-    public function checkOtp(Request $request){
-        dd($request->all());
+    public function checkOtp(Request $request)
+    {
+
+        $otp          = implode("", $request->otp);
+        $AuthUserCode = session('AuthUserCode');
+        $user         = User::where('code', $AuthUserCode)->first();
+        if (! $user) {
+            return back()->withErrors(['msg' => 'User not found. Please try again.']);
+        }
+
+        // Check if OTP matches
+        if ($user->otp !== $otp) {
+            return back()->withErrors(['msg' => 'Invalid OTP. Please try again.']);
+        }
+
+        // Check if OTP is expired
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return back()->withErrors(['msg' => 'OTP has expired. Please request a new one.']);
+        }
+
+        // OTP verified ✅
+        // Clear OTP so it can't be reused
+        $user->otp            = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return redirect()->route('password.reset.form')->with('success', 'OTP verified. You can now reset your password.');
+    }
+
+    public function password_reset_form()
+    {
+        return view('dashboard.change_password.password_reset_form');
+    }
+
+    public function save_new_password(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'password.required'  => 'Password is required.',
+            'password.min'       => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
+
+        // Find the user (from session/email passed in route)
+        $AuthUserCode = session('AuthUserCode');
+        $user         = User::where('code', $AuthUserCode)->first();
+
+        if (! $user) {
+            return back()->withErrors(['msg' => 'User not found.']);
+        }
+
+        // Save new password (hashed)
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Optionally clear sessions
+        session()->forget('AuthUserCode');
+
+        // Redirect to login page
+        return redirect()->route('login_view')->with('success', 'Your password has been reset successfully. Please login.');
     }
 }

@@ -53,7 +53,7 @@
                 method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
-                
+
                 <div class="form-group mt-3">
                     <img src="{{ asset('dashboard/assets/images/logo.png') }}" style="border-radius: 12px;width:100%;">
                 </div>
@@ -65,6 +65,12 @@
                             style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">
                             {{ $errors->first('msg') }}</p>
                     @endif
+                @endif
+                @if (session('success'))
+                    <div id="successAlert"
+                        class="alert alert-success"style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:green;border-radius: 20px; color:beige;">
+                        {{ session('success') }}
+                    </div>
                 @endif
                 <div class="form-group mt-3">
                     <label for="inputEmail" class="sr-only">Email address</label>
@@ -128,7 +134,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             setTimeout(function() {
-                $('#alert').fadeOut('fast');
+                $('.alert').fadeOut('fast');
             }, 5000);
         });
     </script>
