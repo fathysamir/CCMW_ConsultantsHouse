@@ -49,7 +49,7 @@
     <div class="wrapper vh-100">
         <div id="background-div" class="row align-items-center h-100"
             style="background-image: url('{{ asset('dashboard/assets/images/bg3.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center;">
-            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('forgot.password.sendOtp') }}"
+            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('forgot-password.sendOtp') }}"
                 method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
@@ -67,7 +67,6 @@
                     @endif
                 @endif
                 <div class="form-group mt-3">
-                    <label for="inputEmail" class="sr-only">Email address</label>
                     <input type="email" id="inputEmail" class="form-control form-control-lg" name="email"
                         placeholder="Email address" required autofocus="" value="{{ old('email') }}">
                 </div>

@@ -253,4 +253,8 @@ class AuthController extends Controller
     {
         return view('dashboard.change_password.otp_view');
     }
+
+    public function checkOtp(Request $request){
+        dd($request->all());
+    }
 }

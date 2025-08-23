@@ -1,11 +1,8 @@
 <IfModule mod_rewrite.c>
-    <Files .env>
-        Order allow,deny
-        Deny from all
-    </Files>
+    
     <FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
+        Require all denied
+    </FilesMatch>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>

@@ -44,8 +44,10 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register_view'])->name('register_view');
 Route::post('/sign-up', [AuthController::class, 'sign_up'])->name('sign-up');
 Route::get('/forget-password',[AuthController::class, 'email_view'])->name('forget-password.email_view');
-Route::post('/forgot-password', [AuthController::class, 'sendOtp'])->name('forgot.password.sendOtp');
-Route::get('/ccmw/OTP',[AuthController::class, 'otp_view'])->name('forgot.password.otp-view');
+Route::post('/forgot-password', [AuthController::class, 'sendOtp'])->name('forgot-password.sendOtp');
+Route::get('/ccmw/OTP',[AuthController::class, 'otp_view'])->name('forgot-password.otp-view');
+Route::post('/forgot-password/checkOtp', [AuthController::class, 'checkOtp'])->name('forgot-password.checkOtp');
+
 Route::get('/', function () {
 
     if (! auth()->user()) {
