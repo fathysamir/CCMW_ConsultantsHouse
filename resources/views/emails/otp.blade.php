@@ -14,8 +14,8 @@
                 <p>Dear {{ $name }},</p>
 
                 <p>
-                    We received a request to change the password for your
-                    <span style="font-size: 28px; font-weight: bold; color: #000;">
+                    We received a request to change the password for your 
+                    <span style="font-size: 12px; font-weight: bold; color: #000;">
                         C<span style="color: red; font-weight: bold;">M</span>W
                     </span> account.
                 </p>
@@ -39,9 +39,9 @@
                 <p>Best Regards,</p>
 
                 <p style="font-weight: bold;">
-                    <span style="font-size: 28px; font-weight: bold; color: #000;">
+                    <span style="font-size: 12px; font-weight: bold; color: #000;">
                         C<span style="color: red; font-weight: bold;">M</span>W
-                    </span>&nbsp;Team
+                    </span> Team
                 </p>
 
                 <div style="margin-top: 20px; max-width: 200px;">
