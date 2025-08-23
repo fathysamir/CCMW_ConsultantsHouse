@@ -70,6 +70,7 @@
                     <input type="email" id="inputEmail" class="form-control form-control-lg" name="email"
                         placeholder="Email address" required autofocus="" value="{{ old('email') }}">
                 </div>
+                <a id="resendOTP"href="{{ route('login_view') }}">Login</a>
 
                 <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Send</button>
 
