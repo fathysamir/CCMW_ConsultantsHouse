@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('code');
             $table->string('email');
+            $table->string('otp', 6)->nullable(); // assuming 6-digit OTP
+            $table->timestamp('otp_expires_at')->nullable();
             $table->string('phone')->nullable();
             $table->string('country_code')->nullable();
             $table->timestamp('email_verified_at')->nullable();

@@ -2,11 +2,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendOTP;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -217,5 +219,38 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Password updated successfully.',
         ]);
+    }
+
+    /////////////////////////////////////////// forget password ////////////////////////////////////////
+    public function email_view()
+    {
+        return view('dashboard.change_password.email');
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return back()->withErrors(['msg' => 'This email is not registered.'])->withInput();
+        }
+
+        // Generate OTP (6-digit)
+        $otp = rand(100000, 999999);
+
+        // Save OTP in DB (you can store in users table or a separate table)
+        $user->otp            = $otp;
+        $user->otp_expires_at = now()->addMinutes(10); // valid for 10 minutes
+        $user->save();
+        session(['AuthUserCode' => $user->code]);
+        Mail::to($user->email)->send(new SendOTP($otp, $user->name));
+        return redirect('/ccmw/OTP')->with('success', 'OTP has been sent to your email.');
+
+        // return back()->with('success', 'OTP has been sent to your email.');
+    }
+
+    public function otp_view()
+    {
+        return view('dashboard.change_password.otp_view');
     }
 }

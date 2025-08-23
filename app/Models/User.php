@@ -31,7 +31,9 @@ class User extends Authenticatable
         'current_folder_id',
         'password',
         'sideBarTheme',
-        'country_code'
+        'country_code',
+        'otp',
+        'otp_expires_at '
     ];
 
     /**

@@ -49,7 +49,7 @@
     <div class="wrapper vh-100">
         <div id="background-div" class="row align-items-center h-100"
             style="background-image: url('{{ asset('dashboard/assets/images/bg3.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center;">
-            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('login') }}"
+            <form class="col-lg-3 col-md-4 col-10 mx-auto text-center"action="{{ route('forgot.password.sendOtp') }}"
                 method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
@@ -69,36 +69,10 @@
                 <div class="form-group mt-3">
                     <label for="inputEmail" class="sr-only">Email address</label>
                     <input type="email" id="inputEmail" class="form-control form-control-lg" name="email"
-                        placeholder="Email address" required autofocus="">
-                    @if ($errors->has('email'))
-                        <p class="text-error more-info-err" style="color: red;">
-                            {{ $errors->first('email') }}</p>
-                    @endif
+                        placeholder="Email address" required autofocus="" value="{{ old('email') }}">
                 </div>
-                <div class="form-group">
-                    <label for="inputPassword" class="sr-only">Password</label>
-                    <input type="password" id="inputPassword" name="password" class="form-control form-control-lg"
-                        placeholder="Password" required>
-                    @if ($errors->has('password'))
-                        <p class="text-error more-info-err" style="color: red;">
-                            {{ $errors->first('password') }}</p>
-                    @endif
-                </div>
-                <div class="row ml-1 mr-1 d-flex justify-content-between">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="remember"id="customCheck1">
-                        <label class="custom-control-label" for="customCheck1" style="color: #fff">Remember me</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="last_project"id="customCheck2">
-                        <label class="custom-control-label" for="customCheck2" style="color: #fff">Login to last
-                            project</label>
-                    </div>
 
-                </div>
-                <a id="forgot_password"href="{{ route('forget-password.email_view') }}">Forgot Password</a>
-
-                <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Login</button>
+                <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Send</button>
 
             </form>
         </div>
