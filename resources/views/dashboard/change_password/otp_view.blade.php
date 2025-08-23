@@ -147,7 +147,7 @@
                             $("#resendMsg").text("✅ " + response.message);
 
                             // Add cooldown (30s before user can resend again)
-                            let countdown = 30;
+                            let countdown = 60;
                             let timer = setInterval(() => {
                                 link.text("Resend OTP (" + countdown + "s)");
                                 countdown--;
@@ -156,6 +156,7 @@
                                     clearInterval(timer);
                                     link.text("Resend OTP").css("pointer-events",
                                         "auto");
+                                        $("#resendMsg").text("");
                                 }
                             }, 1000);
                         } else {
