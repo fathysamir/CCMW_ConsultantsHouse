@@ -96,7 +96,8 @@
                     <input type="text" name="otp[]" maxlength="1" class="otp-input form-control text-center mx-1"
                         required>
                 </div>
-
+                <a id="resendOTP"href="javascript:void(0)">Resend OTP</a>
+                <p id="resendMsg" style="color:yellow; margin-top:10px;"></p>
 
             </form>
         </div>
@@ -128,6 +129,46 @@
             setTimeout(function() {
                 $('.alert').fadeOut('fast');
             }, 5000);
+
+            $("#resendOTP").on("click", function(e) {
+                e.preventDefault();
+
+                let link = $(this);
+                link.text("Resending...").css("pointer-events", "none"); // disable link
+
+                $.ajax({
+                    url: "{{ route('resendOTP') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            $("#resendMsg").text("✅ " + response.message);
+
+                            // Add cooldown (30s before user can resend again)
+                            let countdown = 30;
+                            let timer = setInterval(() => {
+                                link.text("Resend OTP (" + countdown + "s)");
+                                countdown--;
+
+                                if (countdown < 0) {
+                                    clearInterval(timer);
+                                    link.text("Resend OTP").css("pointer-events",
+                                        "auto");
+                                }
+                            }, 1000);
+                        } else {
+                            $("#resendMsg").text("❌ " + response.message);
+                            link.text("Resend OTP").css("pointer-events", "auto");
+                        }
+                    },
+                    error: function(xhr) {
+                        $("#resendMsg").text("❌ Failed to resend OTP");
+                        link.text("Resend OTP").css("pointer-events", "auto");
+                    }
+                });
+            });
         });
     </script>
     <script>

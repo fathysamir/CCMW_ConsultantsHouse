@@ -316,4 +316,21 @@ class AuthController extends Controller
         // Redirect to login page
         return redirect()->route('login_view')->with('success', 'Your password has been reset successfully. Please login.');
     }
+
+    public function resendOtp(Request $request)
+    {
+        $AuthUserCode = session('AuthUserCode');
+        $user         = User::where('code', $AuthUserCode)->first();
+        if (! $user) {
+            return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+        }
+        $otp = rand(100000, 999999);
+
+        // Save OTP in DB (you can store in users table or a separate table)
+        $user->otp            = $otp;
+        $user->otp_expires_at = now()->addMinutes(10); // valid for 10 minutes
+        $user->save();
+        Mail::to($user->email)->send(new SendOTP($otp, $user->name));
+        return response()->json(['status' => 'success', 'message' => 'OTP resent successfully']);
+    }
 }
