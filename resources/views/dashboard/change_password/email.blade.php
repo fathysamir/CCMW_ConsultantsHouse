@@ -42,6 +42,13 @@
         #forgot_password:hover {
             color: #1900fd
         }
+        #login_link {
+            color: #ffffff
+        }
+
+        #login_link:hover {
+            color: #1900fd
+        }
     </style>
 </head>
 
@@ -70,7 +77,7 @@
                     <input type="email" id="inputEmail" class="form-control form-control-lg" name="email"
                         placeholder="Email address" required autofocus="" value="{{ old('email') }}">
                 </div>
-                <a id="resendOTP"href="{{ route('login_view') }}">Login</a>
+                <a id="login_link"href="{{ route('login_view') }}">Login</a>
 
                 <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Send</button>
 

@@ -52,6 +52,13 @@
             border: 1px solid #ccc;
             border-radius: 8px;
         }
+        #resendOTP {
+            color: #ffffff
+        }
+
+        #resendOTP:hover {
+            color: #1900fd
+        }
     </style>
 </head>
 
