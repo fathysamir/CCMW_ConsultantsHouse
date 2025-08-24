@@ -214,10 +214,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="analysis_date">Date Of Analysis</label>
+                                    <label for="analysis_date">Date of Analysis</label>
                                     <input required type="date" style="background-color:#fff;" name="analysis_date"
                                         id="analysis_date" class="form-control date" placeholder="Date Of Analysis"
-                                        value="{{ $analysis->analysis_date ?? date('Y-m-d') }}">
+                                        value="{{ $analysis->analysis_date }}">
                                 </div>
                             </div>
 
@@ -236,6 +236,7 @@
                                 class="btn mb-2 btn-outline-success"onclick="document.getElementById('formAction').value='save'">Save</button>
                             <button type="button" class="btn mb-2 btn-outline-primary"
                                 id="assigne-to-btn">Assign</button>
+                            <button type="button" class="btn mb-2 btn-outline-secondary">Initiate a Notice</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Close</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Send e-mail & close</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Print</button>
