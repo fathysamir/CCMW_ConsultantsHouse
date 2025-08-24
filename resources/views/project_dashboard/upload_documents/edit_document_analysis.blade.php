@@ -236,7 +236,7 @@
                                 class="btn mb-2 btn-outline-success"onclick="document.getElementById('formAction').value='save'">Save</button>
                             <button type="button" class="btn mb-2 btn-outline-primary"
                                 id="assigne-to-btn">Assign</button>
-                            <button type="button" class="btn mb-2 btn-outline-secondary">Initiate a Notice</button>
+                            <button type="button" class="btn mb-2 btn-outline-warning">Initiate a Notice</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Close</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Send e-mail & close</button>
                             <button type="button" class="btn mb-2 btn-outline-secondary">Print</button>
