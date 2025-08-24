@@ -42,6 +42,7 @@
         #forgot_password:hover {
             color: #1900fd
         }
+
         #login_link {
             color: #ffffff
         }
@@ -60,7 +61,7 @@
                 method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
-                
+
                 <div class="form-group mt-3">
                     <img src="{{ asset('dashboard/assets/images/logo.png') }}" style="border-radius: 12px;width:100%;">
                 </div>

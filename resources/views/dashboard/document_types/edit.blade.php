@@ -25,7 +25,7 @@
 
 
 
-                         <div class="row">
+                        <div class="row">
                             <!-- Type Input -->
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
@@ -43,7 +43,8 @@
                             </div>
                         </div>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" name="shortcut"id="shortcut" @if($document_type->shortcut=='1') checked @endif>
+                            <input type="checkbox" class="custom-control-input" name="shortcut"id="shortcut"
+                                @if ($document_type->shortcut == '1') checked @endif>
                             <label class="custom-control-label" for="shortcut">Add To Shortcut Menu</label>
                         </div>
 

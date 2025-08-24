@@ -53,7 +53,7 @@
                 method="POST"style="background-color: rgba(128, 128, 128, 0.8); border-radius: 0.4rem">
                 @csrf
 
-                
+
                 <div class="form-group mt-3">
                     <img src="{{ asset('dashboard/assets/images/logo.png') }}" style="border-radius: 12px;width:100%;">
                 </div>
@@ -66,7 +66,7 @@
                             {{ $errors->first('msg') }}</p>
                     @endif
                 @endif
-                
+
                 <div class="form-group">
                     <input type="password" id="inputPassword" name="password" class="form-control form-control-lg"
                         placeholder="Password" required>
@@ -76,8 +76,8 @@
                     @endif
                 </div>
                 <div class="form-group">
-                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-control-lg"
-                        placeholder="Confirm Password" required>
+                    <input type="password" id="password_confirmation" name="password_confirmation"
+                        class="form-control form-control-lg" placeholder="Confirm Password" required>
                     @if ($errors->has('password_confirmation'))
                         <p class="text-error more-info-err" style="color: red;">
                             {{ $errors->first('password_confirmation') }}</p>

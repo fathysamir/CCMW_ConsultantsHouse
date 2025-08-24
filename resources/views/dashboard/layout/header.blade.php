@@ -30,7 +30,7 @@
                 class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink"
                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span style="color:white" class="avatar avatar-sm mt-2">
-                    <img @if (getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) != null) src="{{ getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection,true) }}" @else src="{{ asset('dashboard/assets/avatars/user_avatar.png') }}" @endif
+                    <img @if (getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection) != null) src="{{ getFirstMediaUrl(auth()->user(), auth()->user()->avatarCollection, true) }}" @else src="{{ asset('dashboard/assets/avatars/user_avatar.png') }}" @endif
                         alt="..." class="avatar-img rounded-circle" width=35 height=35>
                 </span>
             </a>

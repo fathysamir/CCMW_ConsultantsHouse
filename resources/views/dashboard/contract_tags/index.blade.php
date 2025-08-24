@@ -58,12 +58,12 @@
                         </thead>
                         <tbody>
                             <?php
-                                $counter=1;    
+                            $counter = 1;
                             ?>
                             @foreach ($contract_tags as $tag)
                                 <tr>
 
-                                    <td>{{$counter}}</td>
+                                    <td>{{ $counter }}</td>
                                     <td>{{ $tag->name }}</td>
                                     <td>{{ $tag->sub_clause }}</td>
                                     <td>{{ $tag->var_process }}</td>
@@ -84,8 +84,8 @@
                                     </td>
                                 </tr>
                                 <?php
-                                $counter++;    
-                            ?>
+                                $counter++;
+                                ?>
                             @endforeach
                         </tbody>
                     </table>

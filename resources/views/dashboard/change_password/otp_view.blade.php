@@ -52,6 +52,7 @@
             border: 1px solid #ccc;
             border-radius: 8px;
         }
+
         #resendOTP {
             color: #ffffff
         }
@@ -163,7 +164,7 @@
                                     clearInterval(timer);
                                     link.text("Resend OTP").css("pointer-events",
                                         "auto");
-                                        $("#resendMsg").text("");
+                                    $("#resendMsg").text("");
                                 }
                             }, 1000);
                         } else {

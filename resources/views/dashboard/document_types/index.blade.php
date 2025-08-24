@@ -56,12 +56,12 @@
                         </thead>
                         <tbody>
                             <?php
-                                $counter=1;    
+                            $counter = 1;
                             ?>
                             @foreach ($document_types as $type)
                                 <tr>
 
-                                    <td>{{$counter}}</td>
+                                    <td>{{ $counter }}</td>
                                     <td>{{ $type->name }}</td>
                                     <td>
                                         @if (strlen($type->description) > 50)
@@ -70,7 +70,7 @@
                                             {{ $type->description }}
                                         @endif
                                     </td>
-                                    <td>{{ $type->relevant_word?? '__' }}</td>
+                                    <td>{{ $type->relevant_word ?? '__' }}</td>
                                     <td>{{ $type->order }}</td>
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -85,8 +85,8 @@
                                     </td>
                                 </tr>
                                 <?php
-                                $counter++;    
-                            ?>
+                                $counter++;
+                                ?>
                             @endforeach
                         </tbody>
                     </table>
