@@ -1272,14 +1272,25 @@
         }
     </script>
     @stack('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         $(document).ready(function() {
-
+            let bootstrapScriptId = "bootstrap-5-bundle";
             $('#UpdateUserProfileInfoLink').on('click', function() {
 
-                $('#userProfileInfoModal').modal('show');
+                if (!document.getElementById(bootstrapScriptId)) {
+                    let script = document.createElement("script");
+                    script.src =
+                        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js";
+                    script.id = bootstrapScriptId;
+                    document.body.appendChild(script);
+
+                    script.onload = function() {
+                        $('#userProfileInfoModal').modal('show'); // show after Bootstrap loaded
+                    };
+                } else {
+                    $('#userProfileInfoModal').modal('show');
+                }
             });
 
             $('#saveUserProfileInfo').on('click', function(e) {
@@ -1317,11 +1328,34 @@
                     }
                 });
             });
-
+            $('#userProfileInfoModal').on('hidden.bs.modal', function() {
+                let script = document.getElementById(bootstrapScriptId);
+                if (script) {
+                    script.remove();
+                }
+            });
+            $('#changePasswordModal').on('hidden.bs.modal', function() {
+                let script = document.getElementById(bootstrapScriptId);
+                if (script) {
+                    script.remove();
+                }
+            });
             $('#changePasswordButton').on('click', function() {
 
                 $('#userProfileInfoModal').modal('hide');
-                $('#changePasswordModal').modal('show');
+                if (!document.getElementById(bootstrapScriptId)) {
+                    let script = document.createElement("script");
+                    script.src =
+                        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js";
+                    script.id = bootstrapScriptId;
+                    document.body.appendChild(script);
+
+                    script.onload = function() {
+                        $('#changePasswordModal').modal('show'); // show after Bootstrap loaded
+                    };
+                } else {
+                    $('#changePasswordModal').modal('show');
+                }
             });
 
             $('#saveChangePassword').on('click', function(e) {
