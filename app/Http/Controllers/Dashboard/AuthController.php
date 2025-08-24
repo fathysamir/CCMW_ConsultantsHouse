@@ -171,7 +171,7 @@ class AuthController extends Controller
         // Update basic info
         $user->name         = $request->name;
         $user->country_code = $request->country_code;
-        $user->phone        = $request->country_code . $request->phone; // combine again
+        $user->phone        = $request->phone; // combine again
         $user->save();
 
         // Handle profile image
