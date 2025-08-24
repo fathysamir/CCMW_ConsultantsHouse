@@ -70,7 +70,7 @@ class ProjectDashboardController extends ApiController
                 $labels['needSynopsis']                           = 'Active open claim files need synopsis assigned to me';
                 $labels['needContractualA']                       = 'Active open claim files need contractual position assigned to me';
                 $labels['needCauseEffectA']                       = 'Active open claim files need cause-and-effect analysis assigned to me';
-
+                $selectedValue                                    = '';
             } else {
                 $project_dashboard_class_name                     = 'fancy-btn2';
                 $my_dashboard_class_name                          = 'fancy-btn2';
@@ -107,8 +107,9 @@ class ProjectDashboardController extends ApiController
                 $labels['needSynopsis']                           = 'Active open claim files need synopsis assigned to ' . $selected_user->name;
                 $labels['needContractualA']                       = 'Active open claim files need contractual position assigned to ' . $selected_user->name;
                 $labels['needCauseEffectA']                       = 'Active open claim files need cause-and-effect analysis assigned to ' . $selected_user->name;
-
+                $selectedValue                                    = $request->user;
             }
+
         } else {
             $project_dashboard_class_name                     = 'fancy-btn';
             $my_dashboard_class_name                          = 'fancy-btn2';
@@ -144,6 +145,7 @@ class ProjectDashboardController extends ApiController
             $labels['needSynopsis']                           = 'All active open claim files need synopsis in project';
             $labels['needContractualA']                       = 'All active open claim files need contractual position in project';
             $labels['needCauseEffectA']                       = 'All active open claim files need cause-and-effect analysis in project';
+            $selectedValue                                    = '';
 
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -630,7 +632,7 @@ class ProjectDashboardController extends ApiController
             'allNeedNarrativeUserDocuments', 'project', 'assigned_users',
             'allHaveConTagsUserDocuments', 'allHaveConTagsNoticeClaimUserDocuments', 'ActiveOpenClaimFilesNeed1ClaimNotice', 'ActiveOpenClaimFilesNeedFurtherNotice',
             'FileVariation1', 'FileVariation2', 'FileVariation3', 'FileVariation4', 'FileVariation5', 'FileVariation6',
-            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name', 'labels'));
+            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name', 'labels','selectedValue'));
 
     }
     public function assign_users(Request $request)

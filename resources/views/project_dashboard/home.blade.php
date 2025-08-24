@@ -45,7 +45,7 @@
         .label2 {
             padding-top: 5px;
             padding-bottom: 6.5px;
-            
+
             font-size: 12px;
         }
 
@@ -618,7 +618,7 @@
                         </div>
                         <div style="height: 23%">
 
-                            <div class="label-wrapper" >
+                            <div class="label-wrapper">
                                 <div class="label"style="width:100%; padding-top: 10%;">Active Open Claim Files Need
                                     Further
                                     Notice</div>
@@ -846,9 +846,10 @@
                     Dashboard</button>
                 <div style="display: flex;margin-top: 8px; width:100%">
                     <select class="form-control" id="owner" style="width: 80%;">
-                        <option value="" selected disabled>select User</option>
+                        <option value="" selected disabled>Select User</option>
                         @foreach ($project_users as $user)
-                            <option value="{{ $user->code }}">{{ $user->name }}</option>
+                            <option value="{{ $user->code }}" {{ $selectedValue == $user->code ? 'selected' : '' }}>
+                                {{ $user->name }}</option>
                         @endforeach
                     </select>
                     <button id="dashboardBtn" class="{{ $user_dashboard_class_name }}" disabled
