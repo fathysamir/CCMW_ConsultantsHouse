@@ -287,7 +287,8 @@ class ImportDocumentController extends ApiController
                     $success                               = false;
                 } else {
                     // $start_date=date('Y-m-d',strtotime($sheets[$request->sheet][$request->start_date][$index]));
-                    $start_date = $this->formate_date($sheets[$request->sheet][$request->start_date][$index], 'd-M-Y');
+                    $xx_date=date('d-M-Y',strtotime($sheets[$request->sheet][$request->start_date][$index]));
+                    $start_date = $this->formate_date($xx_date, 'd-M-Y');
                 }
             }
 
