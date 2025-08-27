@@ -908,6 +908,48 @@
             theme: 'bootstrap4',
             tags: false
         });
+        $('.xxxx').select2({
+            multiple: true,
+            theme: 'bootstrap4',
+            tags: false
+        }).on('change', function() {
+            let selected = $(this).find(':selected');
+            let container = $('#exhibit-links');
+            container.empty(); // clear old links
+
+            selected.each(function() {
+                let id = $(this).val();
+                let slug = $(this).data('docslug');
+                let text = $(this).text();
+
+                // adjust href depending on your route
+                let link = `<a href="/project/document/edit/${slug}" target="_blank" class="d-block mb-1">
+                        ${text}
+                    </a>`;
+                container.append(link);
+            });
+        });
+         $('.xxxxx').select2({
+            multiple: true,
+            theme: 'bootstrap4',
+            tags: false
+        }).on('change', function() {
+            let selected = $(this).find(':selected');
+            let container = $('#exhibit-links2');
+            container.empty(); // clear old links
+
+            selected.each(function() {
+                let id = $(this).val();
+                let slug = $(this).data('docslug');
+                let text = $(this).text();
+
+                // adjust href depending on your route
+                let link = `<a href="/project/document/edit/${slug}" target="_blank" class="d-block mb-1">
+                        ${text}
+                    </a>`;
+                container.append(link);
+            });
+        });
         $('.drgpicker').daterangepicker({
             singleDatePicker: true,
             timePicker: false,

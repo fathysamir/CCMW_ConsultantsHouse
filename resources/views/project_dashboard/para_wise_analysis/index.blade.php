@@ -140,12 +140,12 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 57% !important;
+            width: 67% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 30% !important;
+            width: 20% !important;
         }
 
         .table-container th:nth-child(4),
@@ -198,8 +198,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -281,7 +281,9 @@
                                             </div>
                                         </td>
 
-                                        <td>{{ $para_wise->title }}</td>
+                                        <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
+                                                href="{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}">{{ $para_wise->title }}</a>
+                                        </td>
 
                                         <td>{{ $para_wise->user->name }}</td>
 
@@ -347,8 +349,8 @@
 
                         <div class="form-group">
                             <label for="percentage_complete">% Complete</label>
-                            <input type="number" name="percentage_complete" id="percentage_complete" class="form-control"
-                                min="0" max="100">
+                            <input type="number" name="percentage_complete" id="percentage_complete"
+                                class="form-control" min="0" max="100">
                         </div>
 
                     </div>

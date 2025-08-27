@@ -353,4 +353,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/para-wise-analysis/update/{id}', [ParaWiseController::class, 'update'])->name('project.para-wise-analysis.update');
     Route::get('/project/para-wise-analysis/{id}/delete', [ParaWiseController::class, 'delete'])->name('project.para-wise-analysis.delete');
 
+    Route::get('/project/para-wise-analysis/paragraphs/{id}', [ParaWiseController::class, 'paragraphs'])->name('project.para-wise-analysis.paragraphs');
+    Route::get('/project/para-wise-analysis/paragraph/{id}/delete', [ParaWiseController::class, 'delete_paragraph'])->name('project.para-wise-analysis.delete_paragraph');
+    Route::post('/paragraphs/change-flag', [ParaWiseController::class, 'changeFlag'])->name('paragraphs.changeFlag');
+    Route::get('/project/para-wise-analysis/paragraphs/{id}/create', [ParaWiseController::class, 'create_paragraph'])->name('project.para-wise-analysis.create_paragraph');
+    Route::post('/project/para-wise-analysis/paragraph/stor', [ParaWiseController::class, 'stor_paragraph'])->name('project.para-wise-analysis.stor_paragraph');
 });

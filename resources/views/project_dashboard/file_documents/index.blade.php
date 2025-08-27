@@ -347,7 +347,7 @@
                                             title="Blue Flags">
                                             <i class="fa-regular fa-flag"></i>
                                         </label>
-                                        <label id="all_red_flag" style="cursor: pointer;" title="Blue Flags">
+                                        <label id="all_red_flag" style="cursor: pointer;" title="Red Flags">
                                             <i class="fa-regular fa-flag"></i>
                                         </label>
                                     </th>

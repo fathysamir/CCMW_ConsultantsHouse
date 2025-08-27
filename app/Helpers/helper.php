@@ -87,3 +87,19 @@ function highlight($text, $search)
 
     return $text;
 }
+
+function extractTextSnippet($html, $limit = 50)
+{
+    // 1) Remove HTML tags
+    $text = strip_tags($html);
+
+    // 2) Trim spaces
+    $text = trim($text);
+
+    // 3) If length > 70 cut and add "..."
+    if (mb_strlen($text) > $limit) {
+        return mb_substr($text, 0, $limit) . '...';
+    }
+
+    return $text;
+}
