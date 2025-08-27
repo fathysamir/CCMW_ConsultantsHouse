@@ -168,4 +168,74 @@ class ParaWiseController extends ApiController
         // Check if there's any actual content
         return ! empty($text);
     }
+
+    public function edit_paragraph($id)
+    {
+        $paragraph  = Paragraph::where('slug', $id)->first();
+        $para_wise  = ParaWise::where('id', $paragraph->para_wise_id)->first();
+        $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference')->get();
+        $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->where('id', '!=', $paragraph->id)->get();
+
+        return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('paragraph', 'para_wise', 'docs', 'paragraphs'));
+    }
+
+    public function update_paragraph(Request $request, $slug)
+    {
+        // هات البرجراف بالـ slug
+        $paragraph = Paragraph::where('slug', $slug)->firstOrFail();
+
+        // Background
+        $background = $this->hasContent($request->background) ? $request->background : null;
+
+        // Paragraph
+        $paraContent = $this->hasContent($request->paragraph) ? $request->paragraph : null;
+
+        // Reply
+        $reply = $this->hasContent($request->reply) ? $request->reply : null;
+
+        // para_numbers
+        if ($paragraph->para_numbers) {
+            Paragraph::whereIn('id', $paragraph->para_numbers)
+                ->update(['replyed' => "0", 'reply_user_id' => null]);
+        }
+        if ($request->para_numbers) {
+            Paragraph::whereIn('id', $request->para_numbers)
+                ->update(['replyed' => "1", 'reply_user_id' => auth()->user()->id]);
+            $para_numbers = implode(",", $request->para_numbers);
+        } else {
+            $para_numbers = null;
+        }
+
+        // Exhibits
+        $para_exhibits  = $request->para_exhibits ? implode(",", $request->para_exhibits) : null;
+        $reply_exhibits = $request->reply_exhibits ? implode(",", $request->reply_exhibits) : null;
+
+        // Update paragraph
+        $paragraph->update([
+            'reply'          => $reply,
+            'paragraph'      => $paraContent,
+            'background'     => $background,
+            'blue_flag'      => $request->blue_flag,
+            'green_flag'     => $request->green_flag,
+            'red_flag'       => $request->red_flag,
+            'notes'          => $request->notes,
+            'background_ref' => $request->background_ref,
+            'title_above'    => $request->title_above,
+            'number'         => $request->number,
+            'para_numbers'   => $para_numbers,
+            'reply_exhibits' => $reply_exhibits,
+            'para_exhibits'  => $para_exhibits,
+        ]);
+
+        // لو فيه رد يتعلم عليه إنه replyed
+        if ($reply) {
+            $paragraph->replyed       = "1";
+            $paragraph->reply_user_id = auth()->user()->id;
+            $paragraph->save();
+        }
+
+        return redirect('/project/para-wise-analysis/paragraphs/' . $paragraph->para_wise->slug)
+            ->with('success', 'Paragraph Updated successfully.');
+    }
+
 }

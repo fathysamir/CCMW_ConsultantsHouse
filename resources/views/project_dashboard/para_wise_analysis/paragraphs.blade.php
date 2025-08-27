@@ -399,7 +399,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
 
-                                                <a class="dropdown-item edit-paraWise" href="javascript:void(0);">
+                                                <a class="dropdown-item edit-paraWise" href="{{ route('project.para-wise-analysis.edit_paragraph',$paragraph->slug) }}">
                                                     Edit
                                                 </a>
                                                 <a class="dropdown-item text-danger"
