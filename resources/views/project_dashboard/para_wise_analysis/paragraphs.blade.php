@@ -464,6 +464,7 @@
     </script>
     <script>
         $(document).ready(function() {
+            $("#check").removeClass("sorting_asc");
             var table = $('#dataTable-1').DataTable();
             var activeFlags = [];
 
