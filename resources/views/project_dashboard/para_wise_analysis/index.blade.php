@@ -140,7 +140,7 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 50% !important;
+            width: 57% !important;
         }
 
         .table-container th:nth-child(3),
@@ -155,7 +155,7 @@
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 9% !important;
+            width: 2% !important;
         }
 
 
@@ -198,8 +198,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -222,7 +222,7 @@
         </div>
         <div class="col-auto">
 
-            <a type="button" href="{{ route('project.para-wise-analysis.create') }}"
+            <a type="button" href="javascript:void(0);"
                 class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create</a>
 
         </div>
@@ -293,8 +293,13 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
 
-                                                <a class="dropdown-item"
-                                                    href="{{ route('project.para-wise-analysis.edit', $para_wise->slug) }}">Edit</a>
+                                                <a class="dropdown-item edit-paraWise" href="javascript:void(0);"
+                                                    data-id="{{ $para_wise->id }}" data-title="{{ $para_wise->title }}"
+                                                    data-owner="{{ $para_wise->user_id }}"
+                                                    data-percentage="{{ $para_wise->percentage_complete }}"
+                                                    data-url="{{ route('project.para-wise-analysis.update', $para_wise->slug) }}">
+                                                    Edit
+                                                </a>
                                                 <a class="dropdown-item text-danger"
                                                     href="javascript:void(0);"onclick="confirmDelete('{{ route('project.para-wise-analysis.delete', $para_wise->slug) }}')">Delete</a>
                                             </div>
@@ -306,6 +311,52 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="paraWiseModal" tabindex="-1" role="dialog" aria-labelledby="paraWiseModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form id="paraWiseForm" method="POST" action="">
+                    @csrf
+                    <input type="hidden" name="_method" id="formMethod" value="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="paraWiseModalLabel">Create Para-wise Analysis</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label for="title">Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" id="title" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner">Owner</label>
+                            <select name="user_id" id="owner" class="form-control" required>
+                                <option value="">-- Select Owner --</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="percentage_complete">% Complete</label>
+                            <input type="number" name="percentage_complete" id="percentage_complete" class="form-control"
+                                min="0" max="100">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -355,6 +406,36 @@
 
     <script>
         $(document).ready(function() {
+            $('#btn-outline-primary').on('click', function(e) {
+                e.preventDefault();
+                $('#paraWiseModalLabel').text('Create Para-wise Analysis');
+                $('#paraWiseForm').attr('action', "{{ route('project.para-wise-analysis.store') }}");
+                $('#formMethod').val('POST'); // for store
+                $('#title').val('');
+                $('#owner').val('');
+                $('#percentage_complete').val('');
+                $('#paraWiseModal').modal('show');
+            });
+
+            // Open Edit Modal
+            $('.edit-paraWise').on('click', function(e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                let title = $(this).data('title');
+                let owner = $(this).data('owner');
+                let percentage = $(this).data('percentage');
+                let updateUrl = $(this).data('url');
+
+                $('#paraWiseModalLabel').text('Edit Para-wise Analysis');
+                $('#paraWiseForm').attr('action', updateUrl);
+                $('#formMethod').val('POST'); // for update
+                $('#title').val(title);
+                $('#owner').val(owner);
+                $('#percentage_complete').val(percentage);
+
+                $('#paraWiseModal').modal('show');
+            });
+
             function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
                 const hintBox = document.getElementById("hintBox");
                 hintBox.innerText = message;

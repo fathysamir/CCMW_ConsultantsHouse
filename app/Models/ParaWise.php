@@ -15,6 +15,7 @@ class ParaWise extends Model
     protected $fillable = [
         'project_id',
         'title',
+        'slug',
         'user_id',
         'percentage_complete'
 

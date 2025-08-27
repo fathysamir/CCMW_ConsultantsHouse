@@ -349,9 +349,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/user/delete/{id}', [UserController::class, 'delete'])->name('delete.user');
 
     Route::any('/project/para-wise-analysis', [ParaWiseController::class, 'para_wise_analysis'])->name('project.para-wise-analysis');
-    Route::get('/project/para-wise-analysis/create', [ParaWiseController::class, 'create'])->name('project.para-wise-analysis.create');
     Route::post('/project/para-wise-analysis/store', [ParaWiseController::class, 'store'])->name('project.para-wise-analysis.store');
-    Route::get('/project/para-wise-analysis/{id}/edit', [ParaWiseController::class, 'edit'])->name('project.para-wise-analysis.edit');
     Route::post('/project/para-wise-analysis/update/{id}', [ParaWiseController::class, 'update'])->name('project.para-wise-analysis.update');
     Route::get('/project/para-wise-analysis/{id}/delete', [ParaWiseController::class, 'delete'])->name('project.para-wise-analysis.delete');
 

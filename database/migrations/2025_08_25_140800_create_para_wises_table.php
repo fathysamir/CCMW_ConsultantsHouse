@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('para_wises', function (Blueprint $table) {
             $table->id();
+            $table->string('slug');
             $table->unsignedBigInteger('project_id');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
             $table->string('title', 225);
