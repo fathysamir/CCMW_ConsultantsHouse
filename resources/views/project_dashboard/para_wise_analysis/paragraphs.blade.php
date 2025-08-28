@@ -140,31 +140,36 @@
 
         .table-container th:nth-child(2),
         .table-container td:nth-child(2) {
-            width: 7% !important;
+            width: 6% !important;
         }
 
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
-            width: 7% !important;
+            width: 5% !important;
         }
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-            width: 36% !important;
+            width: 25% !important;
         }
 
         .table-container th:nth-child(5),
         .table-container td:nth-child(5) {
-            width: 34% !important;
+            width: 25% !important;
         }
 
         .table-container th:nth-child(6),
         .table-container td:nth-child(6) {
-            width: 13% !important;
+            width: 26% !important;
         }
 
         .table-container th:nth-child(7),
         .table-container td:nth-child(7) {
+            width: 10% !important;
+        }
+
+        .table-container th:nth-child(8),
+        .table-container td:nth-child(8) {
             width: 2% !important;
         }
 
@@ -208,8 +213,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -235,7 +240,7 @@
         </div>
         <div class="col-auto">
 
-            <a type="button" href="{{ route('project.para-wise-analysis.create_paragraph',$para_wise->slug) }}"
+            <a type="button" href="{{ route('project.para-wise-analysis.create_paragraph', $para_wise->slug) }}"
                 class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create</a>
             <a type="button" href="javascript:void(0);" class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Export
                 to MS Word</a>
@@ -264,7 +269,7 @@
                     <div class="table-container">
 
                         <!-- Table -->
-                        <table class="table datatables" id="dataTable-1">
+                        <table class="table datatables" id="dataTable-1" style="font-size: 12px;">
 
                             <thead>
                                 <tr>
@@ -299,6 +304,7 @@
                                     <th><b>Para.No.</b></th>
                                     <th><b>Paragraph</b></th>
                                     <th><b>Reply</b></th>
+                                    <th><b>Note</b></th>
                                     <th><b>Reply to Paras Nos.</b></th>
                                     <th></th>
 
@@ -307,7 +313,8 @@
                             <tbody>
 
                                 @foreach ($paragraphs as $paragraph)
-                                    <tr>
+                                    <tr
+                                        @if ($specific_paragraph == $paragraph->slug) style="background-color: #AFEEEE" class="specific_specific_paragraph" @endif>
                                         <td>
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox"
@@ -363,11 +370,20 @@
                                                 @endif
                                             </label>
                                         </td>
-                                        <td><strong style="color:blue;">{{ $paragraph->number }}</strong></td>
+                                        <td><strong style="color:blue;"><a class="l-link"style="color:rgb(80, 78, 78);"
+                                                    style="color:"
+                                                    href="{{ route('project.para-wise-analysis.edit_paragraph', $paragraph->slug) }}">{{ $paragraph->number }}</a></strong>
+                                        </td>
 
                                         <td>{{ extractTextSnippet($paragraph->paragraph) }}</td>
 
                                         <td>{{ $paragraph->reply ? extractTextSnippet($paragraph->reply) : '__' }}</td>
+                                        <td>{{ $paragraph->notes
+                                            ? (strlen($paragraph->notes) > 50
+                                                ? substr($paragraph->notes, 0, 50) . '...'
+                                                : $paragraph->notes)
+                                            : '__' }}
+                                        </td>
                                         <td>
                                             @if ($paragraph->para_numbers)
                                                 @php
@@ -399,7 +415,8 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
 
-                                                <a class="dropdown-item edit-paraWise" href="{{ route('project.para-wise-analysis.edit_paragraph',$paragraph->slug) }}">
+                                                <a class="dropdown-item edit-paraWise"
+                                                    href="{{ route('project.para-wise-analysis.edit_paragraph', $paragraph->slug) }}">
                                                     Edit
                                                 </a>
                                                 <a class="dropdown-item text-danger"
@@ -460,6 +477,18 @@
                     alert("Server error, please try again!");
                 }
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const targetRow = document.querySelector('.specific_paragraph');
+            const container = document.querySelector('.table-container tbody');
+            console.log(targetRow.offsetTop);
+            if (targetRow && container) {
+                const headerHeight = 0; // في حالتك الهيدر sticky فوق الجدول مش جواه، فمش لازم نطرح ارتفاعه
+                const offsetTop = targetRow.offsetTop - headerHeight;
+                container.scrollTop = offsetTop - 58;
+            }
         });
     </script>
     <script>
@@ -606,12 +635,21 @@
                 "targets": 1, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }, {
+                "targets": 3, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
+                "targets": 4, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, {
                 "targets": 5, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
             }, {
                 "targets": 6, // Target the first column (index 0)
                 "orderable": false // Disable sorting for this column
-            }]
+            }, {
+                "targets": 7, // Target the first column (index 0)
+                "orderable": false // Disable sorting for this column
+            }, ]
         });
     </script>
     <script>

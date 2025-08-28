@@ -3,12 +3,12 @@
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <h3 class="h3 mb-0 page-title"><a href="{{ route('project.para-wise-analysis') }}">Para-wise Analysis</a><span
-            id="chevronIcon" class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span><a
+    <h4 class="h4 mb-0 page-title"><a href="{{ route('project.para-wise-analysis') }}">Para-wise Analysis</a><span
+            class="fe fe-24 fe-chevrons-right"style="position: relative; top: 3px;"></span><a
             href="{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}">{{ $para_wise->title }}</a><span
-            id="chevronIcon" class="fe fe-24 fe-chevrons-right"style="position: relative; top: 2px;"></span>Create New
+            class="fe fe-24 fe-chevrons-right"style="position: relative; top: 3px;"></span>Create New
         Paragraph
-    </h3>
+    </h4>
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
@@ -95,7 +95,8 @@
                                     <select class="form-control xxxx" id="multi-select2_1" name="para_exhibits[]"
                                         multiple>
                                         @foreach ($docs as $key => $doc)
-                                            <option value="{{ $doc->id }}" data-docslug="{{ $doc->slug }}">
+                                            <option value="{{ $doc->id }}"
+                                                data-docslug="{{ $doc->storageFile->path }}">
                                                 {{ $doc->reference }}
                                             </option>
                                         @endforeach
@@ -121,7 +122,8 @@
                                     <select class="form-control xxxxx" id="multi-select2_2"
                                         name="reply_exhibits[]"multiple>
                                         @foreach ($docs as $key => $doc)
-                                            <option value="{{ $doc->id }}" data-docslug="{{ $doc->slug }}">
+                                            <option value="{{ $doc->id }}"
+                                                data-docslug="{{ $doc->storageFile->path }}">
                                                 {{ $doc->reference }}
                                             </option>
                                         @endforeach
@@ -146,6 +148,8 @@
                         </div>
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
                             style="margin-top: 10px;">Create</button>
+                        <button type="button" class="btn mb-2 btn-outline-danger"id="btn-outline-primary"
+                            style="margin-top: 10px;" onclick="window.location.href='{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}'">Close</button>
                     </form>
                 </div>
 

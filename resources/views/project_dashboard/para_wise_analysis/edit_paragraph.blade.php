@@ -4,13 +4,51 @@
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <h3 class="h3 mb-0 page-title">
-        <a href="{{ route('project.para-wise-analysis') }}">Para-wise Analysis</a>
-        <span class="fe fe-24 fe-chevrons-right"></span>
-        <a href="{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}">{{ $para_wise->title }}</a>
-        <span class="fe fe-24 fe-chevrons-right"></span>
-        Edit Paragraph
-    </h3>
+
+    <div class="row align-items-center my-4"
+        style="margin-top: 0px !important; justify-content: center;margin-bottom: 0px !important;">
+        <div class="col">
+            <h4 class="h4 mb-0 page-title">
+                <a href="{{ route('project.para-wise-analysis') }}">Para-wise Analysis</a>
+                <span class="fe fe-24 fe-chevrons-right" style="position: relative; top: 3px;"></span>
+                <a href="{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}">{{ $para_wise->title }}</a>
+                <span class="fe fe-24 fe-chevrons-right" style="position: relative; top: 3px;"></span>
+                Edit Paragraph
+            </h4>
+        </div>
+
+
+        <div class="col-auto">
+            {{-- Previous --}}
+            @if ($previous)
+                <label
+                    onclick="window.location.href='{{ route('project.para-wise-analysis.edit_paragraph', $previous->slug) }}'"
+                    style="cursor:pointer;margin-right:-15px;" title="Previous Paragraph">
+                    <span class="fe fe-24 fe-navigation-2" style="font-size:30px;"></span>
+                </label>
+            @else
+                <label style="color:#ccc;margin-right:-15px;" title="No Previous Paragraph">
+                    <span class="fe fe-24 fe-navigation-2" style="font-size:30px;"></span>
+                </label>
+            @endif
+
+            {{-- Next --}}
+            @if ($next)
+                <label
+                    onclick="window.location.href='{{ route('project.para-wise-analysis.edit_paragraph', $next->slug) }}'"
+                    style="cursor:pointer;" title="Next Paragraph">
+                    <span class="fe fe-24 fe-navigation-2"
+                        style="font-size:30px;transform: rotate(180deg);display:inline-block;"></span>
+                </label>
+            @else
+                <label style="color:#ccc;" title="No Next Paragraph">
+                    <span class="fe fe-24 fe-navigation-2"
+                        style="font-size:30px;transform: rotate(180deg);display:inline-block;"></span>
+                </label>
+            @endif
+        </div>
+
+    </div>
 
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -56,6 +94,7 @@
                                             <i class="{{ $paragraph->green_flag ? 'fa-solid' : 'fa-regular' }} fa-flag"
                                                 style="color: {{ $paragraph->green_flag ? '#00ff00' : '' }}"></i>
                                         </label>
+
                                     </div>
                                 </div>
                             </div>
@@ -77,7 +116,8 @@
 
                         <div class="form-group mb-3">
                             <label for="background">Background</label>
-                            <div id="editor1" class="quill-editor" style="min-height:250px;">{!! $paragraph->background !!}</div>
+                            <div id="editor1" class="quill-editor" style="min-height:250px;">{!! $paragraph->background !!}
+                            </div>
                             <input type="hidden" name="background" id="background">
                         </div>
 
@@ -96,7 +136,8 @@
                                     <select class="form-control xxxx" id="multi-select2_1" name="para_exhibits[]"
                                         multiple>
                                         @foreach ($docs as $doc)
-                                            <option value="{{ $doc->id }}" data-docslug="{{ $doc->slug }}"
+                                            <option value="{{ $doc->id }}"
+                                                data-docslug="{{ $doc->storageFile->path }}"
                                                 {{ in_array($doc->id, array_map('intval', explode(',', $paragraph->para_exhibits))) ? 'selected' : '' }}>
                                                 {{ $doc->reference }}
                                             </option>
@@ -122,7 +163,8 @@
                                     <select class="form-control xxxxx" id="multi-select2_2" name="reply_exhibits[]"
                                         multiple>
                                         @foreach ($docs as $doc)
-                                            <option value="{{ $doc->id }}" data-docslug="{{ $doc->slug }}"
+                                            <option value="{{ $doc->id }}"
+                                                data-docslug="{{ $doc->storageFile->path }}"
                                                 {{ in_array($doc->id, array_map('intval', explode(',', $paragraph->reply_exhibits))) ? 'selected' : '' }}>
                                                 {{ $doc->reference }}
                                             </option>
@@ -152,6 +194,8 @@
                         </div>
 
                         <button type="submit" class="btn mb-2 btn-outline-primary">Update</button>
+                        <button type="button" class="btn mb-2 btn-outline-danger"id="btn-outline-primary"
+                            onclick="window.location.href='{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}'">Close</button>
                     </form>
                 </div>
             </div>
@@ -410,7 +454,7 @@
             selectedOptions.forEach(opt => {
                 let slug = opt.dataset.docslug;
                 let ref = opt.textContent.trim();
-                let url = `/project/document/edit/${slug}`; // هنا حط الروت المناسب عندك
+                let url = `/${slug}`; // هنا حط الروت المناسب عندك
 
                 let a = document.createElement('a');
                 a.href = url;

@@ -60,9 +60,11 @@ class ParaWiseController extends ApiController
 
     public function paragraphs($id)
     {
-        $para_wise  = ParaWise::where('slug', $id)->first();
-        $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->get();
-        return view('project_dashboard.para_wise_analysis.paragraphs', compact('paragraphs', 'para_wise'));
+        $para_wise          = ParaWise::where('slug', $id)->first();
+        $paragraphs         = Paragraph::where('para_wise_id', $para_wise->id)->get();
+        $specific_paragraph = session('specific_paragraph');
+        session()->forget('specific_paragraph');
+        return view('project_dashboard.para_wise_analysis.paragraphs', compact('paragraphs', 'para_wise', 'specific_paragraph'));
     }
 
     public function delete_paragraph($id)
@@ -98,7 +100,7 @@ class ParaWiseController extends ApiController
     public function create_paragraph($id)
     {
         $para_wise  = ParaWise::where('slug', $id)->first();
-        $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference')->get();
+        $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference', 'storage_file_id')->with('storageFile')->get();
         $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->get();
 
         return view('project_dashboard.para_wise_analysis.create_paragraph', compact('para_wise', 'docs', 'paragraphs'));
@@ -173,10 +175,23 @@ class ParaWiseController extends ApiController
     {
         $paragraph  = Paragraph::where('slug', $id)->first();
         $para_wise  = ParaWise::where('id', $paragraph->para_wise_id)->first();
-        $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference')->get();
+        $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference', 'storage_file_id')->with('storageFile')->get();
         $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->where('id', '!=', $paragraph->id)->get();
 
-        return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('paragraph', 'para_wise', 'docs', 'paragraphs'));
+        session(['specific_paragraph' => $id]);
+
+        $previous = Paragraph::where('para_wise_id', $paragraph->para_wise_id)
+            ->where('number', '<', $paragraph->number)
+            ->orderBy('number', 'desc')
+            ->first();
+
+        // get next (أكبر number)
+        $next = Paragraph::where('para_wise_id', $paragraph->para_wise_id)
+            ->where('number', '>', $paragraph->number)
+            ->orderBy('number', 'asc')
+            ->first();
+
+        return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('next','previous','paragraph', 'para_wise', 'docs', 'paragraphs'));
     }
 
     public function update_paragraph(Request $request, $slug)

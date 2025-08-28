@@ -923,7 +923,7 @@
                 let text = $(this).text();
 
                 // adjust href depending on your route
-                let link = `<a href="/project/document/edit/${slug}" target="_blank" class="d-block mb-1">
+                let link = `<a href="/${slug}" target="_blank" class="d-block mb-1">
                         ${text}
                     </a>`;
                 container.append(link);
@@ -944,7 +944,7 @@
                 let text = $(this).text();
 
                 // adjust href depending on your route
-                let link = `<a href="/project/document/edit/${slug}" target="_blank" class="d-block mb-1">
+                let link = `<a href="/${slug}" target="_blank" class="d-block mb-1">
                         ${text}
                     </a>`;
                 container.append(link);
