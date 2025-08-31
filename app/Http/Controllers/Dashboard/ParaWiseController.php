@@ -260,7 +260,7 @@ class ParaWiseController extends ApiController
         
 
         if ($request->action == 'save') {
-            return redirect('/project/para-wise-analysis/paragraphs/' . $slug)->with('success', 'Paragraph Updated successfully.');
+            return redirect('/project/para-wise-analysis/paragraphs/' . $slug . '/edit')->with('success', 'Paragraph Updated successfully.');
         } else {
             return redirect('/project/para-wise-analysis/paragraphs/' . $paragraph->para_wise->slug)
             ->with('success', 'Paragraph Updated successfully.');
