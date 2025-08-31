@@ -61,8 +61,8 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="title_above">Add Title Above</label>
-                                    <input type="text" name="title_above" id="title_above" class="form-control"
-                                        placeholder="" value="{{ old('title_above') }}">
+                                    <textarea name="title_above" rows="1" id="title_above" class="form-control" placeholder="">{{ old('title_above') }}</textarea>
+
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -70,6 +70,8 @@
                                     <label for="background_ref">Background Ref.</label>
                                     <input type="text" name="background_ref" id="background_ref" class="form-control"
                                         placeholder="" value="{{ old('background_ref') }}">
+                                    <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('background_ref') }}</textarea>
+
                                 </div>
                             </div>
                         </div>
@@ -149,7 +151,8 @@
                         <button type="submit" class="btn mb-2 btn-outline-primary"id="btn-outline-primary"
                             style="margin-top: 10px;">Create</button>
                         <button type="button" class="btn mb-2 btn-outline-danger"id="btn-outline-primary"
-                            style="margin-top: 10px;" onclick="window.location.href='{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}'">Close</button>
+                            style="margin-top: 10px;"
+                            onclick="window.location.href='{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}'">Close</button>
                     </form>
                 </div>
 

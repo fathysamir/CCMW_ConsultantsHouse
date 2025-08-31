@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreign('reply_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('slug');
             $table->string('number');
-            $table->string('title_above')->nullable();
-            $table->string('background_ref')->nullable();
+            $table->longText('title_above')->nullable();
+            $table->longText('background_ref')->nullable();
             $table->boolean('red_flag')->default(false);
             $table->boolean('green_flag')->default(false);
             $table->boolean('blue_flag')->default(false);
