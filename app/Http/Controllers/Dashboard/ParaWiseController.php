@@ -191,7 +191,7 @@ class ParaWiseController extends ApiController
             ->orderBy('number', 'asc')
             ->first();
 
-        return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('next','previous','paragraph', 'para_wise', 'docs', 'paragraphs'));
+        return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('next', 'previous', 'paragraph', 'para_wise', 'docs', 'paragraphs'));
     }
 
     public function update_paragraph(Request $request, $slug)
@@ -210,13 +210,18 @@ class ParaWiseController extends ApiController
 
         // para_numbers
         if ($paragraph->para_numbers) {
-            Paragraph::whereIn('id', $paragraph->para_numbers)
+            Paragraph::whereIn('id', $paragraph->para_numbers)->where('reply',null)
                 ->update(['replyed' => "0", 'reply_user_id' => null]);
         }
         if ($request->para_numbers) {
-            Paragraph::whereIn('id', $request->para_numbers)
-                ->update(['replyed' => "1", 'reply_user_id' => auth()->user()->id]);
-            $para_numbers = implode(",", $request->para_numbers);
+            if ($reply) {
+                Paragraph::whereIn('id', $request->para_numbers)
+                    ->update(['replyed' => "1", 'reply_user_id' => auth()->user()->id]);
+                $para_numbers = implode(",", $request->para_numbers);
+            } else {
+                $para_numbers = null;
+            }
+
         } else {
             $para_numbers = null;
         }
@@ -246,9 +251,12 @@ class ParaWiseController extends ApiController
         if ($reply) {
             $paragraph->replyed       = "1";
             $paragraph->reply_user_id = auth()->user()->id;
-            $paragraph->save();
-        }
 
+        } else {
+            $paragraph->replyed       = "0";
+            $paragraph->reply_user_id = null;
+        }
+        $paragraph->save();
         return redirect('/project/para-wise-analysis/paragraphs/' . $paragraph->para_wise->slug)
             ->with('success', 'Paragraph Updated successfully.');
     }
