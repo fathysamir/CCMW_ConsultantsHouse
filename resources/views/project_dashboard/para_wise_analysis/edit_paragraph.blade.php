@@ -109,8 +109,8 @@
                             <div class="col-md-2">
                                 <div class="form-group mb-3">
                                     <label for="background_ref">Background Ref.</label>
-                                   
-                                    <textarea name="title_above" rows="1" id="title_above" class="form-control" placeholder="">{{ old('title_above', $paragraph->background_ref) }}</textarea>
+                                    
+                                    <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('title_above', $paragraph->background_ref) }}</textarea>
 
                                 </div>
                             </div>
