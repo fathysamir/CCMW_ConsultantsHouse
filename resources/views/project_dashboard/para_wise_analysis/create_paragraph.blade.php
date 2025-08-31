@@ -34,7 +34,7 @@
                                         {{ $errors->first('number') }}</p>
                                 @endif
                             </div>
-                            <div class="col-md-2"  style="line-height: unset;">
+                            <div class="col-md-1"  style="line-height: unset;padding-left: 0px;">
                                 <div class="form-group "style="margin-bottom:0px;">
                                     <label></label>
                                     <div style="display: flex">
@@ -65,7 +65,7 @@
 
                                 </div>
                             </div>
-                            <div class="col-md-2"  style="line-height: unset;">
+                            <div class="col-md-3"  style="line-height: unset;">
                                 <div class="form-group" style="margin-bottom:0px;">
                                     <label for="background_ref">Background Ref.</label>
                                     
