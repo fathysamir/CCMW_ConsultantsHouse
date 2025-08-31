@@ -148,8 +148,8 @@
                                     <p style="margin-bottom:0px;">Percentage Analysis Complete : </p>
                                     <input type="number" name="Percentage_Analysis_Complete"
                                         class="form-control"value="{{ $file->analyses_complete }}"
-                                        style="width: 12%;margin-left:2%; margin-top:-5px;" min="1" max="100"
-                                        oninput="this.value = Math.min(Math.max(1, this.value), 100)">
+                                        style="width: 12%;margin-left:2%; margin-top:-5px;" min="0" max="100"
+                                        oninput="this.value = Math.min(Math.max(0, this.value), 100)">
                                     <p style="margin-left:3px;"> %</p>
 
 
