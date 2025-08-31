@@ -110,7 +110,7 @@
                                 <div class="form-group mb-3">
                                     <label for="background_ref">Background Ref.</label>
                                     
-                                    <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('title_above', $paragraph->background_ref) }}</textarea>
+                                    <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('background_ref', $paragraph->background_ref) }}</textarea>
 
                                 </div>
                             </div>
