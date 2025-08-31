@@ -68,8 +68,7 @@
                             <div class="col-md-2">
                                 <div class="form-group mb-3">
                                     <label for="background_ref">Background Ref.</label>
-                                    <input type="text" name="background_ref" id="background_ref" class="form-control"
-                                        placeholder="" value="{{ old('background_ref') }}">
+                                    
                                     <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('background_ref') }}</textarea>
 
                                 </div>

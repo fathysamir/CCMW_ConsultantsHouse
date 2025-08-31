@@ -101,15 +101,17 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="title_above">Add Title Above</label>
-                                    <input type="text" name="title_above" id="title_above" class="form-control"
-                                        value="{{ old('title_above', $paragraph->title_above) }}">
+                                    
+                                    <textarea name="title_above" rows="1" id="title_above" class="form-control" placeholder="">{{ old('title_above', $paragraph->title_above) }}</textarea>
+
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group mb-3">
                                     <label for="background_ref">Background Ref.</label>
-                                    <input type="text" name="background_ref" id="background_ref" class="form-control"
-                                        value="{{ old('background_ref', $paragraph->background_ref) }}">
+                                   
+                                    <textarea name="title_above" rows="1" id="title_above" class="form-control" placeholder="">{{ old('title_above', $paragraph->background_ref) }}</textarea>
+
                                 </div>
                             </div>
                         </div>
