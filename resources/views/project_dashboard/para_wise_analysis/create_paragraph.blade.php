@@ -23,8 +23,8 @@
                         <input hidden name="green_flag" id="green_flag_input" value="0">
                         <div class="row">
                             <!-- Type Input -->
-                            <div class="col-md-3">
-                                <div class="form-group mb-3">
+                            <div class="col-md-3" style="line-height: 0.01;">
+                                <div class="form-group "style="marin-bottom:0px;">
                                     <label for="number">Para.No. <span style="color: red">*</span></label>
                                     <input type="number" name="number" required id="number" class="form-control"
                                         placeholder="" value="{{ old('number') }}" step="0.001">
@@ -34,8 +34,8 @@
                                         {{ $errors->first('number') }}</p>
                                 @endif
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group mb-3">
+                            <div class="col-md-3"  style="line-height: 0.01;">
+                                <div class="form-group "style="marin-bottom:0px;">
                                     <label></label>
                                     <div style="display: flex">
                                         <label class="flag-toggle" data-input="blue_flag_input" data-color="#0000ff"
@@ -58,18 +58,18 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group mb-3">
+                            <div class="col-md-4"  style="line-height: 0.01;">
+                                <div class="form-group"style="marin-bottom:0px;">
                                     <label for="title_above">Add Title Above</label>
-                                    <textarea name="title_above" rows="1" id="title_above" class="form-control" placeholder="">{{ old('title_above') }}</textarea>
+                                    <textarea name="title_above" rows="2" id="title_above" class="form-control" placeholder="">{{ old('title_above') }}</textarea>
 
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="form-group mb-3">
+                            <div class="col-md-2"  style="line-height: 0.01;">
+                                <div class="form-group" style="marin-bottom:0px;">
                                     <label for="background_ref">Background Ref.</label>
                                     
-                                    <textarea name="background_ref" rows="1" id="background_ref" class="form-control" placeholder="">{{ old('background_ref') }}</textarea>
+                                    <textarea name="background_ref" rows="2" id="background_ref" class="form-control" placeholder="">{{ old('background_ref') }}</textarea>
 
                                 </div>
                             </div>
