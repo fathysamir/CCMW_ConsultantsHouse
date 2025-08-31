@@ -76,7 +76,7 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="background">Background</label>
+                            <label for="background"style="margin-bottom: 0px;">Background</label>
                             <div id="editor1" class="quill-editor"style="min-height:250px;">
                             </div>
                             <input type="hidden" name="background" id="background">
