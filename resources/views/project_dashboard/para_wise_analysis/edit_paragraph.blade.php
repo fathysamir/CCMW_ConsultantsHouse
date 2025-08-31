@@ -102,7 +102,7 @@
                                 <div class="form-group"style="margin-bottom:0px;">
                                     <label for="title_above">Add Title Above</label>
 
-                                    <textarea name="title_above" rows="2" id="title_above" class="form-control" placeholder="">{{ old('title_above', $paragraph->title_above) }}</textarea>
+                                    <textarea name="title_above" style="height: 60px;"id="title_above" class="form-control" placeholder="">{{ old('title_above', $paragraph->title_above) }}</textarea>
 
                                 </div>
                             </div>
@@ -110,7 +110,7 @@
                                 <div class="form-group" style="margin-bottom:0px;">
                                     <label for="background_ref">Background Ref.</label>
 
-                                    <textarea name="background_ref" rows="2" id="background_ref" class="form-control" placeholder="">{{ old('background_ref', $paragraph->background_ref) }}</textarea>
+                                    <textarea name="background_ref"style="height: 60px;" id="background_ref" class="form-control" placeholder="">{{ old('background_ref', $paragraph->background_ref) }}</textarea>
 
                                 </div>
                             </div>
