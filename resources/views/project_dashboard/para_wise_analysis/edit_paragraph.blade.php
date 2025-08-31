@@ -49,7 +49,19 @@
         </div>
 
     </div>
+    @if (session('error'))
+        <div id="errorAlert" class="alert alert-danger"
+            style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:brown;border-radius: 20px; color:beige;">
+            {{ session('error') }}
+        </div>
+    @endif
 
+    @if (session('success'))
+        <div id="successAlert"
+            class="alert alert-success"style="padding-top:5px;padding-bottom:5px; padding-left: 10px; background-color:green;border-radius: 20px; color:beige;">
+            {{ session('success') }}
+        </div>
+    @endif
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
@@ -194,8 +206,11 @@
                             <label for="Note">Note</label>
                             <textarea name="notes" rows="5" id="Note" class="form-control">{{ old('notes', $paragraph->notes) }}</textarea>
                         </div>
-
-                        <button type="submit" class="btn mb-2 btn-outline-primary">Update</button>
+                        <input type="hidden" name="action" id="formAction" value="save">
+                        <button type="submit" class="btn mb-2 btn-outline-primary"
+                            onclick="document.getElementById('formAction').value='save'">Save</button>
+                        <button type="submit" class="btn mb-2 btn-outline-primary"
+                            onclick="document.getElementById('formAction').value='update'">Update</button>
                         <button type="button" class="btn mb-2 btn-outline-danger"id="btn-outline-primary"
                             onclick="window.location.href='{{ route('project.para-wise-analysis.paragraphs', $para_wise->slug) }}'">Close</button>
                     </form>

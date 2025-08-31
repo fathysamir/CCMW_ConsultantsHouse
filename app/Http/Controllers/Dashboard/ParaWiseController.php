@@ -210,7 +210,7 @@ class ParaWiseController extends ApiController
 
         // para_numbers
         if ($paragraph->para_numbers) {
-            Paragraph::whereIn('id', $paragraph->para_numbers)->where('reply',null)
+            Paragraph::whereIn('id', $paragraph->para_numbers)->where('reply', null)
                 ->update(['replyed' => "0", 'reply_user_id' => null]);
         }
         if ($request->para_numbers) {
@@ -257,8 +257,14 @@ class ParaWiseController extends ApiController
             $paragraph->reply_user_id = null;
         }
         $paragraph->save();
-        return redirect('/project/para-wise-analysis/paragraphs/' . $paragraph->para_wise->slug)
+        
+
+        if ($request->action == 'save') {
+            return redirect('/project/para-wise-analysis/paragraphs/' . $slug)->with('success', 'Paragraph Updated successfully.');
+        } else {
+            return redirect('/project/para-wise-analysis/paragraphs/' . $paragraph->para_wise->slug)
             ->with('success', 'Paragraph Updated successfully.');
+        }
     }
 
 }
