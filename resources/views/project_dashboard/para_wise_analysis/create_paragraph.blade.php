@@ -34,7 +34,7 @@
                                         {{ $errors->first('number') }}</p>
                                 @endif
                             </div>
-                            <div class="col-md-3"  style="line-height: unset;">
+                            <div class="col-md-2"  style="line-height: unset;">
                                 <div class="form-group "style="margin-bottom:0px;">
                                     <label></label>
                                     <div style="display: flex">
@@ -58,7 +58,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-4"  style="line-height: unset;">
+                            <div class="col-md-5"  style="line-height: unset;">
                                 <div class="form-group"style="margin-bottom:0px;">
                                     <label for="title_above">Add Title Above</label>
                                     <textarea name="title_above" style="height: 60px;" id="title_above" class="form-control" placeholder="">{{ old('title_above') }}</textarea>

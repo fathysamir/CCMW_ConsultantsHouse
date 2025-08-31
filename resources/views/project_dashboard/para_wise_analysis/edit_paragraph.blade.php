@@ -73,7 +73,7 @@
                                         value="{{ old('number', $paragraph->number) }}" step="0.001">
                                 </div>
                             </div>
-                            <div class="col-md-3" style="line-height: unset;">
+                            <div class="col-md-2" style="line-height: unset;">
                                 <div class="form-group "style="margin-bottom:0px;">
                                     <label></label>
                                     <div style="display: flex">
@@ -98,7 +98,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4" style="line-height: unset;">
+                            <div class="col-md-5" style="line-height: unset;">
                                 <div class="form-group"style="margin-bottom:0px;">
                                     <label for="title_above">Add Title Above</label>
 
