@@ -629,7 +629,7 @@
                                 </div>
                             </div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
-                                <div class="count-box Barbel" id="count-pending-assignment"style="display: inline-block">
+                                <div class="count-box Barbel"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
                                 </div>
                             </div>
@@ -1270,7 +1270,7 @@
                 "/project/all-documents?authUser={{ $user_code }}&analysis_complete=0&active_docs=1";
         });
         document.getElementById("count-pending-assignment").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&not_assignment=on&active_docs=1";
+            window.location.href = "/project/all-documents?authUser={{ $user_code }}&not_assignment=on&active_docs=1";
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
