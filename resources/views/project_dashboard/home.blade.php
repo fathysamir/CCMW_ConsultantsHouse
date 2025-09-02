@@ -629,7 +629,7 @@
                                 </div>
                             </div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
-                                <div class="count-box Barbel"style="display: inline-block">
+                                <div class="count-box Barbel" id="ActiveOpenClaimFilesNeedFurtherNotice"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
                                 </div>
                             </div>
@@ -1274,6 +1274,9 @@
         });
         document.getElementById("count-need-1-claim-notice").addEventListener("click", function() {
             window.location.href = "/project/files?authUser={{ $user_code }}&filter=need_1_claim_notice";
+        });
+        document.getElementById("ActiveOpenClaimFilesNeedFurtherNotice").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=need_further_notice";
         });
         
     </script>

@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -51,6 +52,25 @@ class FileController extends ApiController
                                 $q->where('project_id', $user->current_project_id)
                                     ->where('assess_not_pursue', '0');
                             });
+                    });
+            })->get();
+
+        } elseif ($request->filter == 'need_further_notice') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->whereHas('fileDocuments', function ($d) use ($user) {
+                $d->whereHas('tags', function ($t) {
+                    $t->where('is_notice', '1');
+                })
+                    ->whereHas('document', function ($q) use ($user) {
+                        $q->where('project_id', $user->current_project_id)
+                            ->where('assess_not_pursue', '0')
+                            ->where('start_date', '<', Carbon::now()->subMonth()->format('Y-m-d'));
                     });
             })->get();
 
