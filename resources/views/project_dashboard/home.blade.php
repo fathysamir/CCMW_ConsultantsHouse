@@ -1266,7 +1266,7 @@
             window.location.href = "/project/all-documents?authUser=on&active_docs=0";
         });
         document.getElementById("count-pending-analysis").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser="+{{ $user_code }}+"&analysis_complete=0&active_docs=1";
+            window.location.href = "/project/all-documents?authUser=" + {{ $user_code }} + "&analysis_complete=0&active_docs=1";
         });
         document.getElementById("count-pending-assignment").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&not_assignment=on&active_docs=1";
