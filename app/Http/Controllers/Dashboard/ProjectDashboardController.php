@@ -39,6 +39,7 @@ class ProjectDashboardController extends ApiController
                 $my_dashboard_class_name                          = 'fancy-btn';
                 $user_dashboard_class_name                        = 'fancy-btn2';
                 $selected_user                                    = User::where('code', $request->user)->first();
+                $user_code                                        = $request->user;
                 $labels['allUserDocuments']                       = 'Documents assigned to me';
                 $labels['allActiveUserDocuments']                 = 'Active documents assigned to me';
                 $labels['allInactiveUserDocuments']               = 'Inactive documents assigned to me';
@@ -76,6 +77,7 @@ class ProjectDashboardController extends ApiController
                 $my_dashboard_class_name                          = 'fancy-btn2';
                 $user_dashboard_class_name                        = 'fancy-btn';
                 $selected_user                                    = User::where('code', $request->user)->first();
+                $user_code                                        = $request->user;
                 $labels['allUserDocuments']                       = 'Documents assigned to ' . $selected_user->name;
                 $labels['allActiveUserDocuments']                 = 'Active documents assigned to ' . $selected_user->name;
                 $labels['allInactiveUserDocuments']               = 'Inactive documents assigned to ' . $selected_user->name;
@@ -114,6 +116,7 @@ class ProjectDashboardController extends ApiController
             $project_dashboard_class_name                     = 'fancy-btn';
             $my_dashboard_class_name                          = 'fancy-btn2';
             $user_dashboard_class_name                        = 'fancy-btn2';
+            $user_code                                        = 'non';
             $labels['allUserDocuments']                       = 'All documents';
             $labels['allActiveUserDocuments']                 = 'All active documents';
             $labels['allInactiveUserDocuments']               = 'All inactive documents';
@@ -632,7 +635,7 @@ class ProjectDashboardController extends ApiController
             'allNeedNarrativeUserDocuments', 'project', 'assigned_users',
             'allHaveConTagsUserDocuments', 'allHaveConTagsNoticeClaimUserDocuments', 'ActiveOpenClaimFilesNeed1ClaimNotice', 'ActiveOpenClaimFilesNeedFurtherNotice',
             'FileVariation1', 'FileVariation2', 'FileVariation3', 'FileVariation4', 'FileVariation5', 'FileVariation6',
-            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name', 'labels','selectedValue'));
+            'project_dashboard_class_name', 'my_dashboard_class_name', 'user_dashboard_class_name', 'labels', 'selectedValue','user_code'));
 
     }
     public function assign_users(Request $request)
