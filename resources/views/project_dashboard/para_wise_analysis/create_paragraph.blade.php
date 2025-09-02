@@ -34,7 +34,7 @@
                                         {{ $errors->first('number') }}</p>
                                 @endif
                             </div>
-                            <div class="col-md-1"  style="line-height: unset;padding-left: 0px;">
+                            <div class="col-md-1" style="line-height: unset;padding-left: 0px;">
                                 <div class="form-group "style="margin-bottom:0px;">
                                     <label></label>
                                     <div style="display: flex">
@@ -58,17 +58,17 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-5"  style="line-height: unset;">
+                            <div class="col-md-5" style="line-height: unset;">
                                 <div class="form-group"style="margin-bottom:0px;">
                                     <label for="title_above">Add Title Above</label>
                                     <textarea name="title_above" style="height: 60px;" id="title_above" class="form-control" placeholder="">{{ old('title_above') }}</textarea>
 
                                 </div>
                             </div>
-                            <div class="col-md-3"  style="line-height: unset;">
+                            <div class="col-md-3" style="line-height: unset;">
                                 <div class="form-group" style="margin-bottom:0px;">
                                     <label for="background_ref">Background Ref.</label>
-                                    
+
                                     <textarea name="background_ref" style="height: 60px;"id="background_ref" class="form-control" placeholder="">{{ old('background_ref') }}</textarea>
 
                                 </div>
@@ -205,11 +205,13 @@
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <script>
         $(document).ready(function() {
+            $('.dropdown-toggle').dropdown();
             $(".flag-toggle").on("click", function() {
                 var inputId = $(this).data("input");
                 var color = $(this).data("color");
