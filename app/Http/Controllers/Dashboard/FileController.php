@@ -2,13 +2,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Document;
 use App\Models\FileAttachment;
 use App\Models\FileDocument;
 use App\Models\GanttChartDocData;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
@@ -18,7 +18,7 @@ use PhpOffice\PhpWord\Shared\Html;
 
 class FileController extends ApiController
 {
-    public function index()
+    public function index(Request $request)
     {
         $zip_file = session('zip_file');
         if ($zip_file != null) {
@@ -28,12 +28,38 @@ class FileController extends ApiController
             }
             session()->forget('zip_file');
         }
-        $project   = Project::findOrFail(auth()->user()->current_project_id);
-        $users     = $project->assign_users;
-        $user      = auth()->user();
-        $folder    = ProjectFolder::findOrFail($user->current_folder_id);
-        $all_files = ProjectFile::where('folder_id', $folder->id)->orderBy('code', 'asc')->get();
-        $folders   = ProjectFolder::where('id', '!=', $folder->id)->where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
+        $project = Project::findOrFail(auth()->user()->current_project_id);
+        $users   = $project->assign_users;
+        $user    = auth()->user();
+        if ($request->filter == 'need_1_claim_notice') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser) {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->where(function ($query) use ($user) {
+                // No file documents at all
+                $query->whereDoesntHave('fileDocuments')
+                // Or file documents without the notice tag
+                    ->orWhereDoesntHave('fileDocuments', function ($d) use ($user) {
+                        $d->whereHas('tags', function ($t) {
+                            $t->where('is_notice', '1');
+                        })
+                            ->whereHas('document', function ($q) use ($user) {
+                                $q->where('project_id', $user->current_project_id)
+                                    ->where('assess_not_pursue', '0');
+                            });
+                    });
+            })->get();
+
+        } else {
+            $folder    = ProjectFolder::findOrFail($user->current_folder_id);
+            $all_files = ProjectFile::where('folder_id', $folder->id)->orderBy('code', 'asc')->get();
+
+        }
+        $folders = ProjectFolder::where('id', '!=', $folder->id)->where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
 
         return view('project_dashboard.project_files.index', compact('all_files', 'folders', 'folder', 'users'));
     }

@@ -1272,6 +1272,10 @@
         document.getElementById("count-pending-assignment").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser={{ $user_code }}&not_assignment=on&active_docs=1";
         });
+        document.getElementById("count-need-1-claim-notice").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=need_1_claim_notice";
+        });
+        
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
