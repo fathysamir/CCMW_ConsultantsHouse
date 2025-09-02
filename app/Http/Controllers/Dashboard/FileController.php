@@ -34,7 +34,7 @@ class FileController extends ApiController
         if ($request->filter == 'need_1_claim_notice') {
             $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
             $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
-            if ($request->authUser) {
+            if ($request->authUser != 'non') {
                 $selected_user = User::where('code', $request->authUser)->first();
                 $all_files->where('user_id', $selected_user->id);
 
