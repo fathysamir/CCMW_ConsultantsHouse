@@ -74,6 +74,122 @@ class FileController extends ApiController
                     });
             })->get();
 
+        } elseif ($request->filter == 'ActiveClaimFile') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveOpenClaimFile') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveClosedClaimFile') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '1')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveOpenClaimFileTime') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('time', '1')->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveOpenClaimFileProlongationCost') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('prolongation_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveOpenClaimFileDisruption') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('disruption_cost', '1')->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'ActiveOpenClaimFileVariation') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('variation', '1')->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->get();
+
+        } elseif ($request->filter == 'needChronology') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->whereDoesntHave('fileDocuments')->get();
+
+        } elseif ($request->filter == 'needSynopsis') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->whereDoesntHave('fileAttachment', function ($a) {
+                $a->where('section', '1');
+            })->get();
+
+        } elseif ($request->filter == 'needContractualA') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->whereDoesntHave('fileAttachment', function ($a) {
+                $a->where('section', '2');
+            })->get();
+
+        } elseif ($request->filter == 'needCauseEffectA') {
+            $folder    = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->where('potential_impact', '1')->first();
+            $all_files = ProjectFile::where('project_id', $user->current_project_id)->where('closed', '0')->where('assess_not_pursue', '0')->where('folder_id', $folder->id);
+            if ($request->authUser != 'non') {
+                $selected_user = User::where('code', $request->authUser)->first();
+                $all_files->where('user_id', $selected_user->id);
+
+            }
+            $all_files = $all_files->whereDoesntHave('fileAttachment', function ($a) {
+                $a->where('section', '3');
+            })->get();
+
         } else {
             $folder    = ProjectFolder::findOrFail($user->current_folder_id);
             $all_files = ProjectFile::where('folder_id', $folder->id)->orderBy('code', 'asc')->get();

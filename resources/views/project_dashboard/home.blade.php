@@ -629,7 +629,8 @@
                                 </div>
                             </div>
                             <div style="display: block; justify-content: center; align-items: center; margin-bottom:20px;">
-                                <div class="count-box Barbel" id="ActiveOpenClaimFilesNeedFurtherNotice"style="display: inline-block">
+                                <div class="count-box Barbel"
+                                    id="ActiveOpenClaimFilesNeedFurtherNotice"style="display: inline-block">
                                     {{ $ActiveOpenClaimFilesNeedFurtherNotice }}
                                 </div>
                             </div>
@@ -1257,7 +1258,7 @@
     </script>
     <script>
         document.getElementById("total-docs").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on";
+            window.location.href = "/project/all-documents?authUser={{ $user_code }}";
         });
         document.getElementById("active-docs").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser=on&active_docs=1";
@@ -1270,7 +1271,8 @@
                 "/project/all-documents?authUser={{ $user_code }}&analysis_complete=0&active_docs=1";
         });
         document.getElementById("count-pending-assignment").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser={{ $user_code }}&not_assignment=on&active_docs=1";
+            window.location.href =
+                "/project/all-documents?authUser={{ $user_code }}&not_assignment=on&active_docs=1";
         });
         document.getElementById("count-need-1-claim-notice").addEventListener("click", function() {
             window.location.href = "/project/files?authUser={{ $user_code }}&filter=need_1_claim_notice";
@@ -1278,7 +1280,46 @@
         document.getElementById("ActiveOpenClaimFilesNeedFurtherNotice").addEventListener("click", function() {
             window.location.href = "/project/files?authUser={{ $user_code }}&filter=need_further_notice";
         });
-        
+        document.getElementById("ActiveClaimFile").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=ActiveClaimFile";
+        });
+        document.getElementById("ActiveOpenClaimFile").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFile";
+        });
+        document.getElementById("ActiveOpenClaimFile2").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFile";
+        });
+        document.getElementById("ActiveClosedClaimFile").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=ActiveClosedClaimFile";
+        });
+        document.getElementById("ActiveOpenClaimFileTime").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFileTime";
+        });
+        document.getElementById("ActiveOpenClaimFileProlongationCost").addEventListener("click", function() {
+            window.location.href =
+                "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFileProlongationCost";
+        });
+        document.getElementById("ActiveOpenClaimFileVariation").addEventListener("click", function() {
+            window.location.href =
+                "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFileVariation";
+        });
+        document.getElementById("ActiveOpenClaimFileDisruption").addEventListener("click", function() {
+            window.location.href =
+                "/project/files?authUser={{ $user_code }}&filter=ActiveOpenClaimFileDisruption";
+        });
+
+        document.getElementById("needChronology").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=needChronology";
+        });
+        document.getElementById("needSynopsis").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=needSynopsis";
+        });
+        document.getElementById("needContractualA").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=needContractualA";
+        });
+        document.getElementById("needCauseEffectA").addEventListener("click", function() {
+            window.location.href = "/project/files?authUser={{ $user_code }}&filter=needCauseEffectA";
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
