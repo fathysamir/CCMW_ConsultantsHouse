@@ -210,7 +210,8 @@ class ParaWiseController extends ApiController
 
         // para_numbers
         if ($paragraph->para_numbers) {
-            Paragraph::whereIn('id', $paragraph->para_numbers)->where('reply', null)
+            $array = explode(",", $paragraph->para_numbers);
+            Paragraph::whereIn('id', $array)->where('reply', null)
                 ->update(['replyed' => "0", 'reply_user_id' => null]);
         }
         if ($request->para_numbers) {
