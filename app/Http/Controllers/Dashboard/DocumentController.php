@@ -450,7 +450,7 @@ Based on that and provided that we have the following list of stakeholders:';
         if ($request->doc_type) {
             $all_documents->where('doc_type_id', $request->doc_type);
         }
-        if ($request->authUser != 'non') {
+        if ($request->authUser && $request->authUser != 'non') {
             $user=User::where('code',$request->authUser)->first();
             $all_documents->where('user_id', $user->id);
         }
