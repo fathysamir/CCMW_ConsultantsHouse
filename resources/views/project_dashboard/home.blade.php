@@ -1256,7 +1256,7 @@
         document.getElementById("bar-have-tags").style.width = `${(valuesBox2.haveTags / max2) * 100}%`;
         document.getElementById("bar-have-tags-noticed").style.width = `${(valuesBox2.haveTagsNoticed / max2) * 100}%`;
     </script>
-    {{-- <script>
+    <script>
         document.getElementById("total-docs").addEventListener("click", function() {
             window.location.href = "/project/all-documents?authUser={{ $user_code }}";
         });
@@ -1320,7 +1320,7 @@
         document.getElementById("needCauseEffectA").addEventListener("click", function() {
             window.location.href = "/project/files?authUser={{ $user_code }}&filter=needCauseEffectA";
         });
-    </script> --}}
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx3 = document.getElementById('pieChart').getContext('2d');
