@@ -1261,10 +1261,10 @@
             window.location.href = "/project/all-documents?authUser={{ $user_code }}";
         });
         document.getElementById("active-docs").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&active_docs=1";
+            window.location.href = "/project/all-documents?authUser={{ $user_code }}&active_docs=1";
         });
         document.getElementById("not-pursue").addEventListener("click", function() {
-            window.location.href = "/project/all-documents?authUser=on&active_docs=0";
+            window.location.href = "/project/all-documents?authUser={{ $user_code }}&active_docs=0";
         });
         document.getElementById("count-pending-analysis").addEventListener("click", function() {
             window.location.href =
