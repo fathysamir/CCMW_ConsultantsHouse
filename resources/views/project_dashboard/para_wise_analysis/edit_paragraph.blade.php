@@ -3,7 +3,23 @@
 @section('content')
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .ql-toolbar .ql-footnote {
+            width: auto !important;
+            /* ياخد العرض المناسب للنص */
+            padding: 0 0 0 4px;
+            /* مسافة جوه الزرار */
+            font-size: 14px;
+            /* حجم الخط */
+            font-weight: bold;
+            color: #6c757d;
+            ;
+        }
 
+        .ql-toolbar .ql-footnote::before {
+            content: "Footnote";
+        }
+    </style>
 
     <div class="row align-items-center my-4"
         style="margin-top: 0px !important; justify-content: center;margin-bottom: 0px !important;">
@@ -259,6 +275,29 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="insertRefModal" tabindex="-1" role="dialog" aria-labelledby="insertRefModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Insert Reference</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-control" id="refInput">
+                        <option value="" disabled selected> -- Select Document -- </option>
+
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="insertRefBtn">Insert</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -300,10 +339,7 @@
         ];
         Quill.register(Size, true);
 
-        var toolbarOptions = [
-            // [{
-            //     'font': []
-            // }],
+        var commonToolbar = [
             [{
                 'header': [1, 2, 3, 4, 5, 6, false]
             }],
@@ -311,66 +347,46 @@
                 'size': Size.whitelist
             }],
             ['bold', 'italic', 'underline', 'strike'],
-            // ['blockquote', 'code-block'],
-            // [{
-            //         'header': 1
-            //     },
-            //     {
-            //         'header': 2
-            //     }
-            // ],
             [{
-                    'list': 'ordered'
-                },
-                {
-                    'list': 'bullet'
-                }
-            ],
-            // [{
-            //         'script': 'sub'
-            //     },
-            //     {
-            //         'script': 'super'
-            //     }
-            // ],
+                'list': 'ordered'
+            }, {
+                'list': 'bullet'
+            }],
             [{
-                    'indent': '-1'
-                },
-                {
-                    'indent': '+1'
-                }
-            ], // outdent/indent
+                'indent': '-1'
+            }, {
+                'indent': '+1'
+            }],
             [{
                 'direction': 'rtl'
-            }], // text direction
+            }],
             [{
-                    'color': []
-                },
-                {
-                    'background': []
-                }
-            ], // dropdown with defaults from theme
+                'color': []
+            }, {
+                'background': []
+            }],
             [{
                 'align': []
             }],
             ['image'],
-            ['clean'] // remove formatting button
+            ['clean']
         ];
-
+        var replyToolbar = JSON.parse(JSON.stringify(commonToolbar));
+        replyToolbar[replyToolbar.length - 2].push('footnote');
+        var icons = Quill.import('ui/icons');
+        icons['footnote'] = '';
         let editors = {};
         let activeEditor = null; // track current editor
 
-        document.querySelectorAll('.quill-editor').forEach((el) => {
-            let quill = new Quill('#' + el.id, {
+        function initQuill(editorId, toolbarOptions, handlers = {}) {
+            let el = document.getElementById(editorId);
+            if (!el) return;
+
+            let quill = new Quill('#' + editorId, {
                 modules: {
                     toolbar: {
                         container: toolbarOptions,
-                        handlers: {
-                            image: function() {
-                                activeEditor = quill; // set the clicked editor as active
-                                $('#insertImageModal').modal('show');
-                            }
-                        }
+                        handlers: handlers
                     },
                     imageResize: {
                         displayStyles: {
@@ -383,9 +399,59 @@
                 },
                 theme: 'snow'
             });
-            editors[el.id] = quill;
+
+            editors[editorId] = quill;
+            return quill;
+        }
+
+
+        initQuill('editor1', commonToolbar, {
+            image: function() {
+                activeEditor = editors['editor1'];
+                $('#insertImageModal').modal('show');
+            }
         });
 
+        // Paragraph editor (editor2)
+        initQuill('editor2', commonToolbar, {
+            image: function() {
+                activeEditor = editors['editor2'];
+                $('#insertImageModal').modal('show');
+            }
+        });
+
+        // Reply editor (editor3) مع footnote
+        initQuill('editor3', replyToolbar, {
+            image: function() {
+                activeEditor = editors['editor3'];
+                $('#insertImageModal').modal('show');
+            },
+            footnote: function() {
+                activeEditor = editors['editor3'];
+                $('#insertRefModal').modal('show');
+            }
+        });
+        $('#insertRefModal').on('show.bs.modal', function() {
+            let selectedOptions = $('#multi-select2_2 option:selected'); // كل option متعلم عليه
+            let refInput = $('#refInput');
+
+            // فضّي الـ options القديمة
+            refInput.empty();
+
+            // ضيف option default
+            refInput.append('<option value="" disabled selected> -- Select Document -- </option>');
+
+            // ضيف الجديد
+            selectedOptions.each(function() {
+                let val = $(this).val();
+                let text = $(this).text();
+
+
+                refInput.append(
+                    `<option value="${val}">${text}</option>`
+                );
+            });
+        });
         document.querySelector('.close').addEventListener('click', function() {
             $('#insertImageModal').modal('hide');
         });
@@ -447,7 +513,30 @@
             document.getElementById('uploadImageInput').value = '';
             document.getElementById('imageAltInput').value = '';
         });
+        document.getElementById('insertRefBtn').addEventListener('click', function() {
+            let refInput = document.getElementById('refInput');
+            let selectedOption = refInput.options[refInput.selectedIndex]; // الـ option المختار
 
+            if (selectedOption && activeEditor) {
+                let refId = selectedOption.value; // id
+                let refText = selectedOption.text; // النص اللي ظاهر في القائمة
+
+
+                let insertText = `[***${refText}***]`; // تقدر تضيف refSlug أو id كمان لو عايز
+
+                let range = activeEditor.getSelection();
+                if (range) {
+                    // لو المؤشر موجود جوه المحرر
+                    activeEditor.insertText(range.index, insertText, 'bold', true);
+                } else {
+                    // لو مفيش تحديد، ضيفه في آخر النص
+                    activeEditor.insertText(activeEditor.getLength() - 1, insertText, 'bold', true);
+                }
+
+                $('#insertRefModal').modal('hide');
+                refInput.value = '';
+            }
+        });
         document.querySelector('#update_paragraph').addEventListener('submit', function() {
             Object.keys(editors).forEach((editorId) => {
                 // match editor1 -> impacted_zone, editor2 -> concerned_part, etc.
