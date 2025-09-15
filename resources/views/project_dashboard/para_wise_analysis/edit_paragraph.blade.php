@@ -400,10 +400,68 @@
                 theme: 'snow'
             });
 
+            quill.root.addEventListener('paste', async function(e) {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (const item of items) {
+                    if (item.type.indexOf("image") !== -1) {
+                        e.preventDefault();
+                        const file = item.getAsFile();
+                        await uploadAndInsertImage(file, quill);
+                    }
+                }
+            });
+
+            // 🟢 سحب الصور
+            quill.root.addEventListener('drop', async function(e) {
+                e.preventDefault();
+                if (e.dataTransfer && e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith("image/")) {
+                        await uploadAndInsertImage(file, quill);
+                    }
+                }
+            });
+
             editors[editorId] = quill;
             return quill;
         }
+        async function uploadAndInsertImage(file, quill) {
+            let formData = new FormData();
+            formData.append('image', file);
 
+            let imageUrl = null;
+            try {
+                let response = await fetch('/project/upload-editor-image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                let result = await response.json();
+                if (result.success) {
+                    imageUrl = '/' + result.file.path;
+                } else {
+                    alert('Image upload failed');
+                    return;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                return;
+            }
+
+            if (imageUrl) {
+                let range = quill.getSelection();
+                if (!range) {
+                    range = {
+                        index: quill.getLength()
+                    };
+                }
+                let imgTag = `<img src="${imageUrl}" alt="">`;
+                quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
+            }
+        }
 
         initQuill('editor1', commonToolbar, {
             image: function() {
@@ -452,6 +510,8 @@
                 );
             });
         });
+
+
         document.querySelector('.close').addEventListener('click', function() {
             $('#insertImageModal').modal('hide');
         });

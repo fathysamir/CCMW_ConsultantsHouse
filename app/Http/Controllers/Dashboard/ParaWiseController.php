@@ -556,14 +556,7 @@ class ParaWiseController extends ApiController
                                             'underline'                               => false]); // Add caption in italics
                                     }
 
-                                    if ($index2 < count($paragraphsArray) - 1) {
-
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
-
-                                            $textRun->addTextBreak();
-                                        }
-
-                                    }
+                                    
                                 }
 
                             } elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
@@ -589,14 +582,7 @@ class ParaWiseController extends ApiController
                                         'alignment' => 'left',
                                     ]);
 
-                                    if ($index2 < count($paragraphsArray) - 1) {
-
-                                        if (isset($paragraphsArray[$index2 + 1]) && stripos($paragraphsArray[$index2 + 1], '<ol>') === false && stripos($paragraphsArray[$index2 + 1], '<ul>') === false) {
-
-                                            $textRun->addTextBreak();
-                                        }
-
-                                    }
+                                    
                                 }
 
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
