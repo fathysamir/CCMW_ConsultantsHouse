@@ -28,9 +28,9 @@ return new class extends Migration
             $table->longText('background')->nullable();
             $table->longText('paragraph');
             $table->longText('reply')->nullable();
-            $table->string('para_exhibits')->nullable();
-            $table->string('reply_exhibits')->nullable();
-            $table->string('para_numbers')->nullable();
+            $table->longText('para_exhibits')->nullable();
+            $table->longText('reply_exhibits')->nullable();
+            $table->longText('para_numbers')->nullable();
             $table->longText('notes')->nullable();
             $table->unsignedBigInteger('para_wise_id');
             $table->foreign('para_wise_id')->references('id')->on('para_wises')->onDelete('cascade');
