@@ -478,7 +478,7 @@
 
                                 <div class="custom-control custom-radio">
                                     <input type="radio"required id="b_p_r_s" name="style" value="b_p_r_s"
-                                        class="custom-control-input" checked>
+                                        class="custom-control-input">
                                     <label class="custom-control-label" for="b_p_r_s">Background - Paragraph - Reply style</label>
                                 </div>
                                 <div class="custom-control custom-radio">
@@ -487,7 +487,7 @@
                                     <label class="custom-control-label" for="p_r_s">Paragraph - Reply style</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio"required name="style" value="r_s" id="r_s"
+                                    <input type="radio"required name="style" checked value="r_s" id="r_s"
                                         class="custom-control-input">
                                     <label class="custom-control-label" for="r_s">Reply style</label>
                                 </div>
