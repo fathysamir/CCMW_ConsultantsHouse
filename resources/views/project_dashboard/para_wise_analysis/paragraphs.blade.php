@@ -374,7 +374,7 @@
                                         </td>
                                         <td><strong style="color:blue;"><a class="l-link"style="color:rgb(80, 78, 78);"
                                                     style="color:"
-                                                    href="{{ route('project.para-wise-analysis.edit_paragraph', $paragraph->slug) }}">{{ $paragraph->number }}</a></strong>
+                                                    href="{{ route('project.para-wise-analysis.edit_paragraph', $paragraph->slug) }}">{{ floatval($paragraph->number) }}</a></strong>
                                         </td>
 
                                         <td>{{ extractTextSnippet($paragraph->paragraph) }}</td>

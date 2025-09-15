@@ -98,7 +98,7 @@
                                 <div class="form-group "style="margin-bottom:0px;">
                                     <label for="number">Para.No. <span style="color: red">*</span></label>
                                     <input type="number" name="number" required id="number" class="form-control"
-                                        value="{{ old('number', $paragraph->number) }}" step="0.001">
+                                        value="{{ old('number', floatval($paragraph->number)) }}" step="0.001">
                                 </div>
                             </div>
                             <div class="col-md-1" style="line-height: unset;padding-left: 0px;">
