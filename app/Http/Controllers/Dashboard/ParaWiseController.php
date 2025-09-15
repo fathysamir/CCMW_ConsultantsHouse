@@ -196,7 +196,6 @@ class ParaWiseController extends ApiController
             ->where('number', '>', $paragraph->number)
             ->orderBy('number', 'asc')
             ->first();
-dd($previous,$next);
         return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('next', 'previous', 'paragraph', 'para_wise', 'docs', 'paragraphs'));
     }
 

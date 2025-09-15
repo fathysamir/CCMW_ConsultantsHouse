@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('reply_user_id')->nullable();
             $table->foreign('reply_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('slug');
-            $table->string('number');
+            $table->decimal('number',10,4);
             $table->longText('title_above')->nullable();
             $table->longText('background_ref')->nullable();
             $table->boolean('red_flag')->default(false);
