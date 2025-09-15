@@ -213,8 +213,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -242,7 +242,9 @@
 
             <a type="button" href="{{ route('project.para-wise-analysis.create_paragraph', $para_wise->slug) }}"
                 class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Create</a>
-            <a type="button" href="javascript:void(0);" class="btn mb-2 btn-outline-primary"id="btn-outline-primary">Export
+            <a type="button" href="javascript:void(0);"
+                class="btn mb-2 btn-outline-primary"data-para-wise-id="{{ $para_wise->slug }}"
+                id="export-allParaWises">Export
                 to MS Word</a>
 
         </div>
@@ -433,7 +435,143 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportParaWiseModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Settings To Export Para Wises
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        @csrf
+                        <input type="hidden" id="paraWise_ID" name="paraWise_ID">
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Heading 1 Number</label>
+                            <input type="Number" required name="Chapter" class="form-control" placeholder="Heading 1"
+                                id="Chapter" value="1" min="1"
+                                oninput="this.value = Math.max(1, this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label for="header1">Heading 1 Title</label>
+                            <input type="text" required name="header1" class="form-control" placeholder="Header 1"
+                                id="header1">
+                        </div>
+                        <div class="form-group">
+                            <label for="newDocTypeForAll">Heading 2 Number</label>
+                            <input type="Number" required name="Section" class="form-control" placeholder="Heading 2"
+                                id="Section" value="0" min="0"
+                                oninput="this.value = Math.max(0, this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label for="header2">Heading 2 Title</label>
+                            <input type="text" required name="header2" class="form-control" placeholder="Header 2"
+                                id="header2">
+                        </div>
+                        <div class=" form-group mb-0" style="display: inline-flex;width: 100%;">
+                            <label>Select Style : </label>
+                            <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
 
+                                <div class="custom-control custom-radio">
+                                    <input type="radio"required id="b_p_r_s" name="style" value="b_p_r_s"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="b_p_r_s">Background - Paragraph - Reply style</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio"required id="p_r_s" name="style" class="custom-control-input"
+                                        value="p_r_s">
+                                    <label class="custom-control-label" for="p_r_s">Paragraph - Reply style</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio"required name="style" value="r_s" id="r_s"
+                                        class="custom-control-input">
+                                    <label class="custom-control-label" for="r_s">Reply style</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label for="folder_id">Select Footnote format</label>
+                            <div>
+
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="reference_only2" name="formate_type2" value="reference"
+                                        class="custom-control-input" required checked>
+                                    <label class="custom-control-label" for="reference_only2">Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="dateAndReference2" name="formate_type2"
+                                        class="custom-control-input" value="dateAndReference"required>
+                                    <label class="custom-control-label" for="dateAndReference2">YYMMDD – Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="formate_type2" value="formate" id="formate2"
+                                        class="custom-control-input"required>
+                                    <label class="custom-control-label" for="formate2"><span
+                                            style="background-color: #4dff00"><b>Prefix </b></span> <span
+                                            style="background-color: #4dff00"><b>SN</b></span> – [From]’s [Type] Ref-
+                                        [Ref] - dated [Date]</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="extraOptions2" class="row d-none">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-11">
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Prefix2">Prefix : </label>
+                                    <input type="text" name="prefix2" id="Prefix2" class="form-control"
+                                        placeholder="Perfix" value="Exhibit 1.1." style="width: 85%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="sn2">SN - Number of digits : </label>
+                                    <input type="number" name="sn2" id="sn2" class="form-control"
+                                        placeholder="SN" value="2" style="width: 30%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Start">SN - Start : </label>
+                                    <input type="number" name="Start" id="Start" class="form-control"
+                                        placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                                <div class="row form-group mb-0">
+                                    <label for="sn2">In case of e-mails : </label>
+                                    <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
+
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option12" name="ref_part2" value="option1"
+                                                class="custom-control-input" checked>
+                                            <label class="custom-control-label" for="option12">Omit Ref part</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option22" name="ref_part2"
+                                                class="custom-control-input" value="option2">
+                                            <label class="custom-control-label" for="option22">Keep Ref part, but replace
+                                                word “Ref” with “from”</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" name="ref_part2" value="option3" id="option32"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option32">Keep as other types</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="export">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -615,7 +753,76 @@
                 }, 3000); // Hide after 3 seconds
             }
 
+            $('#export-allParaWises').on('click', function() {
+                const paraWiseID = $(this).data('para-wise-id');
+                $('#paraWise_ID').val(paraWiseID);
+                $('#exportParaWiseModal').modal('show');
+            });
+            $('input[name="formate_type2"]').on('change', function() {
+                if ($('#formate2').is(':checked')) {
+                    $('#extraOptions2').removeClass('d-none');
+                    $('#Prefix2').attr('required', true);
+                    $('#sn2').attr('required', true);
+                    $('#Start').attr('required', true);
+                    $('input[name="ref_part2"]').attr('required', true);
+                } else {
+                    $('#extraOptions2').addClass('d-none');
+
+                    // Clear all inputs inside extraOptions
+                    $('#extraOptions2').find('input[type="text"], input[type="number"]').val('');
+                    $('#extraOptions2').find('input[type="radio"]').prop('checked', false);
+
+                    // Remove required attributes
+                    $('#Prefix2').removeAttr('required');
+                    $('#sn2').removeAttr('required');
+                    $('#Start').removeAttr('required');
+                    $('input[name="ref_part2"]').removeAttr('required');
+                }
+            });
+            $('#export').on('click', function() {
+                const form = $('#exportForm');
+
+                // Optional client-side check before AJAX send
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: '/export-word-para-wise', // Replace with real route
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#exportParaWiseModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+            });
+
         });
+    </script>
+    <script>
+        function updatePrefix() {
+            const h1 = document.getElementById('Chapter').value;
+            const h2 = document.getElementById('Section').value;
+            document.getElementById('Prefix2').value = `Exhibit ${h1}.${h2}.`;
+        }
+
+        // Listen to changes on both inputs
+        document.getElementById('Chapter').addEventListener('input', updatePrefix);
+        document.getElementById('Section').addEventListener('input', updatePrefix);
+
+        // Initial run in case values are preset
+        updatePrefix();
     </script>
 
     <script src="{{ asset('dashboard/js/jquery.dataTables.min.js') }}"></script>
@@ -625,8 +832,8 @@
             autoWidth: true,
             responsive: true,
             "lengthMenu": [
-                [-1,16, 32, 64],
-                ["All",16, 32, 64]
+                [-1, 16, 32, 64],
+                ["All", 16, 32, 64]
             ],
             "columnDefs": [{
                 "targets": 0, // Target the first column (index 0)
