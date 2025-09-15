@@ -892,6 +892,9 @@ class ParaWiseController extends ApiController
             if (preg_match('/^<strong\b[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>$/is', $part, $m)) {
                 $refText  = trim($m[1]);
                 $document = Document::where('project_id', auth()->user()->current_project_id)->where('reference', $refText)->first();
+                if(!$document){
+                    dd($refText);
+                }
                 $date = date('d F Y', strtotime($document->start_date));
                 // Add the footnote right here (inline)
                 try {
