@@ -400,7 +400,7 @@
 
                                                 @foreach ($numbers as $index => $num)
                                                     <a href="#">
-                                                        {{ $num }}
+                                                        {{ floatval(\App\Models\Paragraph::where('id',$num)->first()->number) }}
                                                     </a>
                                                     @if (!$loop->last)
                                                         ,
