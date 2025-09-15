@@ -587,20 +587,20 @@
                 let range = activeEditor.getSelection();
                 if (range) {
                     // قبل النص (عادي)
-                    activeEditor.insertText(range.index, ",", 'bold', false);
+                    activeEditor.insertText(range.index, "“", 'bold', false);
 
                     // النص نفسه (Bold)
                     activeEditor.insertText(range.index + 1, insertText, 'bold', true);
 
                     // بعد النص (عادي)
-                    activeEditor.insertText(range.index + 1 + insertText.length, ",", 'bold', false);
+                    activeEditor.insertText(range.index + 1 + insertText.length, "”", 'bold', false);
 
                 } else {
                     const pos = activeEditor.getLength() - 1;
 
-                    activeEditor.insertText(pos, ",", 'bold', false);
+                    activeEditor.insertText(pos, "“", 'bold', false);
                     activeEditor.insertText(pos + 1, insertText, 'bold', true);
-                    activeEditor.insertText(pos + 1 + insertText.length, ",", 'bold', false);
+                    activeEditor.insertText(pos + 1 + insertText.length, "”", 'bold', false);
                 }
 
                 $('#insertRefModal').modal('hide');
