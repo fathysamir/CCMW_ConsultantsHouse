@@ -461,17 +461,27 @@
             if (selectedOption && activeEditor) {
                 let refId = selectedOption.value; // id
                 let refText = selectedOption.text; // النص اللي ظاهر في القائمة
-                
+
 
                 let insertText = `[***${refText}***]`; // تقدر تضيف refSlug أو id كمان لو عايز
 
                 let range = activeEditor.getSelection();
                 if (range) {
-                    // لو المؤشر موجود جوه المحرر
-                    activeEditor.insertText(range.index, insertText, 'bold', true);
+                    // قبل النص (عادي)
+                    activeEditor.insertText(range.index, ",", 'bold', false);
+
+                    // النص نفسه (Bold)
+                    activeEditor.insertText(range.index + 1, insertText, 'bold', true);
+
+                    // بعد النص (عادي)
+                    activeEditor.insertText(range.index + 1 + insertText.length, ",", 'bold', false);
+
                 } else {
-                    // لو مفيش تحديد، ضيفه في آخر النص
-                    activeEditor.insertText(activeEditor.getLength() - 1, insertText, 'bold', true);
+                    const pos = activeEditor.getLength() - 1;
+
+                    activeEditor.insertText(pos, ",", 'bold', false);
+                    activeEditor.insertText(pos + 1, insertText, 'bold', true);
+                    activeEditor.insertText(pos + 1 + insertText.length, ",", 'bold', false);
                 }
 
                 $('#insertRefModal').modal('hide');
