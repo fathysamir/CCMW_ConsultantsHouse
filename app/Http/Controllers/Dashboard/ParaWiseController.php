@@ -164,6 +164,9 @@ class ParaWiseController extends ApiController
     }
     private function hasContent($narrative)
     {
+        if (preg_match('/<img[^>]*>/i', $narrative)) {
+            return true;
+        }
         // Remove all HTML tags except text content
         $text = strip_tags($narrative);
 
@@ -179,7 +182,7 @@ class ParaWiseController extends ApiController
         $paragraph  = Paragraph::where('slug', $id)->first();
         $para_wise  = ParaWise::where('id', $paragraph->para_wise_id)->first();
         $docs       = Document::where('project_id', auth()->user()->current_project_id)->select('id', 'slug', 'reference', 'storage_file_id')->with('storageFile')->get();
-        $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->where('id', '!=', $paragraph->id)->get();
+        $paragraphs = Paragraph::where('para_wise_id', $para_wise->id)->get();
 
         session(['specific_paragraph' => $id]);
 
@@ -193,7 +196,7 @@ class ParaWiseController extends ApiController
             ->where('number', '>', $paragraph->number)
             ->orderBy('number', 'asc')
             ->first();
-
+dd($previous,$next);
         return view('project_dashboard.para_wise_analysis.edit_paragraph', compact('next', 'previous', 'paragraph', 'para_wise', 'docs', 'paragraphs'));
     }
 
@@ -556,7 +559,6 @@ class ParaWiseController extends ApiController
                                             'underline'                               => false]); // Add caption in italics
                                     }
 
-                                    
                                 }
 
                             } elseif (preg_match('/<img[^>]*src=["\'](.*?)["\'][^>]*>/i', $pTag, $matches)) {
@@ -582,7 +584,6 @@ class ParaWiseController extends ApiController
                                         'alignment' => 'left',
                                     ]);
 
-                                    
                                 }
 
                             } elseif (preg_match('/<ol>(.*?)<\/ol>/is', $pTag, $olMatches)) {
@@ -609,16 +610,16 @@ class ParaWiseController extends ApiController
                                         $item = str_replace('&', '&amp;', $item);
                                         $item = '<span style="font-size:11pt;">' . $item . '</span>';
                                         if (preg_match_all('/<strong[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>/', $item, $matches)) {
-                                           
+
                                             $this->addParagraphWithInlineFootnotes($nestedListItemRun, $item, $request, $x);
                                             $count = preg_match_all(
                                                 '/<strong[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>/',
                                                 $item,
                                                 $matches
                                             );
-                                           
+
                                             $x += $count;
-                                            
+
                                         } else {
                                             Html::addHtml($nestedListItemRun, $item, false, false);
 
@@ -807,7 +808,7 @@ class ParaWiseController extends ApiController
 
     public function addParagraphWithInlineFootnotes($container, $htmlLine, Request $request, $x, $listLevel = 2, $numberingStyle = 'multilevel', $paragraphStyle = 'listParagraphStyle')
     {
-        $y=$x;
+        $y                          = $x;
         $GetStandardStylesFootNotes = [
             'name'      => 'Calibri',
             'alignment' => 'left', // Options: left, center, right, justify
@@ -878,46 +879,46 @@ class ParaWiseController extends ApiController
             if (preg_match('/^<strong\b[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>$/is', $part, $m)) {
                 $refText  = trim($m[1]);
                 $document = Document::where('project_id', auth()->user()->current_project_id)->where('reference', $refText)->first();
-                if(!$document){
+                if (! $document) {
                     dd($refText);
                 }
                 $date = date('d F Y', strtotime($document->start_date));
                 // Add the footnote right here (inline)
                 try {
-                    $footnote         = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
-                     $hint             = '';
-                if ($request->formate_type2 == 'reference') {
-                    $hint = $document->reference . '.';
-                } elseif ($request->formate_type2 == 'dateAndReference') {
+                    $footnote = $listItemRun->addFootnote($GetParagraphStyleFootNotes);
+                    $hint     = '';
+                    if ($request->formate_type2 == 'reference') {
+                        $hint = $document->reference . '.';
+                    } elseif ($request->formate_type2 == 'dateAndReference') {
 
-                    $date2 = date('y_m_d', strtotime($document->start_date));
-                    $hint  = preg_replace('/_/', '', $date2) . ' - ' . $document->reference . '.';
-                } elseif ($request->formate_type2 == 'formate') {
-                    $sn         = $request->sn2;
-                    $prefix     = $request->prefix2;
-                    $listNumber = "$prefix" . str_pad($y, $sn, '0', STR_PAD_LEFT);
-                    $hint       = $listNumber . ': ';
-                    $from       = $document->fromStakeHolder ? $document->fromStakeHolder->narrative . "'s " : '';
-                    $type       = $document->docType->name;
-                    $hint .= $from . $type . ' ';
-                    if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->description)), 'email')) {
-                        $ref_part = $request->ref_part2;
-                        if ($ref_part == 'option1') {
-                            $hint .= ', ';
-                        } elseif ($ref_part == 'option2') {
+                        $date2 = date('y_m_d', strtotime($document->start_date));
+                        $hint  = preg_replace('/_/', '', $date2) . ' - ' . $document->reference . '.';
+                    } elseif ($request->formate_type2 == 'formate') {
+                        $sn         = $request->sn2;
+                        $prefix     = $request->prefix2;
+                        $listNumber = "$prefix" . str_pad($y, $sn, '0', STR_PAD_LEFT);
+                        $hint       = $listNumber . ': ';
+                        $from       = $document->fromStakeHolder ? $document->fromStakeHolder->narrative . "'s " : '';
+                        $type       = $document->docType->name;
+                        $hint .= $from . $type . ' ';
+                        if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $document->docType->description)), 'email')) {
+                            $ref_part = $request->ref_part2;
+                            if ($ref_part == 'option1') {
+                                $hint .= ', ';
+                            } elseif ($ref_part == 'option2') {
 
-                            $hint .= 'From: ' . $document->reference . ', ';
-                        } elseif ($ref_part == 'option3') {
+                                $hint .= 'From: ' . $document->reference . ', ';
+                            } elseif ($ref_part == 'option3') {
+                                $hint .= 'Ref: ' . $document->reference . ', ';
+                            }
+                        } else {
                             $hint .= 'Ref: ' . $document->reference . ', ';
                         }
-                    } else {
-                        $hint .= 'Ref: ' . $document->reference . ', ';
-                    }
-                    $hint .= 'dated: ' . $date . '.';
+                        $hint .= 'dated: ' . $date . '.';
 
-                }
-                $footnote->addText($hint, $GetStandardStylesFootNotes);
-                $y++;
+                    }
+                    $footnote->addText($hint, $GetStandardStylesFootNotes);
+                    $y++;
                 } catch (\Exception $e) {
                     $listItemRun->addText(" [{$refText}]");
                 }

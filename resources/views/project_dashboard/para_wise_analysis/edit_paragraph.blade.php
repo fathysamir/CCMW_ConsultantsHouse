@@ -145,7 +145,7 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="background" style="margin-bottom: 0px;">Background</label>
+                            <label for="background" style="margin-bottom: 0px;">Background / Cross Reference</label>
                             <div id="editor1" class="quill-editor" style="min-height:250px;">{!! $paragraph->background !!}
                             </div>
                             <input type="hidden" name="background" id="background">
