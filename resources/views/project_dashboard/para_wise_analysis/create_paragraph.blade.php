@@ -155,7 +155,7 @@
                             <label for="multi-select2_3">Reply to Paras Nos.</label>
                             <select class="form-control xxx" id="multi-select2_3" name="para_numbers[]"multiple>
                                 @foreach ($paragraphs as $paragraph)
-                                    <option value="{{ $paragraph->id }}">{{ $paragraph->number }}</option>
+                                    <option value="{{ $paragraph->id }}">{{ floatval($paragraph->number) }}</option>
                                 @endforeach
                             </select>
                             <p>Fill this box only if the replay is for more than one paras</p>
