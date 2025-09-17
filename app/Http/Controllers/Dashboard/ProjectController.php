@@ -1,20 +1,19 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
+use App\Exports\AbbreviationsExport;
 use App\Http\Controllers\ApiController;
 use App\Models\Account;
+use App\Models\AccountUser;
 use App\Models\Category;
 use App\Models\Project;
-use App\Models\StakeHolder;
-use App\Models\ProjectContact;
 use App\Models\ProjectAbbreviation;
+use App\Models\ProjectContact;
+use App\Models\ProjectUser;
+use App\Models\StakeHolder;
+use App\Models\User;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\ProjectUser;
-use App\Models\AccountUser;
-use App\Exports\AbbreviationsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends ApiController
@@ -28,7 +27,7 @@ class ProjectController extends ApiController
 
     public function index()
     {
-        $user = auth()->user();
+        $user    = auth()->user();
         $account = Account::findOrFail($user->current_account_id);
         if (auth()->user()->roles->first()->name == 'Super Admin') {
             // $project_count= Project::where('account_id',$user->current_account_id)->get();
@@ -44,7 +43,7 @@ class ProjectController extends ApiController
             } else {
                 $projectsId = $user->assign_projects()->pluck('projects.id')->toArray();
 
-                $categoriesId = Project::whereIn('id', $projectsId)->pluck('category_id')->toArray();
+                $categoriesId  = Project::whereIn('id', $projectsId)->pluck('category_id')->toArray();
                 $subCategories = Category::whereIn('id', $categoriesId)->get();
 
                 // Get top-level parents
@@ -74,14 +73,40 @@ class ProjectController extends ApiController
             'Lower-Tier Subcontractor',
             'Other',
         ];
-        $EPS = Category::whereNotIn('name', ['Recycle Bin', 'Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
+        $EPS   = Category::whereNotIn('name', ['Recycle Bin', 'Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
         $route = 'projects.store_project';
 
         return view('account_dashboard.projects.create', compact('roles', 'EPS', 'route'));
     }
-
+    public function upload_doc_attachments(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:512000', // 10MB max
+        ]);
+        $file                 = $request->file('file');
+        $name                 = $file->getClientOriginalName();
+        $size                 = $file->getSize();
+        $type                 = $file->getMimeType();
+        $nameWithoutExtension = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $cleanedName          = preg_replace('/[^a-zA-Z0-9]/', '-', $nameWithoutExtension);
+        $fileName             = time() . '_' . $cleanedName . '.' . pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+        $projectFolder        = 'projects/attachments';
+        $path                 = public_path($projectFolder);
+        if (! file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+        $file->move($path, $fileName);
+        $path = $projectFolder . '/' . $fileName;
+         return response()->json([
+            'success'     => true,
+            'path'        => url('/' . $path),
+            'type'     => $type,
+            'name'   => $name
+        ]);
+    }
     public function store_project(Request $request)
     {
+        
         $result = $this->projectService->createProject($request);
 
         if (! $result['success']) {
@@ -93,9 +118,9 @@ class ProjectController extends ApiController
 
     public function edit_project_view($id)
     {
-        $project = Project::where('slug', $id)->first();
+        $project       = Project::where('slug', $id)->first();
         $project->logo = getFirstMediaUrl($project, $project->logoCollection);
-        $roles = [
+        $roles         = [
             'Employer',
             'Contractor',
             'Engineer',
@@ -130,12 +155,12 @@ class ProjectController extends ApiController
     public function archiveProject(Request $request)
     {
         $archiveEPS = Category::where('account_id', auth()->user()->current_account_id)->where('name', 'Archive')->first();
-        $project = Project::findOrFail($request->project_id);
+        $project    = Project::findOrFail($request->project_id);
         if ($project->old_category_id == null) {
             $project->old_category_id = $project->category_id;
         }
         $project->category_id = $archiveEPS->id;
-        $project->status = 'Archived';
+        $project->status      = 'Archived';
         $project->save();
 
         return $this->sendResponse(null, 'success');
@@ -144,7 +169,7 @@ class ProjectController extends ApiController
 
     public function deleteProject(Request $request)
     {
-        $EPS = Category::where('account_id', auth()->user()->current_account_id)->where('name', 'Recycle Bin')->first();
+        $EPS     = Category::where('account_id', auth()->user()->current_account_id)->where('name', 'Recycle Bin')->first();
         $project = Project::findOrFail($request->project_id);
         if ($project->status == 'Deleted') {
             $project->delete();
@@ -153,7 +178,7 @@ class ProjectController extends ApiController
                 $project->old_category_id = $project->category_id;
             }
             $project->category_id = $EPS->id;
-            $project->status = 'Deleted';
+            $project->status      = 'Deleted';
             $project->save();
         }
 
@@ -163,19 +188,19 @@ class ProjectController extends ApiController
 
     public function restoreProject(Request $request)
     {
-        $project = Project::findOrFail($request->project_id);
-        $project->category_id = $project->old_category_id;
+        $project                  = Project::findOrFail($request->project_id);
+        $project->category_id     = $project->old_category_id;
         $project->old_category_id = null;
-        $project->status = 'Active';
+        $project->status          = 'Active';
         $project->save();
 
         return $this->sendResponse(null, 'success');
     }
 
-
-    public function stakeholders_view($id){
+    public function stakeholders_view($id)
+    {
         $project = Project::where('slug', $id)->first();
-        $roles = [
+        $roles   = [
             'Employer',
             'Contractor',
             'Engineer',
@@ -191,7 +216,8 @@ class ProjectController extends ApiController
 
     }
 
-    public function update_stakeholders(Request $request,Project $project){
+    public function update_stakeholders(Request $request, Project $project)
+    {
         $existingIds = [];
         // Update existing stakeholders
         if ($request->old_stakeholders && count($request->old_stakeholders) > 0) {
@@ -199,10 +225,10 @@ class ProjectController extends ApiController
                 $narrative = $stakeholder['chronology'] ?? $stakeholder['role'];
 
                 StakeHolder::where('id', $id)->update([
-                    'name' => $stakeholder['name'],
-                    'role' => $stakeholder['role'],
+                    'name'      => $stakeholder['name'],
+                    'role'      => $stakeholder['role'],
                     'narrative' => $narrative,
-                    'article' => $stakeholder['article'],
+                    'article'   => $stakeholder['article'],
                 ]);
                 $existingIds[] = $id;
             }
@@ -222,38 +248,43 @@ class ProjectController extends ApiController
 
                 StakeHolder::create([
                     'project_id' => $project->id,
-                    'name' => $stakeholder['name'],
-                    'role' => $stakeholder['role'],
-                    'narrative' => $narrative,
-                    'article' => $stakeholder['article'],
+                    'name'       => $stakeholder['name'],
+                    'role'       => $stakeholder['role'],
+                    'narrative'  => $narrative,
+                    'article'    => $stakeholder['article'],
                 ]);
             }
         }
-        return redirect('/account/project/stakeholders/'. $project->slug)->with('success', 'Project Stakeholders updated successfully.');
- 
+        return redirect('/account/project/stakeholders/' . $project->slug)->with('success', 'Project Stakeholders updated successfully.');
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////Project Abbreviations///////////////////////////////////////
 
-    public function index_abbreviations(){
-        $abbreviations=ProjectAbbreviation::where('project_id',auth()->user()->current_project_id) ->orderByRaw("LOWER(abb) ASC")->get();
+    public function index_abbreviations()
+    {
+        $abbreviations = ProjectAbbreviation::where('project_id', auth()->user()->current_project_id)->orderByRaw("LOWER(abb) ASC")->get();
         return view('project_dashboard.project.abbreviations.index', compact('abbreviations'));
     }
-    public function create_abbreviation(){
+    public function create_abbreviation()
+    {
         return view('project_dashboard.project.abbreviations.create');
     }
-    public function store_abbreviation(Request $request){
-        ProjectAbbreviation::create(['project_id'=>auth()->user()->current_project_id,'abb'=>$request->abb,'description'=>$request->description]);
+    public function store_abbreviation(Request $request)
+    {
+        ProjectAbbreviation::create(['project_id' => auth()->user()->current_project_id, 'abb' => $request->abb, 'description' => $request->description]);
         return redirect('/account/project/abbreviations')->with('success', 'New Abbreviation Saved successfully.');
     }
-    public function edit_abbreviation($id){
-        $abbreviation=ProjectAbbreviation::where('id',$id)->first();
-        return view('project_dashboard.project.abbreviations.edit',compact('abbreviation'));
+    public function edit_abbreviation($id)
+    {
+        $abbreviation = ProjectAbbreviation::where('id', $id)->first();
+        return view('project_dashboard.project.abbreviations.edit', compact('abbreviation'));
     }
-    public function update_abbreviation(Request $request,ProjectAbbreviation $abbreviation){
-        $abbreviation->abb=$request->abb;
-        $abbreviation->description=$request->description;
+    public function update_abbreviation(Request $request, ProjectAbbreviation $abbreviation)
+    {
+        $abbreviation->abb         = $request->abb;
+        $abbreviation->description = $request->description;
         $abbreviation->save();
         return redirect('/account/project/abbreviations')->with('success', 'Abbreviation Updated successfully.');
     }
@@ -264,35 +295,41 @@ class ProjectController extends ApiController
 
     }
 
-    public function export(){
+    public function export()
+    {
         return Excel::download(new AbbreviationsExport, 'abbreviations.xlsx');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////Project Contacts///////////////////////////////////////
 
-    public function index_contacts(){
-        $contacts=ProjectContact::where('project_id',auth()->user()->current_project_id)->get();
+    public function index_contacts()
+    {
+        $contacts = ProjectContact::where('project_id', auth()->user()->current_project_id)->get();
         return view('project_dashboard.project.contacts.index', compact('contacts'));
     }
-    public function create_contact(){
+    public function create_contact()
+    {
         return view('project_dashboard.project.contacts.create');
     }
-    public function store_contact(Request $request){
-        ProjectContact::create(['project_id'=>auth()->user()->current_project_id,'name'=>$request->name,'role'=>$request->role,'email'=>$request->email,'phone'=>$request->phone,'country_code'=>$request->country_code]);
+    public function store_contact(Request $request)
+    {
+        ProjectContact::create(['project_id' => auth()->user()->current_project_id, 'name' => $request->name, 'role' => $request->role, 'email' => $request->email, 'phone' => $request->phone, 'country_code' => $request->country_code]);
         return redirect('/account/project/contacts')->with('success', 'New Contact Saved successfully.');
     }
-    public function edit_contact($id){
-        $contact=ProjectContact::where('id',$id)->first();
-        return view('project_dashboard.project.contacts.edit',compact('contact'));
+    public function edit_contact($id)
+    {
+        $contact = ProjectContact::where('id', $id)->first();
+        return view('project_dashboard.project.contacts.edit', compact('contact'));
     }
-    public function update_contact(Request $request,ProjectContact $contact){
-      
-        $contact->name=$request->name;
-        $contact->email=$request->email;
-        $contact->role=$request->role;
-        $contact->phone=$request->phone;
-        $contact->country_code=$request->country_code;
+    public function update_contact(Request $request, ProjectContact $contact)
+    {
+
+        $contact->name         = $request->name;
+        $contact->email        = $request->email;
+        $contact->role         = $request->role;
+        $contact->phone        = $request->phone;
+        $contact->country_code = $request->country_code;
         $contact->save();
         return redirect('/account/project/contacts')->with('success', 'Contact Updated successfully.');
     }
@@ -305,24 +342,25 @@ class ProjectController extends ApiController
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////Users//////////////////////////////////////////////////////
-    public function index_users(){
+    public function index_users()
+    {
         $project = Project::findOrFail(auth()->user()->current_project_id);
-        $users = $project->assign_users;
-        return view('project_dashboard.project.users.index',compact('users','project'));
+        $users   = $project->assign_users;
+        return view('project_dashboard.project.users.index', compact('users', 'project'));
     }
     public function edit_user($id)
     {
-        $user = User::where('code', $id)->first();
+        $user    = User::where('code', $id)->first();
         $project = Project::findOrFail(auth()->user()->current_project_id);
 
-        return view('project_dashboard.project.users.edit', compact('user','project'));
+        return view('project_dashboard.project.users.edit', compact('user', 'project'));
 
     }
 
-     public function update_user(Request $request,User $user)
+    public function update_user(Request $request, User $user)
     {
         // dd($request->all());
-      
+
         if ($request->account_permissions) {
             AccountUser::where('user_id', $user->id)->where('account_id', auth()->user()->current_account_id)->update(['role' => $request->role, 'permissions' => json_encode($request->account_permissions)]);
         } else {
@@ -331,12 +369,12 @@ class ProjectController extends ApiController
         if ($request->projects_permissions) {
 
             ProjectUser::where('user_id', $user->id)->where('project_id', auth()->user()->current_project_id)->update(['permissions' => json_encode($request->projects_permissions)]);
-           
+
         }
 
         return redirect('/account/project/users')->with('success', 'User Permissions Updated successfully.');
     }
-     public function delete_user($id)
+    public function delete_user($id)
     {
         $user = User::where('code', $id)->first();
         ProjectUser::where('user_id', $user->id)->where('account_id', auth()->user()->current_account_id)->delete();

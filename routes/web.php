@@ -173,6 +173,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/account/project/users/edit/{id}', [ProjectController::class, 'edit_user'])->name('project.edit_user');
     Route::post('/account/project/users/update/{user}', [ProjectController::class, 'update_user'])->name('project.update_user');
     Route::get('/account/project/users/delete/{id}', [ProjectController::class, 'delete_user'])->name('project.delete_user');
+    Route::post('/account/project/upload-single-file', [ProjectController::class, 'upload_doc_attachments'])->name('upload_doc_attachments');
 
     Route::get('/switch-project/{id}', function ($id) {
         // session(['current_account_id' => $id]);

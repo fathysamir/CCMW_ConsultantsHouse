@@ -7,6 +7,57 @@
         }
     </style>
     <style>
+        .loader {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top: 5px solid transparent;
+
+            background: conic-gradient(red,
+                    orange,
+                    yellow,
+                    green,
+                    cyan,
+                    blue,
+                    violet,
+                    red);
+            animation: spin 1s linear infinite;
+            mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black 0);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <style>
         #epsTree {
             list-style-type: none;
             padding-left: 20px;
@@ -156,21 +207,74 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="PerspectiveFile">Project Perspective</label>
-                            <div class="custom-file">
-                                <input name="perspective" type="file" class="custom-file-input"
-                                    id="PerspectiveFile"accept="application/pdf" onchange="updateFileName(this)">
-                                <label class="custom-file-label" for="PerspectiveFile"id="PerspectiveFileLabel">Choose File</label>
-                            </div>
-                            <!-- Image Preview -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label for="PerspectiveFile">Project Perspective</label>
 
+                                @if ($project->perspective)
+                                    <div style="display: flex;cursor: pointer;">
+                                        <img src="{{ asset('dashboard/assets/selected_images/eye3.png') }}"
+                                            width="50"
+                                            style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf"
+                                            title="PDF" data-file-path="{{ $project->perspective }}">
+
+                                    </div>
+                                @else
+                                    <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                        <img class="d-none"
+                                            src="{{ asset('dashboard/assets/selected_images/eye3.png') }}"
+                                            width="50" title="PDF" style="margin-bottom: -10px;"id="viewPdf">
+
+                                    </div>
+                                @endif
+
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input"accept="application/pdf"
+                                    id="PerspectiveFile"name="perspective">
+                                <label class="custom-file-label" for="PerspectiveFile"id="PerspectiveFileLabel">Choose
+                                    File</label>
+                            </div>
+                            <div class="mt-2">
+                                <div class="progress d-none" id="progress1">
+                                    <div class="progress-bar" id="progress-bar1" role="progressbar" style="width: 0%">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="masterFile">Master Layout</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label for="masterFile">Master Layout</label>
+                                {{-- <span class="fe fe-24 fe-eye d-none" id="viewPdf" title="View PDF"
+                                            style="cursor: pointer;"></span> --}}
+                                @if ($project->master)
+                                    <div style="display: flex;cursor: pointer;">
+                                        <img src="{{ asset('dashboard/assets/selected_images/eye3.png') }}"
+                                            width="50"
+                                            style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf2"
+                                            title="PDF" data-file-path="{{ $project->master }}">
+
+                                    </div>
+                                @else
+                                    <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                        <img class="d-none"
+                                            src="{{ asset('dashboard/assets/selected_images/eye3.png') }}"
+                                            width="50" title="PDF" style="margin-bottom: -10px;"id="viewPdf2">
+
+                                    </div>
+                                @endif
+
+                            </div>
                             <div class="custom-file">
-                                <input name="master" type="file" class="custom-file-input"
-                                    id="masterFile"accept="application/pdf" onchange="updateFileName(this)">
-                                <label class="custom-file-label" for="masterFile"id="masterFileLabel">Choose File</label>
+                                <input type="file" class="custom-file-input"accept="application/pdf"
+                                    id="masterFile"name="master">
+                                <label class="custom-file-label" for="masterFile"id="masterFileLabel">Choose
+                                    File</label>
+                            </div>
+                            <div class="mt-2">
+                                <div class="progress d-none" id="progress2">
+                                    <div class="progress-bar" id="progress-bar2" role="progressbar" style="width: 0%">
+                                    </div>
+                                </div>
                             </div>
                             <!-- Image Preview -->
 
@@ -410,6 +514,165 @@
     </script>
     <script>
         $(document).ready(function() {
+            const viewPdfIcon = document.getElementById('viewPdf');
+
+            if (viewPdfIcon) {
+                viewPdfIcon.addEventListener('click', function() {
+                    const filePath = this.getAttribute('data-file-path');
+                    if (filePath) {
+                        window.open(filePath, '_blank'); // Open the file in a new tab
+                    }
+                });
+            }
+            const viewPdfIcon2 = document.getElementById('viewPdf2');
+
+            if (viewPdfIcon2) {
+                viewPdfIcon2.addEventListener('click', function() {
+                    const filePath2 = this.getAttribute('data-file-path');
+                    if (filePath2) {
+                        window.open(filePath2, '_blank'); // Open the file in a new tab
+                    }
+                });
+            }
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $('#PerspectiveFile').on('change', function(e) {
+                $('#PerspectiveFileLabel')
+                    .empty() // Remove any existing content
+                    .append('<div class="loader"></div>');
+                const file = e.target.files[0];
+                if (!file) return;
+                let use_ai = 0;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('use_ai', use_ai);
+
+                // Show progress bar
+                const $progress = $('#progress1');
+                const $progressBar = $progress.find('#progress-bar1');
+                $progress.removeClass('d-none');
+
+                $.ajax({
+                    url: '/account/project/upload-single-file',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    xhr: function() {
+                        const xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percentComplete = Math.round((e.loaded / e
+                                    .total) * 100);
+                                $progressBar.css('width', percentComplete + '%');
+                                $progressBar.text(percentComplete + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#PerspectiveFileLabel').empty();
+                            $('#PerspectiveFileLabel').text(response.name);
+
+                            // Show PDF viewer icon if it's a PDF
+                            if (response.type === 'application/pdf') {
+                                const $viewPdf = $('#viewPdf');
+                                $viewPdf.removeClass('d-none');
+
+                                $viewPdf.attr('data-file-path', response
+                                        .path) // Set or add the attribute
+                                    .off('click')
+                                    .on('click', function() {
+                                        window.open( $(this).attr('data-file-path'),
+                                            '_blank');
+                                    });
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                        alert('Failed to upload file');
+                    },
+                    complete: function() {
+                        // Hide progress bar
+                        setTimeout(function() {
+                            $progress.addClass('d-none');
+                            $progressBar.css('width', '0%');
+                        }, 1000);
+                    }
+                });
+            });
+            $('#masterFile').on('change', function(e) {
+                $('#masterFileLabel')
+                    .empty() // Remove any existing content
+                    .append('<div class="loader"></div>');
+                const file = e.target.files[0];
+                if (!file) return;
+                let use_ai = 0;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('use_ai', use_ai);
+
+                // Show progress bar
+                const $progress = $('#progress2');
+                const $progressBar = $progress.find('#progress-bar2');
+                $progress.removeClass('d-none');
+
+                $.ajax({
+                    url: '/account/project/upload-single-file',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    xhr: function() {
+                        const xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percentComplete = Math.round((e.loaded / e
+                                    .total) * 100);
+                                $progressBar.css('width', percentComplete + '%');
+                                $progressBar.text(percentComplete + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#masterFileLabel').empty();
+                            $('#masterFileLabel').text(response.name);
+
+                            // Show PDF viewer icon if it's a PDF
+                            if (response.type === 'application/pdf') {
+                                const $viewPdf = $('#viewPdf2');
+                                $viewPdf.removeClass('d-none');
+                                $viewPdf.attr('data-file-path', response
+                                        .path) // Set or add the attribute
+                                    .off('click')
+                                    .on('click', function() {
+                                        window.open( $(this).attr('data-file-path'),
+                                            '_blank');
+                                    });
+                            }
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                        alert('Failed to upload file');
+                    },
+                    complete: function() {
+                        // Hide progress bar
+                        setTimeout(function() {
+                            $progress.addClass('d-none');
+                            $progressBar.css('width', '0%');
+                        }, 1000);
+                    }
+                });
+            });
+            //////////////////////////////////////////////
             let stakeholderCounter = $(".stakeholder-row").length;;
             let milestoneCounter = $(".milestone-row").length;;
             $("#addStakeholder").click(function() {

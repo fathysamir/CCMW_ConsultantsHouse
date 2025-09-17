@@ -45,6 +45,19 @@ class Project extends Model
 
     protected $hidden = ['deleted_at'];
 
+     public function getLogoAttribute()
+    {
+        return getFirstMediaUrl($this, $this->logoCollection, true);
+    }
+    public function getPerspectiveAttribute()
+    {
+        return getFirstMediaUrl($this, $this->perspectiveCollection, true);
+    }
+    public function getMasterAttribute()
+    {
+        return getFirstMediaUrl($this, $this->masterCollection, true);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id', 'id')->withTrashed();
