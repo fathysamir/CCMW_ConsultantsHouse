@@ -798,7 +798,6 @@ class ExtractPowerPointController extends ApiController
 
                                 array_unshift($collection, $shapeXX);
                             }
-                            }
                             if ($cur_right_caption != '') {
 
                                 $unit_pixel_cur_right_caption = 2 + $this->calc_pixels($cur_right_caption, intval($request->cur_font_size));
@@ -833,7 +832,7 @@ class ExtractPowerPointController extends ApiController
                                 $collection = array_values($collection);
 
                                 array_unshift($collection, $shapeXXX);
-                            }
+                            
                             }
                         }
 
