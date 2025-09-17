@@ -211,9 +211,9 @@
                                 @foreach ($paragraphs as $para)
                                     <option value="{{ $para->id }}"
                                         {{ in_array($para->id, array_map('intval', explode(',', $paragraph->para_numbers))) ? 'selected' : '' }}>
-                                        {{ $para->number }}
+                                        {{ floatval($para->number) }}
                                     </option>
-
+                                    
                                 @endforeach
                             </select>
                             <p>Fill this box only if the reply is for more than one paras</p>
