@@ -656,8 +656,8 @@ class ExtractPowerPointController extends ApiController
 
                             if ($cur_left_caption != '') {
                                 $unit_pixel_cur_left_caption = 2 + $this->calc_pixels($cur_left_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_left_caption > (($startX - 1) - $currentX)) {
-                                    $unit_pixel_cur_left_caption = ($startX - 1) - $currentX;
+                                if ($unit_pixel_cur_left_caption > (($startX - 6) - $currentX)) {
+                                    $unit_pixel_cur_left_caption = ($startX - 6) - $currentX;
                                     $space_y_cur_left_caption    = -2;
                                 } else {
                                     $space_y_cur_left_caption = 5;
@@ -666,7 +666,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption + 3)
-                                    ->setOffsetX(round($startXX, 2) - 4)
+                                    ->setOffsetX(round($startXX, 2) - 8)
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -686,19 +686,20 @@ class ExtractPowerPointController extends ApiController
                                 $collection = array_values($collection);
 
                                 array_unshift($collection, $shapeXX);
+                                $slide->setShapeCollection($collection);
 
                             }
                             if ($cur_right_caption != '') {
 
                                 $unit_pixel_cur_right_caption = 2 + $this->calc_pixels($cur_right_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2)) {
+                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 6)) {
 
-                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 2;
+                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[count($sections) - 1]['fd'], $endTimeScale . '-30')) - 6;
                                     $space_y_cur_right_caption    = -2;
                                 } else {
                                     $space_y_cur_right_caption = 5;
                                 }
-                                $startXXX = $startX + $wid + 2;
+                                $startXXX = $startX + $wid + 6;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_right_caption + 3)
@@ -768,8 +769,8 @@ class ExtractPowerPointController extends ApiController
                             $slide->addShape($dd);
                             if ($cur_left_caption != '') {
                                 $unit_pixel_cur_left_caption = 2 + $this->calc_pixels($cur_left_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_left_caption > (($startXy - 1) - $currentX)) {
-                                    $unit_pixel_cur_left_caption = ($startXy - 1) - $currentX;
+                                if ($unit_pixel_cur_left_caption > (($startXy - 5) - $currentX)) {
+                                    $unit_pixel_cur_left_caption = ($startXy - 5) - $currentX;
                                     $space_y_cur_left_caption    = -2;
                                 } else {
                                     $space_y_cur_left_caption = 5;
@@ -778,7 +779,7 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_left_caption + 3)
-                                    ->setOffsetX(round($startXX, 2) - 4)
+                                    ->setOffsetX(round($startXX, 2) - 8)
                                     ->setOffsetY($currentY + $space_y_cur_left_caption);
                                 $shapeXX->setInsetRight(0.0);
                                 $shapeXX->setInsetLeft(0.0);
@@ -798,18 +799,20 @@ class ExtractPowerPointController extends ApiController
                                 $collection = array_values($collection);
 
                                 array_unshift($collection, $shapeXX);
+                                $slide->setShapeCollection($collection);
+
                             }
                             if ($cur_right_caption != '') {
 
                                 $unit_pixel_cur_right_caption = 2 + $this->calc_pixels($cur_right_caption, intval($request->cur_font_size));
-                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10)) {
+                                if ($unit_pixel_cur_right_caption > (($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 14)) {
 
-                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 10;
+                                    $unit_pixel_cur_right_caption = ($day_width * $this->calc_days($sections[0]['sd'], $endTimeScale . '-30')) - 14;
                                     $space_y_cur_right_caption    = -2;
                                 } else {
                                     $space_y_cur_right_caption = 5;
                                 }
-                                $startXXX = $startXy + 19;
+                                $startXXX = $startXy + 23;
                                 $shapeXXX = $slide->createRichTextShape()
                                     ->setHeight(17)
                                     ->setWidth($unit_pixel_cur_right_caption + 3)
@@ -833,6 +836,7 @@ class ExtractPowerPointController extends ApiController
                                 $collection = array_values($collection);
 
                                 array_unshift($collection, $shapeXXX);
+                                $slide->setShapeCollection($collection);
 
                             }
                         }
@@ -889,6 +893,17 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
                                 $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                                 $shapeXX->createTextRun($pl_left_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                                $collection = $slide->getShapeCollection();
+                                $index      = array_search($shapeXX, $collection, true);
+
+                                if ($index !== false) {
+                                    unset($collection[$index]); // remove
+                                }
+
+                                $collection = array_values($collection);
+
+                                array_unshift($collection, $shapeXX);
+                                $slide->setShapeCollection($collection);
                             }
                             if ($pl_right_caption != '') {
 
@@ -911,6 +926,17 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
                                 $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                                 $shapeXXX->createTextRun($pl_right_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                                $collection = $slide->getShapeCollection();
+                                $index      = array_search($shapeXXX, $collection, true);
+
+                                if ($index !== false) {
+                                    unset($collection[$index]); // remove
+                                }
+
+                                $collection = array_values($collection);
+
+                                array_unshift($collection, $shapeXXX);
+                                $slide->setShapeCollection($collection);
                             }
                         }
 
@@ -957,6 +983,17 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
                                 $shapeXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                                 $shapeXX->createTextRun($pl_left_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                                $collection = $slide->getShapeCollection();
+                                $index      = array_search($shapeXX, $collection, true);
+
+                                if ($index !== false) {
+                                    unset($collection[$index]); // remove
+                                }
+
+                                $collection = array_values($collection);
+
+                                array_unshift($collection, $shapeXX);
+                                $slide->setShapeCollection($collection);
                             }
                             if ($pl_right_caption != '') {
 
@@ -979,6 +1016,17 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXXX->getBorder()->setLineWidth(0)->setColor(new Color(Color::COLOR_WHITE));
                                 $shapeXXX->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                                 $shapeXXX->createTextRun($pl_right_caption)->getFont()->setSize(intval($request->pl_font_size))->setBold(false)->setName($request->font_type);
+                                $collection = $slide->getShapeCollection();
+                                $index      = array_search($shapeXXX, $collection, true);
+
+                                if ($index !== false) {
+                                    unset($collection[$index]); // remove
+                                }
+
+                                $collection = array_values($collection);
+
+                                array_unshift($collection, $shapeXXX);
+                                $slide->setShapeCollection($collection);
                             }
                         }
                     }
