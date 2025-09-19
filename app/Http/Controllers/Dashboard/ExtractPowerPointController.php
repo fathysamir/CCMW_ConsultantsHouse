@@ -714,13 +714,13 @@ class ExtractPowerPointController extends ApiController
                                 $shapeXXX->createTextRun($cur_right_caption)->getFont()->setSize(intval($request->cur_font_size))->setBold(false)->setName($request->font_type);
                                 $collection = $slide->getShapeCollection();
                                 $index      = array_search($shapeXXX, $collection, true);
-dd($index);
+
                                 if ($index !== false) {
                                     unset($collection[$index]); // remove
                                 }
 
                                 $collection = array_values($collection);
-
+dd($collection);
                                 array_unshift($collection, $shapeXXX);
                             }
 
