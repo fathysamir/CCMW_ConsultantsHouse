@@ -1,4 +1,4 @@
-@extends('account_dashboard.layout.app')
+@extends('project_dashboard.layout.app')
 @section('title', 'Update Project')
 @section('content')
     <style>
@@ -469,7 +469,7 @@
                         <button type="submit" class="btn mb-2 btn-outline-primary"
                             onclick="document.getElementById('formAction').value='save'">Save</button>
                         <button type="button" class="btn mb-2 btn-outline-secondary"
-                            onclick="window.location.href='/account/projects'">Close</button>
+                            onclick="window.location.href='/project'">Close</button>
                     </form>
                 </div> <!-- /.col -->
 

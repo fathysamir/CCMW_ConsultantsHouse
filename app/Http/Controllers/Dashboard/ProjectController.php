@@ -97,16 +97,16 @@ class ProjectController extends ApiController
         }
         $file->move($path, $fileName);
         $path = $projectFolder . '/' . $fileName;
-         return response()->json([
-            'success'     => true,
-            'path'        => url('/' . $path),
-            'type'     => $type,
-            'name'   => $name
+        return response()->json([
+            'success' => true,
+            'path'    => url('/' . $path),
+            'type'    => $type,
+            'name'    => $name,
         ]);
     }
     public function store_project(Request $request)
     {
-        
+
         $result = $this->projectService->createProject($request);
 
         if (! $result['success']) {
@@ -133,8 +133,11 @@ class ProjectController extends ApiController
             'Other',
         ];
         $EPS = Category::whereNotIn('name', ['Recycle Bin', 'Archive'])->where('account_id', auth()->user()->current_account_id)->where('parent_id', null)->orderBy('eps_order')->with('allChildren')->get();
-
-        return view('account_dashboard.projects.edit', compact('roles', 'project', 'EPS'));
+        if (auth()->user()->current_project_id) {
+            return view('project_dashboard.project.project_card', compact('roles', 'project', 'EPS'));
+        } else {
+            return view('account_dashboard.projects.edit', compact('roles', 'project', 'EPS'));
+        }
 
     }
 
@@ -145,10 +148,14 @@ class ProjectController extends ApiController
         if (! $result['success']) {
             return redirect()->back()->withInput()->withErrors($result['errors']);
         }
-        if (auth()->user()->current_project_id) {
-            return redirect('/project')->with('success', 'Project updated successfully.');
+        if ($request->action == 'save') {
+            return redirect('/account/edit-project/' . $project->slug)->with('success', 'Project updated successfully.');
         } else {
-            return redirect('/account/projects')->with('success', 'Project updated successfully.');
+            if (auth()->user()->current_project_id) {
+                return redirect('/project?user='.auth()->user()->code)->with('success', 'Project updated successfully.');
+            } else {
+                return redirect('/account/projects')->with('success', 'Project updated successfully.');
+            }
         }
     }
 
