@@ -721,8 +721,7 @@ class ExtractPowerPointController extends ApiController
                                 $collection = array_values($collection);
 
                                 array_unshift($collection, $shapeXXX);
-                                $index = array_search($shapeXXX, $collection, true);
-                                dd($index);
+                                $slide->setShapeCollection($collection);
 
                             }
 
