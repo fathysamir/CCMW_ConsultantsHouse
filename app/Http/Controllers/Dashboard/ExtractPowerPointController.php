@@ -720,8 +720,9 @@ class ExtractPowerPointController extends ApiController
                                 }
 
                                 $collection = array_values($collection);
-dd($collection);
+
                                 array_unshift($collection, $shapeXXX);
+                                dd($collection);
                             }
 
                         }
