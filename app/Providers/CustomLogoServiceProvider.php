@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\AccountUser;
 use App\Models\ProjectFolder;
 use App\Models\ProjectUser;
+use App\Models\ContractTag;
 use App\Models\DocType;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -74,12 +75,33 @@ class CustomLogoServiceProvider extends ServiceProvider
             if (! $user) {
                 return;
             }
+            $contract_tags = ContractTag::where('account_id', $user->current_account_id)
+                ->where('project_id', $user->current_project_id)->orderBy('order')
+                ->get();
+
+            $view->with('contract_tags', $contract_tags);
+        });
+        view()->composer('*', function ($view) {
+            $currentRoute = Route::currentRouteName();
+
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
+            }
+
+            $user = auth()->user();
+
+            // Avoid running for guest users
+            if (! $user) {
+                return;
+            }
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)
                 ->where('project_id', $user->current_project_id)->orderBy('order')
                 ->get();
 
             $view->with('Folders', $Folders);
         });
+
 
         view()->composer('*', function ($view) {
             $currentRoute = Route::currentRouteName();

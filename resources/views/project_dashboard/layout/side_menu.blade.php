@@ -168,12 +168,20 @@
                 </li>
             @endif
 
-            <li class="nav-item">
-
-                <a class="nav-link pl-3 link_kkkkk" href="#"style="padding-left: 0.5rem !important;"><img
-                        src="{{ asset('/dashboard/assets/selected_images/reports.png') }}" width="22"><span
-                        class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
-                        Reports</span></a>
+           
+            <li class="nav-item dropdown">
+                <a href="#REPORTS" data-toggle="collapse" aria-expanded="false"
+                    class="dropdown-toggle nav-link link_kkkkk">
+                    <img src="{{ asset('/dashboard/assets/selected_images/reports.png') }}" width="22">
+                    <span class="ml-3 item-text" style="color:whitesmoke;">Reports</span>
+                </a>
+                <ul class="collapse list-unstyled pl-4 w-100" id="REPORTS">
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 link_kkkkk"href="#"
+                                id="report1Link"><span
+                                    class="ml-1 item-text"style="color: #e4d125;">Contractual report</span></a>
+                        </li>
+                </ul>
             </li>
             <li class="nav-item">
 
@@ -182,9 +190,10 @@
                         class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
                         Window Analysis</span></a>
             </li>
-             <li class="nav-item">
+            <li class="nav-item">
 
-                <a class="nav-link pl-3 link_kkkkk" href="{{ route('project.para-wise-analysis') }}"style="padding-left: 0.5rem !important;"><img
+                <a class="nav-link pl-3 link_kkkkk"
+                    href="{{ route('project.para-wise-analysis') }}"style="padding-left: 0.5rem !important;"><img
                         src="{{ asset('/dashboard/assets/selected_images/parawise.ico') }}" width="22"><span
                         class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
                         Para-wise Analysis</span></a>

@@ -288,7 +288,7 @@ Based on that and provided that we have the following list of stakeholders:';
             curl_close($ch);
 
             $data = json_decode($response, true);
-
+dd($data);
             // Get the response content
             $answer = $data['content'] ?? 'No answer found';
 

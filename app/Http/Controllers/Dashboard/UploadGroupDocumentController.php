@@ -229,7 +229,7 @@ class UploadGroupDocumentController extends ApiController
                 curl_close($ch);
 
                 $data = json_decode($response, true);
-
+                
                 // Get the response content
                 $answer = $data['content'] ?? 'No answer found';
                 if ($code != null) {

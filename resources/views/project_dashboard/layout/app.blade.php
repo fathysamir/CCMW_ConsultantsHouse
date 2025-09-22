@@ -214,6 +214,82 @@
                 <div class="row justify-content-center">
                     <div class="col-12">
                         @yield('content')
+                        <div class="modal fade" id="report1Modal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Contractual report</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="report1Form">
+                                            @csrf
+                                            <div class="form-group">
+                                                <label for="cont_tag">Contractual Tags</label>
+                                                <select class="form-control"id="cont_tag" name="cont_tag">
+                                                    @foreach ($contract_tags as $tag)
+                                                        <option value="{{ $tag->id }}">{{ $tag->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                            </div>
+                                            @php
+                                                $project = \App\Models\Project::findOrFail(
+                                                    auth()->user()->current_project_id,
+                                                );
+                                                $stake_holders = $project->stakeHolders;
+                                            @endphp
+                                            <div class="form-group">
+                                                <label for="sender">Sender</label>
+
+                                                <select class="form-control"id="sender" name="sender">
+                                                    @foreach ($stake_holders as $stake_holder)
+                                                        <option value="{{ $stake_holder->id }}">
+                                                            {{ $stake_holder->narrative }} -
+                                                            {{ $stake_holder->role }}</option>
+                                                    @endforeach
+
+                                                </select>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="receiver">Receiver</label>
+                                                <select class="form-control"id="receiver" name="receiver">
+                                                    @foreach ($stake_holders as $stake_holder)
+                                                        <option value="{{ $stake_holder->id }}">
+                                                            {{ $stake_holder->narrative }} -
+                                                            {{ $stake_holder->role }}</option>
+                                                    @endforeach
+
+                                                </select>
+
+                                            </div>
+                                            <div class="custom-control custom-radio">
+                                                <input type="radio" id="option1" name="show_data" value="option1"
+                                                    class="custom-control-input" checked>
+                                                <label class="custom-control-label" for="option1">Show in New
+                                                    Window</label>
+                                            </div>
+                                            <div class="custom-control custom-radio">
+                                                <input type="radio" id="option2" name="show_data"
+                                                    class="custom-control-input" value="option2">
+                                                <label class="custom-control-label" for="option2">Export to
+                                                    Excel</label>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" id="report1">Show</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="userProfileInfoModal" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -245,8 +321,8 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Name</label>
-                                                <input class="form-control" id="name" type="text" name="name"
-                                                    required value="{{ auth()->user()->name }}">
+                                                <input class="form-control" id="name" type="text"
+                                                    name="name" required value="{{ auth()->user()->name }}">
                                                 <span class="text-danger error-text name_error"></span>
                                             </div>
                                             <div class="form-group">
@@ -929,7 +1005,7 @@
                 container.append(link);
             });
         });
-         $('.xxxxx').select2({
+        $('.xxxxx').select2({
             multiple: true,
             theme: 'bootstrap4',
             tags: false
@@ -1371,6 +1447,9 @@
 
     <script>
         $(document).ready(function() {
+
+
+
             let bootstrapScriptId = "bootstrap-5-bundle";
             $('#UpdateUserProfileInfoLink').on('click', function() {
 
@@ -1430,6 +1509,44 @@
                     script.remove();
                 }
             });
+
+            $('#report1Link').on('click', function() {
+                if (!document.getElementById(bootstrapScriptId)) {
+                    let script = document.createElement("script");
+                    script.src =
+                        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js";
+                    script.id = bootstrapScriptId;
+                    document.body.appendChild(script);
+
+                    script.onload = function() {
+                        $('#report1Modal').modal('show'); // show after Bootstrap loaded
+                    };
+                } else {
+                    $('#report1Modal').modal('show');
+                }
+
+            });
+            $('#report1').on('click', function() {
+                let form = $('#report1Form');
+                let data = form.serialize(); // serialize all inputs
+
+                let showOption = $('input[name="show_data"]:checked').val();
+
+                if (showOption === 'option1') {
+                    let url = "{{ route('project.all_documents.index') }}?" + data;
+                    window.open(url, '_blank');
+                } else if (showOption === 'option2') {
+                    let url = "{{ route('project.all_documents.index') }}?" + data + "&export=excel";
+                    window.open(url, '_blank');// triggers download
+                }
+            });
+            $('#report1Modal').on('hidden.bs.modal', function() {
+                let script = document.getElementById(bootstrapScriptId);
+                if (script) {
+                    script.remove();
+                }
+            });
+
             $('#changePasswordModal').on('hidden.bs.modal', function() {
                 let script = document.getElementById(bootstrapScriptId);
                 if (script) {
