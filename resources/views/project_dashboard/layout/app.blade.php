@@ -1536,8 +1536,28 @@
                     let url = "{{ route('project.all_documents.index') }}?" + data;
                     window.open(url, '_blank');
                 } else if (showOption === 'option2') {
-                    let url = "{{ route('project.all_documents.index') }}?" + data + "&export=excel";
-                    window.open(url, '_blank');// triggers download
+                    $.ajax({
+                        url: "{{ route('project.all_documents.index') }}",
+                        type: "GET",
+                        data: data + "&export=excel",
+                        success: function(response) {
+                            
+                                // open the file in new tab
+                                
+                                window.open(response.download_url, '_blank');
+
+                                // OR download directly:
+                                // window.location.href = response.url;
+
+                                // OR show the link in modal:
+                                // $('#excelLink').attr('href', response.url).show();
+                           
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert("Failed to export Excel.");
+                        }
+                    });
                 }
             });
             $('#report1Modal').on('hidden.bs.modal', function() {

@@ -77,4 +77,8 @@ class Document extends Model
     {
         return $this->hasOne(DocumentAnalysis::class);
     }
+     public function fileDocuments()
+    {
+        return $this->hasMany(FileDocument::class, 'document_id');
+    }
 }

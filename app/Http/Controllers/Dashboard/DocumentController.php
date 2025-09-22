@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dashboard;
 
+use App\Exports\DocumentsExport;
 use App\Http\Controllers\ApiController;
 use App\Models\DocType;
 use App\Models\Document;
@@ -15,6 +16,7 @@ use App\Models\StorageFile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
 use setasign\Fpdi\Fpdi;
 
 class DocumentController extends ApiController
@@ -321,7 +323,7 @@ Based on that and provided that we have the following list of stakeholders:';
                 } else {
                     $type_id = '';
                 }
-                if ($documents_type->from) {
+                if ($documents_type && $documents_type->from) {
                     $sender_id = $documents_type->from;
                 } else {
                     if (array_key_exists('Document_sender', $result) && $result['Document_sender'] != 'No Match') {
@@ -340,7 +342,7 @@ Based on that and provided that we have the following list of stakeholders:';
                         $sender_id = '';
                     }
                 }
-                if ($documents_type->to) {
+                if ($documents_type && $documents_type->to) {
                     $receiver_id = $documents_type->to;
                 } else {
                     if (array_key_exists('Document_receiver', $result) && $result['Document_receiver'] != 'No Match') {
@@ -451,7 +453,7 @@ Based on that and provided that we have the following list of stakeholders:';
             $all_documents->where('doc_type_id', $request->doc_type);
         }
         if ($request->authUser && $request->authUser != 'non') {
-            $user=User::where('code',$request->authUser)->first();
+            $user = User::where('code', $request->authUser)->first();
             $all_documents->where('user_id', $user->id);
         }
 
@@ -467,7 +469,45 @@ Based on that and provided that we have the following list of stakeholders:';
         if ($request->active_docs == '0') {
             $all_documents->where('assess_not_pursue', '1');
         }
+
+        if ($request->sender) {
+            $all_documents->where('from_id', $request->sender);
+        }
+        if ($request->receiver) {
+            $all_documents->where('to_id', $request->receiver);
+        }
+        if ($request->cont_tag) {
+            $all_documents->whereHas('fileDocuments', function ($q) use ($request) {
+                $q->whereHas('tags', function ($t) use ($request) {
+                    $t->where('contract_tag_id', $request->cont_tag);
+                });
+            });
+        }
         $all_documents = $all_documents->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
+        if ($request->show_data === 'option2') {
+            $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+            $path          = public_path($projectFolder);
+            if (! file_exists($path)) {
+
+                mkdir($path, 0755, true);
+            }
+            $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            // Save document
+            // Define file path in public folder
+            $fileName     = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . 'documents_' . time() . '.xlsx';
+            $filePath     = public_path($fileName);
+            $excelContent = Excel::raw(new DocumentsExport($all_documents), \Maatwebsite\Excel\Excel::XLSX);
+
+            file_put_contents($filePath, $excelContent);
+            session(['zip_file' => $code]);
+            return response()->json(['download_url' => asset($fileName)]);
+            // return Excel::download(new DocumentsExport($all_documents), 'documents.xlsx');
+        }
         // dd($all_documents);
         $stake_holders = $project->stakeHolders;
         $folders       = ProjectFolder::where('project_id', auth()->user()->current_project_id)->whereNotIn('name', ['Archive', 'Recycle Bin'])->pluck('name', 'id');
