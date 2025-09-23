@@ -362,5 +362,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/para-wise-analysis/paragraphs/{id}/edit', [ParaWiseController::class, 'edit_paragraph'])->name('project.para-wise-analysis.edit_paragraph');
     Route::post('/project/para-wise-analysis/paragraph/{id}/update', [ParaWiseController::class, 'update_paragraph'])->name('project.para-wise-analysis.update_paragraph');
     Route::post('/export-word-para-wise', [ParaWiseController::class, 'exportWordParaWise']);
+    Route::post('/download-para-wise-paragraphs', [ParaWiseController::class, 'download_paragraphs'])->name('download.para-wise-paragraphs');
 
 });

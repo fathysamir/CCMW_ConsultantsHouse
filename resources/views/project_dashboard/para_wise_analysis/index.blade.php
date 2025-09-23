@@ -198,8 +198,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -302,6 +302,9 @@
                                                     data-url="{{ route('project.para-wise-analysis.update', $para_wise->slug) }}">
                                                     Edit
                                                 </a>
+                                                <a class="dropdown-item download_Exhibits" href="javascript:void(0);"
+                                                    data-para-wise-id="{{ $para_wise->slug }}">Download
+                                                    Exhibits</a>
                                                 <a class="dropdown-item text-danger"
                                                     href="javascript:void(0);"onclick="confirmDelete('{{ route('project.para-wise-analysis.delete', $para_wise->slug) }}')">Delete</a>
                                             </div>
@@ -362,6 +365,100 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="downloadParagraphsModal" tabindex="-1" role="dialog"
+        aria-labelledby="downloadParagraphsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="downloadParagraphsModalLabel">How do you want to name the documents
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="downloadParagraphsForm">
+                        @csrf
+                        <input type="hidden" id="para_wise_slug" name="para_wise_slug">
+
+                        <div class="form-group">
+                            <label for="folder_id">Select document naming format</label>
+                            <div>
+
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="reference_only" name="formate_type" value="reference"
+                                        class="custom-control-input" required checked>
+                                    <label class="custom-control-label" for="reference_only">Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="dateAndReference" name="formate_type"
+                                        class="custom-control-input" value="dateAndReference"required>
+                                    <label class="custom-control-label" for="dateAndReference">YYMMDD – Reference</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="formate_type" value="formate" id="formate"
+                                        class="custom-control-input"required>
+                                    <label class="custom-control-label" for="formate"><span
+                                            style="background-color: #4dff00"><b>Prefix SN</b></span> – [From]’s [Type]
+                                        Ref-
+                                        [Ref] - dated [Date]</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="extraOptions" class="row d-none">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-11">
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Prefix">Prefix : </label>
+                                    <input type="text" name="prefix" id="Prefix" class="form-control"
+                                        placeholder="Perfix" value="" style="width: 85%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="sn">Number Of Digits : </label>
+                                    <input type="number" name="sn" id="sn" class="form-control"
+                                        placeholder="SN" value="" style="width: 30%;margin-left:2%;">
+                                </div>
+                                <div class="row form-group mb-3">
+                                    <label class="mt-1" for="Start">SN - Start : </label>
+                                    <input type="number" name="Start" id="Start" class="form-control"
+                                        placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                                <div class="row form-group mb-0">
+                                    <label for="sn">In case of e-mails : </label>
+                                    <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
+
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option1" name="ref_part" value="option1"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option1">Omit Ref part</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="option2" name="ref_part"
+                                                class="custom-control-input" value="option2">
+                                            <label class="custom-control-label" for="option2">Keep Ref part, but replace
+                                                word “Ref” with “from”</label>
+                                        </div>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" name="ref_part" value="option3" id="option3"
+                                                class="custom-control-input">
+                                            <label class="custom-control-label" for="option3">Keep as other types</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="downloadParagraphs">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -402,6 +499,62 @@
                 const checkedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
 
             });
+
+            $('.download_Exhibits').on('click', function() {
+                const paraWiseId = $(this).data('para-wise-id');
+                $('#para_wise_slug').val(paraWiseId);
+                $('#downloadParagraphsModal').modal('show');
+            });
+            $('input[name="formate_type"]').on('change', function() {
+                if ($('#formate').is(':checked')) {
+                    $('#extraOptions').removeClass('d-none');
+                    $('#Prefix').attr('required', true);
+                    $('#sn').attr('required', true);
+                    $('#Start').attr('required', true);
+                    $('input[name="ref_part"]').attr('required', true);
+                } else {
+                    $('#extraOptions').addClass('d-none');
+
+                    // Clear all inputs inside extraOptions
+                    $('#extraOptions').find('input').val('');
+                    $('#extraOptions').find('input[type="radio"]').prop('checked', false);
+
+                    // Remove required attributes
+                    $('#Prefix').removeAttr('required');
+                    $('#sn').removeAttr('required');
+                    $('#Start').removeAttr('required');
+                    $('input[name="ref_part"]').removeAttr('required');
+                }
+            });
+            $('#downloadParagraphs').on('click', function() {
+                const form = $('#downloadParagraphsForm');
+
+                // Optional client-side check before AJAX send
+                if (!form[0].checkValidity()) {
+                    form[0].reportValidity();
+                    return;
+                }
+
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: '/download-para-wise-paragraphs', // Replace with real route
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        $('#downloadParagraphsModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+            });
+
 
         });
     </script>

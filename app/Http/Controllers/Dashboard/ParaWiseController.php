@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Shared\Html;
+use ZipArchive;
 
 class ParaWiseController extends ApiController
 {
@@ -938,6 +939,119 @@ class ParaWiseController extends ApiController
                 error_log('Html::addHtml failed for fragment: ' . substr($part, 0, 200) . ' Error: ' . $e->getMessage());
             }
         }
+    }
+
+    public function download_paragraphs(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        $paraWise = ParaWise::where('slug', $request->para_wise_slug)->first();
+
+        $paragraphs = Paragraph::where('para_wise_id', $paraWise->id)->where('reply', '!=', null)->orderBy('number', 'asc')->get();
+
+        if (count($paragraphs) > 0) {
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp');
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $zip = new ZipArchive;
+
+            $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+            $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+            if (! file_exists($directory)) {
+                mkdir($directory, 0755, true); // true = create nested directories
+            }
+            $zipFileName = $paraWise->slug . '-' . $paraWise->title . '.zip';
+            $zipFilePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/') . $zipFileName;
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== true) {
+
+                return redirect()->back()->with('error', 'Could not create ZIP file');
+            }
+            $counter   = intval($request->Start);
+            $ref_array = [];
+            foreach ($paragraphs as $paragraph) {
+                preg_match_all('/\[?\*\*\*(.*?)\*\*\*\]?/', $paragraph->reply, $matches);
+
+                if (! empty($matches[1])) {
+                    foreach ($matches[1] as $ref) {
+                        $ref_array[] = trim($ref); // push reference into $array
+                    }
+                }
+            }
+            
+            foreach ($ref_array as $reference) {
+                $doc=Document::where('reference',$reference)->where('project_id',auth()->user()->current_project_id)->first();
+                $filePath = public_path($doc->storageFile->path);
+                if ($request->formate_type == 'reference') {
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $doc->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    // $date = date('y_m_d', strtotime($document->document->start_date));
+                    $fileName = $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                } elseif ($request->formate_type == 'dateAndReference') {
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $doc->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    $date              = date('y_m_d', strtotime($doc->start_date));
+                    $fileName          = preg_replace('/_/', '', $date) . ' - ' . $sanitizedFilename . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                } elseif ($request->formate_type == 'formate') {
+
+                    $prefix = $request->prefix;
+                    $sn     = $request->sn;
+
+                    $date              = date('d-M-y', strtotime($doc->start_date));
+                    $from              = $doc->fromStakeHolder ? $doc->fromStakeHolder->narrative . "'s " : '';
+                    $type              = $doc->docType->name;
+                    $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $doc->reference);
+                    $sanitizedFilename = trim($sanitizedFilename, '-');
+                    $number_prefix     = str_pad($counter, $sn, '0', STR_PAD_LEFT);
+                    $fileName          = $prefix . $number_prefix . ' - ' . $from . $type . ' ';
+                    if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $doc->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $doc->docType->description)), 'email')) {
+                        $ref_part = $request->ref_part;
+                        if ($ref_part == 'option1') {
+                            $fileName .= '- ';
+                        } elseif ($ref_part == 'option2') {
+
+                            $fileName .= 'From- ' . $sanitizedFilename . ' - ';
+                        } elseif ($ref_part == 'option3') {
+                            $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                        }
+                    } else {
+                        $fileName .= 'Ref- ' . $sanitizedFilename . ' - ';
+                    }
+                    $fileName .= 'dated ' . $date . '.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                    $counter++;
+                }
+
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $fileName);
+                }
+            }
+
+            $zip->close();
+
+            // Return the zip file as a download
+            if (file_exists($zipFilePath)) {
+                session(['zip_file' => $code]);
+                $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $zipFileName;
+
+                return response()->json(['download_url' => asset($relativePath)]);
+                // return response()->download($zipFilePath,null, [
+                //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                //     'Pragma' => 'no-cache',
+                //     'Expires' => '0',
+                // ]);
+            }
+        }
+
+        return redirect()->back()->with('error', 'No files found to download.');
+
     }
 
 }
