@@ -8,7 +8,7 @@
                 <a class="nav-link pl-3 pr-0 vibrate-hover"
                     style="color:white; font-size:1.2rem; padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('switch.folder', $Folders->first()->id) }}">
-                    <span class="item-text"><b>Files</b></span>
+                    <span class="item-text" style="font-size: 17px;"><b>Files</b></span>
                 </a>
 
                 <!-- Dropdown arrow -->
@@ -37,7 +37,7 @@
                 <a class="nav-link pl-3 pr-0 vibrate-hover"
                     style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('project.all_documents.index') }}"><span
-                        class="ml-1 item-text"><b>Documents</b></span></a>
+                        class="ml-1 item-text"style="font-size: 17px;"><b>Documents</b></span></a>
                 <a class="nav-link dropdown-toggle pr-0 vibrate-hover" href="#" id="navbarDropdownMenuLink3"
                     role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                     style="color:white; padding-left: 0.25rem;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;">
@@ -66,7 +66,7 @@
                 <a class="nav-link pl-3 nav-item vibrate-hover"
                     style="color:white;font-size:1.2rem;padding-top:0px !important;padding-bottom:0px !important;"
                     href="{{ route('account.edit_project_view', $project->slug) }}"><span
-                        class="ml-1 item-text"><b>Project Card</b></span></a>
+                        class="ml-1 item-text"style="font-size: 17px;"><b>Project Card</b></span></a>
             </li>
             {{-- <li class="nav-item">
           <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
