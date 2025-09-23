@@ -261,7 +261,7 @@
     </style>
     <div class="row align-items-center my-4" style="margin-top: 0px !important; justify-content: center;">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">{{ $project->name }}</h2>
+            <h4 class="h4 mb-0 page-title">{{ $project->name }}</h4>
         </div>
         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('assign_users', $Account_Permissions ?? []))
             <div class="col-auto" style="padding-right: 0px;">
