@@ -116,8 +116,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="#" id="UpdateUserProfileInfoLink">Profile</a>
-                <a class="dropdown-item" href="#">Settings</a>
-                <a class="dropdown-item" href="{{ route('project.home') }}">Project Details</a>
                 <a class="dropdown-item" href="{{ route('account.home') }}">Account Details</a>
                 <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
             </div>
