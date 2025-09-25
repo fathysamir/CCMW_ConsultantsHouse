@@ -1007,12 +1007,14 @@ Based on that and provided that we have the following list of stakeholders:';
     {
         $file_doc_type = session('file_doc_type');
         if ($file_doc_type == 'document') {
+
             $doc      = Document::where('slug', $id)->first();
             $file_ids = FileDocument::where('document_id', $doc->id)->pluck('file_id')->toArray();
         } elseif ($file_doc_type == 'note') {
             $doc      = Note::where('slug', $id)->first();
             $file_ids = FileDocument::where('note_id', $doc->id)->pluck('file_id')->toArray();
         }
+        dd($file_doc_type);
         session()->forget('file_doc_type');
         $files = ProjectFile::whereIn('id', $file_ids)->with('folder')->get();
 
