@@ -32,7 +32,7 @@ class FileDocumentsExport implements FromCollection, WithHeadings, WithMapping
             $document->document->reference,
             $document->document->subject,
             date('d-M-Y', strtotime($document->document->start_date)),
-            $document->document->end_date? date('d-M-Y', strtotime($document->document->end_date)): '__',
+            $document->document->end_date? date('d-M-Y', strtotime($document->document->end_date)): ' ',
             $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative : '_',  // relation sender
             $document->document->toStakeHolder ? $document->document->toStakeHolder->narrative : '_', // relation receiver
             $document->document->revision,
