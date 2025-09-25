@@ -287,6 +287,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/doc/make-for-claim', [FileDocumentController::class, 'change_for_claimOrNoticeOrChart'])->name('project.change_for_claimOrNoticeOrChart');
     Route::post('/download-all-documents', [FileDocumentController::class, 'download_documents'])->name('download.all-documents');
     Route::post('/download-specific-documents', [FileDocumentController::class, 'download_specific_documents'])->name('download.download_specific_documents');
+    Route::post('/export-excel-specific-documents', [FileDocumentController::class, 'download_excel_specific_documents'])->name('download.download_excel_specific_documents');
     Route::post('/project/edit-docs-info', [FileDocumentController::class, 'edit_docs_info'])->name('download.edit_docs_info');
     Route::post('/project/change-flag', [FileDocumentController::class, 'change_flag'])->name('change-flag');
     Route::post('/get-narrative', [FileDocumentController::class, 'get_narrative'])->name('get_narrative');

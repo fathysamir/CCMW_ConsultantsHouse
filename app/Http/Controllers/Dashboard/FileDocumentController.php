@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dashboard;
 
+use App\Exports\FileDocumentsExport;
 use App\Http\Controllers\ApiController;
 use App\Models\ContractTag;
 use App\Models\DocType;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Shared\Html;
@@ -1273,6 +1275,49 @@ class FileDocumentController extends ApiController
 
     }
 
+    public function download_excel_specific_documents(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        $file          = ProjectFile::where('slug', $request->file_id)->first();
+        $fileDocuments = FileDocument::with(['document', 'note'])
+            ->whereIn('id', $request->document_ids)
+            ->get()
+            ->sortBy([
+                fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
+                <=> ($b->document->start_date ?? $b->note->start_date ?? '9999-12-31'),
+                fn($a, $b) => $a->sn <=> $b->sn,
+            ])
+            ->values();
+        $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
+        $path          = public_path($projectFolder);
+        if (! file_exists($path)) {
+
+            mkdir($path, 0755, true);
+        }
+        $code      = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $directory = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $code);
+
+        if (! file_exists($directory)) {
+            mkdir($directory, 0755, true); // true = create nested directories
+        }
+        // Save document
+        // Define file path in public folder
+        $fileName     = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '-' . $file->name . '-documents_' . time() . '.xlsx';
+        $filePath     = public_path($fileName);
+        $excelContent = Excel::raw(new FileDocumentsExport($fileDocuments), \Maatwebsite\Excel\Excel::XLSX);
+
+        file_put_contents($filePath, $excelContent);
+        session(['zip_file' => $code]);
+        return response()->json(['message' => 'Selected Documents Exported successfully', 'download_url' => asset($fileName)]);
+    }
+
     public function download_specific_documents(Request $request)
     {
         $zip_file = session('zip_file');
@@ -1332,7 +1377,7 @@ class FileDocumentController extends ApiController
                 session(['zip_file' => $code]);
                 $relativePath = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $zipFileName;
 
-                return response()->json(['message' => 'Selected Documnets Downloaded successfully', 'download_url' => asset($relativePath)]);
+                return response()->json(['message' => 'Selected Documents Downloaded successfully', 'download_url' => asset($relativePath)]);
                 // return response()->download($zipFilePath,null, [
                 //     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
                 //     'Pragma' => 'no-cache',

@@ -2606,6 +2606,7 @@
                                     <div class="dropdown-menu " id="actionList" style="position: absolute;right:10px; ">
                                          <a class="dropdown-item" id="editDocsForAllBtn" href="javascript:void(0);">Edit Documents</a>
                                          <a class="dropdown-item" id="downloadForAllBtn" href="javascript:void(0);">Download Documents</a>
+                                         <a class="dropdown-item" id="exportExcelForAllBtn" href="javascript:void(0);">Export Excel</a>
                                          <a class="dropdown-item copyForAllBtn" id="copyForAllBtn" href="javascript:void(0);"data-action-type2="copy">Copy All Documents To Another File</a>
                                          <a class="dropdown-item copyForAllBtn" id="moveForAllBtn" href="javascript:void(0);"data-action-type2="move">Move All Documents To Another File</a>
                                          <a class="dropdown-item" id="unassignForAllBtn" href="javascript:void(0);">Unassign Documents</a>
@@ -3063,6 +3064,49 @@
 
                 $.ajax({
                     url: '/download-specific-documents', // Replace with real route
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        document_ids: documentIds,
+                        file_id: $('#download-allDoc').data('file-id')
+
+                    },
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        if (response.download_url) {
+                            window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                        }
+                        document.getElementById('actionList').style.display = 'none';
+                        showHint(response.message);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+
+            });
+            $('#exportExcelForAllBtn').on('click', function() {
+                // Get all checked checkboxes
+
+                const checkedCheckboxes = document.querySelectorAll(
+                    'tbody tr:not([style*="display: none"]) .row-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    alert('Please select at least one document.');
+                    return;
+                }
+
+                // Collect the IDs of all checked checkboxes
+                let documentIds = [];
+                checkedCheckboxes.forEach(function(checkbox) {
+                    documentIds.push(checkbox.value);
+                });
+
+                // Set the document IDs in a hidden input (optional)
+
+                $.ajax({
+                    url: '/export-excel-specific-documents', // Replace with real route
                     type: 'POST',
                     data: {
                         _token: $('input[name="_token"]').val(), // CSRF token
