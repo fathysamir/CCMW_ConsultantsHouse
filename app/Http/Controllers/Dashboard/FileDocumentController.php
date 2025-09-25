@@ -1288,6 +1288,7 @@ class FileDocumentController extends ApiController
         $file          = ProjectFile::where('slug', $request->file_id)->first();
         $fileDocuments = FileDocument::with(['document', 'note'])
             ->whereIn('id', $request->document_ids)
+            ->whereNull('note_id')
             ->get()
             ->sortBy([
                 fn($a, $b) => ($a->document->start_date ?? $a->note->start_date ?? '9999-12-31')
