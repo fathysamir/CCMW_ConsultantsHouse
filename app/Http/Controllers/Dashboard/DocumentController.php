@@ -1014,10 +1014,9 @@ Based on that and provided that we have the following list of stakeholders:';
             $doc      = Note::where('slug', $id)->first();
             $file_ids = FileDocument::where('note_id', $doc->id)->pluck('file_id')->toArray();
         }
-        dd($file_doc_type);
-        session()->forget('file_doc_type');
-        $files = ProjectFile::whereIn('id', $file_ids)->with('folder')->get();
 
+        $files = ProjectFile::whereIn('id', $file_ids)->with('folder')->get();
+        session()->forget('file_doc_type');
         return response()->json(['files' => $files]);
 
     }
