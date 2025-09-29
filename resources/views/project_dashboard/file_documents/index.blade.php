@@ -258,8 +258,98 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
+    </style>
+    <style>
+        .assignment-list1 {
+            max-width: 600px;
+            margin: 0px auto;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            /* مسافة بين المجموعات */
+        }
+
+        .assignment-group1 {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ref-code1 {
+            font-weight: bold;
+            font-size: 16px;
+            color: #16a34a;
+
+            display: block;
+        }
+
+        .ref-code2 {
+            font-weight: bold;
+            font-size: 16px;
+            color: #a31616;
+
+            display: block;
+        }
+
+        .assignment-item1 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .ref-link1 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #16a34a;
+            margin-bottom: 0px;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .ref-link1:hover {
+            color: #0f9d58;
+            text-decoration: underline;
+        }
+
+        .assign-btn1,
+        .replace-btn1 {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 110px;
+        }
+
+        .assign-btn1 {
+            background: #0b74ff;
+            color: #fff;
+            border-color: #0b74ff;
+        }
+
+        .replace-btn1 {
+            background: #f59e0b;
+            color: #fff;
+            border-color: #f59e0b;
+        }
+
+        .assign-btn1:hover {
+            background: #0856c0;
+        }
+
+        .replace-btn1:hover {
+            background: #d97706;
+        }
     </style>
     <div id="hintBox"
         style="
@@ -298,6 +388,9 @@
                 </a>
                 <a class="dropdown-item" href="javascript:void(0);" id="exportGanttChart">
                     Export Gantt Chart
+                </a>
+                <a class="dropdown-item" href="javascript:void(0);" id="checkThreads">
+                    Check Threads
                 </a>
             </div>
         </div>
@@ -649,7 +742,8 @@
                                                         Edit Document
                                                     </a>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('project.documents.document_analysis', $document->document->slug) }}" target="_blink">Document Analysis</a>
+                                                        href="{{ route('project.documents.document_analysis', $document->document->slug) }}"
+                                                        target="_blink">Document Analysis</a>
                                                     <a class="dropdown-item"
                                                         href="{{ route('project.file-document-first-analyses', $document->id) }}">Chronology</a>
                                                     <a class="dropdown-item copy-to-file-btn" href="javascript:void(0);"
@@ -952,7 +1046,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="assigneToForm">
+                    <form>
                         @csrf
                         <input type="hidden" id="documentIdds" name="documentIdds">
 
@@ -1082,7 +1176,7 @@
                                 </div>
                                 <div class="row form-group mb-3">
                                     <label class="mt-1" for="Start">SN - Start : </label>
-                                    <input type="number" name="Start" id="Start" class="form-control"
+                                    <input type="number" name="Start" id="Start2" class="form-control"
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
                                 </div>
@@ -1213,7 +1307,7 @@
                     <form id="addNoteForm">
                         @csrf
 
-                        <input type="hidden" id="file__slug" name="file_slug" value={{ $file->slug }}>
+                        <input type="hidden" name="file_slug" value={{ $file->slug }}>
                         <div class="form-group">
                             <label for="folder_id2">subject</label>
                             <input class="form-control" id="subject" type="text" name="subject" required>
@@ -1274,6 +1368,27 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="checkThreadsModal" tabindex="-1" role="dialog"
+        aria-labelledby="checkThreadsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="checkThreadsModalLabel">Check Documents Threads</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="exportGanttChartModal" tabindex="-1" role="dialog"
         aria-labelledby="exportGanttChartModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -1300,8 +1415,8 @@
                                     <label class="custom-control-label" for="auto">Auto</label>
                                 </div>
                                 <div class="custom-control custom-radio"style="width: 50%;">
-                                    <input type="radio" id="fixed_dates" name="timeframe" class="custom-control-input"
-                                        value="fixed_dates">
+                                    <input type="radio" id="fixed_dates" name="timeframe"
+                                        class="custom-control-input" value="fixed_dates">
                                     <label class="custom-control-label" for="fixed_dates">Fixed Dates</label>
                                 </div>
                             </div>
@@ -1445,6 +1560,25 @@
             window.open(url, '_blank');
         }
     </script>
+    <script>
+        let clickTimer = null;
+
+        function handleClick(editUrl, pdfUrl) {
+            if (clickTimer !== null) {
+                // يعني double click → افتح الـ PDF
+                clearTimeout(clickTimer);
+                clickTimer = null;
+                window.open(pdfUrl, '_blank');
+            } else {
+                // يعني single click → نستنى شوية قبل الفتح
+                clickTimer = setTimeout(() => {
+                    window.open(editUrl, '_blank');
+                    clickTimer = null;
+                }, 250); // 250ms كافية تفرق single عن double
+            }
+        }
+    </script>
+
     <script>
         function updatePrefix() {
             const h1 = document.getElementById('Chapter').value;
@@ -1974,6 +2108,32 @@
                     }
                 });
             });
+            ////////////////////////////////////////////
+
+            $('#checkThreads').on('click', function() {
+                let file = "{{ $file->slug }}";
+                $.ajax({
+                    url: '/check-unassignment-docs-by-threads',
+                    type: 'GET',
+                    data: {
+                        _token: $('input[name="_token"]').val(), // CSRF token
+                        file: file, // Pass the array here
+                    },
+
+                    success: function(response) {
+                        // showHint(response.message || 'Download started!');
+                        $('#modal-body').html(response.html);
+                        $('#checkThreadsModal').modal('show');
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Failed to process. Please try again.');
+                    }
+                });
+
+            });
+
+
             ///////////////////////////////////////////////////////
             $('#exportGanttChart').on('click', function() {
 
@@ -2056,7 +2216,7 @@
                     $('#extraOptions2').removeClass('d-none');
                     $('#Prefix2').attr('required', true);
                     $('#sn2').attr('required', true);
-                    $('#Start').attr('required', true);
+                    $('#Start2').attr('required', true);
                     $('input[name="ref_part2"]').attr('required', true);
                 } else {
                     $('#extraOptions2').addClass('d-none');
@@ -2068,7 +2228,7 @@
                     // Remove required attributes
                     $('#Prefix2').removeAttr('required');
                     $('#sn2').removeAttr('required');
-                    $('#Start').removeAttr('required');
+                    $('#Start2').removeAttr('required');
                     $('input[name="ref_part2"]').removeAttr('required');
                 }
             });
@@ -2106,7 +2266,64 @@
 
         });
     </script>
+    <script>
+        function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
+            const hintBox = document.getElementById("hintBox");
+            hintBox.innerText = message;
+            hintBox.style.backgroundColor = bgColor;
+            hintBox.style.color = textColor;
+            hintBox.style.display = "block";
 
+            setTimeout(() => {
+                hintBox.style.display = "none";
+            }, 3000); // Hide after 3 seconds
+        }
+        $(document).on("click", ".assign-btn1", function() {
+            console.log('fff');
+            let docSlug = $(this).data("doc-slug");
+            let parentDocSlug = $(this).data("parent-doc-slug");
+            let thread = $(this).data("thread");
+            let action = $(this).data("action");
+            let file = "{{ $file->slug }}"
+            $.ajax({
+                url: "{{ route('project.assign-thread') }}", // اعمل route في لارافيل
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    doc_slug: docSlug,
+                    parent_doc_slug: parentDocSlug,
+                    thread: thread,
+                    action: action,
+                    file: file
+                },
+                success: function(response) {
+                    showHint(response.success);
+                    $.ajax({
+                        url: '/check-unassignment-docs-by-threads',
+                        type: 'GET',
+                        data: {
+                            _token: $('input[name="_token"]').val(), // CSRF token
+                            file: file, // Pass the array here
+                        },
+
+                        success: function(response) {
+                            // showHint(response.message || 'Download started!');
+                            $('#modal-body').html(response.html);
+                            
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('Failed to process. Please try again.');
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    alert("Something went wrong ❌");
+                    console.log(xhr.responseText);
+                }
+            });
+        })
+    </script>
     <script>
         $(document).ready(function() {
 

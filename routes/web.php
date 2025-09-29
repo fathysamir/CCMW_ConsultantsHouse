@@ -300,6 +300,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/checkDoc_aiLayerUsed', [FileDocumentController::class, 'checkDoc_aiLayerUsed'])->name('project.file_document.checkDoc_aiLayerUsed');
     Route::get('/project/file-document/gantt-chart/{id}', [FileDocumentController::class, 'gantt_chart'])->name('project.file_document.gantt-chart');
     Route::post('/project/file-document/save-gantt-chart', [FileDocumentController::class, 'save_gantt_chart_data'])->name('project.file_document.save_gantt_chart_data');
+    Route::get('/check-unassignment-docs-by-threads', [FileDocumentController::class, 'check_unassignment_docs_by_threads'])->name('project.file.check_unassignment_docs_by_threads');
+    Route::post('/project/file/assign-thread', [FileDocumentController::class, 'assignDocument'])->name('project.assign-thread');
 
     Route::Post('/uuu', [ExtractPowerPointController::class, 'uuu'])->name('project.file-documents.extractPowerPoint')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 

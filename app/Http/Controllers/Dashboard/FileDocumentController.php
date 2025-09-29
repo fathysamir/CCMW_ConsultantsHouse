@@ -1969,4 +1969,130 @@ class FileDocumentController extends ApiController
 
         ]);
     }
+
+    public function check_unassignment_docs_by_threads(Request $request)
+    {
+        $file      = ProjectFile::where('slug', $request->file)->first();
+        $documents = Document::where('threads', '!=', null)->whereHas('fileDocuments', function ($q) use ($file) {
+            $q->where('file_id', $file->id);
+        })->get();
+        $assignments    = [];
+        $notAssignments = [];
+        if ($documents->isEmpty()) {
+            $html = '<h4 class="h4 mb-0 page-title">This File is Empty, doesn\'t Have Any Documents</h4>';
+        } else {
+
+            $html = '<div class="assignment-list1">';
+            foreach ($documents as $document) {
+                $threads = json_decode($document->threads, true);
+                foreach ($threads as $thread) {
+
+                    $doc = Document::where('reference', $thread)->first();
+                    if (! $doc) {
+                        $similar_documents = Document::where('project_id', auth()->user()->current_project_id)->where('reference', 'like', '%' . $thread . '%')->get();
+                        if ($similar_documents->isEmpty()) {
+                            $html .= '
+                                <div class="assignment-group1">
+                                    <span class="ref-code2">' . $thread . '</span>
+                                </div>';
+                        } else {
+                            $html .= '<div class="assignment-group1">
+                                                <span class="ref-code1">' . $thread . '</span>';
+                            foreach ($similar_documents as $similar_document) {
+                                $hasFile = $similar_document->fileDocuments()->where('file_id', $file->id)->exists();
+                                if (! $hasFile) {
+                                    $html .= '<div class="assignment-item1">
+                                                    <label
+                                                        class="ref-link1"
+                                                        onclick="handleClick(\'' . route('project.edit-document', $similar_document->slug) . '\', \'' . asset($similar_document->storageFile->path) . '\')"
+                                                    ><span class="fa fa-star"></span> ' . $similar_document->reference . '</label>
+                                                    <button type="button" class="assign-btn1" data-doc-slug="' . $similar_document->slug . '"data-parent-doc-slug="' . $document->slug . '"data-thread="' . $thread . '"data-action="assign">Assign Here</button>
+                                                </div>';
+                                } else {
+                                    $html .= '<div class="assignment-item1">
+                                                    <label
+                                                        class="ref-link1"
+                                                        onclick="handleClick(\'' . route('project.edit-document', $similar_document->slug) . '\', \'' . asset($similar_document->storageFile->path) . '\')"
+                                                    ><span class="fa fa-star"></span> ' . $similar_document->reference . '</label>
+                                                    <button type="button" class="assign-btn1" data-doc-slug="' . $similar_document->slug . '"data-parent-doc-slug="' . $document->slug . '"data-thread="' . $thread . '"data-action="replace">Replace</button>
+                                                </div>';
+                                }
+                            }
+                            $html .= '</div>';
+                        }
+
+                    } else {
+                        $hasFile = $doc->fileDocuments()->where('file_id', $file->id)->exists();
+                        if (! $hasFile) {
+                            $assignments[$doc->slug][$thread][$thread] = ['button' => 'assign_here', 'pdf_path' => $doc->storageFile->path];
+                            $html .= '
+                                <div class="assignment-group1">
+                                    <span class="ref-code1">' . $thread . '</span>
+                                    <div class="assignment-item1">
+                                        <label
+                                            class="ref-link1"
+                                            onclick="handleClick(\'' . route('project.edit-document', $doc->slug) . '\', \'' . asset($doc->storageFile->path) . '\')"
+                                        ><span class="fa fa-star"></span> ' . $thread . '</label>
+                                        <button type="button" class="assign-btn1" data-doc-slug="' . $doc->slug . '"data-parent-doc-slug="' . $document->slug . '"data-thread="' . $thread . '"data-action="assign">Assign Here</button>
+                                    </div>
+
+                                </div>';
+                        }
+                    }
+                }
+            }
+            $html .= '</div>';
+
+        }
+        return response()->json(['html' => $html]);
+
+    }
+
+    public function assignDocument(Request $request)
+    {
+        $file       = ProjectFile::where('slug', $request->file)->first();
+        $doc        = Document::where('slug', $request->doc_slug)->first();
+        $parent_doc = Document::where('slug', $request->parent_doc_slug)->first();
+        $thread     = $request->thread;
+        if ($request->action === 'assign') {
+            $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $file->id, 'document_id' => $doc->id]);
+            $start_date  = $fileDoc->document->start_date;
+            $end_date    = $fileDoc->document->end_date;
+            $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+            $gantt_chart->lp_sd = $start_date;
+            $gantt_chart->lp_fd = $end_date;
+
+            $sections[] = [
+                'sd'    => $start_date,
+                'fd'    => $end_date,
+                'color' => '00008B',
+            ];
+
+            $gantt_chart->cur_sections = json_encode($sections);
+            if ($end_date == null) {
+                $gantt_chart->cur_type = 'M';
+            }
+            $gantt_chart->save();
+            $threads = json_decode($parent_doc->threads, true);
+            if (($key = array_search($thread, $threads)) !== false) {
+                $threads[$key] = $doc->reference;
+            }
+
+            $parent_doc->threads = $threads;
+            $parent_doc->save();
+        } elseif ($request->action === 'replace') {
+            $threads = json_decode($parent_doc->threads, true);
+
+            if (($key = array_search($thread, $threads)) !== false) {
+                $threads[$key] = $doc->reference;
+            }
+
+            $parent_doc->threads = $threads;
+            $parent_doc->save();
+        }
+
+        return response()->json(['success' => 'Document Assigned Successfully']);
+
+    }
 }
