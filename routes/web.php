@@ -17,6 +17,7 @@ use App\Http\Controllers\Dashboard\ProjectDashboardController;
 use App\Http\Controllers\Dashboard\settings\ContractSettingController;
 use App\Http\Controllers\Dashboard\settings\ContractTagController;
 use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
+use App\Http\Controllers\Dashboard\settings\ExportFormateController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Http\Controllers\Dashboard\UserController;
@@ -89,6 +90,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/accounts/document-types/update/{id}', [DocumentTypeController::class, 'update'])->name('accounts.document-types.update');
     Route::get('/accounts/document-types/delete/{id}', [DocumentTypeController::class, 'delete'])->name('accounts.document-types.delete');
 
+    Route::get('/accounts/export-formate-settings', [ExportFormateController::class, 'edit'])->name('accounts.export-formate-settings');
+    Route::post('/accounts/export-formate-settings', [ExportFormateController::class, 'update'])->name('accounts.export-formate-settings.update');
+
     Route::get('/accounts/project-folders', [ProjectFolderController::class, 'index'])->name('accounts.project-folders');
     Route::get('/accounts/project-folders/create', [ProjectFolderController::class, 'create'])->name('accounts.project-folders.create');
     Route::post('/accounts/project-folders/store', [ProjectFolderController::class, 'store'])->name('accounts.project-folders.store');
@@ -120,6 +124,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/account/document-types', [DocumentTypeController::class, 'index'])->name('account.document-types');
     Route::get('/account/document-types/create', [DocumentTypeController::class, 'create'])->name('account.document-types.create');
     Route::get('/account/document-types/edit/{id}', [DocumentTypeController::class, 'edit'])->name('account.document-types.edit');
+    Route::get('/account/export-formate-settings', [ExportFormateController::class, 'edit'])->name('account.export-formate-settings');
     Route::get('/account/contract-settings/{id}', [ContractSettingController::class, 'index'])->name('account.contract-settings');
     Route::get('/account/contract-settings/{id}/create', [ContractSettingController::class, 'create'])->name('account.contract-settings.create');
     Route::get('/account/contract-settings/edit/{id}', [ContractSettingController::class, 'edit'])->name('account.contract-settings.edit');
@@ -190,6 +195,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/document-types', [DocumentTypeController::class, 'index'])->name('project.document-types');
     Route::get('/project/document-types/create', [DocumentTypeController::class, 'create'])->name('project.document-types.create');
     Route::get('/project/document-types/edit/{id}', [DocumentTypeController::class, 'edit'])->name('project.document-types.edit');
+    Route::get('/project/export-formate-settings', [ExportFormateController::class, 'edit'])->name('project.export-formate-settings');
     Route::get('/project/contract-settings/{id}', [ContractSettingController::class, 'index'])->name('project.contract-settings');
     Route::get('/project/contract-settings/{id}/create', [ContractSettingController::class, 'create'])->name('project.contract-settings.create');
     Route::get('/project/contract-settings/edit/{id}', [ContractSettingController::class, 'edit'])->name('project.contract-settings.edit');

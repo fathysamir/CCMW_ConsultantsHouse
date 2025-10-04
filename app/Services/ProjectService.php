@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use App\Models\ContractSetting;
@@ -9,6 +8,7 @@ use App\Models\Milestone;
 use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\StakeHolder;
+use App\Models\ExportFormate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -29,25 +29,26 @@ class ProjectService
         $this->createMilestones($request, $project);
         $all_project_folders = ProjectFolder::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_project_folders as $folder) {
-            ProjectFolder::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $folder->name, 'order' => $folder->order, 'label1' => $folder->label1,
-                'label2' => $folder->label2,
-                'label3' => $folder->label3, 'potential_impact' => $folder->potential_impact, 'shortcut' => $folder->shortcut]);
+            ProjectFolder::create(['account_id' => $project->account_id, 'project_id'  => $project->id, 'name'                  => $folder->name, 'order' => $folder->order, 'label1' => $folder->label1,
+                'label2'                            => $folder->label2,
+                'label3'                            => $folder->label3, 'potential_impact' => $folder->potential_impact, 'shortcut' => $folder->shortcut]);
         }
         $all_DocTypes = DocType::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_DocTypes as $DocType) {
-            DocType::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description,'relevant_word' => $DocType->relevant_word,'shortcut' => $DocType->shortcut]);
+            DocType::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description, 'relevant_word' => $DocType->relevant_word, 'shortcut' => $DocType->shortcut]);
         }
         $all_ContractTags = ContractTag::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_ContractTags as $ContractTag) {
-            ContractTag::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $ContractTag->name, 'order' => $ContractTag->order,
-                'description' => $ContractTag->description, 'is_notice' => $ContractTag->is_notice,
-                'sub_clause' => $ContractTag->sub_clause, 'for_letter' => $ContractTag->for_letter, 'var_process' => $ContractTag->var_process]);
+            ContractTag::create(['account_id' => $project->account_id, 'project_id'     => $project->id, 'name'                    => $ContractTag->name, 'order' => $ContractTag->order,
+                'description'                     => $ContractTag->description, 'is_notice' => $ContractTag->is_notice,
+                'sub_clause'                      => $ContractTag->sub_clause, 'for_letter' => $ContractTag->for_letter, 'var_process' => $ContractTag->var_process]);
         }
         $all_ContractSettings = ContractSetting::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_ContractSettings as $ContractSetting) {
             ContractSetting::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $ContractSetting->name, 'order' => $ContractSetting->order, 'type' => $ContractSetting->type]);
         }
-
+        $export_formate = ExportFormate::where('project_id', null)->where('account_id', $project->account_id)->first();
+        ExportFormate::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'value' => $export_formate->value]);
         return ['success' => true, 'project' => $project];
     }
 
@@ -72,8 +73,8 @@ class ProjectService
     {
 
         return Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:191'],
-            'code' => [
+            'name'              => ['required', 'string', 'max:191'],
+            'code'              => [
                 'required',
                 'string',
                 'max:191',
@@ -83,13 +84,13 @@ class ProjectService
             ],
             'selected_category' => ['required'],
         ], [
-            'name.required' => 'The project name is required.',
-            'name.string' => 'The project name must be a valid string.',
-            'name.max' => 'The project name cannot exceed 191 characters.',
-            'code.required' => 'The site code is required.',
-            'code.string' => 'The site code must be a valid string.',
-            'code.max' => 'The site code cannot exceed 191 characters.',
-            'code.unique' => 'This site code is already in use.',
+            'name.required'              => 'The project name is required.',
+            'name.string'                => 'The project name must be a valid string.',
+            'name.max'                   => 'The project name cannot exceed 191 characters.',
+            'code.required'              => 'The site code is required.',
+            'code.string'                => 'The site code must be a valid string.',
+            'code.max'                   => 'The site code cannot exceed 191 characters.',
+            'code.unique'                => 'This site code is already in use.',
             'selected_category.required' => 'You must select a EPS.',
         ]);
     }
@@ -101,39 +102,39 @@ class ProjectService
         } while (Project::where('slug', $slug)->exists());
 
         return Project::create([
-            'name' => $request->name,
-            'code' => $request->code,
-            'slug' => $slug,
-            'account_id' => auth()->user()->current_account_id,
-            'category_id' => intval($request->selected_category),
-            'contract_date' => $request->contract_date,
-            'commencement_date' => $request->commencement_date,
+            'name'               => $request->name,
+            'code'               => $request->code,
+            'slug'               => $slug,
+            'account_id'         => auth()->user()->current_account_id,
+            'category_id'        => intval($request->selected_category),
+            'contract_date'      => $request->contract_date,
+            'commencement_date'  => $request->commencement_date,
             'condation_contract' => $request->condation_contract,
-            'original_value' => floatval($request->original_value),
-            'revised_value' => floatval($request->revised_value),
-            'currency' => $request->currency,
-            'measurement_basis' => $request->measurement_basis,
-            'notes' => $request->notes,
-            'summary' => $request->summary,
-            'user_id' => auth()->user()->id,
+            'original_value'     => floatval($request->original_value),
+            'revised_value'      => floatval($request->revised_value),
+            'currency'           => $request->currency,
+            'measurement_basis'  => $request->measurement_basis,
+            'notes'              => $request->notes,
+            'summary'            => $request->summary,
+            'user_id'            => auth()->user()->id,
         ]);
     }
 
     private function updateProjectDetails(Request $request, Project $project)
     {
         $project->update([
-            'name' => $request->name,
-            'code' => $request->code,
-            'category_id' => intval($request->selected_category),
-            'contract_date' => $request->contract_date,
-            'commencement_date' => $request->commencement_date,
+            'name'               => $request->name,
+            'code'               => $request->code,
+            'category_id'        => intval($request->selected_category),
+            'contract_date'      => $request->contract_date,
+            'commencement_date'  => $request->commencement_date,
             'condation_contract' => $request->condation_contract,
-            'original_value' => floatval($request->original_value),
-            'revised_value' => floatval($request->revised_value),
-            'currency' => $request->currency,
-            'measurement_basis' => $request->measurement_basis,
-            'notes' => $request->notes,
-            'summary' => $request->summary,
+            'original_value'     => floatval($request->original_value),
+            'revised_value'      => floatval($request->revised_value),
+            'currency'           => $request->currency,
+            'measurement_basis'  => $request->measurement_basis,
+            'notes'              => $request->notes,
+            'summary'            => $request->summary,
         ]);
 
         return $project;
@@ -172,10 +173,10 @@ class ProjectService
 
                 StakeHolder::create([
                     'project_id' => $project->id,
-                    'name' => $stakeholder['name'],
-                    'role' => $stakeholder['role'],
-                    'narrative' => $narrative,
-                    'article' => $stakeholder['article'],
+                    'name'       => $stakeholder['name'],
+                    'role'       => $stakeholder['role'],
+                    'narrative'  => $narrative,
+                    'article'    => $stakeholder['article'],
                 ]);
             }
         }
@@ -190,10 +191,10 @@ class ProjectService
                 $narrative = $stakeholder['chronology'] ?? $stakeholder['role'];
 
                 StakeHolder::where('id', $id)->update([
-                    'name' => $stakeholder['name'],
-                    'role' => $stakeholder['role'],
+                    'name'      => $stakeholder['name'],
+                    'role'      => $stakeholder['role'],
                     'narrative' => $narrative,
-                    'article' => $stakeholder['article'],
+                    'article'   => $stakeholder['article'],
                 ]);
                 $existingIds[] = $id;
             }
@@ -213,10 +214,10 @@ class ProjectService
 
                 StakeHolder::create([
                     'project_id' => $project->id,
-                    'name' => $stakeholder['name'],
-                    'role' => $stakeholder['role'],
-                    'narrative' => $narrative,
-                    'article' => $stakeholder['article'],
+                    'name'       => $stakeholder['name'],
+                    'role'       => $stakeholder['role'],
+                    'narrative'  => $narrative,
+                    'article'    => $stakeholder['article'],
                 ]);
             }
         }
@@ -227,11 +228,11 @@ class ProjectService
         if ($request->milestones && count($request->milestones) > 0) {
             foreach ($request->milestones as $milestone) {
                 Milestone::create([
-                    'project_id' => $project->id,
-                    'name' => $milestone['name'],
-                    'contract_finish_date' => $milestone['contract_finish_date'],
-                    'revised_finish_date' => $milestone['revised_finish_date'],
-                    'substantial_completion_date' => $milestone['substantial_completion_date']
+                    'project_id'                  => $project->id,
+                    'name'                        => $milestone['name'],
+                    'contract_finish_date'        => $milestone['contract_finish_date'],
+                    'revised_finish_date'         => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date'],
                 ]);
             }
         }
@@ -245,10 +246,10 @@ class ProjectService
         if ($request->old_milestones && count($request->old_milestones) > 0) {
             foreach ($request->old_milestones as $id => $milestone) {
                 Milestone::where('id', $id)->update([
-                    'name' => $milestone['name'],
-                    'contract_finish_date' => $milestone['contract_finish_date'],
-                    'revised_finish_date' => $milestone['revised_finish_date'],
-                    'substantial_completion_date' => $milestone['substantial_completion_date']
+                    'name'                        => $milestone['name'],
+                    'contract_finish_date'        => $milestone['contract_finish_date'],
+                    'revised_finish_date'         => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date'],
                 ]);
                 $existingIds[] = $id;
             }
@@ -265,11 +266,11 @@ class ProjectService
         if ($request->milestones && count($request->milestones) > 0) {
             foreach ($request->milestones as $milestone) {
                 Milestone::create([
-                    'project_id' => $project->id,
-                    'name' => $milestone['name'],
-                    'contract_finish_date' => $milestone['contract_finish_date'],
-                    'revised_finish_date' => $milestone['revised_finish_date'],
-                    'substantial_completion_date' => $milestone['substantial_completion_date']
+                    'project_id'                  => $project->id,
+                    'name'                        => $milestone['name'],
+                    'contract_finish_date'        => $milestone['contract_finish_date'],
+                    'revised_finish_date'         => $milestone['revised_finish_date'],
+                    'substantial_completion_date' => $milestone['substantial_completion_date'],
                 ]);
             }
         }

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
+use App\Models\ExportFormate;
 use App\Models\FileAttachment;
 use App\Models\FileDocument;
 use App\Models\GanttChartDocData;
@@ -440,145 +441,155 @@ class FileController extends ApiController
                 ],
             ]
         );
+        $formate = ExportFormate::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->first();
+        if ($formate) {
+            $formate_values = $formate->value = json_decode($formate->value, true);
+        } else {
+            $formate_values = null;
+        }
         // Define styles for headings
         $GetStandardStylesH1 = [
-            'name'      => 'Arial',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 24,
-            'bold'      => true,
-            'italic'    => false,
-            'underline' => false,
+            'name'      => $formate_values ? $formate_values['h1']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['h1']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+            'size'      => $formate_values ? intval($formate_values['h1']['standard']['size']) : 24,
+            'bold'      => $formate_values ? ($formate_values['h1']['standard']['bold'] == '1' ? true : false) : true,
+            'italic'    => $formate_values ? ($formate_values['h1']['standard']['italic'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h1']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleH1 = [
-            'spaceBefore'       => 0,
-            'spaceAfter'        => 240,
-            'lineHeight'        => '1.5',
+            'spaceBefore'       => $formate_values ? ((int) $formate_values['h1']['paragraph']['spaceBefore'] * 20) : 0,
+            'spaceAfter'        => $formate_values ? ((int) $formate_values['h1']['paragraph']['spaceAfter'] * 20) : 240,
+            'lineHeight'        => $formate_values ? (float) $formate_values['h1']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => 803.6,
-                'hanging'   => 803.6,
+                'left'      => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['left'] * 1800) : 1000,
+                'hanging'   => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['hanging'] * 1800) : 1000,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => true,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
+            'contextualSpacing' => $formate_values ? ($formate_values['h1']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
+            'keepNext'          => $formate_values ? ($formate_values['h1']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['h1']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['h1']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ];
         $GetStandardStylesH2 = [
-            'name'      => 'Arial',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 16,
-            'bold'      => true,
-            'italic'    => false,
-            'underline' => false,
+            'name'      => $formate_values ? $formate_values['h2']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['h2']['standard']['alignment'] : 'left',
+            'size'      => $formate_values ? intval($formate_values['h2']['standard']['size']) : 16,
+            'bold'      => $formate_values ? ($formate_values['h2']['standard']['bold'] == '1' ? true : false) : true,
+            'italic'    => $formate_values ? ($formate_values['h2']['standard']['italic'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h2']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleH2 = [
-            'spaceBefore'       => 0,
-            'spaceAfter'        => 240,
-            'lineHeight'        => '1.5',
+            'spaceBefore'       => $formate_values ? ((int) $formate_values['h2']['paragraph']['spaceBefore'] * 20) : 0,
+            'spaceAfter'        => $formate_values ? ((int) $formate_values['h2']['paragraph']['spaceAfter'] * 20) : 240,
+            'lineHeight'        => $formate_values ? (float) $formate_values['h2']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => 1071.6,
-                'hanging'   => 1071.6,
+                'left'      => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['left'] * 1800) : 1000,
+                'hanging'   => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['hanging'] * 1800) : 1000,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => true,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
+            'contextualSpacing' => $formate_values ? ($formate_values['h2']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
+            'keepNext'          => $formate_values ? ($formate_values['h2']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['h2']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['h2']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ];
 
         $GetStandardStylesH3 = [
-            'name'      => 'Arial',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 14,
-            'bold'      => false,
-            'italic'    => false,
-            'underline' => false,
+            'name'      => $formate_values ? $formate_values['h3']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['h3']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+            'size'      => $formate_values ? intval($formate_values['h3']['standard']['size']) : 14,
+            'bold'      => $formate_values ? ($formate_values['h3']['standard']['bold'] == '1' ? true : false) : false,
+            'italic'    => $formate_values ? ($formate_values['h3']['standard']['italic'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h3']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleH3 = [
-            'spaceBefore'       => 0,
-            'spaceAfter'        => 240,
-            'lineHeight'        => '1.5',
+            'spaceBefore'       => $formate_values ? ((int) $formate_values['h3']['paragraph']['spaceBefore'] * 20) : 0,
+            'spaceAfter'        => $formate_values ? ((int) $formate_values['h3']['paragraph']['spaceAfter'] * 20) : 240,
+            'lineHeight'        => $formate_values ? (float) $formate_values['h3']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => 1071.6,
-                'hanging'   => 1071.6,
+                'left'      => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['left'] * 1800) : 1000,
+                'hanging'   => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['hanging'] * 1800) : 1000,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => true,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
+            'contextualSpacing' => $formate_values ? ($formate_values['h3']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
+            'keepNext'          => $formate_values ? ($formate_values['h3']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['h3']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['h3']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ];
 
         $GetStandardStylesSubtitle = [
-            'name'      => 'Arial',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 14,
-            'bold'      => true,
-            'italic'    => false,
-            'underline' => false,
+            'name'      => $formate_values ? $formate_values['subtitle']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['subtitle']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+            'size'      => $formate_values ? intval($formate_values['subtitle']['standard']['size']) : 14,
+            'bold'      => $formate_values ? ($formate_values['subtitle']['standard']['bold'] == '1' ? true : false) : true,
+            'italic'    => $formate_values ? ($formate_values['subtitle']['standard']['italic'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleSubtitle = [
-            'spaceBefore'       => 0,
-            'spaceAfter'        => 240,
-            'lineHeight'        => '1.5',
+            'spaceBefore'       => $formate_values ? ((int) $formate_values['subtitle']['paragraph']['spaceBefore'] * 20) : 0,
+            'spaceAfter'        => $formate_values ? ((int) $formate_values['subtitle']['paragraph']['spaceAfter'] * 20) : 240,
+            'lineHeight'        => $formate_values ? (float) $formate_values['subtitle']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => 1071.6,
-                'hanging'   => 0,
+                'left'      => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['left'] * 1800) : 1000,
+                'hanging'   => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['hanging'] * 1800) : 0,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => true,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
+            'contextualSpacing' => $formate_values ? ($formate_values['subtitle']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
+            'keepNext'          => $formate_values ? ($formate_values['subtitle']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['subtitle']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['subtitle']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ];
         $GetStandardStylesP = [
-            'name'      => 'Arial',
-            'alignment' => 'left', // Options: left, center, right, justify
-            'size'      => 11,
-            'bold'      => false,
-            'italic'    => false,
-            'underline' => false,
+            'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+            'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
+            'bold'      => $formate_values ? ($formate_values['body']['standard']['bold'] == '1' ? true : false) : false,
+            'italic'    => $formate_values ? ($formate_values['body']['standard']['italic'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['body']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
 
         $phpWord->addParagraphStyle('listParagraphStyle', [
-            'spaceBefore'       => 0,
-            'spaceAfter'        => 240,
-            'lineHeight'        => '1.5',
+            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => 1071.6,
-                'hanging'   => 1071.6,
+                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
+                'hanging'   => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['hanging'] * 1800) : 1000,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => false,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
-            'keepLines'         => true,
-            'hyphenation'       => false,
-            'pageBreakBefore'   => false,
+            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ]);
 
         $phpWord->addParagraphStyle('listParagraphStyle2', [
             'spaceBefore'       => 0,
-            'spaceAfter'        => 10,
-            'lineHeight'        => '1.5',
+            'spaceAfter'        => 20,
+            'lineHeight'        => 1,
             'indentation'       => [
-                'left'      => 1428.8,
-                'hanging'   => 357.2,
+                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) + 350 : 1350,
+                'hanging'   => 337.5,
                 'firstLine' => 0,
             ],
-            'contextualSpacing' => false,
-            'next'              => true,
-            'keepNext'          => true,
-            'widowControl'      => true,
-            'keepLines'         => true,
-            'hyphenation'       => false,
-            'pageBreakBefore'   => false,
+            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
         ]);
 
         $phpWord->addTitleStyle(1, $GetStandardStylesH1, $GetParagraphStyleH1);
@@ -895,21 +906,21 @@ class FileController extends ApiController
             $subtitle2 = str_replace('&', '&amp;', $subtitle2);
             $section->addText($subtitle2, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
             $GetStandardStylesFootNotes = [
-                'name'      => 'Calibri',
-                'alignment' => 'left', // Options: left, center, right, justify
-                'size'      => 9,
-                'bold'      => false,
-                'italic'    => false,
-                'underline' => false,
+                'name'      => $formate_values ? $formate_values['footnote']['standard']['name'] : 'Calibri',
+                'alignment' => $formate_values ? $formate_values['footnote']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                'size'      => $formate_values ? intval($formate_values['footnote']['standard']['size']) : 9,
+                'bold'      => $formate_values ? ($formate_values['footnote']['standard']['bold'] == '1' ? true : false) : false,
+                'italic'    => $formate_values ? ($formate_values['footnote']['standard']['italic'] == '1' ? true : false) : false,
+                'underline' => $formate_values ? ($formate_values['footnote']['standard']['underline'] == '1' ? true : false) : false,
 
             ];
             $GetParagraphStyleFootNotes = [
-                'spaceBefore' => 0,
-                'spaceAfter'  => 0,
-                'lineSpacing' => 240,
+                'spaceBefore' => $formate_values ? ((int) $formate_values['footnote']['paragraph']['spaceBefore'] * 20) : 0,
+                'spaceAfter'  => $formate_values ? ((int) $formate_values['footnote']['paragraph']['spaceAfter'] * 20) : 0,
+                'lineHeight'  => $formate_values ? (float) $formate_values['footnote']['paragraph']['lineHeight'] : 1,
                 'indentation' => [
-                    'left'      => 0,
-                    'hanging'   => 0,
+                    'left'      => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['left'] * 1800) : 0,
+                    'hanging'   => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['hanging'] * 1800) : 0,
                     'firstLine' => 0,
                 ],
             ];

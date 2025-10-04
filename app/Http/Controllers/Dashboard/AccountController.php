@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
@@ -9,18 +8,18 @@ use App\Models\Category;
 use App\Models\ContractSetting;
 use App\Models\ContractTag;
 use App\Models\DocType;
+use App\Models\ExportFormate;
 use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
 
 class AccountController extends ApiController
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user                     = auth()->user();
         $user->current_account_id = null;
         $user->current_project_id = null;
         $user->save();
@@ -32,15 +31,15 @@ class AccountController extends ApiController
 
         if ($request->has('search') && $request->search != null) {
             $all_accounts->where(function ($query) use ($request) {
-                $query->where('name', 'LIKE', '%'.$request->search.'%')
-                    ->orWhere('email', 'LIKE', '%'.$request->search.'%')
-                    ->orWhere('phone_no', 'LIKE', '%'.$request->search.'%')
-                    ->orWhere('recovery_email', 'LIKE', '%'.$request->search.'%')
-                    ->orWhere('recovery_phone_no', 'LIKE', '%'.$request->search.'%');
+                $query->where('name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('phone_no', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recovery_email', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recovery_phone_no', 'LIKE', '%' . $request->search . '%');
             });
         }
         $all_accounts = $all_accounts->paginate(12);
-        $search = $request->search;
+        $search       = $request->search;
 
         return view('dashboard.home', compact('all_accounts', 'search'));
 
@@ -65,15 +64,15 @@ class AccountController extends ApiController
         // }
 
         $account = Account::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'country_code' => $request->country_code,
-            'phone_no' => $request->phone,
-            'security_question' => $request->security_question,
-            'security_answer' => $request->security_answer,
-            'recovery_email' => $request->recovery_email,
+            'name'                  => $request->name,
+            'email'                 => $request->email,
+            'country_code'          => $request->country_code,
+            'phone_no'              => $request->phone,
+            'security_question'     => $request->security_question,
+            'security_answer'       => $request->security_answer,
+            'recovery_email'        => $request->recovery_email,
             'recovery_country_code' => $request->recovery_country_code,
-            'recovery_phone_no' => $request->recovery_phone,
+            'recovery_phone_no'     => $request->recovery_phone,
 
         ]);
 
@@ -89,8 +88,8 @@ class AccountController extends ApiController
         }
 
         do {
-            $process_last_number = 'EPS-'.sprintf('%06d', $last_number + 1);
-            $EPSExists = Category::where('code', $process_last_number)->exists();
+            $process_last_number = 'EPS-' . sprintf('%06d', $last_number + 1);
+            $EPSExists           = Category::where('code', $process_last_number)->exists();
             $last_number++;
         } while ($EPSExists);
         Category::create(['code' => $process_last_number, 'name' => 'Projects folder', 'eps_order' => 1, 'account_id' => $account->id]);
@@ -102,8 +101,8 @@ class AccountController extends ApiController
         }
 
         do {
-            $process_last_number2 = 'EPS-'.sprintf('%06d', $last_number2 + 1);
-            $EPSExists2 = Category::where('code', $process_last_number2)->exists();
+            $process_last_number2 = 'EPS-' . sprintf('%06d', $last_number2 + 1);
+            $EPSExists2           = Category::where('code', $process_last_number2)->exists();
             $last_number2++;
         } while ($EPSExists2);
         Category::create(['code' => $process_last_number2, 'name' => 'Archive', 'eps_order' => 2, 'account_id' => $account->id]);
@@ -115,8 +114,8 @@ class AccountController extends ApiController
         }
 
         do {
-            $process_last_number3 = 'EPS-'.sprintf('%06d', $last_number3 + 1);
-            $EPSExists3 = Category::where('code', $process_last_number3)->exists();
+            $process_last_number3 = 'EPS-' . sprintf('%06d', $last_number3 + 1);
+            $EPSExists3           = Category::where('code', $process_last_number3)->exists();
             $last_number3++;
         } while ($EPSExists3);
         Category::create(['code' => $process_last_number3, 'name' => 'Recycle Bin', 'eps_order' => 3, 'account_id' => $account->id]);
@@ -130,24 +129,27 @@ class AccountController extends ApiController
 
         $all_project_folders = ProjectFolder::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_project_folders as $folder) {
-            ProjectFolder::create(['account_id' => $account->id, 'name' => $folder->name, 'order' => $folder->order, 'ladel3' => $folder->ladel3,
-                'ladel2' => $folder->ladel2,
-                'ladel1' => $folder->ladel1, 'potential_impact' => $folder->potential_impact, 'shortcut' => $folder->shortcut]);
+            ProjectFolder::create(['account_id' => $account->id, 'name'                => $folder->name, 'order'                => $folder->order, 'ladel3' => $folder->ladel3,
+                'ladel2'                            => $folder->ladel2,
+                'ladel1'                            => $folder->ladel1, 'potential_impact' => $folder->potential_impact, 'shortcut' => $folder->shortcut]);
         }
         $all_DocTypes = DocType::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_DocTypes as $DocType) {
-            DocType::create(['account_id' => $account->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description,'relevant_word' => $DocType->relevant_word,'shortcut' => $DocType->shortcut]);
+            DocType::create(['account_id' => $account->id, 'name' => $DocType->name, 'order' => $DocType->order, 'description' => $DocType->description, 'relevant_word' => $DocType->relevant_word, 'shortcut' => $DocType->shortcut]);
         }
         $all_ContractTags = ContractTag::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_ContractTags as $ContractTag) {
-            ContractTag::create(['account_id' => $account->id, 'name' => $ContractTag->name, 'order' => $ContractTag->order,
-                'description' => $ContractTag->description, 'is_notice' => $ContractTag->is_notice,
-                'sub_clause' => $ContractTag->sub_clause, 'for_letter' => $ContractTag->for_letter, 'var_process' => $ContractTag->var_process]);
+            ContractTag::create(['account_id' => $account->id, 'name'                   => $ContractTag->name, 'order'             => $ContractTag->order,
+                'description'                     => $ContractTag->description, 'is_notice' => $ContractTag->is_notice,
+                'sub_clause'                      => $ContractTag->sub_clause, 'for_letter' => $ContractTag->for_letter, 'var_process' => $ContractTag->var_process]);
         }
         $all_ContractSettings = ContractSetting::where('project_id', null)->where('account_id', null)->get();
         foreach ($all_ContractSettings as $ContractSetting) {
             ContractSetting::create(['account_id' => $account->id, 'name' => $ContractSetting->name, 'order' => $ContractSetting->order, 'type' => $ContractSetting->type]);
         }
+
+        $export_formate = ExportFormate::where('project_id', null)->where('account_id', null)->first();
+        ExportFormate::create(['account_id' => $account->id, 'value' => $export_formate->value]);
 
         return redirect('/accounts')->with('success', 'Account created successfully.');
 
@@ -155,7 +157,7 @@ class AccountController extends ApiController
 
     public function edit()
     {
-        $id = session('current_edit_account');
+        $id      = session('current_edit_account');
         $account = Account::where('id', $id)->first();
 
         return view('dashboard.accounts.edit', compact('account'));
@@ -165,15 +167,15 @@ class AccountController extends ApiController
     {
         $id = session('current_edit_account');
         Account::where('id', $id)->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'country_code' => $request->country_code,
-            'phone_no' => $request->phone,
-            'security_question' => $request->security_question,
-            'security_answer' => $request->security_answer,
-            'recovery_email' => $request->recovery_email,
+            'name'                  => $request->name,
+            'email'                 => $request->email,
+            'country_code'          => $request->country_code,
+            'phone_no'              => $request->phone,
+            'security_question'     => $request->security_question,
+            'security_answer'       => $request->security_answer,
+            'recovery_email'        => $request->recovery_email,
             'recovery_country_code' => $request->recovery_country_code,
-            'recovery_phone_no' => $request->recovery_phone,
+            'recovery_phone_no'     => $request->recovery_phone,
 
         ]);
         $account = Account::find($id);

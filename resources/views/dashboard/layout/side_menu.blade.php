@@ -31,10 +31,15 @@
                 <li class="nav-item dropdown">
                     <a href="#forms" data-toggle="collapse" aria-expanded="false"
                         class="dropdown-toggle nav-link link_kkkkk">
-                        <img src="{{ asset('/dashboard/assets/selected_images/setting.png') }}" width="22">
+                        <img src="{{ asset('dashboard/assets/selected_images/setting.png') }}" width="22">
                         <span class="ml-3 item-text" style="color:whitesmoke;">Settings</span>
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100" id="forms">
+                        
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.export-formate-settings') }}"><span
+                                    class="ml-1 item-text" style="color:#e4d125;">Export Formate</span></a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.contract-tags') }}"><span
                                     class="ml-1 item-text" style="color:#e4d125;">Contract Tags</span></a>
