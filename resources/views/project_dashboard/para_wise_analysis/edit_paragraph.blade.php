@@ -562,8 +562,35 @@
                     };
                 }
 
-                let imgTag = `<img src="${imageUrl}" alt="${altText}">`;
-                activeEditor.clipboard.dangerouslyPasteHTML(range.index, imgTag);
+               const BlockEmbed = Quill.import('blots/block/embed');
+
+                class CustomImageBlot extends BlockEmbed {
+                    static create(value) {
+                        let node = super.create();
+                        node.setAttribute('src', value.url);
+                        if (value.alt) node.setAttribute('alt', value.alt);
+                        return node;
+                    }
+
+                    static value(node) {
+                        return {
+                            url: node.getAttribute('src'),
+                            alt: node.getAttribute('alt')
+                        };
+                    }
+                }
+
+                CustomImageBlot.blotName = 'customImage';
+                CustomImageBlot.tagName = 'img';
+
+                Quill.register(CustomImageBlot);
+
+
+                const range55 = activeEditor.getSelection(true);
+                activeEditor.insertEmbed(range55.index, 'customImage', {
+                    url: imageUrl,
+                    alt: altText
+                });
             } else {
                 alert('Please provide an image URL or upload a file.');
             }

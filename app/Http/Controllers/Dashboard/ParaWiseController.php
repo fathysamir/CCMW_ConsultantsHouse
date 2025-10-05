@@ -116,16 +116,47 @@ class ParaWiseController extends ApiController
         // dd($request->all());
         if ($this->hasContent($request->background)) {
             $background = $request->background;
+
+            $background = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $background);
+
+            $background = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $background);
         } else {
             $background = null;
         }
         if ($this->hasContent($request->paragraph)) {
             $paragraph = $request->paragraph;
+
+            $paragraph = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $paragraph);
+
+            $paragraph = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $paragraph);
         } else {
             $paragraph = null;
         }
         if ($this->hasContent($request->reply)) {
             $reply = $request->reply;
+
+            $reply = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $reply);
+
+            $reply = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $reply);
+
         } else {
             $reply = null;
         }
@@ -207,14 +238,56 @@ class ParaWiseController extends ApiController
         $paragraph = Paragraph::where('slug', $slug)->firstOrFail();
 
         // Background
-        $background = $this->hasContent($request->background) ? $request->background : null;
+        if ($this->hasContent($request->background)) {
+            $background = $request->background;
 
-        // Paragraph
-        $paraContent = $this->hasContent($request->paragraph) ? $request->paragraph : null;
+            $background = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $background);
 
-        // Reply
-        $reply = $this->hasContent($request->reply) ? $request->reply : null;
+            $background = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $background);
 
+        } else {
+            $background = null;
+        }
+
+        if ($this->hasContent($request->background)) {
+            $paraContent = $request->background;
+
+            $paraContent = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $paraContent);
+
+            $paraContent = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $paraContent);
+
+        } else {
+            $paraContent = null;
+        }
+
+        if ($this->hasContent($request->reply)) {
+            $reply = $request->reply;
+
+            $reply = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $reply);
+
+            $reply = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $reply);
+
+        } else {
+            $reply = null;
+        }
         // para_numbers
         if ($paragraph->para_numbers) {
             $array = explode(",", $paragraph->para_numbers);
@@ -524,7 +597,8 @@ class ParaWiseController extends ApiController
                         $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
                         $listItemRun->addText($paragraph->reply . '.');
                     } else {
-                        $paragraph_                      = $this->fixParagraphsWithImages($paragraph->reply);
+                        $paragraph_ = $this->fixParagraphsWithImages($paragraph->reply);
+
                         $paragraphWithoutImagesAndBreaks = preg_replace('/<(br)[^>]*>/i', '', $paragraph_);
 
                         // Step 2: Remove empty <p></p> tags
@@ -950,12 +1024,12 @@ class ParaWiseController extends ApiController
             $clean = trim($part);
 
             $part = preg_replace([
-                '/^(“|”)+/u', 
-                '/(“|”)+$/u', 
+                '/^(“|”)+/u',
+                '/(“|”)+$/u',
             ], '', $clean);
             $part = preg_replace([
-                '/(“)\s*(?=<\/[a-z]+>)/ui', 
-                '/(?<=>)\s*(”)/ui',         
+                '/(“)\s*(?=<\/[a-z]+>)/ui',
+                '/(?<=>)\s*(”)/ui',
             ], '', $part);
 
             try {
