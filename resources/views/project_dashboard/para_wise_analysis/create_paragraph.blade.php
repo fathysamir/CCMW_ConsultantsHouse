@@ -399,7 +399,7 @@
                         index: quill.getLength()
                     };
                 }
-                let imgTag = `<img src="${imageUrl}" alt="">`;
+                let imgTag = `<img src="${imageUrl}">`;
                 quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
             }
         }

@@ -254,9 +254,9 @@ class ParaWiseController extends ApiController
         } else {
             $background = null;
         }
-
-        if ($this->hasContent($request->background)) {
-            $paraContent = $request->background;
+        // Paragraph
+        if ($this->hasContent($request->paragraph)) {
+            $paraContent = $request->paragraph;
 
             $paraContent = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $paraContent);
 
@@ -271,6 +271,7 @@ class ParaWiseController extends ApiController
         } else {
             $paraContent = null;
         }
+        // Reply
 
         if ($this->hasContent($request->reply)) {
             $reply = $request->reply;
