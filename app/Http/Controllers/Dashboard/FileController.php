@@ -550,10 +550,9 @@ class FileController extends ApiController
             'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
             'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
             'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
-            'bold'      => $formate_values ? ($formate_values['body']['standard']['bold'] == '1' ? true : false) : false,
-            'italic'    => $formate_values ? ($formate_values['body']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['body']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
-
+            'bold'      => false,
+            'italic'    => false,
+            'underline' => 'none',
         ];
 
         $phpWord->addParagraphStyle('listParagraphStyle', [
@@ -664,12 +663,11 @@ class FileController extends ApiController
                                 if ($existedList1) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 0.9,
-                                            'lineSpacing' => 'single',
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -677,18 +675,18 @@ class FileController extends ApiController
                                         $shape = $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                               => 'left', // Options: left, center, right, justify
-                                                'size'                                    => 9,
-                                                'bold'                                    => false,
-                                                'italic'                                  => true,
-                                                'underline'                               => 'none']); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                               => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -706,18 +704,18 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                                   => 'left', // Options: left, center, right, justify
-                                                'size'                                        => 9,
-                                                'bold'                                        => false,
-                                                'italic'                                      => true,
-                                                'underline'                                   => 'none']); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                                   => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                        => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                        => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                      => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -739,11 +737,11 @@ class FileController extends ApiController
                                 if ($existedList1) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 1.5,
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -751,7 +749,7 @@ class FileController extends ApiController
                                         $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -769,7 +767,7 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -805,6 +803,11 @@ class FileController extends ApiController
                                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '1', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                           // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -820,6 +823,11 @@ class FileController extends ApiController
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                 // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -832,23 +840,28 @@ class FileController extends ApiController
                                     if ($existedList1) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore'       => 0,
-                                            'spaceAfter'        => 240,
-                                            'lineHeight'        => '1.5',
+                                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation'       => [
-                                                'left' => 1071.6,
-
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
-                                            'contextualSpacing' => false,
-                                            'next'              => true,
-                                            'keepNext'          => true,
-                                            'widowControl'      => true,
-                                            'keepLines'         => true,
-                                            'hyphenation'       => false,
-                                            'pageBreakBefore'   => false,
+
+                                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun2, $pTag, false, false);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -862,6 +875,11 @@ class FileController extends ApiController
                                         // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun, $pTag, false, false);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1025,12 +1043,11 @@ class FileController extends ApiController
                                 if ($existedList) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 0.9,
-                                            'lineSpacing' => 'single',
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1038,18 +1055,18 @@ class FileController extends ApiController
                                         $shape = $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                               => 'left', // Options: left, center, right, justify
-                                                'size'                                    => 9,
-                                                'bold'                                    => false,
-                                                'italic'                                  => true,
-                                                'underline'                               => 'none']); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                               => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1067,18 +1084,18 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                                   => 'left', // Options: left, center, right, justify
-                                                'size'                                        => 9,
-                                                'bold'                                        => false,
-                                                'italic'                                      => true,
-                                                'underline'                                   => 'none']); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                                   => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                        => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                        => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                      => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1100,11 +1117,11 @@ class FileController extends ApiController
                                 if ($existedList) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 1.5,
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1112,7 +1129,7 @@ class FileController extends ApiController
                                         $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1130,7 +1147,7 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1166,6 +1183,11 @@ class FileController extends ApiController
                                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '2', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                           // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1181,6 +1203,11 @@ class FileController extends ApiController
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                 // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1193,23 +1220,27 @@ class FileController extends ApiController
                                     if ($existedList) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore'       => 0,
-                                            'spaceAfter'        => 240,
-                                            'lineHeight'        => '1.5',
+                                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation'       => [
-                                                'left' => 1071.6,
-
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
-                                            'contextualSpacing' => false,
-                                            'next'              => true,
-                                            'keepNext'          => true,
-                                            'widowControl'      => true,
-                                            'keepLines'         => true,
-                                            'hyphenation'       => false,
-                                            'pageBreakBefore'   => false,
+                                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun2, $pTag, false, false);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1223,6 +1254,11 @@ class FileController extends ApiController
                                         // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun, $pTag, false, false);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1310,12 +1346,11 @@ class FileController extends ApiController
                                 if ($existedList2) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 0.9,
-                                            'lineSpacing' => 'single',
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1323,18 +1358,18 @@ class FileController extends ApiController
                                         $shape = $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                               => 'left', // Options: left, center, right, justify
-                                                'size'                                    => 9,
-                                                'bold'                                    => false,
-                                                'italic'                                  => true,
-                                                'underline'                               => 'none']); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                               => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1352,18 +1387,18 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                                   => 'left', // Options: left, center, right, justify
-                                                'size'                                        => 9,
-                                                'bold'                                        => false,
-                                                'italic'                                      => true,
-                                                'underline'                                   => 'none']); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                                   => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                        => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                        => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                      => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1385,11 +1420,11 @@ class FileController extends ApiController
                                 if ($existedList2) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 1.5,
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1397,7 +1432,7 @@ class FileController extends ApiController
                                         $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1415,7 +1450,7 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1451,6 +1486,11 @@ class FileController extends ApiController
                                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '3', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                           // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1466,6 +1506,11 @@ class FileController extends ApiController
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                 // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1478,23 +1523,27 @@ class FileController extends ApiController
                                     if ($existedList2) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore'       => 0,
-                                            'spaceAfter'        => 240,
-                                            'lineHeight'        => '1.5',
+                                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation'       => [
-                                                'left' => 1071.6,
-
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
-                                            'contextualSpacing' => false,
-                                            'next'              => true,
-                                            'keepNext'          => true,
-                                            'widowControl'      => true,
-                                            'keepLines'         => true,
-                                            'hyphenation'       => false,
-                                            'pageBreakBefore'   => false,
+                                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun2, $pTag, false, false);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1508,6 +1557,11 @@ class FileController extends ApiController
                                         // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun, $pTag, false, false);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1595,12 +1649,11 @@ class FileController extends ApiController
                                 if ($existedList3) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 0.9,
-                                            'lineSpacing' => 'single',
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1608,18 +1661,18 @@ class FileController extends ApiController
                                         $shape = $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $textRun->addTextBreak(); // New line
-                                            $textRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                               => 'left', // Options: left, center, right, justify
-                                                'size'                                    => 9,
-                                                'bold'                                    => false,
-                                                'italic'                                  => true,
-                                                'underline'                               => 'none']); // Add caption in italics
+                                            $textRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                               => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1637,18 +1690,18 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         // Add Caption (Alt text)
                                         if (! empty($altText)) {
                                             $listItemRun->addTextBreak(); // New line
-                                            $listItemRun->addText($altText . '.', ['name' => 'Calibri',
-                                                'alignment'                                   => 'left', // Options: left, center, right, justify
-                                                'size'                                        => 9,
-                                                'bold'                                        => false,
-                                                'italic'                                      => true,
-                                                'underline'                                   => 'none']); // Add caption in italics
+                                            $listItemRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                                'alignment'                                   => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                                'size'                                        => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                                'bold'                                        => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                                'italic'                                      => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                                'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1670,11 +1723,11 @@ class FileController extends ApiController
                                 if ($existedList3) {
                                     if (file_exists($fullImagePath)) {
                                         $textRun = $section->addTextRun([
-                                            'spaceBefore' => 0,
-                                            'spaceAfter'  => 240,
-                                            'lineHeight'  => 1.5,
+                                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation' => [
-                                                'left' => 1071.6,
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
                                         ]);
 
@@ -1682,7 +1735,7 @@ class FileController extends ApiController
                                         $textRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1700,7 +1753,7 @@ class FileController extends ApiController
                                         $listItemRun->addImage($fullImagePath, [
                                             'width'     => 100,
                                             'height'    => 80,
-                                            'alignment' => 'left',
+                                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                         ]);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1736,6 +1789,11 @@ class FileController extends ApiController
                                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2 . '4', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                           // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($nestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1751,6 +1809,11 @@ class FileController extends ApiController
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                 // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
+                                        $item = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $item . '</span>';
                                         Html::addHtml($unNestedListItemRun, $item, false, false);
                                     }
                                 }
@@ -1763,23 +1826,27 @@ class FileController extends ApiController
                                     if ($existedList3) {
 
                                         $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
-                                            'spaceBefore'       => 0,
-                                            'spaceAfter'        => 240,
-                                            'lineHeight'        => '1.5',
+                                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                             'indentation'       => [
-                                                'left' => 1071.6,
-
+                                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                             ],
-                                            'contextualSpacing' => false,
-                                            'next'              => true,
-                                            'keepNext'          => true,
-                                            'widowControl'      => true,
-                                            'keepLines'         => true,
-                                            'hyphenation'       => false,
-                                            'pageBreakBefore'   => false,
+                                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
                                         ]);
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun2, $pTag, false, false);
                                         if ($index2 < count($paragraphsArray) - 1) {
 
@@ -1793,6 +1860,11 @@ class FileController extends ApiController
                                         // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
+                                        $pTag = '<span style="font-size:'
+                                            . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                            . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                            . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                            . $pTag . '</span>';
                                         Html::addHtml($listItemRun, $pTag, false, false);
 
                                         if ($index2 < count($paragraphsArray) - 1) {
