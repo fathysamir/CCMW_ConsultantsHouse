@@ -411,7 +411,7 @@
                 }
             });
 
-            // 🟢 سحب الصور
+           
             quill.root.addEventListener('drop', async function(e) {
                 e.preventDefault();
                 if (e.dataTransfer && e.dataTransfer.files.length) {

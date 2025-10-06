@@ -92,7 +92,8 @@
                                             <select class="form-control" name="h1[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h1']['standard']['size'] == $size ? 'selected' : ($size == 24 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h1']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -267,7 +268,8 @@
                                             <select class="form-control" name="h2[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h2']['standard']['size'] == $size ? 'selected' : ($size == 22 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h2']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -443,7 +445,8 @@
                                             <select class="form-control" name="h3[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h3']['standard']['size'] == $size ? 'selected' : ($size == 20 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h3']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -618,7 +621,8 @@
                                             <select class="form-control" name="subtitle[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['subtitle']['standard']['size'] == $size ? 'selected' : ($size == 14 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['subtitle']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -802,7 +806,8 @@
                                             <select class="form-control" name="body[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['body']['standard']['size'] == $size ? 'selected' : ($size == 11 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['body']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -1137,7 +1142,7 @@
                                             <select class="form-control" name="figure[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['figure']['standard']['size'] == $size ? 'selected' : ($size == 9 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['figure']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach

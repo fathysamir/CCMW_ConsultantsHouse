@@ -1154,28 +1154,7 @@
                 ['image'],
                 ['clean'] // remove formatting button
             ];
-            const BlockEmbed = Quill.import('blots/block/embed');
 
-            class CustomImageBlot extends BlockEmbed {
-                static create(value) {
-                    const node = super.create();
-                    node.setAttribute('src', value.url);
-                    if (value.alt) node.setAttribute('alt', value.alt);
-                    node.setAttribute('style', 'max-width:100%; height:auto; display:block; margin:auto;');
-                    return node;
-                }
-
-                static value(node) {
-                    return {
-                        url: node.getAttribute('src'),
-                        alt: node.getAttribute('alt')
-                    };
-                }
-            }
-
-            CustomImageBlot.blotName = 'customImage';
-            CustomImageBlot.tagName = 'img';
-            Quill.register(CustomImageBlot);
             var quill = new Quill('#editor', {
                 modules: {
                     toolbar: {
@@ -1249,7 +1228,29 @@
 
 
 
+                    const BlockEmbed = Quill.import('blots/block/embed');
 
+                    class CustomImageBlot extends BlockEmbed {
+                        static create(value) {
+                            const node = super.create();
+                            node.setAttribute('src', value.url);
+                            if (value.alt) node.setAttribute('alt', value.alt);
+                            node.setAttribute('style',
+                                'max-width:100%; height:auto; display:block; margin:auto;');
+                            return node;
+                        }
+
+                        static value(node) {
+                            return {
+                                url: node.getAttribute('src'),
+                                alt: node.getAttribute('alt')
+                            };
+                        }
+                    }
+
+                    CustomImageBlot.blotName = 'customImage';
+                    CustomImageBlot.tagName = 'img';
+                    Quill.register(CustomImageBlot);
 
 
 
