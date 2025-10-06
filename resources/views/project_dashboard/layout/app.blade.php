@@ -1090,6 +1090,62 @@
             placeholder: "___.___.___.___"
         });
         // editor
+        // var toolbarOptions = [
+        //     // [{
+        //     //     'font': []
+        //     // }],
+        //     [{
+        //         'header': [1, 2, 3, 4, 5, 6, false]
+        //     }],
+        //     [{
+        //         'size': Size.whitelist
+        //     }],
+        //     ['bold', 'italic', 'underline', 'strike'],
+        //     // ['blockquote', 'code-block'],
+        //     // [{
+        //     //         'header': 1
+        //     //     },
+        //     //     {
+        //     //         'header': 2
+        //     //     }
+        //     // ],
+        //     [{
+        //             'list': 'ordered'
+        //         },
+        //         {
+        //             'list': 'bullet'
+        //         }
+        //     ],
+        //     // [{
+        //     //         'script': 'sub'
+        //     //     },
+        //     //     {
+        //     //         'script': 'super'
+        //     //     }
+        //     // ],
+        //     [{
+        //             'indent': '-1'
+        //         },
+        //         {
+        //             'indent': '+1'
+        //         }
+        //     ], // outdent/indent
+        //     [{
+        //         'direction': 'rtl'
+        //     }], // text direction
+        //     [{
+        //             'color': []
+        //         },
+        //         {
+        //             'background': []
+        //         }
+        //     ], // dropdown with defaults from theme
+        //     [{
+        //         'align': []
+        //     }],
+        //     ['image'],
+        //     ['clean'] // remove formatting button
+        // ];
         var editor = document.getElementById('editor');
         if (editor) {
             const Size = Quill.import('attributors/style/size');
@@ -1098,10 +1154,9 @@
             ];
             Quill.register(Size, true);
 
+
             var toolbarOptions = [
-                // [{
-                //     'font': []
-                // }],
+
                 [{
                     'header': [1, 2, 3, 4, 5, 6, false]
                 }],
@@ -1109,64 +1164,42 @@
                     'size': Size.whitelist
                 }],
                 ['bold', 'italic', 'underline', 'strike'],
-                // ['blockquote', 'code-block'],
-                // [{
-                //         'header': 1
-                //     },
-                //     {
-                //         'header': 2
-                //     }
-                // ],
                 [{
-                        'list': 'ordered'
-                    },
-                    {
-                        'list': 'bullet'
-                    }
-                ],
-                // [{
-                //         'script': 'sub'
-                //     },
-                //     {
-                //         'script': 'super'
-                //     }
-                // ],
+                    'list': 'ordered'
+                }, {
+                    'list': 'bullet'
+                }],
                 [{
-                        'indent': '-1'
-                    },
-                    {
-                        'indent': '+1'
-                    }
-                ], // outdent/indent
+                    'indent': '-1'
+                }, {
+                    'indent': '+1'
+                }],
                 [{
                     'direction': 'rtl'
-                }], // text direction
+                }],
                 [{
-                        'color': []
-                    },
-                    {
-                        'background': []
-                    }
-                ], // dropdown with defaults from theme
+                    'color': []
+                }, {
+                    'background': []
+                }],
                 [{
                     'align': []
                 }],
                 ['image'],
-                ['clean'] // remove formatting button
+                ['clean']
             ];
-
             var quill = new Quill('#editor', {
                 modules: {
                     toolbar: {
                         container: toolbarOptions,
                         handlers: {
                             image: function() {
-                                // Show custom image modal
+
                                 $('#insertImageModal').modal('show');
                             }
                         }
                     },
-                    imageResize: { // Move imageResize outside of toolbar
+                    imageResize: {
                         displayStyles: {
                             backgroundColor: 'black',
                             border: 'none',
@@ -1216,116 +1249,96 @@
                     }
                 }
 
-                // Insert Image into Quill Editor with Alt Text
+
                 if (imageUrl) {
-                    var range = quill.getSelection(); // Get cursor position
+                    // 🔥 Ensure editor is focused first
+                    quill.focus();
+
+                    // Get the current cursor position (true = force focus if not already)
+                    var range = quill.getSelection(true);
 
                     if (!range) {
                         range = {
-                            index: quill.getLength()
-                        }; // If null, insert at the end
+                            index: quill.getLength(),
+                            length: 0
+                        }; // Insert at end as fallback
                     }
 
+                    // Insert the image HTML exactly at current position
+                    const imgTag =
+                        `<img src="${imageUrl}" alt="${altText || ''}" style="max-width:100%; height:auto; display:inline-block;">`;
 
+                    // 🔥 Use clipboard paste at cursor index (not append)
+                    quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
 
-                    const BlockEmbed = Quill.import('blots/block/embed');
-
-                    class CustomImageBlot extends BlockEmbed {
-                        static create(value) {
-                            const node = super.create();
-                            node.setAttribute('src', value.url);
-                            if (value.alt) node.setAttribute('alt', value.alt);
-                            node.setAttribute('style',
-                                'max-width:100%; height:auto; display:block; margin:auto;');
-                            return node;
-                        }
-
-                        static value(node) {
-                            return {
-                                url: node.getAttribute('src'),
-                                alt: node.getAttribute('alt')
-                            };
-                        }
-                    }
-
-                    CustomImageBlot.blotName = 'customImage';
-                    CustomImageBlot.tagName = 'img';
-                    Quill.register(CustomImageBlot);
-
-
-
-                    const range55 = quill.getSelection(true);
-                    quill.insertEmbed(range55.index, 'customImage', {
-                        url: imageUrl,
-                        alt: altText
-                    });
-
-                    // var imgTag = `<img src="${imageUrl}" alt="${altText}">`;
-                    // quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
+                    // Move cursor after image (so user can continue typing)
+                    quill.setSelection(range.index + 1, 0);
                 } else {
                     alert('Please provide an image URL or upload a file.');
                 }
 
                 // Close modal
                 $('#insertImageModal').modal('hide');
+                setTimeout(() => quill.focus(), 150);
 
                 // Clear inputs
                 document.getElementById('imageUrlInput').value = '';
                 document.getElementById('uploadImageInput').value = '';
                 document.getElementById('imageAltInput').value = '';
             });
-            // var quill = new Quill('#editor', {
-            //     modules: {
-            //         toolbar: {
-            //             container: toolbarOptions,
-            //             handlers: {
-            //                 image: function() {
-            //                     var input = document.createElement('input');
-            //                     input.setAttribute('type', 'file');
-            //                     input.setAttribute('accept', 'image/*');
-            //                     input.click();
-
-            //                     input.onchange = async function() {
-            //                         var file = input.files[0];
-            //                         if (file) {
-            //                             var formData = new FormData();
-            //                             formData.append('image', file);
-
-            //                             try {
-            //                                 let response = await fetch(
-            //                                 '/project/upload-editor-image', { // <-- Change this URL to your backend route
-            //                                     method: 'POST',
-            //                                     body: formData,
-            //                                     headers: {
-            //                                         'X-CSRF-TOKEN': document.querySelector(
-            //                                             'meta[name="csrf-token"]').content
-            //                                     }
-            //                                 });
-
-            //                                 let result = await response.json();
-            //                                 if (result.success) {
-            //                                     var range = quill.getSelection();
-            //                                     quill.insertEmbed(range.index, 'image', '/' + result
-            //                                         .file.path);
-            //                                 } else {
-            //                                     alert('Image upload failed');
-            //                                 }
-            //                             } catch (error) {
-            //                                 console.error('Upload error:', error);
-            //                             }
-            //                         }
-            //                     };
-            //                 }
-            //             }
-            //         }
-            //     },
-            //     theme: 'snow'
-            // });
 
             document.querySelector('#formNarrative').addEventListener('submit', function() {
                 document.querySelector('#narrative').value = quill.root.innerHTML;
             });
         }
+        // var quill = new Quill('#editor', {
+        //     modules: {
+        //         toolbar: {
+        //             container: toolbarOptions,
+        //             handlers: {
+        //                 image: function() {
+        //                     var input = document.createElement('input');
+        //                     input.setAttribute('type', 'file');
+        //                     input.setAttribute('accept', 'image/*');
+        //                     input.click();
+
+        //                     input.onchange = async function() {
+        //                         var file = input.files[0];
+        //                         if (file) {
+        //                             var formData = new FormData();
+        //                             formData.append('image', file);
+
+        //                             try {
+        //                                 let response = await fetch(
+        //                                 '/project/upload-editor-image', { // <-- Change this URL to your backend route
+        //                                     method: 'POST',
+        //                                     body: formData,
+        //                                     headers: {
+        //                                         'X-CSRF-TOKEN': document.querySelector(
+        //                                             'meta[name="csrf-token"]').content
+        //                                     }
+        //                                 });
+
+        //                                 let result = await response.json();
+        //                                 if (result.success) {
+        //                                     var range = quill.getSelection();
+        //                                     quill.insertEmbed(range.index, 'image', '/' + result
+        //                                         .file.path);
+        //                                 } else {
+        //                                     alert('Image upload failed');
+        //                                 }
+        //                             } catch (error) {
+        //                                 console.error('Upload error:', error);
+        //                             }
+        //                         }
+        //                     };
+        //                 }
+        //             }
+        //         }
+        //     },
+        //     theme: 'snow'
+        // });
+
         // Example starter JavaScript for disabling form submissions if there are invalid fields
         (function() {
             'use strict';
