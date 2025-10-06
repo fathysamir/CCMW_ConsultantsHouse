@@ -454,7 +454,7 @@ class FileController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h1']['standard']['size']) : 24,
             'bold'      => $formate_values ? ($formate_values['h1']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['h1']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h1']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h1']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleH1 = [
@@ -478,7 +478,7 @@ class FileController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h2']['standard']['size']) : 16,
             'bold'      => $formate_values ? ($formate_values['h2']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['h2']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h2']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h2']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleH2 = [
@@ -503,7 +503,7 @@ class FileController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h3']['standard']['size']) : 14,
             'bold'      => $formate_values ? ($formate_values['h3']['standard']['bold'] == '1' ? true : false) : false,
             'italic'    => $formate_values ? ($formate_values['h3']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h3']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h3']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleH3 = [
@@ -528,7 +528,7 @@ class FileController extends ApiController
             'size'      => $formate_values ? intval($formate_values['subtitle']['standard']['size']) : 14,
             'bold'      => $formate_values ? ($formate_values['subtitle']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['subtitle']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleSubtitle = [
@@ -552,7 +552,7 @@ class FileController extends ApiController
             'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
             'bold'      => $formate_values ? ($formate_values['body']['standard']['bold'] == '1' ? true : false) : false,
             'italic'    => $formate_values ? ($formate_values['body']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['body']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['body']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
 
@@ -688,7 +688,7 @@ class FileController extends ApiController
                                                 'size'                                    => 9,
                                                 'bold'                                    => false,
                                                 'italic'                                  => true,
-                                                'underline'                               => false]); // Add caption in italics
+                                                'underline'                               => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -717,7 +717,7 @@ class FileController extends ApiController
                                                 'size'                                        => 9,
                                                 'bold'                                        => false,
                                                 'italic'                                      => true,
-                                                'underline'                                   => false]); // Add caption in italics
+                                                'underline'                                   => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -911,7 +911,7 @@ class FileController extends ApiController
                 'size'      => $formate_values ? intval($formate_values['footnote']['standard']['size']) : 9,
                 'bold'      => $formate_values ? ($formate_values['footnote']['standard']['bold'] == '1' ? true : false) : false,
                 'italic'    => $formate_values ? ($formate_values['footnote']['standard']['italic'] == '1' ? true : false) : false,
-                'underline' => $formate_values ? ($formate_values['footnote']['standard']['underline'] == '1' ? true : false) : false,
+                'underline' => $formate_values ? ($formate_values['footnote']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
             ];
             $GetParagraphStyleFootNotes = [
@@ -1049,7 +1049,7 @@ class FileController extends ApiController
                                                 'size'                                    => 9,
                                                 'bold'                                    => false,
                                                 'italic'                                  => true,
-                                                'underline'                               => false]); // Add caption in italics
+                                                'underline'                               => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1078,7 +1078,7 @@ class FileController extends ApiController
                                                 'size'                                        => 9,
                                                 'bold'                                        => false,
                                                 'italic'                                      => true,
-                                                'underline'                                   => false]); // Add caption in italics
+                                                'underline'                                   => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1334,7 +1334,7 @@ class FileController extends ApiController
                                                 'size'                                    => 9,
                                                 'bold'                                    => false,
                                                 'italic'                                  => true,
-                                                'underline'                               => false]); // Add caption in italics
+                                                'underline'                               => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1363,7 +1363,7 @@ class FileController extends ApiController
                                                 'size'                                        => 9,
                                                 'bold'                                        => false,
                                                 'italic'                                      => true,
-                                                'underline'                                   => false]); // Add caption in italics
+                                                'underline'                                   => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1619,7 +1619,7 @@ class FileController extends ApiController
                                                 'size'                                    => 9,
                                                 'bold'                                    => false,
                                                 'italic'                                  => true,
-                                                'underline'                               => false]); // Add caption in italics
+                                                'underline'                               => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {
@@ -1648,7 +1648,7 @@ class FileController extends ApiController
                                                 'size'                                        => 9,
                                                 'bold'                                        => false,
                                                 'italic'                                      => true,
-                                                'underline'                                   => false]); // Add caption in italics
+                                                'underline'                                   => 'none']); // Add caption in italics
                                         }
 
                                         if ($index2 < count($paragraphsArray) - 1) {

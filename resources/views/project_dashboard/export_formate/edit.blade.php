@@ -975,7 +975,7 @@
                                             <select class="form-control" name="footnote[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['footnote']['standard']['size'] == $size ? 'selected' : ($size == 9 ? 'selected' : '') }}>
+                                                        {{ $formate_values && (int)$formate_values['footnote']['standard']['size'] == $size ? 'selected' : ($size == 9 ? 'selected' : '') }}>
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -1039,20 +1039,20 @@
                                             <label>Line Height</label>
                                             <select class="form-control" name="footnote[paragraph][lineHeight]">
                                                 <option
-                                                    value="1"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1') selected @endif>
+                                                    value="1" @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1') selected @endif>
                                                     Single (1.0)</option>
                                                 <option
-                                                    value="1.15"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1.15') selected @endif>
+                                                    value="1.15" @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
                                                 <option value="1.5" selected>1.5</option>
                                                 <option
-                                                    value="2"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2') selected @endif>
+                                                    value="2" @if($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option
-                                                    value="2.5"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2.5') selected @endif>2.5
+                                                    value="2.5" @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2.5') selected @endif>2.5
                                                 </option>
                                                 <option
-                                                    value="3"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '3') selected @endif>
+                                                    value="3" @if($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '3') selected @endif>
                                                     Triple (3.0)</option>
                                             </select>
                                         </div>

@@ -208,7 +208,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h1']['standard']['size']) : 24,
             'bold'      => $formate_values ? ($formate_values['h1']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['h1']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h1']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h1']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleH1 = [
@@ -257,7 +257,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h3']['standard']['size']) : 14,
             'bold'      => $formate_values ? ($formate_values['h3']['standard']['bold'] == '1' ? true : false) : false,
             'italic'    => $formate_values ? ($formate_values['h3']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h3']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['h3']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleH3 = [
@@ -282,7 +282,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['subtitle']['standard']['size']) : 14,
             'bold'      => $formate_values ? ($formate_values['subtitle']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['subtitle']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleSubtitle = [
@@ -307,7 +307,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
             'bold'      => false,
             'italic'    => false,
-            'underline' => false,
+            'underline' => 'none',
 
         ];
 
@@ -386,7 +386,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['footnote']['standard']['size']) : 9,
             'bold'      => $formate_values ? ($formate_values['footnote']['standard']['bold'] == '1' ? true : false) : false,
             'italic'    => $formate_values ? ($formate_values['footnote']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['footnote']['standard']['underline'] == '1' ? true : false) : false,
+            'underline' => $formate_values ? ($formate_values['footnote']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
 
         ];
         $GetParagraphStyleFootNotes = [
@@ -523,7 +523,7 @@ class FileDocumentController extends ApiController
                                             'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
                                             'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
                                             'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
-                                            'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? true : false) : false]); // Add caption in italics
+                                            'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                     }
 
                                     if ($index2 < count($paragraphsArray) - 1) {
@@ -552,7 +552,7 @@ class FileDocumentController extends ApiController
                                             'size'                                        => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
                                             'bold'                                        => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
                                             'italic'                                      => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
-                                            'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? true : false) : false]); // Add caption in italics
+                                            'underline'                                   => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']); // Add caption in italics
                                     }
 
                                     if ($index2 < count($paragraphsArray) - 1) {
