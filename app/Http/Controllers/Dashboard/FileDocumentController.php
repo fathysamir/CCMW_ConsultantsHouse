@@ -639,7 +639,11 @@ class FileDocumentController extends ApiController
                                     $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2, 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                 // $nestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
-                                    $item = '<span style="font-size:' . $formate_values ? intval($formate_values['body']['standard']['size']) : 11 . 'pt; font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">' . $item . '</span>';
+                                    $item = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $item . '</span>';
                                     Html::addHtml($nestedListItemRun, $item, false, false);
                                 }
                             }
@@ -655,8 +659,11 @@ class FileDocumentController extends ApiController
                                     $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                             // $unNestedListItemRun->addText($item);
                                     $item = str_replace('&', '&amp;', $item);
-                                    $item = '<span style="font-size:' . $formate_values ? intval($formate_values['body']['standard']['size']) : 11 . 'pt; font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">' . $item . '</span>';
-
+                                    $item = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $item . '</span>';
                                     Html::addHtml($unNestedListItemRun, $item, false, false);
                                 }
                             }
@@ -686,7 +693,11 @@ class FileDocumentController extends ApiController
                                     ]);
                                     $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
-                                    $pTag = '<span style="font-size:' . $formate_values ? intval($formate_values['body']['standard']['size']) : 11 . 'pt; font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">' . $pTag . '</span>';
+                                    $pTag = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $pTag . '</span>';
                                     Html::addHtml($listItemRun2, $pTag, false, false);
                                     if ($index2 < count($paragraphsArray) - 1) {
 
@@ -700,7 +711,11 @@ class FileDocumentController extends ApiController
                                     // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                     $pTag = $this->lowercaseFirstCharOnly($pTag);
                                     $pTag = str_replace('&', '&amp;', $pTag);
-                                    $pTag = '<span style="font-size:' . $formate_values ? intval($formate_values['body']['standard']['size']) : 11 . 'pt; font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">' . $pTag . '</span>';
+                                    $pTag = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $pTag . '</span>';
                                     Html::addHtml($listItemRun, $pTag, false, false);
 
                                     if ($index2 < count($paragraphsArray) - 1) {
@@ -939,6 +954,17 @@ class FileDocumentController extends ApiController
         }
         if ($this->hasContent($request->narrative)) {
             $narrative = $request->narrative;
+
+            $narrative = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $narrative);
+
+            $narrative = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $narrative);
+
         } else {
             $narrative = null;
         }

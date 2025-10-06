@@ -620,12 +620,11 @@ class ParaWiseController extends ApiController
 
                                 if (file_exists($fullImagePath)) {
                                     $textRun = $section->addTextRun([
-                                        'spaceBefore' => 0,
-                                        'spaceAfter'  => 240,
-                                        'lineHeight'  => 0.9,
-                                        'lineSpacing' => 'single',
+                                        'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                        'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                        'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                         'indentation' => [
-                                            'left' => 1071.6,
+                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                         ],
                                     ]);
 
@@ -633,7 +632,7 @@ class ParaWiseController extends ApiController
                                     $shape = $textRun->addImage($fullImagePath, [
                                         'width'     => 100,
                                         'height'    => 80,
-                                        'alignment' => 'left',
+                                        'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                     ]);
 
                                     // Add Caption (Alt text)

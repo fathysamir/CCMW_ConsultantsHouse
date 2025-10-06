@@ -213,7 +213,6 @@
                                         {{ in_array($para->id, array_map('intval', explode(',', $paragraph->para_numbers))) ? 'selected' : '' }}>
                                         {{ floatval($para->number) }}
                                     </option>
-                                    
                                 @endforeach
                             </select>
                             <p>Fill this box only if the reply is for more than one paras</p>
@@ -562,7 +561,7 @@
                     };
                 }
 
-               const BlockEmbed = Quill.import('blots/block/embed');
+                const BlockEmbed = Quill.import('blots/block/embed');
 
                 class CustomImageBlot extends BlockEmbed {
                     static create(value) {

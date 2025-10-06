@@ -1154,6 +1154,28 @@
                 ['image'],
                 ['clean'] // remove formatting button
             ];
+            const BlockEmbed = Quill.import('blots/block/embed');
+
+            class CustomImageBlot extends BlockEmbed {
+                static create(value) {
+                    const node = super.create();
+                    node.setAttribute('src', value.url);
+                    if (value.alt) node.setAttribute('alt', value.alt);
+                    node.setAttribute('style', 'max-width:100%; height:auto; display:block; margin:auto;');
+                    return node;
+                }
+
+                static value(node) {
+                    return {
+                        url: node.getAttribute('src'),
+                        alt: node.getAttribute('alt')
+                    };
+                }
+            }
+
+            CustomImageBlot.blotName = 'customImage';
+            CustomImageBlot.tagName = 'img';
+            Quill.register(CustomImageBlot);
             var quill = new Quill('#editor', {
                 modules: {
                     toolbar: {
@@ -1225,8 +1247,20 @@
                         }; // If null, insert at the end
                     }
 
-                    var imgTag = `<img src="${imageUrl}" alt="${altText}">`;
-                    quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
+
+
+
+
+
+
+                    const range55 = quill.getSelection(true);
+                    quill.insertEmbed(range55.index, 'customImage', {
+                        url: imageUrl,
+                        alt: altText
+                    });
+
+                    // var imgTag = `<img src="${imageUrl}" alt="${altText}">`;
+                    // quill.clipboard.dangerouslyPasteHTML(range.index, imgTag);
                 } else {
                     alert('Please provide an image URL or upload a file.');
                 }
@@ -1541,17 +1575,17 @@
                         type: "GET",
                         data: data + "&export=excel",
                         success: function(response) {
-                            
-                                // open the file in new tab
-                                
-                                window.open(response.download_url, '_blank');
 
-                                // OR download directly:
-                                // window.location.href = response.url;
+                            // open the file in new tab
 
-                                // OR show the link in modal:
-                                // $('#excelLink').attr('href', response.url).show();
-                           
+                            window.open(response.download_url, '_blank');
+
+                            // OR download directly:
+                            // window.location.href = response.url;
+
+                            // OR show the link in modal:
+                            // $('#excelLink').attr('href', response.url).show();
+
                         },
                         error: function(xhr) {
                             console.error(xhr.responseText);

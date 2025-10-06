@@ -67,6 +67,15 @@ class FileAttachmentController extends ApiController
         }
         if ($this->hasContent($request->narrative)) {
             $narrative = $request->narrative;
+            $narrative = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $narrative);
+
+            $narrative = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $narrative);
         } else {
             $narrative = null;
         }
@@ -108,6 +117,15 @@ class FileAttachmentController extends ApiController
         }
         if ($this->hasContent($request->narrative)) {
             $narrative = $request->narrative;
+            $narrative = preg_replace('/<p>\s*(<img\b[^>]*>)\s*<\/p>/i', '$1', $narrative);
+
+            $narrative = preg_replace_callback('/<img\b[^>]*>/i', function ($matches) {
+                $img = $matches[0];
+                if (preg_match('/<\/p>\s*$/i', substr($img, -10)) || preg_match('/^<p[^>]*>/i', substr($img, 0, 10))) {
+                    return $img;
+                }
+                return "<p>$img</p>";
+            }, $narrative);
         } else {
             $narrative = null;
         }
