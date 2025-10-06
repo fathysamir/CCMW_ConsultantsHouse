@@ -300,14 +300,14 @@ class FileDocumentController extends ApiController
             'pageBreakBefore'   => $formate_values ? ($formate_values['subtitle']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
 
         ];
-        dd($formate_values['body']['standard']['bold']);
+        
         $GetStandardStylesP = [
             'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
             'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
             'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
-            'bold'      => $formate_values ? ($formate_values['body']['standard']['bold'] == '1' ? true : false) : false,
-            'italic'    => $formate_values ? ($formate_values['body']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['body']['standard']['underline'] == '1' ? true : false) : false,
+            'bold'      => false,
+            'italic'    => false,
+            'underline' => false,
 
         ];
 
