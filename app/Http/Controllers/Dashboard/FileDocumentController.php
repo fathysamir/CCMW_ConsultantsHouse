@@ -232,7 +232,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['h2']['standard']['size']) : 16,
             'bold'      => $formate_values ? ($formate_values['h2']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['h2']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['h2']['standard']['underline'] == '1' ? true : false) : false,
+            'underLine' => $formate_values ? ($formate_values['h2']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleH2 = [
@@ -282,7 +282,7 @@ class FileDocumentController extends ApiController
             'size'      => $formate_values ? intval($formate_values['subtitle']['standard']['size']) : 14,
             'bold'      => $formate_values ? ($formate_values['subtitle']['standard']['bold'] == '1' ? true : false) : true,
             'italic'    => $formate_values ? ($formate_values['subtitle']['standard']['italic'] == '1' ? true : false) : false,
-            'underline' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? true : false) : false,
+            'underLine' => $formate_values ? ($formate_values['subtitle']['standard']['underline'] == '1' ? true : false) : false,
 
         ];
         $GetParagraphStyleSubtitle = [
