@@ -973,8 +973,19 @@ class FileController extends ApiController
                         $prefix     = $request->prefix2;
                         $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
                         $hint       = $listNumber . ': ';
-                        $from       = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                        $type       = $paragraph->document->docType->name;
+                        if ($request->fromForL_E) {
+                            $text = strtolower(($paragraph->document->docType->name ?? '') . ' ' . ($paragraph->document->docType->description ?? ''));
+                           
+                            if (preg_match('/\b(letter|email|e-mail)\b/', $text)) {
+
+                                $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                            } else {
+                                $from = '';
+                            }
+                        } else {
+                            $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                        }
+                        $type = $paragraph->document->docType->name;
                         $hint .= $from . $type . ' ';
                         if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
                             $ref_part = $request->ref_part2;

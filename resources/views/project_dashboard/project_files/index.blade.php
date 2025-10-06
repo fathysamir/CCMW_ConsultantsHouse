@@ -149,8 +149,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                max-height:650px;
-                                                                                                                            } */
+                                                                                                                                    max-height:650px;
+                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -446,6 +446,11 @@
                                     <input type="number" name="Start" id="Start" class="form-control"
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                                <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
+                                    <input type="checkbox" class="custom-control-input" id="fromForL-E"
+                                        name="fromForL_E">
+                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>

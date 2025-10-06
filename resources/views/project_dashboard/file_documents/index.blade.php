@@ -1001,6 +1001,11 @@
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
                                 </div>
+                                <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
+                                    <input type="checkbox" class="custom-control-input" id="fromForL-E"
+                                        name="fromForL_E">
+                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
+                                </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn">In case of e-mails : </label>
                                     <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
@@ -1179,6 +1184,11 @@
                                     <input type="number" name="Start" id="Start2" class="form-control"
                                         placeholder="Start" value="1" style="width: 30%;margin-left:2%;"min="1"
                                         oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                                <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
+                                    <input type="checkbox" class="custom-control-input" id="fromForL-E"
+                                        name="fromForL_E">
+                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>

@@ -300,7 +300,7 @@ class FileDocumentController extends ApiController
             'pageBreakBefore'   => $formate_values ? ($formate_values['subtitle']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
 
         ];
-        
+
         $GetStandardStylesP = [
             'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
             'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
@@ -430,8 +430,19 @@ class FileDocumentController extends ApiController
                     $prefix     = $request->prefix2;
                     $listNumber = "$prefix" . str_pad($x, $sn, '0', STR_PAD_LEFT);
                     $hint       = $listNumber . ': ';
-                    $from       = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
-                    $type       = $paragraph->document->docType->name;
+                    if ($request->fromForL_E) {
+                        $text = strtolower(($paragraph->document->docType->name ?? '') . ' ' . ($paragraph->document->docType->description ?? ''));
+
+                        if (preg_match('/\b(letter|email|e-mail)\b/', $text)) {
+
+                            $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                        } else {
+                            $from = '';
+                        }
+                    } else {
+                        $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
+                    }
+                    $type = $paragraph->document->docType->name;
                     $hint .= $from . $type . ' ';
                     if (str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->name)), 'email') || str_contains(strtolower(preg_replace('/[\\\\\/:*?"+.<>\|{}\[\]`\-]/', '', $paragraph->document->docType->description)), 'email')) {
                         $ref_part = $request->ref_part2;
@@ -1262,8 +1273,20 @@ class FileDocumentController extends ApiController
                     $prefix = $request->prefix;
                     $sn     = $request->sn;
 
-                    $date              = date('d-M-y', strtotime($document->document->start_date));
-                    $from              = $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative . "'s " : '';
+                    $date = date('d-M-y', strtotime($document->document->start_date));
+
+                    if ($request->fromForL_E) {
+                        $text = strtolower(($document->document->docType->name ?? '') . ' ' . ($document->document->docType->description ?? ''));
+
+                        if (preg_match('/\b(letter|email|e-mail)\b/', $text)) {
+
+                            $from = $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative . "'s " : '';
+                        } else {
+                            $from = '';
+                        }
+                    } else {
+                        $from = $document->document->fromStakeHolder ? $document->document->fromStakeHolder->narrative . "'s " : '';
+                    }
                     $type              = $document->document->docType->name;
                     $sanitizedFilename = preg_replace('/[\\\\\/:;*?"+.<>|{}\[\]`]/', '-', $document->document->reference);
                     $sanitizedFilename = trim($sanitizedFilename, '-');
