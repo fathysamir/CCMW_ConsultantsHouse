@@ -92,7 +92,8 @@
                                             <select class="form-control" name="h1[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h1']['standard']['size'] == $size ? 'selected' : ($size == 24 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h1']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -151,7 +152,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -267,7 +269,8 @@
                                             <select class="form-control" name="h2[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h2']['standard']['size'] == $size ? 'selected' : ($size == 22 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h2']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -327,7 +330,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -443,7 +447,8 @@
                                             <select class="form-control" name="h3[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['h3']['standard']['size'] == $size ? 'selected' : ($size == 20 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['h3']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -503,7 +508,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -618,7 +624,8 @@
                                             <select class="form-control" name="subtitle[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['subtitle']['standard']['size'] == $size ? 'selected' : ($size == 14 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['subtitle']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -682,7 +689,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -767,14 +775,16 @@
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Courier New') selected @endif>Courier New</option>
                                                 <option value="Verdana"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Verdana') selected @endif>Verdana</option>
-                                                <option value="Tahoma" @if ($formate_values && $formate_values['body']['standard']['name'] == 'Tahoma') selected @endif>
+                                                <option value="Tahoma"
+                                                    @if ($formate_values && $formate_values['body']['standard']['name'] == 'Tahoma') selected @endif>
                                                     Tahoma</option>
                                                 <option value="Georgia"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Georgia') selected @endif>Georgia</option>
                                                 <option value="Trebuchet MS"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Trebuchet MS') selected @endif>Trebuchet MS
                                                 </option>
-                                                <option value="Impact" @if ($formate_values && $formate_values['body']['standard']['name'] == 'Impact') selected @endif>
+                                                <option value="Impact"
+                                                    @if ($formate_values && $formate_values['body']['standard']['name'] == 'Impact') selected @endif>
                                                     Impact</option>
                                             </select>
                                         </div>
@@ -784,11 +794,14 @@
                                             <label>Alignment</label>
                                             <select class="form-control" name="body[standard][alignment]">
                                                 <option value="left" selected>Left</option>
-                                                <option value="center"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'center') selected @endif>
+                                                <option
+                                                    value="center"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'center') selected @endif>
                                                     Center</option>
-                                                <option value="right"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'right') selected @endif>
+                                                <option
+                                                    value="right"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'right') selected @endif>
                                                     Right</option>
-                                                <option value="justify"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'justify') selected @endif>
+                                                <option
+                                                    value="justify"@if ($formate_values && $formate_values['body']['standard']['alignment'] == 'justify') selected @endif>
                                                     Justify</option>
                                             </select>
                                         </div>
@@ -799,7 +812,8 @@
                                             <select class="form-control" name="body[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['body']['standard']['size'] == $size ? 'selected' : ($size == 11 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['body']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
+
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -830,12 +844,14 @@
                                         <div class="form-group">
                                             <label>Line Height</label>
                                             <select class="form-control" name="body[paragraph][lineHeight]">
-                                                <option value="1"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1') selected @endif>
+                                                <option
+                                                    value="1"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1') selected @endif>
                                                     Single (1.0)</option>
                                                 <option
                                                     value="1.15"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5"
+                                                    @if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1.5') selected @endif>1.5</option>
                                                 <option
                                                     value="2"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
@@ -975,7 +991,7 @@
                                             <select class="form-control" name="footnote[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['footnote']['standard']['size'] == $size ? 'selected' : ($size == 9 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['footnote']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach
@@ -1038,21 +1054,22 @@
                                         <div class="form-group">
                                             <label>Line Height</label>
                                             <select class="form-control" name="footnote[paragraph][lineHeight]">
-                                                <option
-                                                    value="1"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1') selected @endif>
+                                                <option value="1"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1') selected @endif>
                                                     Single (1.0)</option>
-                                                <option
-                                                    value="1.15"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1.15') selected @endif>
+                                                <option value="1.15"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
-                                                <option
-                                                    value="2"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2') selected @endif>
+                                                <option value="1.5"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '1.5') selected @endif>1.5</option>
+                                                <option value="2"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
-                                                <option
-                                                    value="2.5"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2.5') selected @endif>2.5
+                                                <option value="2.5"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '2.5') selected @endif>2.5
                                                 </option>
-                                                <option
-                                                    value="3"@if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '3') selected @endif>
+                                                <option value="3"
+                                                    @if ($formate_values && $formate_values['footnote']['paragraph']['lineHeight'] == '3') selected @endif>
                                                     Triple (3.0)</option>
                                             </select>
                                         </div>
@@ -1132,7 +1149,7 @@
                                             <select class="form-control" name="figure[standard][size]">
                                                 @foreach ([8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] as $size)
                                                     <option value="{{ $size }}"
-                                                        {{ $formate_values && $formate_values['figure']['standard']['size'] == $size ? 'selected' : ($size == 9 ? 'selected' : '') }}>
+                                                        {{ ($formate_values && (int) $formate_values['figure']['standard']['size'] == $size) || (!$formate_values && $size == 9) ? 'selected' : '' }}>
                                                         {{ $size }}
                                                     </option>
                                                 @endforeach

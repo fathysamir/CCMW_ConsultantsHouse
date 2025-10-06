@@ -152,7 +152,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h1']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -329,7 +330,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h2']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -506,7 +508,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['h3']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -686,7 +689,8 @@
                                                     Single (1.0)</option>
                                                 <option value="1.15"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5" @if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '1.5') selected @endif>
+                                                    1.5</option>
                                                 <option value="2"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
                                                 <option value="2.5"@if ($formate_values && $formate_values['subtitle']['paragraph']['lineHeight'] == '2.5') selected @endif>
@@ -771,14 +775,16 @@
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Courier New') selected @endif>Courier New</option>
                                                 <option value="Verdana"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Verdana') selected @endif>Verdana</option>
-                                                <option value="Tahoma" @if ($formate_values && $formate_values['body']['standard']['name'] == 'Tahoma') selected @endif>
+                                                <option value="Tahoma"
+                                                    @if ($formate_values && $formate_values['body']['standard']['name'] == 'Tahoma') selected @endif>
                                                     Tahoma</option>
                                                 <option value="Georgia"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Georgia') selected @endif>Georgia</option>
                                                 <option value="Trebuchet MS"
                                                     @if ($formate_values && $formate_values['body']['standard']['name'] == 'Trebuchet MS') selected @endif>Trebuchet MS
                                                 </option>
-                                                <option value="Impact" @if ($formate_values && $formate_values['body']['standard']['name'] == 'Impact') selected @endif>
+                                                <option value="Impact"
+                                                    @if ($formate_values && $formate_values['body']['standard']['name'] == 'Impact') selected @endif>
                                                     Impact</option>
                                             </select>
                                         </div>
@@ -844,7 +850,8 @@
                                                 <option
                                                     value="1.15"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1.15') selected @endif>
                                                     1.15</option>
-                                                <option value="1.5" selected>1.5</option>
+                                                <option value="1.5"
+                                                    @if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '1.5') selected @endif>1.5</option>
                                                 <option
                                                     value="2"@if ($formate_values && $formate_values['body']['paragraph']['lineHeight'] == '2') selected @endif>
                                                     Double (2.0)</option>
