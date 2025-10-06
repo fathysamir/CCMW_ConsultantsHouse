@@ -638,12 +638,12 @@ class ParaWiseController extends ApiController
                                     // Add Caption (Alt text)
                                     if (! empty($altText)) {
                                         $textRun->addTextBreak(); // New line
-                                        $textRun->addText($altText . '.', ['name' => 'Calibri',
-                                            'alignment'                               => 'left', // Options: left, center, right, justify
-                                            'size'                                    => 9,
-                                            'bold'                                    => false,
-                                            'italic'                                  => true,
-                                            'underline'                               => false]); // Add caption in italics
+                                        $textRun->addText($altText . '.', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                                            'alignment'                               => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                                            'size'                                    => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                                            'bold'                                    => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                                            'italic'                                  => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                                            'underline'                               => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? true : false) : false]); // Add caption in italics
                                     }
 
                                 }
@@ -656,11 +656,11 @@ class ParaWiseController extends ApiController
 
                                 if (file_exists($fullImagePath)) {
                                     $textRun = $section->addTextRun([
-                                        'spaceBefore' => 0,
-                                        'spaceAfter'  => 240,
-                                        'lineHeight'  => 1.5,
+                                        'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                        'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                        'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                         'indentation' => [
-                                            'left' => 1071.6,
+                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
                                         ],
                                     ]);
 
@@ -668,7 +668,7 @@ class ParaWiseController extends ApiController
                                     $textRun->addImage($fullImagePath, [
                                         'width'     => 100,
                                         'height'    => 80,
-                                        'alignment' => 'left',
+                                        'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
                                     ]);
 
                                 }
@@ -695,7 +695,11 @@ class ParaWiseController extends ApiController
                                         $nestedListItemRun = $section->addListItemRun(0, 'multilevel_1' . $index . $index2, 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                                     // $nestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
-                                        $item = '<span style="font-size:11pt;">' . $item . '</span>';
+                                        $item = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $item . '</span>';
                                         if (preg_match_all('/<strong[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>/', $item, $matches)) {
 
                                             $this->addParagraphWithInlineFootnotes($nestedListItemRun, $item, $request, $x);
@@ -723,7 +727,11 @@ class ParaWiseController extends ApiController
                                         $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
                                                                                                                                 // $unNestedListItemRun->addText($item);
                                         $item = str_replace('&', '&amp;', $item);
-                                        $item = '<span style="font-size:11pt;">' . $item . '</span>';
+                                        $item = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $item . '</span>';
                                         if (preg_match_all('/<strong[^>]*>\s*\[?\*{3}(.*?)\*{3}\]?\s*<\/strong>/', $item, $matches)) {
                                             $this->addParagraphWithInlineFootnotes($unNestedListItemRun, $item, $request, $x);
                                             $count = preg_match_all(
@@ -755,7 +763,11 @@ class ParaWiseController extends ApiController
                                         // $pTagEscaped = htmlspecialchars($pTag, ENT_QUOTES, 'UTF-8');
                                         $pTag = $this->lowercaseFirstCharOnly($pTag);
                                         $pTag = str_replace('&', '&amp;', $pTag);
-                                        $pTag = '<span style="font-size:11pt;">' . $pTag . '</span>';
+                                        $pTag = '<span style="font-size:'
+                                        . ($formate_values ? intval($formate_values['body']['standard']['size']) : 11) . 'pt; '
+                                        . 'font-family:' . ($formate_values ? $formate_values['body']['standard']['name'] : 'Arial') . '; '
+                                        . 'text-align:' . ($formate_values ? $formate_values['body']['standard']['alignment'] : 'left') . ';">'
+                                        . $pTag . '</span>';
                                         Html::addHtml($listItemRun, $pTag, false, false);
 
                                         // if ($index2 < count($paragraphsArray) - 1) {
