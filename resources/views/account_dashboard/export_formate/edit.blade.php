@@ -1,7 +1,7 @@
 @extends('account_dashboard.layout.app')
-@section('title', 'Admin Account Home - Edit Export Formate')
+@section('title', 'Admin Account Home - Writing Format')
 @section('content')
-    <h2 class="page-title">Wright Formate</h2>
+    <h2 class="page-title">Writing Format</h2>
 
     <div class="card shadow mb-4">
         <div class="card-body">

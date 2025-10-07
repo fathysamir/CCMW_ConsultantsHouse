@@ -38,7 +38,7 @@
                         
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.export-formate-settings') }}"><span
-                                    class="ml-1 item-text" style="color:#e4d125;">Export Formate</span></a>
+                                    class="ml-1 item-text" style="color:#e4d125;">Writing Format</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.contract-tags') }}"><span

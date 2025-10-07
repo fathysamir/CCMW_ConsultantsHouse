@@ -85,7 +85,7 @@
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk"
                                 href="{{ route('account.export-formate-settings') }}"><span class="ml-1 item-text"
-                                    style="color:#e4d125;">Export Formate</span></a>
+                                    style="color:#e4d125;">Writing Format</span></a>
                         </li>
                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_contract_tags', $Account_Permissions ?? []))
                             <li class="nav-item">
