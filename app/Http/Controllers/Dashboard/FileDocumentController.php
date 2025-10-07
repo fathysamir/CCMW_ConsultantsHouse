@@ -913,7 +913,8 @@ class FileDocumentController extends ApiController
                 'file'    => $storageFile,
             ]);
         }
-        $fileName = auth()->user()->id . '_' . time() . '_' . $file->getClientOriginalName();
+        $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $fileName = auth()->user()->id . '_' . time() . '_' . $code . '_' . $file->getClientOriginalName();
 
         // Create project-specific folder in public path
         $projectFolder = 'projects/' . auth()->user()->current_project_id . '/images';
