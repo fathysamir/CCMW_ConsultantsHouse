@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreign('from')->references('id')->on('stake_holders')->onDelete('cascade');
             $table->unsignedBigInteger('to')->nullable();
             $table->foreign('to')->references('id')->on('stake_holders')->onDelete('cascade');
+            $table->integer('doc_count')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

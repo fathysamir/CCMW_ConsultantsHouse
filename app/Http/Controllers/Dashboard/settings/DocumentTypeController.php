@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard\settings;
 use App\Http\Controllers\ApiController;
 use App\Models\DocType;
 use App\Models\Project;
+use App\Models\Document;
 use Illuminate\Http\Request;
 
 class DocumentTypeController extends ApiController
@@ -17,6 +18,11 @@ class DocumentTypeController extends ApiController
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return view('account_dashboard.document_types.index', compact('document_types'));
         } else {
+            foreach($document_types as $type){
+                $docs=Document::where('doc_type_id',$type->id)->count();
+                $type->doc_count=$docs;
+                $type->save();
+            }
             return view('project_dashboard.document_types.index', compact('document_types'));
         }
 

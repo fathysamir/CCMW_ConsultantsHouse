@@ -56,7 +56,8 @@
                                 <th>To</th>
                                 <th>Relevant Verb</th>
                                 <th>Order</th>
-                                <th>Action</th>
+                                <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,6 +80,7 @@
                                     <td>{{ $type->toStakeHolder? $type->toStakeHolder->narrative : '__' }}</td>
                                     <td>{{ $type->relevant_word?? '__' }}</td>
                                     <td>{{ $type->order }}</td>
+                                    <td>@if($type->doc_count>0) <a href="{{ url('/project/all-documents?doc_type=' . $type->id) }}">{{ $type->doc_count }}</a> @else {{ $type->doc_count }} @endif</td>
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span class="text-muted sr-only">Action</span>
