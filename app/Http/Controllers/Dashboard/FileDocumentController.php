@@ -148,6 +148,21 @@ class FileDocumentController extends ApiController
 
         $chapter       = $request->Chapter; // Dynamic chapter number
         $sectionNumber = $request->Section; // Dynamic section number
+        $formate       = ExportFormate::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->first();
+        if ($formate) {
+            $formate_values = $formate->value = json_decode($formate->value, true);
+        } else {
+            $formate_values = null;
+        }
+        $GetStandardStylesP = [
+            'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
+            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+            'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
+            'bold'      => false,
+            'italic'    => false,
+            'underline' => 'none',
+
+        ];
         $phpWord->addNumberingStyle(
             'multilevel',
             [
@@ -156,7 +171,7 @@ class FileDocumentController extends ApiController
                 'levels'   => [
                     ['Heading0', 'format' => 'decimal', 'text' => '%1.', 'start' => (int) $chapter],
                     ['Heading1', 'format' => 'decimal', 'text' => '%1.%2', 'start' => (int) $sectionNumber],
-                    ['Heading2', 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1],
+                    ['font' =>$GetStandardStylesP['name'] , 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1],
                     ['Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.%4', 'start' => 1],
                     ['Heading3', 'format' => 'decimal', 'text' => ''],
                 ],
@@ -195,12 +210,7 @@ class FileDocumentController extends ApiController
                 ],
             ]
         );
-        $formate = ExportFormate::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->first();
-        if ($formate) {
-            $formate_values = $formate->value = json_decode($formate->value, true);
-        } else {
-            $formate_values = null;
-        }
+
         // Define styles for headings
         $GetStandardStylesH1 = [
             'name'      => $formate_values ? $formate_values['h1']['standard']['name'] : 'Arial',
@@ -216,8 +226,8 @@ class FileDocumentController extends ApiController
             'spaceAfter'        => $formate_values ? ((int) $formate_values['h1']['paragraph']['spaceAfter'] * 20) : 240,
             'lineHeight'        => $formate_values ? (float) $formate_values['h1']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['left'] * 1800) : 1000,
-                'hanging'   => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['hanging'] * 1800) : 1000,
+                'left'      => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['left'] * 1436) : 1077,
+                'hanging'   => $formate_values ? ((float) $formate_values['h1']['paragraph']['indentation']['hanging'] * 1436) : 1077,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => $formate_values ? ($formate_values['h1']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
@@ -240,8 +250,8 @@ class FileDocumentController extends ApiController
             'spaceAfter'        => $formate_values ? ((int) $formate_values['h2']['paragraph']['spaceAfter'] * 20) : 240,
             'lineHeight'        => $formate_values ? (float) $formate_values['h2']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['left'] * 1800) : 1000,
-                'hanging'   => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['hanging'] * 1800) : 1000,
+                'left'      => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['left'] * 1436) : 1077,
+                'hanging'   => $formate_values ? ((float) $formate_values['h2']['paragraph']['indentation']['hanging'] * 1436) : 1077,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => $formate_values ? ($formate_values['h2']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
@@ -265,8 +275,8 @@ class FileDocumentController extends ApiController
             'spaceAfter'        => $formate_values ? ((int) $formate_values['h3']['paragraph']['spaceAfter'] * 20) : 240,
             'lineHeight'        => $formate_values ? (float) $formate_values['h3']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['left'] * 1800) : 1000,
-                'hanging'   => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['hanging'] * 1800) : 1000,
+                'left'      => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['left'] * 1436) : 1077,
+                'hanging'   => $formate_values ? ((float) $formate_values['h3']['paragraph']['indentation']['hanging'] * 1436) : 1077,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => $formate_values ? ($formate_values['h3']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
@@ -290,8 +300,8 @@ class FileDocumentController extends ApiController
             'spaceAfter'        => $formate_values ? ((int) $formate_values['subtitle']['paragraph']['spaceAfter'] * 20) : 240,
             'lineHeight'        => $formate_values ? (float) $formate_values['subtitle']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['left'] * 1800) : 1000,
-                'hanging'   => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['hanging'] * 1800) : 0,
+                'left'      => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['left'] * 1436) : 1077,
+                'hanging'   => $formate_values ? ((float) $formate_values['subtitle']['paragraph']['indentation']['hanging'] * 1436) : 0,
                 'firstLine' => 0,
             ],
             'contextualSpacing' => $formate_values ? ($formate_values['subtitle']['paragraph']['contextualSpacing'] == '1' ? true : false) : true,
@@ -301,23 +311,13 @@ class FileDocumentController extends ApiController
 
         ];
 
-        $GetStandardStylesP = [
-            'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
-            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
-            'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
-            'bold'      => false,
-            'italic'    => false,
-            'underline' => 'none',
-
-        ];
-
         $phpWord->addParagraphStyle('listParagraphStyle', [
             'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
             'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
             'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
-                'hanging'   => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['hanging'] * 1800) : 1000,
+                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+                'hanging'   => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['hanging'] * 1436) : 1077,
                 'firstLine' => 0,
             ],
             'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
@@ -334,7 +334,7 @@ class FileDocumentController extends ApiController
             'spaceAfter'        => 20,
             'lineHeight'        => 1,
             'indentation'       => [
-                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) + 350 : 1350,
+                'left'      => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) + 350 : 1350,
                 'hanging'   => 337.5,
                 'firstLine' => 0,
             ],
@@ -394,8 +394,8 @@ class FileDocumentController extends ApiController
             'spaceAfter'  => $formate_values ? ((int) $formate_values['footnote']['paragraph']['spaceAfter'] * 20) : 0,
             'lineHeight'  => $formate_values ? (float) $formate_values['footnote']['paragraph']['lineHeight'] : 1,
             'indentation' => [
-                'left'      => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['left'] * 1800) : 0,
-                'hanging'   => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['hanging'] * 1800) : 0,
+                'left'      => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['left'] * 1436) : 0,
+                'hanging'   => $formate_values ? ((float) $formate_values['footnote']['paragraph']['indentation']['hanging'] * 1436) : 0,
                 'firstLine' => 0,
             ],
         ];
@@ -515,7 +515,7 @@ class FileDocumentController extends ApiController
                                         'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
                                         'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                         'indentation' => [
-                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
+                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
                                         ],
                                     ]);
 
@@ -589,7 +589,7 @@ class FileDocumentController extends ApiController
                                         'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
                                         'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
                                         'indentation' => [
-                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
+                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
                                         ],
                                     ]);
 
@@ -692,7 +692,7 @@ class FileDocumentController extends ApiController
                                         'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
                                         'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
                                         'indentation'       => [
-                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1800) : 1000,
+                                            'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
 
                                         ],
                                         'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
@@ -913,7 +913,7 @@ class FileDocumentController extends ApiController
                 'file'    => $storageFile,
             ]);
         }
-        $code       = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
+        $code     = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
         $fileName = auth()->user()->id . '_' . time() . '_' . $code . '_' . $file->getClientOriginalName();
 
         // Create project-specific folder in public path

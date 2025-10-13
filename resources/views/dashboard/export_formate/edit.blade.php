@@ -3,7 +3,7 @@
 @section('content')
     <h2 class="page-title">Writing Format</h2>
 
-    <div class="card shadow mb-4">
+   <div class="card shadow mb-4">
         <div class="card-body">
             <div class="row">
 
@@ -169,7 +169,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="h1[paragraph][indentation][left]" step="0.02"
+                                                name="h1[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h1']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -177,7 +177,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="h1[paragraph][indentation][hanging]" step="0.02"
+                                                name="h1[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h1']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -347,7 +347,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="h2[paragraph][indentation][left]" step="0.02"
+                                                name="h2[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h2']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -355,7 +355,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="h2[paragraph][indentation][hanging]" step="0.02"
+                                                name="h2[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h2']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -525,7 +525,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="h3[paragraph][indentation][left]" step="0.02"
+                                                name="h3[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h2']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -533,7 +533,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="h3[paragraph][indentation][hanging]" step="0.02"
+                                                name="h3[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['h2']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -706,7 +706,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="subtitle[paragraph][indentation][left]" step="0.02"
+                                                name="subtitle[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['subtitle']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -714,7 +714,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="subtitle[paragraph][indentation][hanging]" step="0.02"
+                                                name="subtitle[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['subtitle']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -870,7 +870,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="body[paragraph][indentation][left]" step="0.02"
+                                                name="body[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['body']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -878,7 +878,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="body[paragraph][indentation][hanging]" step="0.02"
+                                                name="body[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['body']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -1080,7 +1080,7 @@
                                         <div class="form-group">
                                             <label>Indentation Left</label>
                                             <input type="number" class="form-control"
-                                                name="footnote[paragraph][indentation][left]" step="0.02"
+                                                name="footnote[paragraph][indentation][left]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['footnote']['paragraph']['indentation']['left'] : 0.56 }}">
                                         </div>
                                     </div>
@@ -1088,7 +1088,7 @@
                                         <div class="form-group">
                                             <label>Indentation Hanging</label>
                                             <input type="number" class="form-control"
-                                                name="footnote[paragraph][indentation][hanging]" step="0.02"
+                                                name="footnote[paragraph][indentation][hanging]" step="0.01"
                                                 value="{{ $formate_values ? $formate_values['footnote']['paragraph']['indentation']['hanging'] : 0.56 }}">
                                         </div>
                                     </div>
