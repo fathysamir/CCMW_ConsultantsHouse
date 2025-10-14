@@ -158,7 +158,7 @@ class FileDocumentController extends ApiController
             'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
             'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left', // Options: left, center, right, justify
             'size'      => $formate_values ? intval($formate_values['body']['standard']['size']) : 11,
-            'bold'      => false,
+            'bold'      => true,
             'italic'    => false,
             'underline' => 'none',
 
@@ -171,7 +171,12 @@ class FileDocumentController extends ApiController
                 'levels'   => [
                     ['Heading0', 'format' => 'decimal', 'text' => '%1.', 'start' => (int) $chapter],
                     ['Heading1', 'format' => 'decimal', 'text' => '%1.%2', 'start' => (int) $sectionNumber],
-                    ['font' =>$GetStandardStylesP['name'] , 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1],
+                    ['Heading2','format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1,
+                        'font' => $GetStandardStylesP['name'],                                                                               // Tab position
+                        'sz'      => (int)$GetStandardStylesP['size'] * 2,                                                      
+                        'i'       => $GetStandardStylesP['italic'],                                         
+                        'b'       => $GetStandardStylesP['bold']
+                    ],
                     ['Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.%4', 'start' => 1],
                     ['Heading3', 'format' => 'decimal', 'text' => ''],
                 ],

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Dashboard\AccountController;
 use App\Http\Controllers\Dashboard\AccountDashboardController;
+use App\Http\Controllers\Dashboard\ActivityController;
 use App\Http\Controllers\Dashboard\AuthController;
 use App\Http\Controllers\Dashboard\DocumentController;
 use App\Http\Controllers\Dashboard\ExtractPowerPointController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Dashboard\settings\ExportFormateController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\WindowController;
 use App\Models\FileDocument;
 use App\Models\ProjectFile;
 use Illuminate\Support\Facades\Route;
@@ -372,5 +374,16 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/para-wise-analysis/paragraph/{id}/update', [ParaWiseController::class, 'update_paragraph'])->name('project.para-wise-analysis.update_paragraph');
     Route::post('/export-word-para-wise', [ParaWiseController::class, 'exportWordParaWise']);
     Route::post('/download-para-wise-paragraphs', [ParaWiseController::class, 'download_paragraphs'])->name('download.para-wise-paragraphs');
+
+    Route::get('/project/activities', [ActivityController::class, 'index'])->name('project.all_activities.index');
+    Route::get('/project/activity/delete/{id}', [ActivityController::class, 'delete'])->name('project.activity.delete');
+    Route::post('/activities/store', [ActivityController::class, 'store'])->name('project.activity.store');
+    Route::post('/activities/update/{id}', [ActivityController::class, 'update'])->name('project.activity.update');
+
+
+    Route::get('/project/windows', [WindowController::class, 'index'])->name('project.all_windows.index');
+    Route::get('/project/window/delete/{id}', [WindowController::class, 'delete'])->name('project.window.delete');
+    Route::post('/windows/store', [WindowController::class, 'store'])->name('project.window.store');
+    Route::post('/windows/update/{id}', [WindowController::class, 'update'])->name('project.window.update');
 
 });

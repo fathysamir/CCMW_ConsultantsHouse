@@ -168,7 +168,7 @@
                 </li>
             @endif
 
-           
+
             <li class="nav-item dropdown">
                 <a href="#REPORTS" data-toggle="collapse" aria-expanded="false"
                     class="dropdown-toggle nav-link link_kkkkk">
@@ -176,19 +176,30 @@
                     <span class="ml-3 item-text" style="color:whitesmoke;">Reports</span>
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="REPORTS">
-                        <li class="nav-item">
-                            <a class="nav-link pl-3 link_kkkkk"href="#"
-                                id="report1Link"><span
-                                    class="ml-1 item-text"style="color: #e4d125;">Contractual report</span></a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3 link_kkkkk"href="#" id="report1Link"><span
+                                class="ml-1 item-text"style="color: #e4d125;">Contractual report</span></a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">
 
-                <a class="nav-link pl-3 link_kkkkk" href="#"style="padding-left: 0.5rem !important;"><img
-                        src="{{ asset('/dashboard/assets/selected_images/w_analysis.png') }}" width="22"><span
-                        class="ml-1 item-text" style="margin-left: 1rem !important;color:whitesmoke;">
-                        Window Analysis</span></a>
+                
+                <a href="#windows" data-toggle="collapse" aria-expanded="false"
+                    class="dropdown-toggle nav-link link_kkkkk">
+                    <img src="{{ asset('/dashboard/assets/selected_images/w_analysis.png') }}" width="22">
+                    <span class="ml-3 item-text" style="color:whitesmoke;">Window Analysis</span>
+                </a>
+                <ul class="collapse list-unstyled pl-4 w-100" id="windows">
+                    <li class="nav-item">
+                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_activities.index') }}" id="report1Link"><span
+                                class="ml-1 item-text"style="color: #e4d125;">Activities</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_windows.index') }}" id="report1Link"><span
+                                class="ml-1 item-text"style="color: #e4d125;">Windows</span></a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
 
@@ -229,8 +240,9 @@
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100" id="forms">
                         <li class="nav-item">
-                            <a class="nav-link pl-3 link_kkkkk" href="{{ route('project.export-formate-settings') }}"><span
-                                    class="ml-1 item-text" style="color:#e4d125;">Writing Format</span></a>
+                            <a class="nav-link pl-3 link_kkkkk"
+                                href="{{ route('project.export-formate-settings') }}"><span class="ml-1 item-text"
+                                    style="color:#e4d125;">Writing Format</span></a>
                         </li>
                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_contract_tags', $Project_Permissions ?? []))
                             <li class="nav-item">
