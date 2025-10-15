@@ -1003,7 +1003,7 @@
                                 </div>
                                 <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
                                     <input type="checkbox" class="custom-control-input" id="fromForL-E"
-                                        name="fromForL_E">
+                                        name="fromForL_E"checked>
                                     <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
@@ -1187,7 +1187,7 @@
                                 </div>
                                 <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
                                     <input type="checkbox" class="custom-control-input" id="fromForL-Ee"
-                                        name="fromForL_E">
+                                        name="fromForL_E" checked>
                                     <label class="custom-control-label" for="fromForL-Ee">"From" only for Litters & Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
