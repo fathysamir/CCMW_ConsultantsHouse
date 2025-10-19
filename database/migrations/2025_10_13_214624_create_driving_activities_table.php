@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('activity_id')->references('id')->on('activities')->onDelete('cascade');
             $table->unsignedBigInteger('window_id');
             $table->foreign('window_id')->references('id')->on('windows')->onDelete('cascade');
-            $table->enum('program', ['BAS', 'IMP', 'UPD', 'PUT'])->default('BAS');
+            $table->enum('program', ['BAS', 'IMP', 'UPD', 'BUT'])->default('BAS');
             $table->date('ms_come_date')->nullable();
             $table->enum('liability', ['Excusable', 'Culpable', 'Neutral', 'Excusable took longer than estimated'])->nullable();
             $table->unsignedBigInteger('milestone_id')->nullable();

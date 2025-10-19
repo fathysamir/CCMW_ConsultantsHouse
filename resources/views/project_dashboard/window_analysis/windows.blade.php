@@ -5,6 +5,28 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        .is-invalid {
+            border-color: red !important;
+            box-shadow: 0 0 4px rgba(255, 0, 0, 0.4);
+        }
+
+        .driving-activity-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            align-items: flex-end;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .driving-activity-row:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
         .date {
             background-color: #fff !important;
         }
@@ -221,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -278,7 +300,7 @@
                                     </th>
                                     <th><b>Window No</b></th>
                                     <th><b>Start Date</b></th>
-                                    <th><b>end Date</b></th>
+                                    <th><b>End Date</b></th>
                                     <th><b>Duration</b></th>
                                     <th><b>Culpable</b></th>
                                     <th><b>Excusable</b></th>
@@ -289,6 +311,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $prev_window = '';
+                                @endphp
                                 @foreach ($all_windows as $window)
                                     <tr>
                                         <td>
@@ -323,16 +348,40 @@
                                                         Edit
                                                     </a>
 
-                                                    <a class="dropdown-item bas_button" href="javascript:void(0);"data-program="BAS">
+                                                    <a class="dropdown-item form_button"
+                                                        href="javascript:void(0);"data-program="BAS"
+                                                        data-window-no="{{ $window->no }}"
+                                                        data-prev_window-slug="{{ $prev_window }}"
+                                                        data-start="{{ $window->start_date }}"
+                                                        data-end="{{ $window->end_date }}"
+                                                        data-window-slug="{{ $window->slug }}">
                                                         BAS
                                                     </a>
-                                                    <a class="dropdown-item imp_button" href="javascript:void(0);"data-program="IMP">
+                                                    <a class="dropdown-item form_button"
+                                                        href="javascript:void(0);"data-program="IMP"
+                                                        data-window-no="{{ $window->no }}"
+                                                        data-prev_window-slug="{{ $prev_window }}"
+                                                        data-start="{{ $window->start_date }}"
+                                                        data-end="{{ $window->end_date }}"
+                                                        data-window-slug="{{ $window->slug }}">
                                                         IMP
                                                     </a>
-                                                    <a class="dropdown-item upd_button" href="javascript:void(0);"data-program="UPD">
+                                                    <a class="dropdown-item form_button"
+                                                        href="javascript:void(0);"data-program="UPD"
+                                                        data-window-no="{{ $window->no }}"
+                                                        data-prev_window-slug="{{ $prev_window }}"
+                                                        data-start="{{ $window->start_date }}"
+                                                        data-end="{{ $window->end_date }}"
+                                                        data-window-slug="{{ $window->slug }}">
                                                         UPD
                                                     </a>
-                                                    <a class="dropdown-item but_button" href="javascript:void(0);"data-program="BUT">
+                                                    <a class="dropdown-item form_button"
+                                                        href="javascript:void(0);"data-program="BUT"
+                                                        data-window-no="{{ $window->no }}"
+                                                        data-prev_window-slug="{{ $prev_window }}"
+                                                        data-start="{{ $window->start_date }}"
+                                                        data-end="{{ $window->end_date }}"
+                                                        data-window-slug="{{ $window->slug }}">
                                                         BUT
                                                     </a>
                                                     <a class="dropdown-item text-danger" href="javascript:void(0);"
@@ -343,6 +392,9 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    @php
+                                        $prev_window = $window->slug;
+                                    @endphp
                                 @endforeach
                             </tbody>
                         </table>
@@ -374,8 +426,8 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="start_date">srart Date <span style="color: red">*</span></label>
-                            <input required type="date"style="background-color:#fff;" name="start_date" id="start_date"
-                                class="form-control date" placeholder="Start Date"value="">
+                            <input required type="date"style="background-color:#fff;" name="start_date"
+                                id="start_date" class="form-control date" placeholder="Start Date"value="">
                         </div>
                         <div class="form-group mb-3">
                             <label for="end_date">End Date <span style="color: red">*</span></label>
@@ -393,7 +445,67 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="formsModal" tabindex="-1" role="dialog" aria-labelledby="formsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <form id="formsForm" enctype="multipart/form-data" method="POST" novalidate>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formsModalLabel">Create Activity</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div style="display:flex;width:100%;margin-top:10px;">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label>Window No : <b>
+                                        <spam id="w_no"></spam>
+                                    </b></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3" style="text-align: center;">
+                                <label>Start Date : <b>
+                                        <spam id="s_date"></spam>
+                                    </b></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3"style="text-align: right;">
+                                <label>End Date : <b>
+                                        <spam id="e_date"></spam>
+                                    </b></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="prev_window_label_div">
+                        <div class="col-md-4">
+                            <label id="prev_window"
+                                style="text-decoration: underline;color:#007bff;cursor: pointer;">Import from prev.
+                                <spam id="prev_window_label"></spam>
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" id="window_slug2" name="slug">
+                    <input type="hidden" id="program" name="program">
+                    <input type="hidden" id="prev_window_slug">
 
+                    <div class="modal-body" id="driving-activities-container">
+
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="save_form">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -470,6 +582,246 @@
 
     <script>
         $(document).ready(function() {
+            const form2 = $('#formsForm');
+            const modal2 = $('#formsModal');
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }; // e.g. 13-Oct-2025
+                return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
+            };
+            $('#prev_window').click(function() {
+                let program_2 = $('#program').val()
+                let prev='';
+                if (program_2 == 'BAS') {
+                    prev = 'UPD'
+                } else if (program_2 == 'UPD') {
+                    prev = 'IMP'
+                } else if (program_2 == 'IMP') {
+                    prev = 'IMP'
+                }
+                let slug_2 = $('#prev_window_slug').val()
+                $.ajax({
+                    url: '/get-window-driving-activity',
+                    type: 'GET',
+                    data: {
+                        slug: slug_2,
+                        program: program_2,
+                        prev: prev
+                    },
+
+                    success: function(response) {
+                        if (response.success) {
+                            $('#drivingActivitiesContainer').empty();
+                            $('#drivingActivitiesContainer').append(response.html)
+                            flatpickr(".date", {
+                                enableTime: false,
+                                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                                altInput: true,
+                                altFormat: "d.M.Y",
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                        alert('Failed to upload file');
+                    }
+                });
+            });
+            $(document).on('click', '.form_button', function() {
+                const slug = $(this).data('window-slug');
+                const program = $(this).data('program');
+                const prev_window = $(this).data('prev_window-slug');
+                const w_no = $(this).data('window-no');
+                const s_date = $(this).data('start');
+                const e_date = $(this).data('end');
+                $('#prev_window_label_div').hide();
+                if (program == 'BAS') {
+                    $('#prev_window_label_div').show();
+                    $('#prev_window_label').text('UPD')
+                } else if (program == 'UPD') {
+                    $('#prev_window_label_div').show();
+                    $('#prev_window_label').text('IMP')
+                } else if (program == 'IMP') {
+                    $('#prev_window_label_div').show();
+                    $('#prev_window_label').text('IMP')
+                }
+
+                $('#window_slug2').val(slug);
+                $('#prev_window_slug').val(prev_window);
+                $('#program').val(program);
+                $('#formsModalLabel').text(program);
+                $('#w_no').text(w_no);
+                $('#s_date').text(formatDate(s_date));
+                $('#e_date').text(formatDate(e_date));
+                form2.attr('action', "{{ route('project.window.form.store') }}");
+
+                $.ajax({
+                    url: '/get-window-driving-activity',
+                    type: 'GET',
+                    data: {
+                        slug: slug,
+                        program: program
+                    },
+
+                    success: function(response) {
+                        if (response.success) {
+                            $('#driving-activities-container').empty();
+                            $('#driving-activities-container').append(response.html)
+                            flatpickr(".date", {
+                                enableTime: false,
+                                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                                altInput: true,
+                                altFormat: "d.M.Y",
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                        alert('Failed to upload file');
+                    }
+                });
+                modal2.modal('show');
+            });
+            $(document).on('click', '.add-row', function() {
+                let currentRow = $(this).closest('.driving-activity-row');
+                let container = $('#drivingActivitiesContainer');
+                let currentIndex = container.find('.driving-activity-row').length;
+
+                // Clone only the *base structure* (first row template)
+                let baseRow = $('.driving-activity-row').first().clone();
+
+                // Clear all values and set unique names
+                baseRow.find('select, input').each(function() {
+                    let name = $(this).attr('name');
+                    if (name) {
+                        name = name.replace(/\[\d+\]/, '[' + currentIndex + ']');
+                        $(this).attr('name', name);
+                    }
+                    $(this).val('');
+                });
+
+                // Remove any duplicate date fields if they exist (keep only one)
+                baseRow.find('.date').not(':first').remove();
+
+                // Insert clean new row after the current row
+                currentRow.after(baseRow);
+
+                // Reinitialize Flatpickr for date field
+                baseRow.find('.date').each(function() {
+                    if (this._flatpickr) {
+                        this._flatpickr.destroy();
+                    }
+                    flatpickr(this, {
+                        enableTime: false,
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "d-M-Y"
+                    });
+                });
+
+                refreshSelectOptions()
+            });
+
+            // Handle remove row
+            $(document).on('click', '.remove-row', function() {
+                const rows = $('.driving-activity-row');
+                if (rows.length > 1) {
+                    $(this).closest('.driving-activity-row').remove();
+                    refreshSelectOptions()
+                } else {
+                    alert('At least one row must remain.');
+                }
+            });
+
+            function getSelectedPairs() {
+                let pairs = [];
+                $('.driving-activity-row').each(function() {
+                    const milestone = $(this).find('.milestone-select').val();
+                    const activity = $(this).find('.activity-select').val();
+
+                    if (milestone && activity) {
+                        pairs.push({
+                            milestone,
+                            activity
+                        });
+                    }
+                });
+                return pairs;
+            }
+
+            // Function to refresh dropdowns to avoid duplicates
+            function refreshSelectOptions() {
+                const usedPairs = getSelectedPairs();
+
+                $('.driving-activity-row').each(function() {
+                    const milestoneSelect = $(this).find('.milestone-select');
+                    const activitySelect = $(this).find('.activity-select');
+
+                    const currentMilestone = milestoneSelect.val();
+                    const currentActivity = activitySelect.val();
+
+                    // Reset visibility (show all)
+                    milestoneSelect.find('option').show();
+                    activitySelect.find('option').show();
+
+                    // Hide used pairs in other rows
+                    usedPairs.forEach(pair => {
+                        // If this row is not the one currently using that pair
+                        if (!(pair.milestone === currentMilestone && pair.activity ===
+                                currentActivity)) {
+                            // Hide same milestone if activity matches
+                            milestoneSelect.find(`option[value="${pair.milestone}"]`).each(
+                                function() {
+                                    if (activitySelect.val() === pair.activity) {
+                                        $(this).hide();
+                                    }
+                                });
+
+                            // Hide same activity if milestone matches
+                            activitySelect.find(`option[value="${pair.activity}"]`).each(
+                                function() {
+                                    if (milestoneSelect.val() === pair.milestone) {
+                                        $(this).hide();
+                                    }
+                                });
+                        }
+                    });
+                });
+            }
+
+            // Watch for change events on milestone or activity selects
+            $(document).on('change', '.milestone-select, .activity-select', function() {
+                refreshSelectOptions();
+            });
+            $(document).on('submit', '#formsForm', function(e) {
+                e.preventDefault(); // stop default submit for validation check
+
+                let isValid = true;
+
+                // Loop through all required inputs and selects
+                $(this).find('input[required], select[required]').each(function() {
+                    if (!$(this).val() || $(this).val() === '') {
+                        $(this).addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Please fill all required fields before submitting.');
+                    return false;
+                }
+
+                // ✅ if valid → proceed to submit form
+                this.submit();
+            });
+
+
 
             function showHint(message, bgColor = '#d4edda', textColor = '#155724') {
                 const hintBox = document.getElementById("hintBox");
@@ -612,6 +964,28 @@
                 "orderable": false // Disable sorting for this column
             }]
         });
+    </script>
+    <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || 'Choose File';
+            const labelId = input.id + 'Label';
+            document.getElementById(labelId).textContent = fileName;
+        }
+
+        function previewImage(event, id) {
+            var input = event.target;
+            var reader = new FileReader();
+
+            reader.onload = function() {
+                var img = document.getElementById(id);
+                img.src = reader.result;
+                img.style.display = 'block'; // Show the image
+            };
+
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]); // Read the uploaded image
+            }
+        }
     </script>
     <script>
         function confirmDelete(url) {

@@ -37,6 +37,33 @@ class Window extends Model
     ];
 
     protected $hidden = ['deleted_at'];
+    protected $appends = [
+        'bas_snip',
+        'frag_snip',
+        'imp_snip',
+        'upd_snip',
+        'but_snip'
+    ];
+    public function getBasSnipAttribute()
+    {
+        return getFirstMediaUrl($this, $this->BASSnipCollection, true);
+    }
+     public function getFragSnipAttribute()
+    {
+        return getFirstMediaUrl($this, $this->FRAGSnipCollection, true);
+    }
+     public function getImpSnipAttribute()
+    {
+        return getFirstMediaUrl($this, $this->IMPSnipCollection, true);
+    }
+     public function getUpdSnipAttribute()
+    {
+        return getFirstMediaUrl($this, $this->UPDSnipCollection, true);
+    }
+     public function getButSnipAttribute()
+    {
+        return getFirstMediaUrl($this, $this->BUTSnipCollection, true);
+    }
 
     public function project()
     {

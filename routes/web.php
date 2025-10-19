@@ -385,5 +385,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/window/delete/{id}', [WindowController::class, 'delete'])->name('project.window.delete');
     Route::post('/windows/store', [WindowController::class, 'store'])->name('project.window.store');
     Route::post('/windows/update/{id}', [WindowController::class, 'update'])->name('project.window.update');
-
+    Route::post('/windows/form/store', [WindowController::class, 'store_driving_activity'])->name('project.window.form.store');
+    Route::get('/get-window-driving-activity',[WindowController::class, 'get_driving_activities'])->name('get-window-driving-activities');
 });
