@@ -550,7 +550,7 @@
                                                             isset($WhatIfUPDExtendedAsExcusableTookLonger) &&
                                                             $WhatIfUPDExtendedAsExcusableTookLonger->value
                                                                 ? $WhatIfUPDExtendedAsExcusableTookLonger->value
-                                                                : '2';
+                                                                : '1';
 
                                                         $options = [
                                                             '1' => 'EOT based on IMP',
