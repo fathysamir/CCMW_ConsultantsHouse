@@ -30,6 +30,51 @@
     <link rel="stylesheet" href="{{ asset('dashboard/css/app-light.css') }}" id="lightTheme">
     <link rel="stylesheet" href="{{ asset('dashboard/css/app-dark.css') }}" id="darkTheme" disabled>
     <style>
+        .eot-form {
+            max-width: 520px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #222;
+        }
+
+        /* Main Fieldset */
+        .eot-fieldset {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px 16px 10px;
+            margin-bottom: 16px;
+            background: #fff;
+        }
+
+        /* Nested Fieldset */
+        .eot-fieldset-nested {
+            border: 1px dashed #bbb;
+            border-radius: 6px;
+            margin-top: 10px;
+            margin-left: 20px;
+            padding: 10px 14px;
+            background: #fafafa;
+        }
+
+        /* Legends */
+        .eot-legend {
+            font-weight: 600;
+            font-size: 15px;
+            color: #333;
+            padding: 0 6px;
+            width: auto;
+
+        }
+
+        .eot-legend-nested {
+            font-size: 13px;
+            color: #555;
+            font-weight: 600;
+            padding: 0 6px;
+            width: auto;
+        }
+    </style>
+    <style>
         .sidebar-resize-handle {
             position: absolute;
             top: 0;
@@ -286,6 +331,257 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Close</button>
                                         <button type="button" class="btn btn-primary" id="report1">Show</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="calculationMethodModal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Calculation Method</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="calculationMethodForm">
+                                            @csrf
+                                            <div class="eot-form">
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">In Case of Concurrency</legend>
+                                                    @php
+                                                        // Safely get the saved value or set default to '1'
+                                                        $inCaseValue =
+                                                            isset($InCaseOfConcurrency) && $InCaseOfConcurrency->value
+                                                                ? $InCaseOfConcurrency->value
+                                                                : '1';
+
+                                                        $options = [
+                                                            '1' => 'Entitled to EOT',
+                                                            '2' => 'No EOT',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="InCaseOfConcurrencyOption{{ $value }}"
+                                                                name="InCaseOfConcurrency"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $inCaseValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="InCaseOfConcurrencyOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </fieldset>
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">Compensability Calculation</legend>
+                                                    @php
+                                                        // Get saved value or fallback to '2' (Apportionment)
+                                                        $compensabilityValue =
+                                                            isset($CompensabilityCalculation) &&
+                                                            $CompensabilityCalculation->value
+                                                                ? $CompensabilityCalculation->value
+                                                                : '2';
+
+                                                        $options = [
+                                                            '1' => 'Full EOT',
+                                                            '2' => 'Apportionment (IMP–BUT/BAS)',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="CompensabilityCalculationOption{{ $value }}"
+                                                                name="CompensabilityCalculation"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $compensabilityValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="CompensabilityCalculationOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </fieldset>
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">What if Compensable exceeded Executable
+                                                    </legend>
+                                                    @php
+                                                        // Determine saved or default value (2 = EOT + transfer)
+                                                        $whatIfValue =
+                                                            isset($WhatIfCompensableExceededExcusable) &&
+                                                            $WhatIfCompensableExceededExcusable->value
+                                                                ? $WhatIfCompensableExceededExcusable->value
+                                                                : '2';
+
+                                                        $options = [
+                                                            '1' => 'EOT only',
+                                                            '2' => 'EOT + transfer the extra days to next Window',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="WhatIfCompensableExceededExcusableOption{{ $value }}"
+                                                                name="WhatIfCompensableExceededExcusable"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $whatIfValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="WhatIfCompensableExceededExcusableOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </fieldset>
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">How to deal with Mitigation?</legend>
+                                                    @php
+                                                        // Determine saved or default value (default = 2)
+                                                        $howToDealValue =
+                                                            isset($HowToDealWithMitigation) &&
+                                                            $HowToDealWithMitigation->value
+                                                                ? $HowToDealWithMitigation->value
+                                                                : '2';
+
+                                                        $options = [
+                                                            '1' => 'Give the net at the end of all Windows',
+                                                            '2' => 'Give it immediately in the Window',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="HowToDealWithMitigationOption{{ $value }}"
+                                                                name="HowToDealWithMitigation"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $howToDealValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="HowToDealWithMitigationOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </fieldset>
+
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">
+                                                        What if Critical Path shifted to Culpable in the UPD?
+                                                    </legend>
+
+                                                    @php
+                                                        $criticalPathValue =
+                                                            isset($WhatIfCriticalPathShiftedToCulpableInUPD) &&
+                                                            $WhatIfCriticalPathShiftedToCulpableInUPD->value
+                                                                ? $WhatIfCriticalPathShiftedToCulpableInUPD->value
+                                                                : '2';
+
+                                                        $options = [
+                                                            '1' => 'No EOT',
+                                                            '2' => 'Give EOT',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="WhatIfCriticalPathShiftedToCulpableInUPDOption{{ $value }}"
+                                                                name="WhatIfCriticalPathShiftedToCulpableInUPD"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $criticalPathValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="WhatIfCriticalPathShiftedToCulpableInUPDOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+
+                                                    <fieldset class="eot-fieldset-nested"
+                                                        id="basedOnProgrammeFieldset"
+                                                        style="display: {{ $criticalPathValue == '2' ? 'block' : 'none' }}">
+                                                        <legend class="eot-legend-nested">Based on which Programme?
+                                                        </legend>
+
+                                                        @php
+                                                            $basedOnWhichProgrammeValue =
+                                                                isset($BasedOnWhichProgramme) &&
+                                                                $BasedOnWhichProgramme->value
+                                                                    ? $BasedOnWhichProgramme->value
+                                                                    : '1';
+                                                            $options = [
+                                                                '1' => 'IMP (no mitigation) and UPD (mitigation)',
+                                                                '2' => 'UPD (BUT for Culpable)',
+                                                            ];
+                                                        @endphp
+
+                                                        @foreach ($options as $value => $label)
+                                                            <div class="custom-control custom-radio mb-1">
+                                                                <input type="radio"
+                                                                    id="BasedOnWhichProgrammeOption{{ $value }}"
+                                                                    name="BasedOnWhichProgramme"
+                                                                    value="{{ $value }}"
+                                                                    class="custom-control-input"
+                                                                    {{ $basedOnWhichProgrammeValue == $value ? 'checked' : '' }}>
+                                                                <label class="custom-control-label"
+                                                                    for="BasedOnWhichProgrammeOption{{ $value }}">
+                                                                    {{ $label }}
+                                                                </label>
+                                                            </div>
+                                                        @endforeach
+                                                    </fieldset>
+                                                </fieldset>
+
+                                                <fieldset class="eot-fieldset">
+                                                    <legend class="eot-legend">What if UPD extended as executable took
+                                                        longer?</legend>
+                                                    @php
+                                                        // Determine saved or default value (default = 2)
+                                                        $updExtendedValue =
+                                                            isset($WhatIfUPDExtendedAsExcusableTookLonger) &&
+                                                            $WhatIfUPDExtendedAsExcusableTookLonger->value
+                                                                ? $WhatIfUPDExtendedAsExcusableTookLonger->value
+                                                                : '2';
+
+                                                        $options = [
+                                                            '1' => 'EOT based on IMP',
+                                                            '2' => 'EOT based on UPD',
+                                                        ];
+                                                    @endphp
+
+                                                    @foreach ($options as $value => $label)
+                                                        <div class="custom-control custom-radio mb-1">
+                                                            <input type="radio"
+                                                                id="WhatIfUPDExtendedAsExcusableTookLongerOption{{ $value }}"
+                                                                name="WhatIfUPDExtendedAsExcusableTookLonger"
+                                                                value="{{ $value }}"
+                                                                class="custom-control-input"
+                                                                {{ $updExtendedValue == $value ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="WhatIfUPDExtendedAsExcusableTookLongerOption{{ $value }}">
+                                                                {{ $label }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </fieldset>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary"
+                                            id="calculationMethod">Save</button>
                                     </div>
                                 </div>
                             </div>
@@ -1362,6 +1658,21 @@
     <script src="{{ asset('dashboard/js/apps.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const radios = document.querySelectorAll('input[name="WhatIfCriticalPathShiftedToCulpableInUPD"]');
+            const nestedFieldset = document.getElementById('basedOnProgrammeFieldset');
+
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === '1') {
+                        nestedFieldset.style.display = 'none';
+                    } else if (this.value === '2') {
+                        nestedFieldset.style.display = 'block';
+                    }
+                });
+            });
+
+
+
             const sidebar = document.querySelector('.sidebar-left');
             if (!sidebar) return;
 
@@ -1590,15 +1901,7 @@
                         data: data + "&export=excel",
                         success: function(response) {
 
-                            // open the file in new tab
-
                             window.open(response.download_url, '_blank');
-
-                            // OR download directly:
-                            // window.location.href = response.url;
-
-                            // OR show the link in modal:
-                            // $('#excelLink').attr('href', response.url).show();
 
                         },
                         error: function(xhr) {
@@ -1614,7 +1917,48 @@
                     script.remove();
                 }
             });
+            $('#calcMethodLink').on('click', function() {
+                if (!document.getElementById(bootstrapScriptId)) {
+                    let script = document.createElement("script");
+                    script.src =
+                        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js";
+                    script.id = bootstrapScriptId;
+                    document.body.appendChild(script);
 
+                    script.onload = function() {
+                        $('#calculationMethodModal').modal('show'); // show after Bootstrap loaded
+                    };
+                } else {
+                    $('#calculationMethodModal').modal('show');
+                }
+
+            });
+            $('#calculationMethod').on('click', function() {
+                let form = $('#calculationMethodForm');
+                let data = form.serialize(); // serialize all inputs
+
+                $.ajax({
+                    url: "{{ route('project.calculation-methods.update') }}",
+                    type: "POST",
+                    data: data,
+                    success: function(response) {
+
+                        location.reload();
+
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert("Failed to export Excel.");
+                    }
+                });
+
+            });
+            $('#calculationMethodModal').on('hidden.bs.modal', function() {
+                let script = document.getElementById(bootstrapScriptId);
+                if (script) {
+                    script.remove();
+                }
+            });
             $('#changePasswordModal').on('hidden.bs.modal', function() {
                 let script = document.getElementById(bootstrapScriptId);
                 if (script) {

@@ -1,12 +1,12 @@
 <?php
-
 namespace App\Providers;
 
 use App\Models\AccountUser;
-use App\Models\ProjectFolder;
-use App\Models\ProjectUser;
+use App\Models\CalculationMethod;
 use App\Models\ContractTag;
 use App\Models\DocType;
+use App\Models\ProjectFolder;
+use App\Models\ProjectUser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,7 +17,7 @@ class CustomLogoServiceProvider extends ServiceProvider
         $this->app->bind('Folders', function () {
             // Logic to determine the path to the logo image
             // $logo=url(Setting::where('key','logo')->where('category','website')->where('type','file')->first()->value);
-            $user = auth()->user();
+            $user    = auth()->user();
             $Folders = ProjectFolder::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id);
 
             return $Folders;
@@ -26,17 +26,17 @@ class CustomLogoServiceProvider extends ServiceProvider
         $this->app->bind('DocTypes_', function () {
             // Logic to determine the path to the logo image
             // $logo=url(Setting::where('key','logo')->where('category','website')->where('type','file')->first()->value);
-            $user = auth()->user();
+            $user      = auth()->user();
             $DocTypes_ = DocType::where('account_id', $user->current_account_id)->where('project_id', $user->current_project_id);
 
             return $DocTypes_;
         });
 
         $this->app->bind('Acco_Permissions', function () {
-            $user = auth()->user();
+            $user        = auth()->user();
             $AccountUser = AccountUser::where('account_id', $user->current_account_id)->where('user_id', $user->id)->first();
             if ($AccountUser) {
-                $permissions = $AccountUser->permissions;
+                $permissions      = $AccountUser->permissions;
                 $Acco_Permissions = json_decode($permissions);
             } else {
                 $Acco_Permissions = null;
@@ -46,10 +46,10 @@ class CustomLogoServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('Project_Permissions', function () {
-            $user = auth()->user();
+            $user        = auth()->user();
             $ProjectUser = ProjectUser::where('project_id', $user->current_project_id)->where('user_id', $user->id)->first();
             if ($ProjectUser) {
-                $permissions = $ProjectUser->permissions;
+                $permissions     = $ProjectUser->permissions;
                 $Pro_Permissions = json_decode($permissions);
             } else {
                 $Pro_Permissions = null;
@@ -102,6 +102,47 @@ class CustomLogoServiceProvider extends ServiceProvider
             $view->with('Folders', $Folders);
         });
 
+        view()->composer('*', function ($view) {
+            $currentRoute = Route::currentRouteName();
+
+            // Skip for login and register pages
+            if (in_array($currentRoute, ['login_view', 'register_view'])) {
+                return;
+            }
+
+            $user = auth()->user();
+
+            // Avoid running for guest users
+            if (! $user) {
+                return;
+            }
+            $projectId = $user->current_project_id;
+
+            // Fetch all needed CalculationMethods at once
+            $calculationMethods = CalculationMethod::where('project_id', $projectId)
+                ->whereIn('key', [
+                    'InCaseOfConcurrency',
+                    'CompensabilityCalculation',
+                    'WhatIfCompensableExceededExcusable',
+                    'HowToDealWithMitigation',
+                    'WhatIfCriticalPathShiftedToCulpableInUPD',
+                    'BasedOnWhichProgramme',
+                    'WhatIfUPDExtendedAsExcusableTookLonger',
+                ])
+                ->get()
+                ->keyBy('key'); // make it easy to access by key in the view
+
+            // Share all with the view
+            $view->with([
+                'InCaseOfConcurrency'                      => $calculationMethods['InCaseOfConcurrency'] ?? null,
+                'CompensabilityCalculation'                => $calculationMethods['CompensabilityCalculation'] ?? null,
+                'WhatIfCompensableExceededExcusable'       => $calculationMethods['WhatIfCompensableExceededExcusable'] ?? null,
+                'HowToDealWithMitigation'                  => $calculationMethods['HowToDealWithMitigation'] ?? null,
+                'WhatIfCriticalPathShiftedToCulpableInUPD' => $calculationMethods['WhatIfCriticalPathShiftedToCulpableInUPD'] ?? null,
+                'BasedOnWhichProgramme'                    => $calculationMethods['BasedOnWhichProgramme'] ?? null,
+                'WhatIfUPDExtendedAsExcusableTookLonger'   => $calculationMethods['WhatIfUPDExtendedAsExcusableTookLonger'] ?? null,
+            ]);
+        });
 
         view()->composer('*', function ($view) {
             $currentRoute = Route::currentRouteName();

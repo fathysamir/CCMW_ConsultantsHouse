@@ -380,11 +380,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/activities/store', [ActivityController::class, 'store'])->name('project.activity.store');
     Route::post('/activities/update/{id}', [ActivityController::class, 'update'])->name('project.activity.update');
 
-
     Route::get('/project/windows', [WindowController::class, 'index'])->name('project.all_windows.index');
     Route::get('/project/window/delete/{id}', [WindowController::class, 'delete'])->name('project.window.delete');
     Route::post('/windows/store', [WindowController::class, 'store'])->name('project.window.store');
     Route::post('/windows/update/{id}', [WindowController::class, 'update'])->name('project.window.update');
     Route::post('/windows/form/store', [WindowController::class, 'store_driving_activity'])->name('project.window.form.store');
-    Route::get('/get-window-driving-activity',[WindowController::class, 'get_driving_activities'])->name('get-window-driving-activities');
+    Route::get('/get-window-driving-activity', [WindowController::class, 'get_driving_activities'])->name('get-window-driving-activities');
+    Route::post('/update_calculation_method', [WindowController::class, 'update_calculation_method'])->name('project.calculation-methods.update');
+
 });

@@ -192,13 +192,18 @@
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="windows">
                     <li class="nav-item">
-                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_activities.index') }}" id="report1Link"><span
+                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_activities.index') }}"><span
                                 class="ml-1 item-text"style="color: #e4d125;">Activities</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_windows.index') }}" id="report1Link"><span
+                        <a class="nav-link pl-3 link_kkkkk"href="{{ route('project.all_windows.index') }}"><span
                                 class="ml-1 item-text"style="color: #e4d125;">Windows</span></a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3 link_kkkkk"href="#" id="calcMethodLink"><span
+                                class="ml-1 item-text"style="color: #e4d125;">Calculation Method</span></a>
+                    </li>
+                    
                 </ul>
             </li>
             <li class="nav-item">

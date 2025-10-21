@@ -7,6 +7,7 @@ use App\Models\DrivingActivity;
 use App\Models\Milestone;
 use App\Models\ProjectFile;
 use App\Models\Window;
+use App\Models\CalculationMethod;
 use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Http\Request;
@@ -111,11 +112,11 @@ class WindowController extends ApiController
     public function store_driving_activity(Request $request)
     {
         $validated = $request->validate([
-            'slug'                           => 'required|string|exists:windows,slug',
-            'program'                        => 'required|string',
-            'driving_activities'             => 'required|array|min:1',
-            'driving_activities.*.activity'  => 'required|integer|exists:activities,id',
-            'driving_activities.*.date'      => 'required|date',
+            'slug'                          => 'required|string|exists:windows,slug',
+            'program'                       => 'required|string',
+            'driving_activities'            => 'required|array|min:1',
+            'driving_activities.*.activity' => 'required|integer|exists:activities,id',
+            'driving_activities.*.date'     => 'required|date',
         ]);
         $window = Window::where('slug', $request->slug)->firstOrFail();
 
@@ -123,7 +124,7 @@ class WindowController extends ApiController
         try {
             $array_IDs = [];
             foreach ($request->driving_activities as $activity) {
-                $d_a = DrivingActivity::where('project_id', $window->project_id)->where('activity_id', $activity['activity'])->where('milestone_id', ($activity['milestone']??null))->where('window_id', $window->id)->where('program', $request->program)->first();
+                $d_a = DrivingActivity::where('project_id', $window->project_id)->where('activity_id', $activity['activity'])->where('milestone_id', ($activity['milestone'] ?? null))->where('window_id', $window->id)->where('program', $request->program)->first();
                 if ($d_a) {
 
                     $d_a->ms_come_date = $activity['date'];
@@ -133,7 +134,7 @@ class WindowController extends ApiController
                     $d_a = DrivingActivity::create([
                         'project_id'   => $window->project_id,
                         'activity_id'  => $activity['activity'],
-                        'milestone_id' => $activity['milestone']?? null,
+                        'milestone_id' => $activity['milestone'] ?? null,
                         'window_id'    => $window->id, // adjust if available
                         'program'      => $request->program,
                         'ms_come_date' => $activity['date'],
@@ -277,6 +278,41 @@ class WindowController extends ApiController
 
             ]);
         }
+
+    }
+
+    ////////////////////////////////////////////////////////////
+    public function update_calculation_method(Request $request)
+    {
+        $user = auth()->user();
+        $validated = $request->validate([
+            'InCaseOfConcurrency'                      => 'nullable|in:1,2',
+            'CompensabilityCalculation'                => 'nullable|in:1,2',
+            'WhatIfCompensableExceededExcusable'       => 'nullable|in:1,2',
+            'HowToDealWithMitigation'                  => 'nullable|in:1,2',
+            'WhatIfCriticalPathShiftedToCulpableInUPD' => 'nullable|in:1,2',
+            'BasedOnWhichProgramme'                    => 'nullable|in:1,2',
+            'WhatIfUPDExtendedAsExcusableTookLonger'   => 'nullable|in:1,2',
+        ]);
+
+        $projectId = $user->current_project_id;
+
+        foreach ($validated as $key => $value) {
+            CalculationMethod::updateOrCreate(
+                [
+                    'key'        => $key,
+                    'project_id' => $projectId,
+                ],
+                [
+                    'value' => $value,
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Calculation methods updated successfully.',
+        ]);
 
     }
 
