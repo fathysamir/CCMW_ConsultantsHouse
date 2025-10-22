@@ -679,6 +679,13 @@
 
                 fieldset.find('.select-all-project').prop('checked', allChecked);
             });
+            $('.select-all-project').each(function() {
+                let fieldset = $(this).closest('fieldset');
+                let allBoxes = fieldset.find('.project_per');
+                let allChecked = allBoxes.length > 0 && allBoxes.length === allBoxes.filter(':checked')
+                    .length;
+                $(this).prop('checked', allChecked);
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();
