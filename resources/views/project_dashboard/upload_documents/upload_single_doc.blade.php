@@ -6,9 +6,7 @@
         .date {
             background-color: #fff !important;
         }
-    </style>
 
-    <style>
         .loader {
             width: 20px;
             height: 20px;
@@ -287,7 +285,39 @@
 
     <script>
         $(document).ready(function() {
+            let typeSelect = document.getElementById('type');
+            let fromSelect = document.getElementById('from_id');
+            let toSelect = document.getElementById('to_id');
 
+            typeSelect.addEventListener('change', function() {
+                let typeId = this.value;
+                if (!typeId) return;
+
+                // Reset dropdowns to "please select"
+                fromSelect.selectedIndex = 0;
+                toSelect.selectedIndex = 0;
+
+                fetch(`/get-doc-type-relations/${typeId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) return;
+
+                        // --- Handle "From" ---
+                        if (data.from_id) {
+                            fromSelect.value = data.from_id;
+                        } else {
+                            fromSelect.selectedIndex = 0; // selects "please select"
+                        }
+
+                        // --- Handle "To" ---
+                        if (data.to_id) {
+                            toSelect.value = data.to_id;
+                        } else {
+                            toSelect.selectedIndex = 0; // selects "please select"
+                        }
+                    })
+                    .catch(err => console.error('Error fetching doc type relations:', err));
+            });
             $('#folder_id').change(function() {
                 let folderId = $(this).val();
 
@@ -388,7 +418,7 @@
                                     window.open('/project/ocr_layer', '_blank');
                                 });
                             }
-                           
+
                             if (response.type_id) $('#type').val(response.type_id).trigger(
                                 'change');
                             if (response.sender_id) $('#from_id').val(response.sender_id)

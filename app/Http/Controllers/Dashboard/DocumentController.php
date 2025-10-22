@@ -1020,6 +1020,43 @@ Based on that and provided that we have the following list of stakeholders:';
         return response()->json(['files' => $files]);
 
     }
+    public function get_assigned_files_in_documents($id)
+    {
+        $file_doc_type = session('file_doc_type');
+        $doc           = null;
+        $fileDocuments = collect();
+
+        //if ($file_doc_type === 'document') {
+        $doc           = Document::where('slug', $id)->first();
+        $fileDocuments = FileDocument::where('document_id', $doc->id)
+            ->with(['file.folder'])
+            ->get();
+        // }
+        //  elseif ($file_doc_type === 'note') {
+        //     $doc           = Note::where('slug', $id)->first();
+        //     $fileDocuments = FileDocument::where('note_id', $doc->id)
+        //         ->with(['file.folder'])
+        //         ->get();
+        // }
+
+        session()->forget('file_doc_type');
+
+        // Check permission
+        $user          = auth()->user();
+        $hasPermission = $user->roles->first()->name === 'Super Admin' ||
+        in_array('analysis', session('Project_Permissions') ?? []);
+
+        return response()->json([
+            'can_view_analysis' => $hasPermission,
+            'files'             => $fileDocuments->map(function ($fd) {
+                return [
+                    'file_document_id' => $fd->id,
+                    'file_name'        => $fd->file->name ?? '',
+                    'folder_name'      => $fd->file->folder->name ?? '',
+                ];
+            }),
+        ]);
+    }
 
     public function getDocsByReference(Request $request)
     {
@@ -1083,4 +1120,19 @@ Based on that and provided that we have the following list of stakeholders:';
 
         return view('project_dashboard.upload_documents.ocr_layer', compact('path'));
     }
+
+    public function getDocTypeRelations($id)
+    {
+        $docType = DocType::find($id);
+
+        if (! $docType) {
+            return response()->json(['error' => 'Document type not found'], 404);
+        }
+
+        return response()->json([
+            'from_id' => $docType->from,
+            'to_id'   => $docType->to,
+        ]);
+    }
+
 }

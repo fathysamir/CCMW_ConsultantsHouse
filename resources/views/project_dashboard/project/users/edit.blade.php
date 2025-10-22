@@ -30,8 +30,7 @@
 
 
                 <div class="col-md-12">
-                    <form method="post" action="{{ route('project.update_user', $user->id) }}"
-                        enctype="multipart/form-data">
+                    <form method="post" action="{{ route('project.update_user', $user->id) }}" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-3">
                             <label for="simpleinputName">Name</label>
@@ -291,10 +290,20 @@
                             @endphp
                             <fieldset class="custom-fieldset">
                                 <legend class="custom-legend">{{ $project->name }} - {{ $project->code }}</legend>
+                                <div class="mb-2"
+                                    style="margin-left:50px;padding-bottom: 20px;margin-left: 50px;margin-top: -20px;">
+                                    <div class="custom-control custom-checkbox" style="text-align: center;">
+                                        <input type="checkbox" class="custom-control-input select-all-project"
+                                            id="select_all_{{ $project->id }}">
+                                        <label class="custom-control-label" for="select_all_{{ $project->id }}">
+                                            Select All Permissions
+                                        </label>
+                                    </div>
+                                </div>
                                 <div class="row" style="margin-left: 50px;">
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_contract_tags"id="show_contract_tags{{ $project->id }}"
                                             @if (in_array('show_contract_tags', $project_permission ?? [])) checked @endif>
@@ -304,7 +313,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_contract_tags"id="create_contract_tags{{ $project->id }}"
                                             @if (in_array('create_contract_tags', $project_permission ?? [])) checked @endif>
@@ -314,7 +323,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_contract_tags"id="edit_contract_tags{{ $project->id }}"
                                             @if (in_array('edit_contract_tags', $project_permission ?? [])) checked @endif>
@@ -324,7 +333,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_contract_tags"id="delete_contract_tags{{ $project->id }}"
                                             @if (in_array('delete_contract_tags', $project_permission ?? [])) checked @endif>
@@ -334,7 +343,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_project_folder"id="show_project_folder{{ $project->id }}"
                                             @if (in_array('show_project_folder', $project_permission ?? [])) checked @endif>
@@ -344,7 +353,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_project_folder"id="create_project_folder{{ $project->id }}"
                                             @if (in_array('create_project_folder', $project_permission ?? [])) checked @endif>
@@ -354,7 +363,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_project_folder"id="edit_project_folder{{ $project->id }}"
                                             @if (in_array('edit_project_folder', $project_permission ?? [])) checked @endif>
@@ -364,7 +373,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_project_folder"id="delete_project_folder{{ $project->id }}"
                                             @if (in_array('delete_project_folder', $project_permission ?? [])) checked @endif>
@@ -375,7 +384,7 @@
 
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_document_type"id="show_document_type{{ $project->id }}"
                                             @if (in_array('show_document_type', $project_permission ?? [])) checked @endif>
@@ -385,7 +394,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_document_type"id="create_document_type{{ $project->id }}"
                                             @if (in_array('create_document_type', $project_permission ?? [])) checked @endif>
@@ -395,7 +404,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_document_type"id="edit_document_type{{ $project->id }}"
                                             @if (in_array('edit_document_type', $project_permission ?? [])) checked @endif>
@@ -405,7 +414,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_document_type"id="delete_document_type{{ $project->id }}"
                                             @if (in_array('delete_document_type', $project_permission ?? [])) checked @endif>
@@ -415,7 +424,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_contract_settings"id="show_contract_settings{{ $project->id }}"
                                             @if (in_array('show_contract_settings', $project_permission ?? [])) checked @endif>
@@ -425,7 +434,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_contract_settings"id="create_contract_settings{{ $project->id }}"
                                             @if (in_array('create_contract_settings', $project_permission ?? [])) checked @endif>
@@ -436,7 +445,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_contract_settings"id="edit_contract_settings{{ $project->id }}"
                                             @if (in_array('edit_contract_settings', $project_permission ?? [])) checked @endif>
@@ -446,7 +455,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_contract_settings"id="delete_contract_settings{{ $project->id }}"
                                             @if (in_array('delete_contract_settings', $project_permission ?? [])) checked @endif>
@@ -457,7 +466,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="upload_documents"id="upload_documents{{ $project->id }}"
                                             @if (in_array('upload_documents', $project_permission ?? [])) checked @endif>
@@ -467,9 +476,8 @@
                                     </div>
                                     <div class="custom-control custom-checkbox"style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
-                                            name="projects_permissions[]"
-                                            value="upload_group_documents"
+                                        <input type="checkbox" class="custom-control-input project_per"
+                                            name="projects_permissions[]" value="upload_group_documents"
                                             id="upload_group_documents{{ $project->id }}"@if (in_array('upload_group_documents', $project_permission ?? [])) checked @endif>
                                         <label class="custom-control-label"
                                             for="upload_group_documents{{ $project->id }}">Upload Group
@@ -477,7 +485,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="import_documents"id="import_documents{{ $project->id }}"
                                             @if (in_array('import_documents', $project_permission ?? [])) checked @endif>
@@ -487,7 +495,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_documents"id="edit_documents{{ $project->id }}"
                                             @if (in_array('edit_documents', $project_permission ?? [])) checked @endif>
@@ -496,7 +504,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_documents"id="delete_documents{{ $project->id }}"
                                             @if (in_array('delete_documents', $project_permission ?? [])) checked @endif>
@@ -506,7 +514,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="analysis"id="analysis{{ $project->id }}"
                                             @if (in_array('analysis', $project_permission ?? [])) checked @endif>
@@ -515,7 +523,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_file"id="create_file{{ $project->id }}"
                                             @if (in_array('create_file', $project_permission ?? [])) checked @endif>
@@ -524,7 +532,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_file"id="edit_file{{ $project->id }}"
                                             @if (in_array('edit_file', $project_permission ?? [])) checked @endif>
@@ -533,7 +541,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_file"id="delete_file{{ $project->id }}"
                                             @if (in_array('delete_file', $project_permission ?? [])) checked @endif>
@@ -542,7 +550,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="cope_move_file"id="cope_move_file{{ $project->id }}"
                                             @if (in_array('cope_move_file', $project_permission ?? [])) checked @endif>
@@ -553,7 +561,7 @@
 
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_abbreviations"id="show_abbreviations{{ $project->id }}"
                                             @if (in_array('show_abbreviations', $project_permission ?? [])) checked @endif>
@@ -562,7 +570,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_abbreviation"id="create_abbreviation{{ $project->id }}"
                                             @if (in_array('create_abbreviation', $project_permission ?? [])) checked @endif>
@@ -571,7 +579,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_abbreviation"id="edit_abbreviation{{ $project->id }}"
                                             @if (in_array('edit_abbreviation', $project_permission ?? [])) checked @endif>
@@ -580,7 +588,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_abbreviation"id="delete_abbreviation{{ $project->id }}"
                                             @if (in_array('delete_abbreviation', $project_permission ?? [])) checked @endif>
@@ -590,7 +598,7 @@
 
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="show_project_contacts"id="show_project_contacts{{ $project->id }}"
                                             @if (in_array('show_project_contacts', $project_permission ?? [])) checked @endif>
@@ -599,7 +607,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="create_project_contact"id="create_project_contact{{ $project->id }}"
                                             @if (in_array('create_project_contact', $project_permission ?? [])) checked @endif>
@@ -609,7 +617,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="edit_project_contact"id="edit_project_contact{{ $project->id }}"
                                             @if (in_array('edit_project_contact', $project_permission ?? [])) checked @endif>
@@ -618,7 +626,7 @@
                                     </div>
                                     <div class="custom-control custom-checkbox" style="width:25%">
 
-                                        <input type="checkbox" class="custom-control-input"
+                                        <input type="checkbox" class="custom-control-input project_per"
                                             name="projects_permissions[]"
                                             value="delete_project_contact"id="delete_project_contact{{ $project->id }}"
                                             @if (in_array('delete_project_contact', $project_permission ?? [])) checked @endif>
@@ -655,7 +663,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('.select-all-project').on('change', function() {
+                let fieldset = $(this).closest('fieldset');
+                let isChecked = $(this).is(':checked');
 
+                // Toggle all checkboxes in that fieldset only
+                fieldset.find('.project_per').prop('checked', isChecked);
+            });
+
+            // If any individual checkbox is unchecked, uncheck the "Select All"
+            $('.project_per').on('change', function() {
+                let fieldset = $(this).closest('fieldset');
+                let allBoxes = fieldset.find('.project_per');
+                let allChecked = allBoxes.length === allBoxes.filter(':checked').length;
+
+                fieldset.find('.select-all-project').prop('checked', allChecked);
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();

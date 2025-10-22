@@ -222,12 +222,14 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/project/delete-selected-docs', [DocumentController::class, 'deleteSelectedDocs'])->name('project.document.delete-selected-docs');
     Route::post('/project/assign-to-file-for-all', [DocumentController::class, 'assignToFileForAll'])->name('project.document.assign-to-file-for-all');
     Route::get('/document/get-files/{id}', [DocumentController::class, 'get_assigned_files'])->name('get_assigned_files');
+    Route::get('/document/get_assigned_files_in_documents/{id}', [DocumentController::class, 'get_assigned_files_in_documents'])->name('get_assigned_files_in_documents');
     Route::post('/get-documents-by-thread', [DocumentController::class, 'getDocsByReference']);
     Route::post('/project/document/assign-document-bySlug', [DocumentController::class, 'assignDocumentbyslug'])->name('project.document.assign-document-slug');
     Route::get('/project/ocr_layer/{id}', [DocumentController::class, 'ocr_layer'])->name('project.file-documents.ocr_layer');
     Route::get('/project/ocr_layer', [DocumentController::class, 'ocr_with_path'])->name('project.file-documents.ocr_layer_with_path');
     Route::get('/project/document/{id}/document-analysis', [DocumentController::class, 'document_analysis'])->name('project.documents.document_analysis');
     Route::post('/project/document/{id}/update-document-analysis', [DocumentController::class, 'update_analysis'])->name('project.update-document-analysis');
+    Route::get('/get-doc-type-relations/{id}', [DocumentController::class, 'getDocTypeRelations'])->name('getDocTypeRelations');
 
     Route::get('go-to-fileDocument/{docId}/{fileId}', function ($doc, $file) {
 

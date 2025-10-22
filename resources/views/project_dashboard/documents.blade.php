@@ -214,8 +214,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -319,7 +319,8 @@
                                                     <a class="dropdown-item"
                                                         href="{{ route('project.edit-document', $document->slug) }}">Edit</a>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('project.documents.document_analysis', $document->slug) }}" target="_blink">Document Analysis</a>
+                                                        href="{{ route('project.documents.document_analysis', $document->slug) }}"
+                                                        target="_blink">Document Analysis</a>
                                                     <a class="dropdown-item"
                                                         href="{{ route('download', $document->slug) }}">
                                                         Download Document
@@ -911,14 +912,14 @@
                     var actionsHtml = {!! json_encode(
                         ($canEdit
                             ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="changeOwnerForAllBtn" href="javascript:void(0);">Edit Documents</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item" id="assignToForAllBtn" href="javascript:void(0);">Assign To File</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
                             : '') .
                             ($canDelete
                                 ? '
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <a class="dropdown-item text-danger" id="deleteForAllBtn" href="javascript:void(0);">Delete</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '
                                 : ''),
                     ) !!};
                     new_down_list.innerHTML = `
@@ -1342,22 +1343,45 @@
                         console.log(data); // should log { status: 'ok' }
                     });
                 $.ajax({
-                    url: '/document/get-files/' +
-                        documentId, // Adjust the route to your API endpoint
+                    url: '/document/get_assigned_files_in_documents/' + documentId,
                     type: 'GET',
                     success: function(response) {
                         let container = $('#container');
-                        container.empty()
+                        container.empty();
+
+                        if (!response.files || response.files.length === 0) {
+                            container.append('<p>No files found.</p>');
+                            return;
+                        }
+
                         $.each(response.files, function(index, file) {
-                            container.append(
-                                `<p><span class="fa fa-star"></span> <span style="font-size:1.2rem;">${file.folder.name}</span>  <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>  <span style="font-size:1.2rem;">${file.name}</span></p>`
-                            );
+                            const hasAccess = response.can_view_analysis;
+                            const href = hasAccess ?
+                                `/project/file-document-first-analyses/${file.file_document_id}` :
+                                '#';
+
+                            const style = hasAccess ? 'color: rgb(80, 78, 78);' :
+                                'color: gray; cursor: not-allowed;';
+
+                            const fileLink = `
+                                        <p>
+                                            <span class="fa fa-star"></span>
+                                            <a class="l-link"
+                                            style="${style} font-size:1.2rem;" href="${href}"
+                                            ${hasAccess ? '' : 'onclick="return false;"'}>
+                                                <span>${file.folder_name}</span>
+                                                <span style="font-family: Helvetica, Arial, Sans-Serif; font-size: 26px;">&#x2192;</span>
+                                                <span>${file.file_name}</span>
+                                            </a>
+                                        </p>`;
+                            container.append(fileLink);
                         });
                     },
                     error: function() {
                         alert('Failed to fetch files. Please try again.');
                     }
                 });
+
 
                 $('#CheckOtherAssignmentModal').modal('show'); // Show the modal
             });

@@ -51,18 +51,13 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="phone">Role</label>
-                           
-                                <select class="form-control" name="role">
-                                    <option value="User" @if($user
-                                    ->accounts()
-                                    ->where('account_id', auth()->user()->current_account_id)
-                                    ->first()->pivot->role == 'User') selected @endif>User</option>
-                                    <option value="Admin Account"@if($user
-                                    ->accounts()
-                                    ->where('account_id', auth()->user()->current_account_id)
-                                    ->first()->pivot->role == 'Admin Account') selected @endif>Account Admin</option>
 
-                                </select>
+                            <select class="form-control" name="role">
+                                <option value="User" @if ($user->accounts()->where('account_id', auth()->user()->current_account_id)->first()->pivot->role == 'User') selected @endif>User</option>
+                                <option value="Admin Account"@if ($user->accounts()->where('account_id', auth()->user()->current_account_id)->first()->pivot->role == 'Admin Account') selected @endif>Account Admin
+                                </option>
+
+                            </select>
                         </div>
                         <div class="form-group" style="display: flex; align-items: center;margin-bottom:0px;">
                             <h5 style="margin-right: 10px;">Account Permissions</h5>
@@ -296,305 +291,353 @@
                                 @endphp
                                 <fieldset class="custom-fieldset">
                                     <legend class="custom-legend">{{ $project->name }} - {{ $project->code }}</legend>
+                                    <div class="mb-2"
+                                        style="margin-left:50px;padding-bottom: 20px;margin-left: 50px;margin-top: -20px;">
+                                        <div class="custom-control custom-checkbox" style="text-align: center;">
+                                            <input type="checkbox" class="custom-control-input select-all-project"
+                                                id="select_all_{{ $project->id }}">
+                                            <label class="custom-control-label" for="select_all_{{ $project->id }}">
+                                                Select All Permissions
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div class="row" style="margin-left: 50px;">
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_contract_tags"id="show_contract_tags{{ $project->id }}"
                                                 @if (in_array('show_contract_tags', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_contract_tags{{ $project->id }}">Show Contract
+                                            <label class="custom-control-label"
+                                                for="show_contract_tags{{ $project->id }}">Show Contract
                                                 Tags</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_contract_tags"id="create_contract_tags{{ $project->id }}"
                                                 @if (in_array('create_contract_tags', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_contract_tags{{ $project->id }}">Create Contract
+                                            <label class="custom-control-label"
+                                                for="create_contract_tags{{ $project->id }}">Create Contract
                                                 Tags</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_contract_tags"id="edit_contract_tags{{ $project->id }}"
                                                 @if (in_array('edit_contract_tags', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_contract_tags{{ $project->id }}">Edit Contract
+                                            <label class="custom-control-label"
+                                                for="edit_contract_tags{{ $project->id }}">Edit Contract
                                                 Tags</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_contract_tags"id="delete_contract_tags{{ $project->id }}"
                                                 @if (in_array('delete_contract_tags', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_contract_tags{{ $project->id }}">Delete Contract
+                                            <label class="custom-control-label"
+                                                for="delete_contract_tags{{ $project->id }}">Delete Contract
                                                 Tags</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_project_folder"id="show_project_folder{{ $project->id }}"
                                                 @if (in_array('show_project_folder', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_project_folder{{ $project->id }}">Show Project
+                                            <label class="custom-control-label"
+                                                for="show_project_folder{{ $project->id }}">Show Project
                                                 Folders</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_project_folder"id="create_project_folder{{ $project->id }}"
                                                 @if (in_array('create_project_folder', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_project_folder{{ $project->id }}">Create Project
+                                            <label class="custom-control-label"
+                                                for="create_project_folder{{ $project->id }}">Create Project
                                                 Folders</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_project_folder"id="edit_project_folder{{ $project->id }}"
                                                 @if (in_array('edit_project_folder', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_project_folder{{ $project->id }}">Edit Project
+                                            <label class="custom-control-label"
+                                                for="edit_project_folder{{ $project->id }}">Edit Project
                                                 Folders</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_project_folder"id="delete_project_folder{{ $project->id }}"
                                                 @if (in_array('delete_project_folder', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_project_folder{{ $project->id }}">Delete Project
+                                            <label class="custom-control-label"
+                                                for="delete_project_folder{{ $project->id }}">Delete Project
                                                 Folders</label>
                                         </div>
 
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_document_type"id="show_document_type{{ $project->id }}"
                                                 @if (in_array('show_document_type', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_document_type{{ $project->id }}">Show Document
+                                            <label class="custom-control-label"
+                                                for="show_document_type{{ $project->id }}">Show Document
                                                 Types</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_document_type"id="create_document_type{{ $project->id }}"
                                                 @if (in_array('create_document_type', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_document_type{{ $project->id }}">Create Document
+                                            <label class="custom-control-label"
+                                                for="create_document_type{{ $project->id }}">Create Document
                                                 Types</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_document_type"id="edit_document_type{{ $project->id }}"
                                                 @if (in_array('edit_document_type', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_document_type{{ $project->id }}">Edit Document
+                                            <label class="custom-control-label"
+                                                for="edit_document_type{{ $project->id }}">Edit Document
                                                 Types</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_document_type"id="delete_document_type{{ $project->id }}"
                                                 @if (in_array('delete_document_type', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_document_type{{ $project->id }}">Delete Document
+                                            <label class="custom-control-label"
+                                                for="delete_document_type{{ $project->id }}">Delete Document
                                                 Types</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_contract_settings"id="show_contract_settings{{ $project->id }}"
                                                 @if (in_array('show_contract_settings', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_contract_settings{{ $project->id }}">Show Contract
+                                            <label class="custom-control-label"
+                                                for="show_contract_settings{{ $project->id }}">Show Contract
                                                 Settings</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_contract_settings"id="create_contract_settings{{ $project->id }}"
                                                 @if (in_array('create_contract_settings', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_contract_settings{{ $project->id }}">Create
+                                            <label class="custom-control-label"
+                                                for="create_contract_settings{{ $project->id }}">Create
                                                 Contract
                                                 Settings</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_contract_settings"id="edit_contract_settings{{ $project->id }}"
                                                 @if (in_array('edit_contract_settings', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_contract_settings{{ $project->id }}">Edit Contract
+                                            <label class="custom-control-label"
+                                                for="edit_contract_settings{{ $project->id }}">Edit Contract
                                                 Settings</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_contract_settings"id="delete_contract_settings{{ $project->id }}"
                                                 @if (in_array('delete_contract_settings', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_contract_settings{{ $project->id }}">Delete
+                                            <label class="custom-control-label"
+                                                for="delete_contract_settings{{ $project->id }}">Delete
                                                 Contract
                                                 Settings</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="upload_documents"id="upload_documents{{ $project->id }}"
                                                 @if (in_array('upload_documents', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="upload_documents{{ $project->id }}">Upload Single
+                                            <label class="custom-control-label"
+                                                for="upload_documents{{ $project->id }}">Upload Single
                                                 Document</label>
                                         </div>
                                         <div class="custom-control custom-checkbox"style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="upload_group_documents"
                                                 id="upload_group_documents{{ $project->id }}"@if (in_array('upload_group_documents', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="upload_group_documents{{ $project->id }}">Upload Group
+                                            <label class="custom-control-label"
+                                                for="upload_group_documents{{ $project->id }}">Upload Group
                                                 Of Documents</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="import_documents"id="import_documents{{ $project->id }}"
                                                 @if (in_array('import_documents', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="import_documents{{ $project->id }}">Import Documents
+                                            <label class="custom-control-label"
+                                                for="import_documents{{ $project->id }}">Import Documents
                                                 From Excel Sheet</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_documents"id="edit_documents{{ $project->id }}"
                                                 @if (in_array('edit_documents', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_documents{{ $project->id }}">Edit
+                                            <label class="custom-control-label"
+                                                for="edit_documents{{ $project->id }}">Edit
                                                 Documents</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_documents"id="delete_documents{{ $project->id }}"
                                                 @if (in_array('delete_documents', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_documents{{ $project->id }}">Delete
+                                            <label class="custom-control-label"
+                                                for="delete_documents{{ $project->id }}">Delete
                                                 Documents</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="analysis"id="analysis{{ $project->id }}"
                                                 @if (in_array('analysis', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="analysis{{ $project->id }}">Analysis Documents</label>
+                                            <label class="custom-control-label"
+                                                for="analysis{{ $project->id }}">Analysis Documents</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_file"id="create_file{{ $project->id }}"
                                                 @if (in_array('create_file', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_file{{ $project->id }}">Create Files</label>
+                                            <label class="custom-control-label"
+                                                for="create_file{{ $project->id }}">Create Files</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_file"id="edit_file{{ $project->id }}"
                                                 @if (in_array('edit_file', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_file{{ $project->id }}">Edit Files</label>
+                                            <label class="custom-control-label" for="edit_file{{ $project->id }}">Edit
+                                                Files</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_file"id="delete_file{{ $project->id }}"
                                                 @if (in_array('delete_file', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_file{{ $project->id }}">Delete Files</label>
+                                            <label class="custom-control-label"
+                                                for="delete_file{{ $project->id }}">Delete Files</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="cope_move_file"id="cope_move_file{{ $project->id }}"
                                                 @if (in_array('cope_move_file', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="cope_move_file{{ $project->id }}">Copy And Move
+                                            <label class="custom-control-label"
+                                                for="cope_move_file{{ $project->id }}">Copy And Move
                                                 Files</label>
                                         </div>
 
-                                          <div class="custom-control custom-checkbox" style="width:25%">
+                                        <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_abbreviations"id="show_abbreviations{{ $project->id }}"
                                                 @if (in_array('show_abbreviations', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_abbreviations{{ $project->id }}">Show Abbreviations</label>
+                                            <label class="custom-control-label"
+                                                for="show_abbreviations{{ $project->id }}">Show Abbreviations</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_abbreviation"id="create_abbreviation{{ $project->id }}"
                                                 @if (in_array('create_abbreviation', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_abbreviation{{ $project->id }}">Create Abbreviations</label>
+                                            <label class="custom-control-label"
+                                                for="create_abbreviation{{ $project->id }}">Create Abbreviations</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_abbreviation"id="edit_abbreviation{{ $project->id }}"
                                                 @if (in_array('edit_abbreviation', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_abbreviation{{ $project->id }}">Edit Abbreviations</label>
+                                            <label class="custom-control-label"
+                                                for="edit_abbreviation{{ $project->id }}">Edit Abbreviations</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_abbreviation"id="delete_abbreviation{{ $project->id }}"
                                                 @if (in_array('delete_abbreviation', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_abbreviation{{ $project->id }}">Delete Abbreviations</label>
+                                            <label class="custom-control-label"
+                                                for="delete_abbreviation{{ $project->id }}">Delete Abbreviations</label>
                                         </div>
 
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="show_project_contacts"id="show_project_contacts{{ $project->id }}"
                                                 @if (in_array('show_project_contacts', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="show_project_contacts{{ $project->id }}">Show Project Contacts</label>
+                                            <label class="custom-control-label"
+                                                for="show_project_contacts{{ $project->id }}">Show Project
+                                                Contacts</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="create_project_contact"id="create_project_contact{{ $project->id }}"
                                                 @if (in_array('create_project_contact', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="create_project_contact{{ $project->id }}">Create Project Contact</label>
+                                            <label class="custom-control-label"
+                                                for="create_project_contact{{ $project->id }}">Create Project
+                                                Contact</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="edit_project_contact"id="edit_project_contact{{ $project->id }}"
                                                 @if (in_array('edit_project_contact', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="edit_project_contact{{ $project->id }}">Edit Project Contact</label>
+                                            <label class="custom-control-label"
+                                                for="edit_project_contact{{ $project->id }}">Edit Project
+                                                Contact</label>
                                         </div>
                                         <div class="custom-control custom-checkbox" style="width:25%">
 
-                                            <input type="checkbox" class="custom-control-input"
+                                            <input type="checkbox" class="custom-control-input project_per"
                                                 name="projects_permissions[{{ $project->id }}][]"
                                                 value="delete_project_contact"id="delete_project_contact{{ $project->id }}"
                                                 @if (in_array('delete_project_contact', $project_permission ?? [])) checked @endif>
-                                            <label class="custom-control-label" for="delete_project_contact{{ $project->id }}">Delete Project Contact</label>
+                                            <label class="custom-control-label"
+                                                for="delete_project_contact{{ $project->id }}">Delete Project
+                                                Contact</label>
                                         </div>
 
 
@@ -625,7 +668,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('.select-all-project').on('change', function() {
+                let fieldset = $(this).closest('fieldset');
+                let isChecked = $(this).is(':checked');
 
+                // Toggle all checkboxes in that fieldset only
+                fieldset.find('.project_per').prop('checked', isChecked);
+            });
+
+            // If any individual checkbox is unchecked, uncheck the "Select All"
+            $('.project_per').on('change', function() {
+                let fieldset = $(this).closest('fieldset');
+                let allBoxes = fieldset.find('.project_per');
+                let allChecked = allBoxes.length === allBoxes.filter(':checked').length;
+
+                fieldset.find('.select-all-project').prop('checked', allChecked);
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();

@@ -258,8 +258,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <style>
         .assignment-list1 {
@@ -642,7 +642,13 @@
 
                                             <label class="with_tag @if ($document->note_id == null && count($document->tags) != 0) active @endif"><span
                                                     class="fe fe-23 fe-volume-2"
-                                                    style="@if ($document->note_id == null && count($document->tags) != 0) color: rgb(45, 209, 45); @else color: rgb(169, 169, 169); @endif"></span></label>
+                                                    style="@if ($document->note_id == null && count($document->tags) != 0) @if ($document->tags->contains('is_notice', 1))
+            color: rgb(255, 0, 0); /* red */
+        @else
+            color: rgb(45, 209, 45); /* green */ @endif
+@else
+color: rgb(169, 169, 169); /* gray */
+    @endif"></span></label>
                                             <label
                                                 class="for_claim for-claim-btn222 @if ($document->forClaim == '1') active @endif"
                                                 style="@if ($document->forClaim == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;"
@@ -1004,7 +1010,8 @@
                                 <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
                                     <input type="checkbox" class="custom-control-input" id="fromForL-E"
                                         name="fromForL_E"checked>
-                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
+                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters &
+                                        Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn">In case of e-mails : </label>
@@ -1188,7 +1195,8 @@
                                 <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
                                     <input type="checkbox" class="custom-control-input" id="fromForL-Ee"
                                         name="fromForL_E" checked>
-                                    <label class="custom-control-label" for="fromForL-Ee">"From" only for Litters & Emails</label>
+                                    <label class="custom-control-label" for="fromForL-Ee">"From" only for Litters &
+                                        Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>
@@ -2319,7 +2327,7 @@
                         success: function(response) {
                             // showHint(response.message || 'Download started!');
                             $('#modal-body').html(response.html);
-                            
+
                         },
                         error: function(xhr) {
                             console.error(xhr.responseText);
