@@ -123,7 +123,7 @@ class CustomLogoServiceProvider extends ServiceProvider
                 ->whereIn('key', [
                     'InCaseOfConcurrency',
                     'CompensabilityCalculation',
-                    'WhatIfCompensableExceededExcusable',
+                    'WhatIfCompensableExceededWindowDuration',
                     'HowToDealWithMitigation',
                     'WhatIfCriticalPathShiftedToCulpableInUPD',
                     'BasedOnWhichProgramme',
@@ -136,7 +136,7 @@ class CustomLogoServiceProvider extends ServiceProvider
             $view->with([
                 'InCaseOfConcurrency'                      => $calculationMethods['InCaseOfConcurrency'] ?? null,
                 'CompensabilityCalculation'                => $calculationMethods['CompensabilityCalculation'] ?? null,
-                'WhatIfCompensableExceededExcusable'       => $calculationMethods['WhatIfCompensableExceededExcusable'] ?? null,
+                'WhatIfCompensableExceededWindowDuration'       => $calculationMethods['WhatIfCompensableExceededWindowDuration'] ?? null,
                 'HowToDealWithMitigation'                  => $calculationMethods['HowToDealWithMitigation'] ?? null,
                 'WhatIfCriticalPathShiftedToCulpableInUPD' => $calculationMethods['WhatIfCriticalPathShiftedToCulpableInUPD'] ?? null,
                 'BasedOnWhichProgramme'                    => $calculationMethods['BasedOnWhichProgramme'] ?? null,

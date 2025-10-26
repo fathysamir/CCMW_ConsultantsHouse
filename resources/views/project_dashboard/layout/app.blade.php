@@ -410,32 +410,32 @@
                                                     @endforeach
                                                 </fieldset>
                                                 <fieldset class="eot-fieldset">
-                                                    <legend class="eot-legend">What if Compensable exceeded Executable
+                                                    <legend class="eot-legend">What if Compensable exceeded Window duration
                                                     </legend>
                                                     @php
                                                         // Determine saved or default value (2 = EOT + transfer)
                                                         $whatIfValue =
-                                                            isset($WhatIfCompensableExceededExcusable) &&
-                                                            $WhatIfCompensableExceededExcusable->value
-                                                                ? $WhatIfCompensableExceededExcusable->value
+                                                            isset($WhatIfCompensableExceededWindowDuration) &&
+                                                            $WhatIfCompensableExceededWindowDuration->value
+                                                                ? $WhatIfCompensableExceededWindowDuration->value
                                                                 : '2';
 
                                                         $options = [
-                                                            '1' => 'EOT only',
-                                                            '2' => 'EOT + transfer the extra days to next Window',
+                                                            '1' => 'Window duration only',
+                                                            '2' => 'Allow transfer to subsequent Windows',
                                                         ];
                                                     @endphp
 
                                                     @foreach ($options as $value => $label)
                                                         <div class="custom-control custom-radio mb-1">
                                                             <input type="radio"
-                                                                id="WhatIfCompensableExceededExcusableOption{{ $value }}"
-                                                                name="WhatIfCompensableExceededExcusable"
+                                                                id="WhatIfCompensableExceededWindowDurationOption{{ $value }}"
+                                                                name="WhatIfCompensableExceededWindowDuration"
                                                                 value="{{ $value }}"
                                                                 class="custom-control-input"
                                                                 {{ $whatIfValue == $value ? 'checked' : '' }}>
                                                             <label class="custom-control-label"
-                                                                for="WhatIfCompensableExceededExcusableOption{{ $value }}">
+                                                                for="WhatIfCompensableExceededWindowDurationOption{{ $value }}">
                                                                 {{ $label }}
                                                             </label>
                                                         </div>

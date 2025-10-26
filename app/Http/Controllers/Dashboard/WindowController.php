@@ -288,7 +288,7 @@ class WindowController extends ApiController
         $validated = $request->validate([
             'InCaseOfConcurrency'                      => 'nullable|in:1,2',
             'CompensabilityCalculation'                => 'nullable|in:1,2',
-            'WhatIfCompensableExceededExcusable'       => 'nullable|in:1,2',
+            'WhatIfCompensableExceededWindowDuration'       => 'nullable|in:1,2',
             'HowToDealWithMitigation'                  => 'nullable|in:1,2',
             'WhatIfCriticalPathShiftedToCulpableInUPD' => 'nullable|in:1,2',
             'BasedOnWhichProgramme'                    => 'nullable|in:1,2',
