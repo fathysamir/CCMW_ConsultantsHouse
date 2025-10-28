@@ -3,11 +3,12 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Activity;
+use App\Models\CalculationMethod;
 use App\Models\DrivingActivity;
 use App\Models\Milestone;
 use App\Models\ProjectFile;
 use App\Models\Window;
-use App\Models\CalculationMethod;
+use App\Services\CalculationMethodService;
 use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Http\Request;
@@ -15,12 +16,52 @@ use Illuminate\Support\Facades\DB;
 
 class WindowController extends ApiController
 {
+    protected $calc_method;
+
+    public function __construct(CalculationMethodService $calc_method)
+    {
+        $this->calc_method = $calc_method;
+    }
     public function index(Request $request)
     {
+        if ($request->milestone) {
+            $milestone_id = $request->milestone;
+        } else {
+            $miles = Milestone::where('project_id', auth()->user()->current_project_id)->first();
+            if ($miles) {
+                $milestone_id = $miles->id;
+            } else {
+                $milestone_id = null;
+            }
+        }
+
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
-        return view('project_dashboard.window_analysis.windows', compact('all_windows'));
+        if ($milestone_id) {
+            foreach ($all_windows as $window) {
+                $BASs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'BAS')->count();
+                $IMPs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'IMP')->count();
+                $UPDs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'UPD')->count();
+                $BUTs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'BUT')->count();
+                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $window->culpable  = $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $milestone_id);
+                    $window->excusable = $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $milestone_id);
+                    if ($BUTs > 0) {
+                        $window->compensable          = $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                        $window->transfer_compensable = $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+
+                    }
+                    $window->save();
+                }
+
+            }
+        }
+        $all_windows = Window::where('project_id', auth()->user()->current_project_id)
+            ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
+            ->get();
+        $milestones = Milestone::where('project_id', auth()->user()->current_project_id)->get();
+        return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones'));
 
     }
     public function store(Request $request)
@@ -284,11 +325,11 @@ class WindowController extends ApiController
     ////////////////////////////////////////////////////////////
     public function update_calculation_method(Request $request)
     {
-        $user = auth()->user();
+        $user      = auth()->user();
         $validated = $request->validate([
             'InCaseOfConcurrency'                      => 'nullable|in:1,2',
             'CompensabilityCalculation'                => 'nullable|in:1,2',
-            'WhatIfCompensableExceededWindowDuration'       => 'nullable|in:1,2',
+            'WhatIfCompensableExceededWindowDuration'  => 'nullable|in:1,2',
             'HowToDealWithMitigation'                  => 'nullable|in:1,2',
             'WhatIfCriticalPathShiftedToCulpableInUPD' => 'nullable|in:1,2',
             'BasedOnWhichProgramme'                    => 'nullable|in:1,2',

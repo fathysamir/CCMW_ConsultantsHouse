@@ -243,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -265,7 +265,17 @@
         <div class="col">
             <h2 class="h3 mb-0 page-title">Windows</h2>
         </div>
-        <div class="col-auto">
+        <div class="col-auto d-flex align-items-center gap-2">
+            <!-- Milestone Select -->
+            <select class="form-control" id="milestoneSelect"
+                style="width: auto;margin-bottom: 0.5rem !important;margin-right: 0.5rem !important;">
+                <option value="" selected disabled>Select Milestone</option>
+                @foreach ($milestones as $milestone)
+                    <option value="{{ $milestone->id }}">{{ $milestone->name }}</option>
+                @endforeach
+            </select>
+
+            <!-- Create Window Button -->
             <a href="javascript:void(0)" class="btn mb-2 btn-outline-primary" id="openCreateWindow">
                 Create Window
             </a>
@@ -329,10 +339,10 @@
                                         <td>{{ date('d-M-Y', strtotime($window->start_date)) }}</td>
                                         <td>{{ date('d-M-Y', strtotime($window->end_date)) }}</td>
                                         <td>{{ $window->duration }}</td>
-                                        <td>{{ $window->culpable }}</td>
-                                        <td>{{ $window->excusable }}</td>
-                                        <td>{{ $window->compensable }}</td>
-                                        <td>{{ $window->transfer_compensable }}</td>
+                                        <td>{{ $window->culpable??'__' }}</td>
+                                        <td>{{ $window->excusable??'__' }}</td>
+                                        <td>{{ $window->compensable??'__' }}</td>
+                                        <td>{{ $window->transfer_compensable??'__' }}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
@@ -412,7 +422,7 @@
                 <form id="windowForm" method="POST" novalidate>
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="windowModalLabel">Create Activity</h5>
+                        <h5 class="modal-title" id="windowModalLabel">Create Window</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -422,7 +432,7 @@
                         <input type="hidden" id="window_slug" name="slug">
                         <div class="form-group">
                             <label for="window_no">Window No <span style="color: red">*</span></label>
-                            <input type="text" class="form-control" id="window_no" name="window_no" required>
+                            <input type="number" class="form-control" id="window_no" name="window_no" required>
                         </div>
                         <div class="form-group mb-3">
                             <label for="start_date">srart Date <span style="color: red">*</span></label>
@@ -512,7 +522,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script>
+        document.getElementById('milestoneSelect').addEventListener('change', function() {
+            const milestoneId = this.value;
+            if (milestoneId) {
+                window.location.href = `/project/windows?milestone=${milestoneId}`;
+            }
+        });
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -595,7 +612,7 @@
             };
             $('#prev_window').click(function() {
                 let program_2 = $('#program').val()
-                let prev='';
+                let prev = '';
                 if (program_2 == 'BAS') {
                     prev = 'UPD'
                 } else if (program_2 == 'UPD') {
