@@ -68,8 +68,7 @@
                     </div>
                     <div class="col-md-6" style="padding-right: 0px;margin-top:10px;">
                         <label>Claim File <span style="color:red">*</span></label>
-                        <select class="form-control" required
-                            name="driving_activities[{{ $counter }}][file]">
+                        <select class="form-control" required name="driving_activities[{{ $counter }}][file]">
                             <option value="" selected disabled>please select</option>
                             @foreach ($claim_files as $file)
                                 <option
@@ -160,13 +159,22 @@
                 <label for="customFile">Snip:</label>
                 <div class="custom-file">
                     <input name="imp_snip" type="file" class="custom-file-input" id="customFile"
-                        accept="image/*"onchange="previewImage(event,'imagePreview');updateFileName(this)">
-                    <label class="custom-file-label" for="customFile"id="customFileLabel">Choose Image</label>
+                        accept="image/*" onchange="previewImage(event, 'imagePreview'); updateFileName(this)">
+                    <label class="custom-file-label" for="customFile" id="customFileLabel">Choose Image</label>
                 </div>
+
                 <!-- Image Preview -->
                 <div class="mt-3">
-                    <img id="imagePreview" src="{{ $imp_snip }}" alt="Image Preview" class="img-thumbnail"
-                        style="@if ($imp_snip) display: block; @else display: none; @endif width: 200px; height: 120px;">
+                    @if ($imp_snip)
+                        <a href="{{ $imp_snip }}" target="_blank">
+                            <img id="imagePreview" src="{{ $imp_snip }}" alt="Image Preview"
+                                class="img-thumbnail i_m_g"
+                                style="display:block; width:200px; height:120px; cursor:pointer;">
+                        </a>
+                    @else
+                        <img id="imagePreview" src="" alt="Image Preview" class="img-thumbnail i_m_g"
+                            style="display:none; width:200px; height:120px; cursor:pointer;">
+                    @endif
                 </div>
             </div>
         </div>
@@ -175,18 +183,29 @@
                 <label for="customFile2">Fragnet:</label>
                 <div class="custom-file">
                     <input name="frag_snip" type="file" class="custom-file-input" id="customFile2"
-                        accept="image/*"onchange="previewImage(event,'imagePreview2');updateFileName(this)">
-                    <label class="custom-file-label" for="customFile2"id="customFile2Label">Choose Image</label>
+                        accept="image/*" onchange="previewImage(event, 'imagePreview2'); updateFileName(this)">
+                    <label class="custom-file-label" for="customFile2" id="customFile2Label">Choose Image</label>
                 </div>
+
                 <!-- Image Preview -->
                 <div class="mt-3">
-                    <img id="imagePreview2" src="{{ $frag_snip }}" alt="Image Preview" class="img-thumbnail"
-                        style="@if ($frag_snip) display: block; @else display: none; @endif width: 200px; height: 120px;">
+                    @if ($frag_snip)
+                        <a href="{{ $frag_snip }}" target="_blank">
+                            <img id="imagePreview2" src="{{ $frag_snip }}" alt="Image Preview"
+                                class="img-thumbnail i_m_g"
+                                style="display:block; width:200px; height:120px; cursor:pointer;">
+                        </a>
+                    @else
+                        <img id="imagePreview2" src="" alt="Image Preview" class="img-thumbnail i_m_g"
+                            style="display:none; width:200px; height:120px; cursor:pointer;">
+                    @endif
                 </div>
             </div>
         </div>
 
     </div>
+
+
 
 
 </div>

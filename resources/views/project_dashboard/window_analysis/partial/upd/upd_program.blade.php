@@ -165,13 +165,22 @@
                 <label for="customFile">Snip:</label>
                 <div class="custom-file">
                     <input name="upd_snip" type="file" class="custom-file-input" id="customFile"
-                        accept="image/*"onchange="previewImage(event,'imagePreview');updateFileName(this)">
-                    <label class="custom-file-label" for="customFile"id="customFileLabel">Choose Image</label>
+                        accept="image/*" onchange="previewImage(event, 'imagePreview'); updateFileName(this)">
+                    <label class="custom-file-label" for="customFile" id="customFileLabel">Choose Image</label>
                 </div>
+
                 <!-- Image Preview -->
                 <div class="mt-3">
-                    <img id="imagePreview" src="{{ $upd_snip }}" alt="Image Preview" class="img-thumbnail"
-                        style="@if ($upd_snip) display: block; @else display: none; @endif width: 200px; height: 120px;">
+                    @if ($upd_snip)
+                        <a href="{{ $upd_snip }}" target="_blank">
+                            <img id="imagePreview" src="{{ $upd_snip }}" alt="Image Preview"
+                                class="img-thumbnail i_m_g"
+                                style="display:block; width:200px; height:120px; cursor:pointer;">
+                        </a>
+                    @else
+                        <img id="imagePreview" src="" alt="Image Preview" class="img-thumbnail i_m_g"
+                            style="display:none; width:200px; height:120px; cursor:pointer;">
+                    @endif
                 </div>
             </div>
         </div>

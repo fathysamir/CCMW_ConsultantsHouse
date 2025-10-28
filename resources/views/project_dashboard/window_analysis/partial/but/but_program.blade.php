@@ -105,24 +105,26 @@
         </div>
 
     @endif
-    <div style="display: flex">
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <label for="customFile">Snip:</label>
-                <div class="custom-file">
-                    <input name="but_snip" type="file" class="custom-file-input" id="customFile"
-                        accept="image/*"onchange="previewImage(event,'imagePreview');updateFileName(this)">
-                    <label class="custom-file-label" for="customFile"id="customFileLabel">Choose Image</label>
-                </div>
-                <!-- Image Preview -->
-                <div class="mt-3">
-                    <img id="imagePreview" src="{{ $but_snip }}" alt="Image Preview" class="img-thumbnail"
-                        style="@if ($but_snip) display: block; @else display: none; @endif width: 200px; height: 120px;">
-                </div>
-            </div>
+    <div class="form-group mb-3">
+        <label for="customFile">Snip:</label>
+        <div class="custom-file">
+            <input name="but_snip" type="file" class="custom-file-input" id="customFile" accept="image/*"
+                onchange="previewImage(event, 'imagePreview'); updateFileName(this)">
+            <label class="custom-file-label" for="customFile" id="customFileLabel">Choose Image</label>
         </div>
 
-
+        <!-- Image Preview -->
+        <div class="mt-3">
+            @if ($but_snip)
+                <a href="{{ $but_snip }}" target="_blank">
+                    <img id="imagePreview" src="{{ $but_snip }}" alt="Image Preview" class="img-thumbnail i_m_g"
+                        style="display:block; width:200px; height:120px; cursor:pointer;">
+                </a>
+            @else
+                <img id="imagePreview" src="" alt="Image Preview" class="img-thumbnail i_m_g"
+                    style="display:none; width:200px; height:120px; cursor:pointer;">
+            @endif
+        </div>
     </div>
 
 
