@@ -243,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                    } */
     </style>
     <div id="hintBox"
         style="
@@ -339,10 +339,10 @@
                                         <td>{{ date('d-M-Y', strtotime($window->start_date)) }}</td>
                                         <td>{{ date('d-M-Y', strtotime($window->end_date)) }}</td>
                                         <td>{{ $window->duration }}</td>
-                                        <td>{{ $window->culpable??'__' }}</td>
-                                        <td>{{ $window->excusable??'__' }}</td>
-                                        <td>{{ $window->compensable??'__' }}</td>
-                                        <td>{{ $window->transfer_compensable??'__' }}</td>
+                                        <td>{{ $window->culpable ?? '__' }}</td>
+                                        <td>{{ $window->excusable ?? '__' }}</td>
+                                        <td>{{ $window->compensable ?? '__' }}</td>
+                                        <td>{{ $window->transfer_compensable ?? '__' }}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button class="btn btn-sm dropdown-toggle more-horizontal" type="button"
@@ -462,7 +462,7 @@
                 <form id="formsForm" enctype="multipart/form-data" method="POST" novalidate>
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="formsModalLabel">Create Activity</h5>
+                        <h5 class="modal-title" id="formsModalLabel"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -989,19 +989,38 @@
             document.getElementById(labelId).textContent = fileName;
         }
 
-        function previewImage(event, id) {
-            var input = event.target;
-            var reader = new FileReader();
+        function previewImage(event, previewId) {
+            const input = event.target;
+            const file = input.files[0];
+            if (!file) return;
 
+            const reader = new FileReader();
             reader.onload = function() {
-                var img = document.getElementById(id);
-                img.src = reader.result;
-                img.style.display = 'block'; // Show the image
+                const preview = document.getElementById(previewId);
+                const parent = preview.parentNode;
+
+                // Update image source first
+                preview.src = reader.result;
+                preview.style.display = 'block';
+                preview.style.cursor = 'pointer';
+
+                // Check if already wrapped inside <a>
+                if (parent.tagName === 'A') {
+                    parent.href = reader.result; // ✅ Update existing link
+                } else {
+                    // ✅ Create a new link wrapper
+                    const link = document.createElement('a');
+                    link.href = reader.result;
+                    link.target = '_blank';
+                    link.classList.add('image-link');
+
+                    // Wrap the image
+                    parent.insertBefore(link, preview);
+                    link.appendChild(preview);
+                }
             };
 
-            if (input.files && input.files[0]) {
-                reader.readAsDataURL(input.files[0]); // Read the uploaded image
-            }
+            reader.readAsDataURL(file);
         }
     </script>
     <script>
