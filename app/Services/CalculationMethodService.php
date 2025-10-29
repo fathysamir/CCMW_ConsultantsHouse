@@ -77,7 +77,7 @@ class CalculationMethodService
             if ($this->compare_dates($date1, $date2) === 'after') {
                 $start    = Carbon::parse($date2);
                 $end      = Carbon::parse($date1);
-                $duration = $start->diffInDays($end);
+                $duration = $start->diffInDays($end, false);
                 $result   = $duration;
             } elseif ($this->compare_dates($date1, $date2) === 'equal') {
                 $InCaseOfConcurrency = CalculationMethod::where('project_id', $project_id)->where('key', 'InCaseOfConcurrency')->first();
@@ -88,14 +88,14 @@ class CalculationMethodService
                     $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 }
             } else {
                 $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
                 $start    = Carbon::parse($date2);
                 $end      = Carbon::parse($date3);
-                $duration = $start->diffInDays($end);
+                $duration = $start->diffInDays($end, false);
                 $result   = $duration;
             }
         } elseif($activities_count == 0) {
@@ -107,7 +107,7 @@ class CalculationMethodService
                 if ($WhatIfUPDExtendedAsExcusableTookLonger == '1') {
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -119,8 +119,7 @@ class CalculationMethodService
                     // $date3    = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end);
-                    dd($duration);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } elseif ($HowToDealWithMitigation == '2') {
                    
@@ -145,7 +144,7 @@ class CalculationMethodService
                 if ($this->compare_dates($date1, $date2) === 'after') {
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -157,7 +156,7 @@ class CalculationMethodService
                     $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -175,7 +174,7 @@ class CalculationMethodService
                     if ($this->compare_dates($date1, $date2) === 'after') {
                         $start    = Carbon::parse($date2);
                         $end      = Carbon::parse($date1);
-                        $duration = $start->diffInDays($end);
+                        $duration = $start->diffInDays($end, false);
                         $result   = $duration;
                     } else {
                         $result = 0;
@@ -190,7 +189,7 @@ class CalculationMethodService
                     $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -205,7 +204,7 @@ class CalculationMethodService
                 if ($this->compare_dates($date1, $date2) === 'after') {
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -217,7 +216,7 @@ class CalculationMethodService
                     $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end);
+                    $duration = $start->diffInDays($end, false);
                     $result   = $duration;
                 } else {
                     $result = 0;
@@ -254,7 +253,7 @@ class CalculationMethodService
             $date2               = $this->comp_date($project_id, $window_id, 'BUT', $milestones_IDs);
             $start               = Carbon::parse($date2);
             $end                 = Carbon::parse($date1);
-            $duration            = $start->diffInDays($end);
+            $duration            = $start->diffInDays($end, false);
             $result              = $duration;
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
             if ($result > $fnExcusableOFLastMS) {
@@ -310,7 +309,7 @@ class CalculationMethodService
                 $date2               = $this->comp_date($project_id, $window_id, 'BUT', $milestones_IDs);
                 $start               = Carbon::parse($date2);
                 $end                 = Carbon::parse($date1);
-                $duration            = $start->diffInDays($end);
+                $duration            = $start->diffInDays($end, false);
                 $x                   = $duration;
                 $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
                 if ($x > $fnExcusableOFLastMS) {
