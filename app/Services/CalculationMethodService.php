@@ -98,7 +98,7 @@ class CalculationMethodService
                 $duration = $start->diffInDays($end);
                 $result   = $duration;
             }
-        } else {
+        } elseif($activities_count == 0) {
             $date1 = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
             $date2 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
             if ($this->compare_dates($date1, $date2) === 'after') {
@@ -112,20 +112,18 @@ class CalculationMethodService
                 } else {
                     $result = 0;
                 }
-            } else {
+            } elseif($this->compare_dates($date1, $date2) === 'before' || $this->compare_dates($date1, $date2) === 'equal') {
                 $HowToDealWithMitigation = CalculationMethod::where('project_id', $project_id)->where('key', 'HowToDealWithMitigation')->first();
                 $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
                 if ($HowToDealWithMitigation == '1') {
-                    $date3    = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                    $start    = Carbon::parse($date3);
-                    $end      = Carbon::parse($date1);
+                    // $date3    = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+                    $start    = Carbon::parse($date1);
+                    $end      = Carbon::parse($date2);
                     $duration = $start->diffInDays($end);
                     $result   = $duration;
-                } else {
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end);
-                    $result   = $duration;
+                } elseif ($HowToDealWithMitigation == '2') {
+                   
+                    $result   = 0;
                 }
             }
         }
