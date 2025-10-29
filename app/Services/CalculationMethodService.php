@@ -117,8 +117,8 @@ class CalculationMethodService
                 $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
                 if ($HowToDealWithMitigation == '1') {
                     // $date3    = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                    $start    = Carbon::parse($date1);
-                    $end      = Carbon::parse($date2);
+                    $start    = Carbon::parse($date2);
+                    $end      = Carbon::parse($date1);
                     $duration = $start->diffInDays($end);
                     $result   = $duration;
                 } elseif ($HowToDealWithMitigation == '2') {
