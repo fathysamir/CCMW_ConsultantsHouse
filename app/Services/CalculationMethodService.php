@@ -120,6 +120,7 @@ class CalculationMethodService
                     $start    = Carbon::parse($date2);
                     $end      = Carbon::parse($date1);
                     $duration = $start->diffInDays($end);
+                    dd($duration);
                     $result   = $duration;
                 } elseif ($HowToDealWithMitigation == '2') {
                    
