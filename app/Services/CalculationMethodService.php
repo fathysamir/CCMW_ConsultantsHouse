@@ -403,7 +403,6 @@ class CalculationMethodService
             $milestones_IDs      = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
             $date1               = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
             $date2               = $this->comp_date($project_id, $window_id, 'BUT');
-            dd($date2);
             $start               = Carbon::parse($date2);
             $end                 = Carbon::parse($date1);
             $duration            = $start->diffInDays($end, false);
