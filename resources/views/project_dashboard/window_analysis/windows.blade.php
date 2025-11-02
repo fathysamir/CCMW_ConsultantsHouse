@@ -243,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                        max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -269,12 +269,15 @@
             <!-- Milestone Select -->
             <select class="form-control" id="milestoneSelect"
                 style="width: auto;margin-bottom: 0.5rem !important;margin-right: 0.5rem !important;">
-                <option value="" selected disabled>Select Milestone</option>
                 @foreach ($milestones as $milestone)
-                    <option value="{{ $milestone->id }}">{{ $milestone->name }}</option>
+                    <option value="{{ $milestone->id }}" {{ $milestone_id == $milestone->id ? 'selected' : '' }}>
+                        {{ $milestone->name }}</option>
                 @endforeach
             </select>
-
+            <a style="margin-right: 0.5rem !important;" href="javascript:void(0)" class="btn mb-2 btn-outline-secondary"
+                id="exportExcel">
+                Window Ledger
+            </a>
             <!-- Create Window Button -->
             <a href="javascript:void(0)" class="btn mb-2 btn-outline-primary" id="openCreateWindow">
                 Create Window
@@ -516,6 +519,139 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportExcelModal" tabindex="-1" role="dialog" aria-labelledby="exportExcelModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <form id="exportExcelForm" enctype="multipart/form-data" method="POST" novalidate>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exportExcelModalLabel">Window Ledger</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="last_ms" name="last_ms" value="{{ $last_ms }}">
+                        <div style="display:flex;width:100%;margin-top:10px;">
+                            <div class="col-md-6" style="padding-left:0px;padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="lastMS" style="margin-bottom: 0rem;">Milestones</label>
+                                    <select class="form-control" id="lastMS" name="lastMS" required>
+                                        <option value="" disabled selected>Select Milestone</option>
+                                        @foreach ($milestones as $milestone)
+                                            <option value="{{ $milestone->id }}"
+                                                {{ $milestone->id == $last_ms ? 'selected' : '' }}>
+                                                {{ $milestone->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="methodology" style="margin-bottom: 0rem;">Methodology</label>
+                                    <select class="form-control" id="methodology" name="methodology" required>
+                                        <option value="Window_Analysis">Window Analysis</option>
+                                        <option value="Time_Slice_Analysis">Time Slice Analysis</option>
+
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3" style="display:flex;">
+                            <label for="sn2">BAS : </label>
+                            <div style="width: 70%;margin-left:2%;font-size: 0.8rem;">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="option11" name="BAS" value="option1"
+                                        class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="option11">All Windows</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="option22" name="BAS" class="custom-control-input"
+                                        value="option2">
+                                    <label class="custom-control-label" for="option22">First Window</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;">
+                            <div class="col-md-5" style="padding-left:0px;padding-right:0px;">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="IMP" name="IMP"
+                                        checked>
+                                    <label class="custom-control-label" for="IMP">IMP</label>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="UPD" name="UPD"
+                                        checked>
+                                    <label class="custom-control-label" for="UPD">UPD</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2" style="padding-left:0px;padding-right:0px;">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="BUT" name="BUT"
+                                        checked>
+                                    <label class="custom-control-label" for="BUT">BUT</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;">
+                            <div class="col-md-5" style="padding-left:0px;padding-right:0px;">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="Culpable" name="Culpable"
+                                        checked>
+                                    <label class="custom-control-label" for="Culpable">Culpable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="Excusable" name="Excusable"
+                                        checked>
+                                    <label class="custom-control-label" for="Excusable">Excusable</label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-2" style="padding-left:0px;padding-right:0px;">
+
+                            </div>
+                        </div>
+
+                        <div id="Compensable_div" style="display: {{ $last_ms ? 'flex' : 'none' }};">
+                            <div class="col-md-5" style="padding-left:0px;padding-right:0px;">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="Compensable"
+                                        name="Compensable" checked>
+                                    <label class="custom-control-label" for="Compensable">Compensable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="Compensable_Transfer"
+                                        name="Compensable_Transfer" checked>
+                                    <label class="custom-control-label" for="Compensable_Transfer">Compensable
+                                        Transfer</label>
+                                </div>
+
+                            </div>
+                            <div class="col-md-2" style="padding-left:0px;padding-right:0px;">
+
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="save_exportExcel">Export</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -533,7 +669,54 @@
 
     <script>
         $(document).ready(function() {
+            $('#exportExcel').click(function() {
+                $('#exportExcelModal').modal('show');
+            });
+            $('#lastMS').on('change', function() {
+                const selectedValue = $(this).val();
+                const lastMs = '{{ $last_ms }}';
+
+                if (selectedValue == lastMs) {
+                    $('#Compensable_div').css('display', 'flex');
+                } else {
+                    $('#Compensable_div').css('display', 'none');
+                }
+            });
+            const methodologySelect = document.getElementById('methodology');
+
+            methodologySelect.addEventListener('change', function() {
+                const value = this.value;
+
+                if (value === 'Time_Slice_Analysis') {
+                    // BAS
+                    document.getElementById('option22').checked = true;
+
+                    // Checkboxes
+                    document.getElementById('IMP').checked = false;
+                    document.getElementById('UPD').checked = true;
+                    document.getElementById('BUT').checked = false;
+                    document.getElementById('Culpable').checked = true;
+                    document.getElementById('Excusable').checked = true;
+                    document.getElementById('Compensable').checked = false;
+                    document.getElementById('Compensable_Transfer').checked = false;
+
+                } else if (value === 'Window_Analysis') {
+                    // BAS
+                    document.getElementById('option11').checked = true;
+
+                    // Checkboxes
+                    document.getElementById('IMP').checked = true;
+                    document.getElementById('UPD').checked = true;
+                    document.getElementById('BUT').checked = true;
+                    document.getElementById('Culpable').checked = true;
+                    document.getElementById('Excusable').checked = true;
+                    document.getElementById('Compensable').checked = true;
+                    document.getElementById('Compensable_Transfer').checked = true;
+                }
+            });
+
             $('.dropdown-toggle').dropdown();
+
 
             setTimeout(function() {
                 $('#errorAlert').fadeOut();

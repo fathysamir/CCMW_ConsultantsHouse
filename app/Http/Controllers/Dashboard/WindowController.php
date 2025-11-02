@@ -22,6 +22,32 @@ class WindowController extends ApiController
     {
         $this->calc_method = $calc_method;
     }
+
+    public function last_ms($project_id, $window_id)
+    {
+        $milestones_IDs = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
+        $date           = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
+        $row            = DrivingActivity::where('project_id', $project_id)
+            ->where('window_id', $window_id)
+            ->where('program', 'UPD')->where('ms_come_date', $date)->orderByDesc('id')
+            ->first();
+
+        return $row;
+    }
+    public function getKeyOfLatestDate($array)
+    {
+        $latestKey  = null;
+        $latestDate = null;
+
+        foreach ($array as $key => $date) {
+            if (! $latestDate || strtotime($date) > strtotime($latestDate)) {
+                $latestDate = $date;
+                $latestKey  = $key;
+            }
+        }
+
+        return $latestKey;
+    }
     public function index(Request $request)
     {
         if ($request->milestone) {
@@ -34,11 +60,13 @@ class WindowController extends ApiController
                 $milestone_id = null;
             }
         }
-
+        $milestones  = Milestone::where('project_id', auth()->user()->current_project_id)->get();
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
         if ($milestone_id) {
+            $last_ms = null;
+            $rows    = [];
             foreach ($all_windows as $window) {
                 $BASs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'BAS')->count();
                 $IMPs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'IMP')->count();
@@ -54,14 +82,22 @@ class WindowController extends ApiController
                     }
                     $window->save();
                 }
+                if ($UPDs > 0) {
+                    $row            = $this->last_ms(auth()->user()->current_project_id, $window->id);
+                    $rows[$row->id] = $row->ms_come_date;
+                }
 
             }
+            if (count($rows) > 0) {
+                $lastRowID = $this->getKeyOfLatestDate($rows);
+                $last_ms = DrivingActivity::where('id',$lastRowID)->first()->milestone_id;
+            }
+
         }
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
-        $milestones = Milestone::where('project_id', auth()->user()->current_project_id)->get();
-        return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones'));
+        return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones', 'milestone_id','last_ms'));
 
     }
     public function store(Request $request)
