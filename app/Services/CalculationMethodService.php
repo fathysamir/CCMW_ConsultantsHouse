@@ -382,7 +382,7 @@ class CalculationMethodService
         $CompensabilityCalculation = CalculationMethod::where('project_id', $project_id)->where('key', 'CompensabilityCalculation')->first();
         $CompensabilityCalculation = $CompensabilityCalculation ? $CompensabilityCalculation->value : '2';
         if ($CompensabilityCalculation == '1') {
-            dd("ll");
+           
             $window          = Window::findOrFail($window_id);
             $previous_window = Window::where('project_id', auth()->user()->current_project_id)
                 ->whereRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED) < ?', [$window->no])
@@ -399,7 +399,7 @@ class CalculationMethodService
                 $result = $window->duration;
             }
         } elseif ($CompensabilityCalculation == '2') {
-            dd("kk");
+           
             $milestones_IDs      = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
             $date1               = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
             $date2               = $this->comp_date($project_id, $window_id, 'BUT', $milestones_IDs);
@@ -407,8 +407,10 @@ class CalculationMethodService
             $end                 = Carbon::parse($date1);
             $duration            = $start->diffInDays($end, false);
             $result              = $duration;
+            dd($result);
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
             if ($result > $fnExcusableOFLastMS) {
+                dd('dd');
                 $result = $fnExcusableOFLastMS;
             }
             $window          = Window::findOrFail($window_id);
@@ -417,6 +419,7 @@ class CalculationMethodService
                 ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED) DESC')
                 ->first();
             if ($previous_window) {
+                dd('ll');
                 $compensableTransfer = $this->compensableTransfer($project_id, $previous_window->id);
             } else {
                 $compensableTransfer = 0;
