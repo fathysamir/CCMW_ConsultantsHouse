@@ -81,7 +81,7 @@ class WindowController extends ApiController
                         $window->transfer_compensable = $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
 
                     }
-                    $window->save();
+                    //$window->save();
                 }
                 if ($UPDs > 0) {
                     $row            = $this->last_ms(auth()->user()->current_project_id, $window->id);
