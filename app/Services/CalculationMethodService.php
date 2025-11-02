@@ -401,8 +401,8 @@ class CalculationMethodService
             $milestones_IDs      = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
             $date1               = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
             $date2               = $this->comp_date($project_id, $window_id, 'BUT', $milestones_IDs);
-            $start               = Carbon::parse($date1);
-            $end                 = Carbon::parse($date2);
+            $start               = Carbon::parse($date2);
+            $end                 = Carbon::parse($date1);
             $duration            = $start->diffInDays($end, false);
             $result              = $duration;
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
@@ -457,8 +457,8 @@ class CalculationMethodService
                 $milestones_IDs      = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
                 $date1               = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
                 $date2               = $this->comp_date($project_id, $window_id, 'BUT', $milestones_IDs);
-                $start               = Carbon::parse($date1);
-                $end                 = Carbon::parse($date2);
+                $start               = Carbon::parse($date2);
+                $end                 = Carbon::parse($date1);
                 $duration            = $start->diffInDays($end, false);
                 $x                   = $duration;
                 $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
