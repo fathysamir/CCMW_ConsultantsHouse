@@ -425,6 +425,7 @@ class CalculationMethodService
             } else {
                 $compensableTransfer = 0;
             }
+            dd($result,$compensableTransfer);
             $result = $result + $compensableTransfer;
             if ($result > $window->duration) {
                 $result = $window->duration;
