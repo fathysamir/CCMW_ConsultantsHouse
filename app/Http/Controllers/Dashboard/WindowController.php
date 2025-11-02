@@ -64,6 +64,7 @@ class WindowController extends ApiController
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
+        $last_ms = null;
         if ($milestone_id) {
             $last_ms = null;
             $rows    = [];
@@ -90,14 +91,14 @@ class WindowController extends ApiController
             }
             if (count($rows) > 0) {
                 $lastRowID = $this->getKeyOfLatestDate($rows);
-                $last_ms = DrivingActivity::where('id',$lastRowID)->first()->milestone_id;
+                $last_ms   = DrivingActivity::where('id', $lastRowID)->first()->milestone_id;
             }
 
         }
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
-        return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones', 'milestone_id','last_ms'));
+        return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones', 'milestone_id', 'last_ms'));
 
     }
     public function store(Request $request)
