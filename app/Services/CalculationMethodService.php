@@ -409,7 +409,7 @@ class CalculationMethodService
             $result              = $duration;
             
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
-            dd($result,$fnExcusableOFLastMS);
+            
             if ($result > $fnExcusableOFLastMS) {
                
                 $result = $fnExcusableOFLastMS;
