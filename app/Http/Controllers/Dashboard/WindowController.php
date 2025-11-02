@@ -26,7 +26,7 @@ class WindowController extends ApiController
     public function last_ms($project_id, $window_id)
     {
         $milestones_IDs = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
-        $date           = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
+        $date           = $this->calc_method->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
         $row            = DrivingActivity::where('project_id', $project_id)
             ->where('window_id', $window_id)
             ->where('program', 'UPD')->where('ms_come_date', $date)->orderByDesc('id')
