@@ -407,6 +407,7 @@ class CalculationMethodService
             $end                 = Carbon::parse($date1);
             $duration            = $start->diffInDays($end, false);
             $result              = $duration;
+            dd($date1,$date2);
             dd($result);
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
             if ($result > $fnExcusableOFLastMS) {
