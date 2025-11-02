@@ -432,7 +432,7 @@ class CalculationMethodService
                 $result = $window->duration;
             }
         }
-        dd($result);
+       
         return $result;
     }
 
