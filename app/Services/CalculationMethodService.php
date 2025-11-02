@@ -407,11 +407,9 @@ class CalculationMethodService
             $end                 = Carbon::parse($date1);
             $duration            = $start->diffInDays($end, false);
             $result              = $duration;
-            dd($date1,$date2);
-            dd($result);
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
             if ($result > $fnExcusableOFLastMS) {
-                dd('dd');
+               
                 $result = $fnExcusableOFLastMS;
             }
             $window          = Window::findOrFail($window_id);
@@ -420,7 +418,7 @@ class CalculationMethodService
                 ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED) DESC')
                 ->first();
             if ($previous_window) {
-                dd('ll');
+                
                 $compensableTransfer = $this->compensableTransfer($project_id, $previous_window->id);
             } else {
                 $compensableTransfer = 0;
