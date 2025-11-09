@@ -116,7 +116,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $key += 1;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving DE');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
-$sheet->getColumnDimension($col_array[$key])->setWidth(12);
+                $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act ID');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
@@ -126,7 +126,6 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act Name');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
                 $sheet->getColumnDimension($col_array[$key])->setWidth(24);
-
 
                 $start_Liability = null;
                 $end_Liability   = null;
@@ -151,17 +150,17 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                         $sheet->getColumnDimension($col_array[$key])->setWidth(13);
 
                     }
-                    if (isset($request['Compensable_Transfer'])) {
-                        $key += 1;
-                        $sheet->setCellValue($col_array[$key] . '2', 'Compensable Transfer');
-                        $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(20);
-
-
-                    }
                     if ($start_Liability != $end_Liability) {
                         $sheet->mergeCells($start_Liability . '1:' . $end_Liability . '1');
                     }
+                    if (isset($request['Compensable_Transfer'])) {
+                        $key += 1;
+                        $sheet->setCellValue($col_array[$key] . '1', 'Compensable Transfer');
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(20);
+                        $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
+
+                    }
+
                 }
 
                 // Header style
@@ -193,16 +192,16 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                     $dates              = [];
                     $variance_array_col = [];
                     $sheet->setCellValue('A' . $row_counter, $window->no);
-                    $sheet->setCellValue('B' . $row_counter, date('d-M-Y', strtotime($window->start_date)));
-                    $sheet->setCellValue('C' . $row_counter, date('d-M-Y', strtotime($window->end_date)));
+                    $sheet->setCellValue('B' . $row_counter, date('d-M-y', strtotime($window->start_date)));
+                    $sheet->setCellValue('C' . $row_counter, date('d-M-y', strtotime($window->end_date)));
                     $sheet->setCellValue('D' . $row_counter, $window->duration);
                     if ($request['BAS'] === 'option2') {
                         if ($first_w) {
                             $sheet->setCellValue('E' . $row_counter, 'BAS');
-                            $sheet->setCellValue('F' . $row_counter, date('d-M-Y', strtotime($window->start_date)));
+                            $sheet->setCellValue('F' . $row_counter, date('d-M-y', strtotime($window->start_date)));
                             $ms_come_date = $this->comp_date(auth()->user()->current_project_id, $window->id, 'BAS', [$request['lastMS']]);
                             $dates['BAS'] = $ms_come_date;
-                            $sheet->setCellValue('G' . $row_counter, $ms_come_date ? date('d-M-Y', strtotime($ms_come_date)) : '__');
+                            $sheet->setCellValue('G' . $row_counter, $ms_come_date ? date('d-M-y', strtotime($ms_come_date)) : '__');
                             $activities_count = DrivingActivity::where('project_id', auth()->user()->current_project_id)
                                 ->where('window_id', $window->id)
                                 ->where('program', 'BAS')->where('milestone_id', $request['lastMS'])->where('ms_come_date', $dates['BAS'])->count();
@@ -220,10 +219,10 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                         }
                     } else {
                         $sheet->setCellValue('E' . $row_counter, 'BAS');
-                        $sheet->setCellValue('F' . $row_counter, date('d-M-Y', strtotime($window->start_date)));
+                        $sheet->setCellValue('F' . $row_counter, date('d-M-y', strtotime($window->start_date)));
                         $ms_come_date = $this->comp_date(auth()->user()->current_project_id, $window->id, 'BAS', [$request['lastMS']]);
                         $dates['BAS'] = $ms_come_date;
-                        $sheet->setCellValue('G' . $row_counter, $ms_come_date ? date('d-M-Y', strtotime($ms_come_date)) : '__');
+                        $sheet->setCellValue('G' . $row_counter, $ms_come_date ? date('d-M-y', strtotime($ms_come_date)) : '__');
                         $activities_count = DrivingActivity::where('project_id', auth()->user()->current_project_id)
                             ->where('window_id', $window->id)
                             ->where('program', 'BAS')->where('milestone_id', $request['lastMS'])->where('ms_come_date', $dates['BAS'])->count();
@@ -238,10 +237,10 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                     if (isset($request['IMP'])) {
                         $x++;
                         $sheet->setCellValue('E' . $row_counter + $x, 'IMP');
-                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-Y', strtotime($window->start_date)));
+                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-y', strtotime($window->start_date)));
                         $ms_come_date = $this->comp_date(auth()->user()->current_project_id, $window->id, 'IMP', [$request['lastMS']]);
                         $dates['IMP'] = $ms_come_date;
-                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-Y', strtotime($ms_come_date)) : '__');
+                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-y', strtotime($ms_come_date)) : '__');
                         $activities_count = DrivingActivity::where('project_id', auth()->user()->current_project_id)
                             ->where('window_id', $window->id)
                             ->where('program', 'IMP')->where('milestone_id', $request['lastMS'])->where('ms_come_date', $dates['IMP'])->count();
@@ -256,10 +255,10 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                     if (isset($request['UPD'])) {
                         $x++;
                         $sheet->setCellValue('E' . $row_counter + $x, 'UPD');
-                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-Y', strtotime($window->end_date)));
+                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-y', strtotime($window->end_date)));
                         $ms_come_date = $this->comp_date(auth()->user()->current_project_id, $window->id, 'UPD', [$request['lastMS']]);
                         $dates['UPD'] = $ms_come_date;
-                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-Y', strtotime($ms_come_date)) : '__');
+                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-y', strtotime($ms_come_date)) : '__');
                         $activities_count = DrivingActivity::where('project_id', auth()->user()->current_project_id)
                             ->where('window_id', $window->id)
                             ->where('program', 'UPD')->where('milestone_id', $request['lastMS'])->where('ms_come_date', $dates['UPD'])->count();
@@ -273,10 +272,10 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                     if (isset($request['BUT'])) {
                         $x++;
                         $sheet->setCellValue('E' . $row_counter + $x, 'BUT');
-                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-Y', strtotime($window->end_date)));
+                        $sheet->setCellValue('F' . $row_counter + $x, date('d-M-y', strtotime($window->end_date)));
                         $ms_come_date = $this->comp_date(auth()->user()->current_project_id, $window->id, 'BUT');
                         $dates['BUT'] = $ms_come_date;
-                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-Y', strtotime($ms_come_date)) : '__');
+                        $sheet->setCellValue('G' . $row_counter + $x, $ms_come_date ? date('d-M-y', strtotime($ms_come_date)) : '__');
                         $activities_count = DrivingActivity::where('project_id', auth()->user()->current_project_id)
                             ->where('window_id', $window->id)
                             ->where('program', 'BUT')->where('ms_come_date', $dates['BUT'])->count();
