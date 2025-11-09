@@ -515,8 +515,9 @@ class WindowsLedgerExport implements FromArray, WithEvents
 
                         }
                     }
-                    $key2 += 3;
+                    $key2 += 2;
                     if (isset($request['Culpable'])) {
+                        $key2 += 1;
                         $sheet->setCellValue($col_array[$key2] . $row_counter, $window->culpable);
                         $sheet->mergeCells($col_array[$key2] . $row_counter . ':' . $col_array[$key2] . $row_counter + $x);
                     }
