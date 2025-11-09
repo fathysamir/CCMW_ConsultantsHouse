@@ -783,28 +783,28 @@
                 }
             }
 
-            function toggleTransfer2() {
-                if ($('#BUT').is(':checked')) {
-                    $('#Compensable_Transfer_div').show();
-                    document.getElementById('Compensable_Transfer').checked = true;
+            // function toggleTransfer2() {
+            //     if ($('#BUT').is(':checked')) {
+            //         $('#Compensable_Transfer_div').show();
+            //         document.getElementById('Compensable_Transfer').checked = true;
 
-                    $('#Compensable_div').show();
-                    document.getElementById('Compensable').checked = true;
+            //         $('#Compensable_div').show();
+            //         document.getElementById('Compensable').checked = true;
 
-                } else {
-                    $('#Compensable_Transfer_div').hide();
-                    document.getElementById('Compensable_Transfer').checked = false;
+            //     } else {
+            //         $('#Compensable_Transfer_div').hide();
+            //         document.getElementById('Compensable_Transfer').checked = false;
 
-                    $('#Compensable_div').hide();
-                    document.getElementById('Compensable').checked = false;
+            //         $('#Compensable_div').hide();
+            //         document.getElementById('Compensable').checked = false;
 
-                }
-            }
+            //     }
+            // }
 
             toggleTransfer(); // initial state
             $('#Compensable').on('change', toggleTransfer);
-            toggleTransfer2();
-            $('#BUT').on('change', toggleTransfer2);
+            // toggleTransfer2();
+            // $('#BUT').on('change', toggleTransfer2);
 
             $('.dropdown-toggle').dropdown();
 

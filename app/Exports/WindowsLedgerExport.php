@@ -166,7 +166,6 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act Name');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
-                $sheet->getColumnDimension($col_array[$key])->setWidth(72.78);
                 $Driving_Act_Name = $col_array[$key];
 
                 $start_Liability = null;
