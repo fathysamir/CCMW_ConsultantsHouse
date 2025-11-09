@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Dashboard;
 
+use App\Exports\WindowsLedgerExport;
 use App\Http\Controllers\ApiController;
 use App\Models\Activity;
 use App\Models\CalculationMethod;
@@ -13,6 +14,9 @@ use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class WindowController extends ApiController
 {
@@ -50,6 +54,14 @@ class WindowController extends ApiController
     }
     public function index(Request $request)
     {
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
         if ($request->milestone) {
             $milestone_id = $request->milestone;
         } else {
@@ -98,6 +110,7 @@ class WindowController extends ApiController
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
+        // $last_ms=11;
         return view('project_dashboard.window_analysis.windows', compact('all_windows', 'milestones', 'milestone_id', 'last_ms'));
 
     }
@@ -392,6 +405,50 @@ class WindowController extends ApiController
             'message' => 'Calculation methods updated successfully.',
         ]);
 
+    }
+
+    public function exportLedger(Request $request)
+    {
+        $zip_file = session('zip_file');
+        if ($zip_file != null) {
+            $filePath = public_path('projects/' . auth()->user()->current_project_id . '/temp/' . $zip_file);
+            if (File::exists($filePath)) {
+                File::deleteDirectory($filePath);
+            }
+            session()->forget('zip_file');
+        }
+        $projectId     = auth()->user()->current_project_id;
+        $projectFolder = 'projects/' . $projectId . '/temp';
+        $path          = public_path($projectFolder);
+
+        // Ensure base directory exists
+        if (! file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        // Create unique temp directory
+        $code      = Str::random(10);
+        $directory = $path . '/' . $code;
+
+        if (! file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        // Full path for saving Excel
+        $fileName = 'windows_ledger.xlsx';
+        $filePath = $directory . '/' . $fileName;
+
+        // Generate Excel binary content
+        $excelData = Excel::raw(new WindowsLedgerExport($request->all()), \Maatwebsite\Excel\Excel::XLSX);
+
+        // Save to public folder manually
+        file_put_contents($filePath, $excelData);
+
+        // Return file URL to frontend
+        return response()->json([
+            'status'       => true,
+            'download_url' => asset($projectFolder . '/' . $code . '/' . $fileName),
+        ]);
     }
 
 }

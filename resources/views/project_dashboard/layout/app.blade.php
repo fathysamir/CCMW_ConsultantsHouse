@@ -581,7 +581,7 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Close</button>
                                         <button type="button" class="btn btn-primary"
-                                            id="calculationMethod">Save</button>
+                                            id="calculationMethod">Save & Run</button>
                                     </div>
                                 </div>
                             </div>

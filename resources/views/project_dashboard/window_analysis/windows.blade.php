@@ -243,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
     </style>
     <div id="hintBox"
         style="
@@ -550,7 +550,7 @@
                             <div class="col-md-6" style="padding-right:0px;">
                                 <div class="form-group mb-3">
                                     <label for="methodology" style="margin-bottom: 0rem;">Methodology</label>
-                                    <select class="form-control" id="methodology" name="methodology" required>
+                                    <select class="form-control" id="methodology" required>
                                         <option value="Window_Analysis">Window Analysis</option>
                                         <option value="Time_Slice_Analysis">Time Slice Analysis</option>
 
@@ -591,9 +591,10 @@
                                 </div>
                             </div>
                             <div class="col-md-2" style="padding-left:0px;padding-right:0px;">
-                                <div class="custom-control custom-checkbox mb-3">
+                                <div class="custom-control custom-checkbox mb-3"
+                                    id="BUT_div"style="{{ $last_ms ? 'display: block;' : 'display: none;' }}">
                                     <input type="checkbox" class="custom-control-input" id="BUT" name="BUT"
-                                        checked>
+                                        {{ $last_ms ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="BUT">BUT</label>
                                 </div>
                             </div>
@@ -621,16 +622,16 @@
 
                         <div id="Compensable_div" style="display: {{ $last_ms ? 'flex' : 'none' }};">
                             <div class="col-md-5" style="padding-left:0px;padding-right:0px;">
-                                <div class="custom-control custom-checkbox mb-3">
+                                <div class="custom-control custom-checkbox mb-3"id="Compensable_div">
                                     <input type="checkbox" class="custom-control-input" id="Compensable"
-                                        name="Compensable" checked>
+                                        name="Compensable" {{ $last_ms ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="Compensable">Compensable</label>
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <div class="custom-control custom-checkbox mb-3">
+                                <div class="custom-control custom-checkbox mb-3" id="Compensable_Transfer_div">
                                     <input type="checkbox" class="custom-control-input" id="Compensable_Transfer"
-                                        name="Compensable_Transfer" checked>
+                                        name="Compensable_Transfer" {{ $last_ms ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="Compensable_Transfer">Compensable
                                         Transfer</label>
                                 </div>
@@ -672,14 +673,69 @@
             $('#exportExcel').click(function() {
                 $('#exportExcelModal').modal('show');
             });
+            $('#exportExcelForm').on('submit', function(e) {
+                e.preventDefault(); // stop normal form submit
+
+                // --- Validate lastMS before sending ---
+                const lastMS = $('#lastMS').val();
+                if (!lastMS) {
+                    alert('⚠️ Please select a milestone before exporting.');
+                    $('#lastMS').focus();
+                    return; // stop submission
+                }
+
+                // prepare form data
+                //let form = $(this)[0];
+                let formData = $('#exportExcelForm').serialize();
+                //let formData = new FormData(form);
+
+                $.ajax({
+                    url: "{{ route('exportLedger') }}",
+                    type: "POST",
+                    data: formData,
+                    beforeSend: function() {
+                        $('#save_exportExcel').prop('disabled', true).text('Exporting...');
+                    },
+                    success: function(response) {
+                        $('#save_exportExcel').prop('disabled', false).text('Export');
+                        if (response.status) {
+                            if (response.download_url) {
+                                window.location.href = response.download_url;
+                            }
+                            $('#exportExcelModal').modal('hide');
+                            console.log(response);
+                        } else {
+                            alert('Something went wrong.');
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#save_exportExcel').prop('disabled', false).text('Export');
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            let errors = Object.values(xhr.responseJSON.errors).flat().join(
+                                "\n");
+                            alert(errors);
+                        } else {
+                            alert('Server error, please try again.');
+                        }
+                    }
+                });
+            });
             $('#lastMS').on('change', function() {
                 const selectedValue = $(this).val();
                 const lastMs = '{{ $last_ms }}';
 
                 if (selectedValue == lastMs) {
                     $('#Compensable_div').css('display', 'flex');
+                    $('#BUT_div').css('display', 'block');
+                    document.getElementById('Compensable').checked = true;
+                    document.getElementById('Compensable_Transfer').checked = true;
+                    document.getElementById('BUT').checked = true;
                 } else {
                     $('#Compensable_div').css('display', 'none');
+                    $('#BUT_div').css('display', 'none');
+                    document.getElementById('Compensable').checked = false;
+                    document.getElementById('Compensable_Transfer').checked = false;
+                    document.getElementById('BUT').checked = false;
                 }
             });
             const methodologySelect = document.getElementById('methodology');
@@ -714,6 +770,41 @@
                     document.getElementById('Compensable_Transfer').checked = true;
                 }
             });
+
+            function toggleTransfer() {
+                if ($('#Compensable').is(':checked')) {
+                    $('#Compensable_Transfer_div').show();
+                    document.getElementById('Compensable_Transfer').checked = true;
+
+                } else {
+                    $('#Compensable_Transfer_div').hide();
+                    document.getElementById('Compensable_Transfer').checked = false;
+
+                }
+            }
+
+            function toggleTransfer2() {
+                if ($('#BUT').is(':checked')) {
+                    $('#Compensable_Transfer_div').show();
+                    document.getElementById('Compensable_Transfer').checked = true;
+
+                    $('#Compensable_div').show();
+                    document.getElementById('Compensable').checked = true;
+
+                } else {
+                    $('#Compensable_Transfer_div').hide();
+                    document.getElementById('Compensable_Transfer').checked = false;
+
+                    $('#Compensable_div').hide();
+                    document.getElementById('Compensable').checked = false;
+
+                }
+            }
+
+            toggleTransfer(); // initial state
+            $('#Compensable').on('change', toggleTransfer);
+            toggleTransfer2();
+            $('#BUT').on('change', toggleTransfer2);
 
             $('.dropdown-toggle').dropdown();
 

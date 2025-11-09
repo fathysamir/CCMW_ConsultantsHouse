@@ -389,5 +389,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/windows/form/store', [WindowController::class, 'store_driving_activity'])->name('project.window.form.store');
     Route::get('/get-window-driving-activity', [WindowController::class, 'get_driving_activities'])->name('get-window-driving-activities');
     Route::post('/update_calculation_method', [WindowController::class, 'update_calculation_method'])->name('project.calculation-methods.update');
+    Route::post('/windows/window-ledger', [WindowController::class, 'exportLedger'])->name('exportLedger');
 
 });
