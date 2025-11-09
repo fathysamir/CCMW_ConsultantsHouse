@@ -50,19 +50,29 @@ class WindowsLedgerExport implements FromArray, WithEvents
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $sheet->setSelectedCell('A3');
-
                 $sheet->getPageSetup()
                     ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
 
+                // 🔹 تعيين حجم الورقة إلى A3
+                $sheet->getPageSetup()
+                    ->setPaperSize(PageSetup::PAPERSIZE_A3);
+
+                // 🔹 (اختياري) جعل الطباعة في صفحة واحدة عرضيًا
                 $sheet->getPageSetup()->setFitToWidth(1);
                 $sheet->getPageSetup()->setFitToHeight(0);
-                $sheet->getPageMargins()->setTop(0.75 / 2.54); // 0.75 inch → cm
-                $sheet->getPageMargins()->setBottom(0.75 / 2.54);
-                $sheet->getPageMargins()->setLeft(0.25 / 2.54);
-                $sheet->getPageMargins()->setRight(0.25 / 2.54);
-                $sheet->getPageMargins()->setHeader(0.3 / 2.54);
-                $sheet->getPageMargins()->setFooter(0.3 / 2.54);
+
+                // 🔹 (اختياري) تجميد الصفوف حتى A3 بحيث يبدأ العرض من هناك
+                $sheet->freezePane('A3');
+
+                // 🔹 (اختياري) تعيين الخلية النشطة
+                $sheet->setSelectedCell('A3');
+
+                $sheet->getPageMargins()->setTop(0.75); // 0.75 inch → cm
+                $sheet->getPageMargins()->setBottom(0.75);
+                $sheet->getPageMargins()->setLeft(0.25);
+                $sheet->getPageMargins()->setRight(0.25);
+                $sheet->getPageMargins()->setHeader(0.3);
+                $sheet->getPageMargins()->setFooter(0.3);
 
                 $request = $this->request;
                 //dd($request);
