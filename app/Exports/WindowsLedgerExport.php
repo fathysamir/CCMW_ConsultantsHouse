@@ -175,7 +175,6 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $end_Liability   = null;
                 if (isset($request['Culpable']) || isset($request['Excusable']) || isset($request['Compensable']) || isset($request['Compensable_Transfer'])) {
 
-                    $sheet->setCellValue($col_array[$key] . '1', 'Liability');
                     if (isset($request['Culpable'])) {
                         $key += 1;
                         if(!$start_Liability){
@@ -184,8 +183,8 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         }
                         $sheet->setCellValue($col_array[$key] . '2', 'Culpable');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(8.45);
-                        $all_width = $all_width - 8.45;
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(9);
+                        $all_width = $all_width - 9;
 
                     }
                     if (isset($request['Excusable'])) {
@@ -196,8 +195,8 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         }
                         $sheet->setCellValue($col_array[$key] . '2', 'Excusable');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(9);
-                        $all_width = $all_width - 9;
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(9.45);
+                        $all_width = $all_width - 9.45;
 
                     }
                     if (isset($request['Compensable'])) {
@@ -208,8 +207,8 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         }
                         $sheet->setCellValue($col_array[$key] . '2', 'Comp.');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(6.45);
-                        $all_width = $all_width - 6.45;
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(7);
+                        $all_width = $all_width - 7;
 
                     }
                     if ($start_Liability != $end_Liability) {
