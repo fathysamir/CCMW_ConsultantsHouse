@@ -207,8 +207,8 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         }
                         $sheet->setCellValue($col_array[$key] . '2', 'Comp.');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(7);
-                        $all_width = $all_width - 7;
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(8);
+                        $all_width = $all_width - 8;
 
                     }
                     if ($start_Liability != $end_Liability) {
