@@ -111,7 +111,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     if ($start_variance != $end_variance) {
                         $sheet->mergeCells($start_variance . '1:' . $end_variance . '1');
                     }
-                    
+
                 }
                 $key += 1;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving DE');
@@ -475,7 +475,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $sheet->mergeCells($variance_array_col['UPD'] . $row_counter . ':' . $variance_array_col['UPD'] . $row_counter + $x);
                     }
                     if (isset($variance_array_col['But'])) {
-                        $sheet->mergeCells($variance_array_col['But'] . $row_counter . ':' . $variance_array_col['But'] . $row_counter + $x);
+                        $sheet->mergeCells($variance_array_col['BUT'] . $row_counter . ':' . $variance_array_col['BUT'] . $row_counter + $x);
                     }
                     $windowStartRow = $row_counter;
                     $windowEndRow   = $row_counter + $x;
