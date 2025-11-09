@@ -83,7 +83,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $sheet->getColumnDimension('B')->setWidth(12); // Start Date
                 $sheet->getColumnDimension('C')->setWidth(12); // Finish Date
                 $sheet->getColumnDimension('D')->setWidth(9);
-                $sheet->getColumnDimension('E')->setWidth(5);  // POW
+                $sheet->getColumnDimension('E')->setWidth(6);  // POW
                 $sheet->getColumnDimension('F')->setWidth(12); // Data Date
                 $sheet->getColumnDimension('G')->setWidth(12);
                 $start_variance = null;
