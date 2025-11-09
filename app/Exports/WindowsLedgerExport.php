@@ -116,13 +116,17 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $key += 1;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving DE');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
-
+$sheet->getColumnDimension($col_array[$key])->setWidth(12);
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act ID');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
+                $sheet->getColumnDimension($col_array[$key])->setWidth(12);
+
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act Name');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
+                $sheet->getColumnDimension($col_array[$key])->setWidth(24);
+
 
                 $start_Liability = null;
                 $end_Liability   = null;
@@ -144,11 +148,15 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Compensable');
                         $end_Liability = $col_array[$key];
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(15);
+
                     }
                     if (isset($request['Compensable_Transfer'])) {
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Compensable Transfer');
                         $end_Liability = $col_array[$key];
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(18);
+
 
                     }
                     if ($start_Liability != $end_Liability) {
