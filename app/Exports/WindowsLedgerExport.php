@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class WindowsLedgerExport implements FromArray, WithEvents
 {
@@ -49,6 +50,13 @@ class WindowsLedgerExport implements FromArray, WithEvents
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
+                $sheet->setSelectedCell('A3');
+
+                $sheet->getPageSetup()
+                    ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+
+                $sheet->getPageSetup()->setFitToWidth(1);
+                $sheet->getPageSetup()->setFitToHeight(0);
                 $sheet->getPageMargins()->setTop(0.75 / 2.54); // 0.75 inch → cm
                 $sheet->getPageMargins()->setBottom(0.75 / 2.54);
                 $sheet->getPageMargins()->setLeft(0.25 / 2.54);
