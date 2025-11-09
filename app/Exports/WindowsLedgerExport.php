@@ -148,14 +148,14 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Compensable');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(15);
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(13);
 
                     }
                     if (isset($request['Compensable_Transfer'])) {
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Compensable Transfer');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(22);
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(21);
 
 
                     }
