@@ -155,7 +155,7 @@ $sheet->getColumnDimension($col_array[$key])->setWidth(12);
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Compensable Transfer');
                         $end_Liability = $col_array[$key];
-                        $sheet->getColumnDimension($col_array[$key])->setWidth(18);
+                        $sheet->getColumnDimension($col_array[$key])->setWidth(22);
 
 
                     }
