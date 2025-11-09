@@ -80,8 +80,8 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 foreach (range('A', 'Q') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(false);
                 }
-
-                $key = 7;
+                $all_width = 206.64;
+                $key       = 7;
                 // Header titles
                 $sheet->setCellValue('A1', 'Window no.');
                 $sheet->setCellValue('B1', 'Start Date');
@@ -97,13 +97,27 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $sheet->mergeCells('E1:E2');
                 $sheet->mergeCells('F1:F2');
                 $sheet->mergeCells('G1:G2');
-                $sheet->getColumnDimension('A')->setWidth(7.78);    // Window no.
+                $sheet->getColumnDimension('A')->setWidth(7.78); // Window no.
+                $all_width = $all_width - 7.78;
+
                 $sheet->getColumnDimension('B')->setWidth(8.9); // Start Date
+                $all_width = $all_width - 8.9;
+
                 $sheet->getColumnDimension('C')->setWidth(8.9); // Finish Date
+                $all_width = $all_width - 8.9;
+
                 $sheet->getColumnDimension('D')->setWidth(8.34);
+                $all_width = $all_width - 8.34;
+
                 $sheet->getColumnDimension('E')->setWidth(5); // POW
+                $all_width = $all_width - 5;
+
                 $sheet->getColumnDimension('F')->setWidth(8.9); // Data Date
+                $all_width = $all_width - 8.9;
+
                 $sheet->getColumnDimension('G')->setWidth(8.9);
+                $all_width = $all_width - 8.9;
+
                 $start_variance = null;
                 $end_variance   = null;
                 if (($request['BAS'] === 'option1' && isset($request['IMP'])) || (isset($request['IMP']) && isset($request['UPD'])) || (isset($request['UPD']) && isset($request['BUT']))) {
@@ -113,18 +127,24 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $sheet->setCellValue($col_array[$key] . '2', 'IMP-BAS');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
+                        $all_width = $all_width - 8.67;
+
                     }
                     if (isset($request['IMP']) && isset($request['UPD'])) {
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'UPD-IMP');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
+                        $all_width = $all_width - 8.67;
+
                     }
                     if (isset($request['UPD']) && isset($request['BUT'])) {
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'BUT-UPD');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
+                        $all_width = $all_width - 8.67;
+
                     }
                     if ($start_variance != $end_variance) {
                         $sheet->mergeCells($start_variance . '1:' . $end_variance . '1');
@@ -135,15 +155,19 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving DE');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
                 $sheet->getColumnDimension($col_array[$key])->setWidth(9.67);
+                $all_width = $all_width - 9.67;
+
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act ID');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
                 $sheet->getColumnDimension($col_array[$key])->setWidth(9.67);
+                $all_width = $all_width - 9.67;
 
                 $key++;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving Act Name');
                 $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
-                $sheet->getColumnDimension($col_array[$key])->setWidth(35.78);
+                $sheet->getColumnDimension($col_array[$key])->setWidth(72.78);
+                $Driving_Act_Name = $col_array[$key];
 
                 $start_Liability = null;
                 $end_Liability   = null;
@@ -155,6 +179,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $sheet->setCellValue($col_array[$key] . '2', 'Culpable');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.45);
+                        $all_width = $all_width - 8.45;
 
                     }
                     if (isset($request['Excusable'])) {
@@ -162,12 +187,16 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $sheet->setCellValue($col_array[$key] . '2', 'Excusable');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(9);
+                        $all_width = $all_width - 9;
+
                     }
                     if (isset($request['Compensable'])) {
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '2', 'Comp.');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(6.45);
+                        $all_width = $all_width - 6.45;
+
                     }
                     if ($start_Liability != $end_Liability) {
                         $sheet->mergeCells($start_Liability . '1:' . $end_Liability . '1');
@@ -176,11 +205,14 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         $key += 1;
                         $sheet->setCellValue($col_array[$key] . '1', 'Comp. Transfer');
                         $sheet->getColumnDimension($col_array[$key])->setWidth(7.89);
+                        $all_width = $all_width - 7.89;
+
                         $sheet->mergeCells($col_array[$key] . '1:' . $col_array[$key] . '2');
 
                     }
 
                 }
+                $sheet->getColumnDimension($Driving_Act_Name)->setWidth($all_width);
 
                 // Header style
                 $sheet->getStyle('A1:' . $col_array[$key] . '2')->applyFromArray([
