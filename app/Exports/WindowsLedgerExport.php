@@ -111,6 +111,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     if ($start_variance != $end_variance) {
                         $sheet->mergeCells($start_variance . '1:' . $end_variance . '1');
                     }
+                    
                 }
                 $key += 1;
                 $sheet->setCellValue($col_array[$key] . '1', 'Driving DE');
