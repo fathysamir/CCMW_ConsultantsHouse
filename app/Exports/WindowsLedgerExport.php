@@ -474,7 +474,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     if (isset($variance_array_col['UPD'])) {
                         $sheet->mergeCells($variance_array_col['UPD'] . $row_counter . ':' . $variance_array_col['UPD'] . $row_counter + $x);
                     }
-                    if (isset($variance_array_col['But'])) {
+                    if (isset($variance_array_col['BUT'])) {
                         $sheet->mergeCells($variance_array_col['BUT'] . $row_counter . ':' . $variance_array_col['BUT'] . $row_counter + $x);
                     }
                     $windowStartRow = $row_counter;
