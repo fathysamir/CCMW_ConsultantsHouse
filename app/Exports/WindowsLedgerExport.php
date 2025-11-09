@@ -121,9 +121,10 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $start_variance = null;
                 $end_variance   = null;
                 if (($request['BAS'] === 'option1' && isset($request['IMP'])) || (isset($request['IMP']) && isset($request['UPD'])) || (isset($request['UPD']) && isset($request['BUT']))) {
-                    $start_variance = $col_array[$key];
+
                     $sheet->setCellValue($col_array[$key] . '1', 'Variance');
                     if ($request['BAS'] === 'option1' && isset($request['IMP'])) {
+                        $start_variance = $start_variance ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'IMP-BAS');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
@@ -132,6 +133,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['IMP']) && isset($request['UPD'])) {
                         $key += 1;
+                        $start_variance = $start_variance ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'UPD-IMP');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
@@ -140,6 +142,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['UPD']) && isset($request['BUT'])) {
                         $key += 1;
+                        $start_variance = $start_variance ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'BUT-UPD');
                         $end_variance = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.67);
@@ -171,10 +174,11 @@ class WindowsLedgerExport implements FromArray, WithEvents
                 $start_Liability = null;
                 $end_Liability   = null;
                 if (isset($request['Culpable']) || isset($request['Excusable']) || isset($request['Compensable']) || isset($request['Compensable_Transfer'])) {
-                    $key += 1;
-                    $start_Liability = $col_array[$key];
+
                     $sheet->setCellValue($col_array[$key] . '1', 'Liability');
                     if (isset($request['Culpable'])) {
+                        $key += 1;
+                        $start_Liability = $start_Liability ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'Culpable');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(8.45);
@@ -183,6 +187,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['Excusable'])) {
                         $key += 1;
+                        $start_Liability = $start_Liability ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'Excusable');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(9);
@@ -191,6 +196,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['Compensable'])) {
                         $key += 1;
+                        $start_Liability = $start_Liability ?? $col_array[$key];
                         $sheet->setCellValue($col_array[$key] . '2', 'Comp.');
                         $end_Liability = $col_array[$key];
                         $sheet->getColumnDimension($col_array[$key])->setWidth(6.45);
