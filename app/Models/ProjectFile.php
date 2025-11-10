@@ -29,8 +29,13 @@ class ProjectFile extends Model
         'prolongation_cost',
         'disruption_cost',
         'variation',
+        
         'closed',
         'assess_not_pursue',
+
+        'red_flag',
+        'green_flag',
+        'blue_flag'
     ];
 
     protected $allowedSorts = [

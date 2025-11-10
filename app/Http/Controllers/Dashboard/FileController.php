@@ -2090,4 +2090,48 @@ class FileController extends ApiController
             ]);
         }
     }
+
+    public function changeFlag(Request $request)
+    {
+        $request->validate([
+            'file_slug' => 'required|exists:project_files,slug',
+            'flag'         => 'required|in:blue_flag,red_flag,green_flag',
+        ]);
+
+        $file = ProjectFile::where('slug',$request->file_slug)->first();
+
+        // قلب القيمة 0 ↔ 1
+        $file->{$request->flag} = ! $file->{$request->flag};
+        $file->save();
+
+        return response()->json([
+            'status' => 'success',
+            'flag'   => $request->flag,
+            'value'  => $file->{$request->flag},
+        ]);
+    }
+
+    public function change_for_tOrDOrV(Request $request){
+        if (count($request->file_ids) > 1) {
+            $do = ProjectFile::where('slug',$request->file_ids[0])->first();
+            $ac = $request->action_type;
+            if ($do->$ac == '1') {
+                $va = '0';
+            } else {
+                $va = '1';
+            }
+            ProjectFile::whereIn('slug', $request->file_ids)->update([$ac => $va]);
+
+            return response()->json([
+                'status' => 'success',
+                'value'  => $va,
+            ]);
+        } else {
+            ProjectFile::whereIn('slug', $request->file_ids)->update([$request->action_type => $request->val]);
+
+            return response()->json([
+                'status' => 'success',
+            ]);
+        }
+    }
 }

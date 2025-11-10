@@ -38,6 +38,10 @@ return new class extends Migration
             $table->enum('closed', ['0', '1'])->default('0');
             $table->enum('assess_not_pursue', ['0', '1'])->default('0');
 
+            $table->boolean('red_flag')->default(false);
+            $table->boolean('green_flag')->default(false);
+            $table->boolean('blue_flag')->default(false);
+
             $table->timestamps();
             $table->softDeletes();
         });

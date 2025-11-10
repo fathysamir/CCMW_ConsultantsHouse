@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ asset('dashboard/css/dataTables.bootstrap4.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         #btn-outline-primary {
             color: blue;
@@ -59,54 +60,102 @@
             table-layout: fixed;
         }
 
-        /* Ensure consistent column widths */
-        .table-container th:nth-child(1),
-        .table-container td:nth-child(1) {
-            width: 1% !important;
-        }
-
-
-
-        .table-container th:nth-child(2),
-        .table-container td:nth-child(2) {
-            width: 4% !important;
-        }
-
-        .table-container th:nth-child(3),
-        .table-container td:nth-child(3) {
-            width: 51% !important;
-        }
-
-        .table-container th:nth-child(4),
-        .table-container td:nth-child(4) {
-            width: 10% !important;
-        }
-
-        .table-container th:nth-child(5),
-        .table-container td:nth-child(5) {
-            width: 10% !important;
-        }
-
-        .table-container th:nth-child(6),
-        .table-container td:nth-child(6) {
-            width: 10% !important;
-        }
-
-        .table-container th:nth-child(7),
-        .table-container td:nth-child(7) {
-            width: 10% !important;
-        }
-
-        .table-container th:nth-child(8),
-        .table-container td:nth-child(8) {
-            width: 4% !important;
-        }
-
         /* Maintain styles from your original table */
         .table-container tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.075);
         }
     </style>
+    @if ($folder->potential_impact == '1')
+        <style>
+            .table-container th:nth-child(1),
+            .table-container td:nth-child(1) {
+                width: 1% !important;
+            }
+
+
+            .table-container th:nth-child(2),
+            .table-container td:nth-child(2) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(3),
+            .table-container td:nth-child(3) {
+                width: 6% !important;
+            }
+
+            .table-container th:nth-child(4),
+            .table-container td:nth-child(4) {
+                width: 40% !important;
+            }
+
+            .table-container th:nth-child(5),
+            .table-container td:nth-child(5) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(6),
+            .table-container td:nth-child(6) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(7),
+            .table-container td:nth-child(7) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(8),
+            .table-container td:nth-child(8) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(9),
+            .table-container td:nth-child(9) {
+                width: 3% !important;
+            }
+        </style>
+    @else
+        <style>
+            .table-container th:nth-child(1),
+            .table-container td:nth-child(1) {
+                width: 1% !important;
+            }
+
+            .table-container th:nth-child(2),
+            .table-container td:nth-child(2) {
+                width: 4% !important;
+            }
+
+            .table-container th:nth-child(3),
+            .table-container td:nth-child(3) {
+                width: 52% !important;
+            }
+
+            .table-container th:nth-child(4),
+            .table-container td:nth-child(4) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(5),
+            .table-container td:nth-child(5) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(6),
+            .table-container td:nth-child(6) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(7),
+            .table-container td:nth-child(7) {
+                width: 10% !important;
+            }
+
+            .table-container th:nth-child(8),
+            .table-container td:nth-child(8) {
+                width: 3% !important;
+            }
+        </style>
+    @endif
     <style>
         .date {
             background-color: #fff !important;
@@ -147,10 +196,6 @@
             width: 92%;
 
         }
-
-        /* #dataTable-1_wrapper {
-                                                                                                                                    max-height:650px;
-                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -212,7 +257,28 @@
                                             <label class="custom-control-label" for="select-all"></label>
                                         </div>
                                     </th>
+                                    @if ($folder->potential_impact == '1')
+                                        <th style="font-size: 0.7rem;">
+                                            <label id="all_for_T"
+                                                style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"><span>T</span></label>
+                                            <label id="all_for_D"
+                                                style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"><span>D</span></label>
+                                            <label id="all_for_V"
+                                                style=" background-color: rgb(169, 169, 169); width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"><span>V</span></label>
+                                            <label id="all_blue_flag" style="margin-right:0.02rem;cursor: pointer;"
+                                                title="Blue Flags">
+                                                <i class="fa-regular fa-flag"></i>
+                                            </label>
+                                            <label id="all_red_flag" style="cursor: pointer;margin-right:0.02rem;"
+                                                title="Red Flags">
+                                                <i class="fa-regular fa-flag"></i>
+                                            </label>
+                                            <label id="all_green_flag" style="cursor: pointer;" title="Green Flags">
+                                                <i class="fa-regular fa-flag"></i>
+                                            </label>
 
+                                        </th>
+                                    @endif
                                     <th><b>NO.</b></th>
                                     <th><b>File Name</b></th>
                                     <th><b>{{ $folder->label1 }}</b></th>
@@ -236,10 +302,81 @@
                                                     for="checkbox-{{ $file->id }}"></label>
                                             </div>
                                         </td>
+                                        @if ($folder->potential_impact == '1')
+                                            <td style="font-size: 0.7rem;">
+                                                <label
+                                                    class="for_t for-claim-btn222 @if ($file->time == '1') active @endif"
+                                                    style="@if ($file->time == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"
+                                                    data-file-id="{{ $file->slug }}"
+                                                    data-action-type="time"><span>T</span></label>
+                                                <label
+                                                    class="for_d for-claim-btn222 @if ($file->disruption_cost == '1') active @endif"
+                                                    style="@if ($file->disruption_cost == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"
+                                                    data-file-id="{{ $file->slug }}"
+                                                    data-action-type="disruption_cost"><span>D</span></label>
+                                                <label
+                                                    class="for_v for-claim-btn222 @if ($file->variation == '1') active @endif"
+                                                    style=" @if ($file->variation == '1') background-color: rgb(45, 209, 45); @else background-color: rgb(169, 169, 169); @endif width:15px;height:15px;border-radius: 50%;text-align:center;cursor: pointer;color:#fff;"
+                                                    data-file-id="{{ $file->slug }}"
+                                                    data-action-type="variation"><span>V</span></label>
+                                                <label
+                                                    class="blue_flag change-flag @if ($file->blue_flag) active @endif"
+                                                    style="margin-right:0.02rem;cursor: pointer;margin-bottom:0px;margin-top: 6px;"data-file-id="{{ $file->slug }}"
+                                                    data-flag="blue_flag" title="Blue Flag">
+                                                    @if ($file->blue_flag)
+                                                        <i class="fa-solid fa-flag" style="color: #0000ff;"></i>
+                                                    @else
+                                                        <i class="fa-regular fa-flag"></i>
+                                                    @endif
 
+                                                </label>
+                                                <label
+                                                    class="red_flag change-flag @if ($file->red_flag) active @endif"
+                                                    data-file-id="{{ $file->slug }}" data-flag="red_flag"
+                                                    style="margin-right:0.02rem;cursor: pointer;margin-bottom:0px;margin-top: 6px;"
+                                                    title="Red Flag">
+                                                    @if ($file->red_flag)
+                                                        <i class="fa-solid fa-flag"style="color: #ff0000;"></i>
+                                                    @else
+                                                        <i class="fa-regular fa-flag"></i>
+                                                    @endif
+                                                </label>
+                                                <label
+                                                    class="green_flag change-flag @if ($file->green_flag) active @endif"
+                                                    data-file-id="{{ $file->slug }}" data-flag="green_flag"
+                                                    style="cursor: pointer;margin-bottom:0px;margin-top: 6px;"
+                                                    title="Green Flag">
+                                                    @if ($file->green_flag)
+                                                        <i class="fa-solid fa-flag"style="color: #00ff00;"></i>
+                                                    @else
+                                                        <i class="fa-regular fa-flag"></i>
+                                                    @endif
+                                                </label>
+                                            </td>
+                                        @endif
                                         <td>{{ $file->code }}</td>
-                                        <td><a class="l-link"style="color:rgb(80, 78, 78);" style="color:"
-                                                href="{{ route('project.file-documents.index', $file->slug) }}">{{ $file->name }}</a>
+                                        <td style="position: relative;">
+                                            <a class="l-link"
+                                                style="color: rgb(80, 78, 78); @if ($file->assess_not_pursue == '1') text-decoration: line-through;text-decoration-thickness: 1.5px;text-decoration-color:red; @endif"
+                                                href="{{ route('project.file-documents.index', $file->slug) }}">
+                                                {{ $file->name }}
+                                            </a>
+                                            @if ($file->closed == '1')
+                                                <span
+                                                    style="
+                                                        position: absolute;
+                                                        right: 8px;
+                                                        top: 50%;
+                                                        transform: translateY(-50%);
+                                                        background-color: #dc3545; /* Bootstrap red */
+                                                        color: white;
+                                                        padding: 2px 8px;
+                                                        border-radius: 6px;
+                                                        font-size: 14px;
+                                                    ">
+                                                    <b>closed</b>
+                                                </span>
+                                            @endif
                                         </td>
                                         <td>{{ $file->against ? $file->against->role : '_' }}</td>
                                         <td>{{ $file->start_date ? date('d-M-Y', strtotime($file->start_date)) : '_' }}
@@ -450,7 +587,8 @@
                                 <div class="custom-control custom-checkbox mb-3" style="padding-left: 0.5rem;">
                                     <input type="checkbox" class="custom-control-input" id="fromForL-E"
                                         name="fromForL_E">
-                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters & Emails</label>
+                                    <label class="custom-control-label" for="fromForL-E">"From" only for Litters &
+                                        Emails</label>
                                 </div>
                                 <div class="row form-group mb-0">
                                     <label for="sn2">In case of e-mails : </label>
@@ -696,6 +834,170 @@
 
         // Initial run in case values are preset
         updatePrefix();
+    </script>
+    <script>
+        $(document).ready(function() {
+            // ---- change-flag ----
+            $(document).on('click', '.change-flag', function() {
+                var label = $(this);
+                var fileId = label.data('file-id');
+                var flag = label.data('flag');
+                var icon = label.find("i");
+
+                $.ajax({
+                    url: "/project/file/change-flag",
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        file_slug: fileId,
+                        flag: flag
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            if (label.hasClass("active")) {
+                                label.removeClass("active");
+                                icon.removeClass("fa-solid").addClass("fa-regular").css("color",
+                                    "");
+                            } else {
+                                label.addClass("active");
+                                icon.removeClass("fa-regular").addClass("fa-solid");
+
+                                if (flag === "blue_flag") icon.css("color", "#0000ff");
+                                if (flag === "red_flag") icon.css("color", "#ff0000");
+                                if (flag === "green_flag") icon.css("color", "#00ff00");
+                            }
+                        } else {
+                            alert("Something went wrong!");
+                        }
+                    },
+                    error: function() {
+                        alert("Server error, please try again!");
+                    }
+                });
+            });
+
+            // ---- for-claim-btn222 ----
+            $('.for-claim-btn222').on('click', function() {
+                var fileIds = [];
+                var type = $(this).data('action-type');
+                fileIds.push($(this).data('file-id'));
+
+                let value = this.classList.contains('active') ? '0' : '1';
+
+                $.ajax({
+                    url: '/project/file/make-for-claim',
+                    type: 'POST',
+                    data: {
+                        _token: $('input[name="_token"]').val(),
+                        file_ids: fileIds,
+                        action_type: type,
+                        val: value
+                    },
+                    success: function(response) {
+                        fileIds.forEach(function(id) {
+                            let tr = document.getElementById('file_' + id);
+                            if (!tr) return;
+
+                            let selectorMap = {
+                                time: 'label.for_t',
+                                disruption_cost: 'label.for_d',
+                                variation: 'label.for_v'
+                            };
+
+                            let label = tr.querySelector(selectorMap[type]);
+                            if (!label) return;
+
+                            if (!label.classList.contains('active')) {
+                                label.classList.add('active');
+                                label.style.backgroundColor = 'rgb(45, 209, 45)';
+                            } else {
+                                label.classList.remove('active');
+                                label.style.backgroundColor = 'rgb(169, 169, 169)';
+                            }
+                        });
+                    },
+                    error: function() {
+                        alert('Please try again.');
+                    }
+                });
+            });
+
+            // ---- DataTable + Filtering ----
+            $("#check").removeClass("sorting_asc");
+            var table = $('#dataTable-1').DataTable();
+
+            var activeFlags = [];
+
+            // Define colors
+            var flagColors = {
+                "all_blue_flag": "#0000ff",
+                "all_red_flag": "#ff0000",
+                "all_green_flag": "#00ff00",
+                "all_for_T": "#2dd12d",
+                "all_for_D": "#2dd12d",
+                "all_for_V": "#2dd12d"
+            };
+
+            // Map header IDs → body classes
+            var flagMap = {
+                "all_blue_flag": "blue_flag",
+                "all_red_flag": "red_flag",
+                "all_green_flag": "green_flag",
+                "all_for_T": "for_t",
+                "all_for_D": "for_d",
+                "all_for_V": "for_v"
+            };
+
+            // Handle click on all header labels
+            $('#all_blue_flag, #all_red_flag, #all_green_flag, #all_for_T, #all_for_D, #all_for_V')
+                .on('click', function() {
+                    var flagId = $(this).attr('id');
+                    var flag = flagMap[flagId];
+                    var icon = $(this).find("i, span");
+
+                    // Toggle state
+                    if ($(this).hasClass('active')) {
+                        $(this).removeClass('active');
+                        if (flag.includes('for_')) {
+                            // T/D/V labels — reset background
+                            $(this).css("background-color", "rgb(169, 169, 169)");
+                            icon.css("color", "#fff");
+                        } else {
+                            // flag icons — reset color
+                            icon.removeClass("fa-solid").addClass("fa-regular").css("color", "");
+                        }
+                        activeFlags = activeFlags.filter(f => f !== flag);
+                    } else {
+                        $(this).addClass('active');
+                        if (flag.includes('for_')) {
+                            $(this).css("background-color", flagColors[flagId]);
+                            icon.css("color", "#fff");
+                        } else {
+                            icon.removeClass("fa-regular").addClass("fa-solid").css("color", flagColors[
+                                flagId]);
+                        }
+                        activeFlags.push(flag);
+                    }
+
+                    table.draw();
+                });
+
+            // Custom filter
+            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                if (activeFlags.length === 0) return true;
+
+                var row = table.row(dataIndex).node();
+                var matches = true;
+
+                activeFlags.forEach(function(flag) {
+                    if (!$(row).find('.' + flag).hasClass('active')) {
+                        matches = false;
+                    }
+                });
+
+                return matches;
+            });
+        });
     </script>
     <script>
         $(document).ready(function() {
@@ -1029,13 +1331,19 @@
                 [16, 32, 64, -1],
                 [16, 32, 64, "All"]
             ],
-            "columnDefs": [{
-                "targets": 0, // Target the first column (index 0)
-                "orderable": false // Disable sorting for this column
-            }, {
-                "targets": 7, // Target the first column (index 0)
-                "orderable": false // Disable sorting for this column
-            }]
+            columnDefs: [
+                @if ($folder->potential_impact == '1')
+                    {
+                        targets: [0, 1, 8],
+                        orderable: false
+                    }
+                @else
+                    {
+                        targets: [0, 7],
+                        orderable: false
+                    }
+                @endif
+            ]
         });
     </script>
     <script>
