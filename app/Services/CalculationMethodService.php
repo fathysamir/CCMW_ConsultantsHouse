@@ -280,101 +280,101 @@ class CalculationMethodService
             }
         }
     }
-    public function excusable2($project_id, $window_id, $ms)
-    {
-        $result                         = 0;
-        $UPD_Excusable_activities_count = $this->activities_num($project_id, $window_id, 'UPD', $ms, 'Excusable');
-        $UPD_Culpable_activities_count  = $this->activities_num($project_id, $window_id, 'UPD', $ms, 'Culpable');
-        if ($UPD_Excusable_activities_count > 0 && $UPD_Culpable_activities_count == 0) {
-            $WhatIfUPDExtendedAsExcusableTookLonger = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfUPDExtendedAsExcusableTookLonger')->first();
-            $WhatIfUPDExtendedAsExcusableTookLonger = $WhatIfUPDExtendedAsExcusableTookLonger ? $WhatIfUPDExtendedAsExcusableTookLonger->value : '2';
-            if ($WhatIfUPDExtendedAsExcusableTookLonger == '1') {
-                $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                if ($this->compare_dates($date1, $date2) === 'after') {
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end, false);
-                    $result   = $duration;
-                } else {
-                    $result = 0;
-                }
-            } else {
-                $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                if ($this->compare_dates($date1, $date2) === 'after') {
-                    $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end, false);
-                    $result   = $duration;
-                } else {
-                    $result = 0;
-                }
-            }
-        } elseif ($UPD_Excusable_activities_count > 0 && $UPD_Culpable_activities_count > 0) {
-            $WhatIfUPDExtendedAsExcusableTookLonger = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfUPDExtendedAsExcusableTookLonger')->first();
-            $WhatIfUPDExtendedAsExcusableTookLonger = $WhatIfUPDExtendedAsExcusableTookLonger ? $WhatIfUPDExtendedAsExcusableTookLonger->value : '2';
-            if ($WhatIfUPDExtendedAsExcusableTookLonger == '1') {
-                $HowToDealWithMitigation = CalculationMethod::where('project_id', $project_id)->where('key', 'HowToDealWithMitigation')->first();
-                $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
-                if ($HowToDealWithMitigation == '1') {
-                    $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                    $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                    if ($this->compare_dates($date1, $date2) === 'after') {
-                        $start    = Carbon::parse($date2);
-                        $end      = Carbon::parse($date1);
-                        $duration = $start->diffInDays($end, false);
-                        $result   = $duration;
-                    } else {
-                        $result = 0;
-                    }
-                } elseif ($HowToDealWithMitigation == '2') {
-                    $result = 0;
-                }
-            } elseif ($WhatIfUPDExtendedAsExcusableTookLonger == '2') {
-                $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                if ($this->compare_dates($date1, $date2) === 'after') {
-                    $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end, false);
-                    $result   = $duration;
-                } else {
-                    $result = 0;
-                }
-            }
-        } elseif ($UPD_Excusable_activities_count == 0 && $UPD_Culpable_activities_count > 0) {
-            $HowToDealWithMitigation = CalculationMethod::where('project_id', $project_id)->where('key', 'HowToDealWithMitigation')->first();
-            $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
-            if ($HowToDealWithMitigation == '1') {
-                $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                if ($this->compare_dates($date1, $date2) === 'after') {
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date1);
-                    $duration = $start->diffInDays($end, false);
-                    $result   = $duration;
-                } else {
-                    $result = 0;
-                }
-            } elseif ($HowToDealWithMitigation == '2') {
-                $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
-                $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
-                if ($this->compare_dates($date1, $date2) === 'after') {
-                    $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
-                    $start    = Carbon::parse($date2);
-                    $end      = Carbon::parse($date3);
-                    $duration = $start->diffInDays($end, false);
-                    $result   = $duration;
-                } else {
-                    $result = 0;
-                }
-            }
-        }
-        return $result;
-    }
+    // public function excusable2($project_id, $window_id, $ms)
+    // {
+    //     $result                         = 0;
+    //     $UPD_Excusable_activities_count = $this->activities_num($project_id, $window_id, 'UPD', $ms, 'Excusable');
+    //     $UPD_Culpable_activities_count  = $this->activities_num($project_id, $window_id, 'UPD', $ms, 'Culpable');
+    //     if ($UPD_Excusable_activities_count > 0 && $UPD_Culpable_activities_count == 0) {
+    //         $WhatIfUPDExtendedAsExcusableTookLonger = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfUPDExtendedAsExcusableTookLonger')->first();
+    //         $WhatIfUPDExtendedAsExcusableTookLonger = $WhatIfUPDExtendedAsExcusableTookLonger ? $WhatIfUPDExtendedAsExcusableTookLonger->value : '2';
+    //         if ($WhatIfUPDExtendedAsExcusableTookLonger == '1') {
+    //             $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //             $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //             if ($this->compare_dates($date1, $date2) === 'after') {
+    //                 $start    = Carbon::parse($date2);
+    //                 $end      = Carbon::parse($date1);
+    //                 $duration = $start->diffInDays($end, false);
+    //                 $result   = $duration;
+    //             } else {
+    //                 $result = 0;
+    //             }
+    //         } else {
+    //             $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //             $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //             if ($this->compare_dates($date1, $date2) === 'after') {
+    //                 $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
+    //                 $start    = Carbon::parse($date2);
+    //                 $end      = Carbon::parse($date3);
+    //                 $duration = $start->diffInDays($end, false);
+    //                 $result   = $duration;
+    //             } else {
+    //                 $result = 0;
+    //             }
+    //         }
+    //     } elseif ($UPD_Excusable_activities_count > 0 && $UPD_Culpable_activities_count > 0) {
+    //         $WhatIfUPDExtendedAsExcusableTookLonger = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfUPDExtendedAsExcusableTookLonger')->first();
+    //         $WhatIfUPDExtendedAsExcusableTookLonger = $WhatIfUPDExtendedAsExcusableTookLonger ? $WhatIfUPDExtendedAsExcusableTookLonger->value : '2';
+    //         if ($WhatIfUPDExtendedAsExcusableTookLonger == '1') {
+    //             $HowToDealWithMitigation = CalculationMethod::where('project_id', $project_id)->where('key', 'HowToDealWithMitigation')->first();
+    //             $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
+    //             if ($HowToDealWithMitigation == '1') {
+    //                 $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //                 $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //                 if ($this->compare_dates($date1, $date2) === 'after') {
+    //                     $start    = Carbon::parse($date2);
+    //                     $end      = Carbon::parse($date1);
+    //                     $duration = $start->diffInDays($end, false);
+    //                     $result   = $duration;
+    //                 } else {
+    //                     $result = 0;
+    //                 }
+    //             } elseif ($HowToDealWithMitigation == '2') {
+    //                 $result = 0;
+    //             }
+    //         } elseif ($WhatIfUPDExtendedAsExcusableTookLonger == '2') {
+    //             $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //             $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //             if ($this->compare_dates($date1, $date2) === 'after') {
+    //                 $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
+    //                 $start    = Carbon::parse($date2);
+    //                 $end      = Carbon::parse($date3);
+    //                 $duration = $start->diffInDays($end, false);
+    //                 $result   = $duration;
+    //             } else {
+    //                 $result = 0;
+    //             }
+    //         }
+    //     } elseif ($UPD_Excusable_activities_count == 0 && $UPD_Culpable_activities_count > 0) {
+    //         $HowToDealWithMitigation = CalculationMethod::where('project_id', $project_id)->where('key', 'HowToDealWithMitigation')->first();
+    //         $HowToDealWithMitigation = $HowToDealWithMitigation ? $HowToDealWithMitigation->value : '2';
+    //         if ($HowToDealWithMitigation == '1') {
+    //             $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //             $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //             if ($this->compare_dates($date1, $date2) === 'after') {
+    //                 $start    = Carbon::parse($date2);
+    //                 $end      = Carbon::parse($date1);
+    //                 $duration = $start->diffInDays($end, false);
+    //                 $result   = $duration;
+    //             } else {
+    //                 $result = 0;
+    //             }
+    //         } elseif ($HowToDealWithMitigation == '2') {
+    //             $date1 = $this->comp_date($project_id, $window_id, 'IMP', [$ms]);
+    //             $date2 = $this->comp_date($project_id, $window_id, 'BAS', [$ms]);
+    //             if ($this->compare_dates($date1, $date2) === 'after') {
+    //                 $date3    = $this->comp_date($project_id, $window_id, 'UPD', [$ms]);
+    //                 $start    = Carbon::parse($date2);
+    //                 $end      = Carbon::parse($date3);
+    //                 $duration = $start->diffInDays($end, false);
+    //                 $result   = $duration;
+    //             } else {
+    //                 $result = 0;
+    //             }
+    //         }
+    //     }
+    //     return $result;
+    // }
 
     public function compensable($project_id, $window_id)
     {
@@ -382,7 +382,7 @@ class CalculationMethodService
         $CompensabilityCalculation = CalculationMethod::where('project_id', $project_id)->where('key', 'CompensabilityCalculation')->first();
         $CompensabilityCalculation = $CompensabilityCalculation ? $CompensabilityCalculation->value : '2';
         if ($CompensabilityCalculation == '1') {
-           
+
             $window          = Window::findOrFail($window_id);
             $previous_window = Window::where('project_id', auth()->user()->current_project_id)
                 ->whereRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED) < ?', [$window->no])
@@ -394,24 +394,31 @@ class CalculationMethodService
             } else {
                 $compensableTransfer = 0;
             }
-            $result = $fnExcusableOFLastMS + $compensableTransfer;
-            if ($result > $window->duration) {
+            $result                                  = $fnExcusableOFLastMS + $compensableTransfer;
+            $WhatIfCompensableExceededWindowDuration = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfCompensableExceededWindowDuration')->first();
+            $WhatIfCompensableExceededWindowDuration = $WhatIfCompensableExceededWindowDuration ? $WhatIfCompensableExceededWindowDuration->value : '2';
+            if ($result > $window->duration && $WhatIfCompensableExceededWindowDuration != '3') {
                 $result = $window->duration;
             }
         } elseif ($CompensabilityCalculation == '2') {
-           
-            $milestones_IDs      = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
-            $date1               = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
-            $date2               = $this->comp_date($project_id, $window_id, 'BUT');
-            $start               = Carbon::parse($date2);
-            $end                 = Carbon::parse($date1);
-            $duration            = $start->diffInDays($end, false);
-            $result              = $duration;
-            
+            $milestone_       = $this->last_ms($project_id, $window_id);
+            $activities_count = $this->activities_num($project_id, $window_id, 'UPD', $milestone_, 'Culpable');
+            if ($activities_count > 1) {
+                $result = 0;
+                return $result;
+            }
+            $milestones_IDs = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
+            $date1          = $this->comp_date($project_id, $window_id, 'UPD', $milestones_IDs);
+            $date2          = $this->comp_date($project_id, $window_id, 'BUT');
+            $start          = Carbon::parse($date2);
+            $end            = Carbon::parse($date1);
+            $duration       = $start->diffInDays($end, false);
+            $result         = $duration;
+
             $fnExcusableOFLastMS = $this->fnExcusableOFLastMS($project_id, $window_id);
-            
+
             if ($result > $fnExcusableOFLastMS) {
-               
+
                 $result = $fnExcusableOFLastMS;
             }
             $window          = Window::findOrFail($window_id);
@@ -420,19 +427,18 @@ class CalculationMethodService
                 ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED) DESC')
                 ->first();
             if ($previous_window) {
-                
+
                 $compensableTransfer = $this->compensableTransfer($project_id, $previous_window->id);
             } else {
                 $compensableTransfer = 0;
             }
             $result = $result + $compensableTransfer;
-                        
 
             if ($result > $window->duration) {
                 $result = $window->duration;
             }
         }
-       
+
         return $result;
     }
 
@@ -441,7 +447,9 @@ class CalculationMethodService
         $result                                  = 0;
         $WhatIfCompensableExceededWindowDuration = CalculationMethod::where('project_id', $project_id)->where('key', 'WhatIfCompensableExceededWindowDuration')->first();
         $WhatIfCompensableExceededWindowDuration = $WhatIfCompensableExceededWindowDuration ? $WhatIfCompensableExceededWindowDuration->value : '2';
-        if ($WhatIfCompensableExceededWindowDuration == '2') {
+        if ($WhatIfCompensableExceededWindowDuration == '3') {
+            $result = 0;
+        } elseif ($WhatIfCompensableExceededWindowDuration == '2') {
             $CompensabilityCalculation = CalculationMethod::where('project_id', $project_id)->where('key', 'CompensabilityCalculation')->first();
             $CompensabilityCalculation = $CompensabilityCalculation ? $CompensabilityCalculation->value : '2';
             if ($CompensabilityCalculation == '1') {

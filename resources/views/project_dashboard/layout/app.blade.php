@@ -423,6 +423,7 @@
                                                         $options = [
                                                             '1' => 'Window duration only',
                                                             '2' => 'Allow transfer to subsequent Windows',
+                                                            '3' => 'Keep Compensable full without transfer',
                                                         ];
                                                     @endphp
 
