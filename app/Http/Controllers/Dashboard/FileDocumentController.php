@@ -171,11 +171,11 @@ class FileDocumentController extends ApiController
                 'levels'   => [
                     ['Heading0', 'format' => 'decimal', 'text' => '%1.', 'start' => (int) $chapter],
                     ['Heading1', 'format' => 'decimal', 'text' => '%1.%2', 'start' => (int) $sectionNumber],
-                    ['Heading2','format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1,
-                        'font' => $GetStandardStylesP['name'],                                                                               // Tab position
-                        'sz'      => (int)$GetStandardStylesP['size'] * 2,                                                      
-                        'i'       => $GetStandardStylesP['italic'],                                         
-                        'b'       => $GetStandardStylesP['bold']
+                    ['Heading2', 'format' => 'decimal', 'text' => '%1.%2.%3', 'start' => 1,
+                        'font' => $GetStandardStylesP['name'], // Tab position
+                        'sz'   => (int) $GetStandardStylesP['size'] * 2,
+                        'i'    => $GetStandardStylesP['italic'],
+                        'b'    => $GetStandardStylesP['bold'],
                     ],
                     ['Heading3', 'format' => 'decimal', 'text' => '%1.%2.%3.%4', 'start' => 1],
                     ['Heading3', 'format' => 'decimal', 'text' => ''],
@@ -781,8 +781,9 @@ class FileDocumentController extends ApiController
         }
         // Save document
         // Define file path in public folder
-        $fileName = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $header . '.docx';
-        $filePath = public_path($fileName);
+        $clean_title = preg_replace('/[^A-Za-z0-9]+/', '_', $header);
+        $fileName    = 'projects/' . auth()->user()->current_project_id . '/temp/' . $code . '/' . $file->code . '_' . $clean_title . '.docx';
+        $filePath    = public_path($fileName);
 
         // Save document to public folder
         $writer = IOFactory::createWriter($phpWord, 'Word2007');

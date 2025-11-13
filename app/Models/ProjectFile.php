@@ -24,6 +24,11 @@ class ProjectFile extends Model
         'older_folder_id',
         'notes',
         'analyses_complete',
+        'milestones',
+        'sup_doc_1',
+        'sup_doc_2',
+        'description1',
+        'description2',
 
         'time',
         'prolongation_cost',

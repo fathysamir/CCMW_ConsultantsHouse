@@ -2,10 +2,12 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\ApiController;
+use App\Models\Document;
 use App\Models\ExportFormate;
 use App\Models\FileAttachment;
 use App\Models\FileDocument;
 use App\Models\GanttChartDocData;
+use App\Models\Milestone;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\ProjectFolder;
@@ -208,15 +210,18 @@ class FileController extends ApiController
         $user          = auth()->user();
         $folder        = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;
+        $milestones    = Milestone::where('project_id', auth()->user()->current_project_id)->get();
+        $all_documents = Document::where('project_id', auth()->user()->current_project_id)->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
 
-        return view('project_dashboard.project_files.create', compact('folder', 'users', 'stake_holders'));
+        return view('project_dashboard.project_files.create', compact('folder', 'all_documents', 'milestones', 'users', 'stake_holders'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required', // 10MB max
-            'owner_id' => 'required|exists:users,id',
+            'name'       => 'required', // 10MB max
+            'owner_id'   => 'required|exists:users,id',
+            'milestones' => 'array|nullable',
         ]);
         do {
             $invitation_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 10);
@@ -229,7 +234,10 @@ class FileController extends ApiController
             'project_id'                        => auth()->user()->current_project_id, 'against_id' => $request->against_id, 'start_date' => $request->start_date,
             'end_date'                          => $request->end_date, 'folder_id'                  => auth()->user()->current_folder_id,
             'notes'                             => $request->notes,
+            'description1'                      => $request->description1,
+            'description2'                      => $request->description2,
             'analyses_complete'                 => intval($request->Percentage_Analysis_Complete)]);
+
         if ($request->time) {
             $file->time = '1';
         }
@@ -248,6 +256,51 @@ class FileController extends ApiController
         if ($request->assess_not_pursue) {
             $file->assess_not_pursue = '1';
         }
+        if ($request->sup_doc_1) {
+            $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $file->id, 'document_id' => $request->sup_doc_1]);
+            $start_date  = $fileDoc->document->start_date;
+            $end_date    = $fileDoc->document->end_date;
+            $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+            $gantt_chart->lp_sd = $start_date;
+            $gantt_chart->lp_fd = $end_date;
+
+            $sections[] = [
+                'sd'    => $start_date,
+                'fd'    => $end_date,
+                'color' => '00008B',
+            ];
+
+            $gantt_chart->cur_sections = json_encode($sections);
+            if ($end_date == null) {
+                $gantt_chart->cur_type = 'M';
+            }
+            $gantt_chart->save();
+            $file->sup_doc_1 = $request->sup_doc_1;
+        }
+        if ($request->sup_doc_2) {
+            $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $file->id, 'document_id' => $request->sup_doc_2]);
+            $start_date  = $fileDoc->document->start_date;
+            $end_date    = $fileDoc->document->end_date;
+            $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+            $gantt_chart->lp_sd = $start_date;
+            $gantt_chart->lp_fd = $end_date;
+
+            $sections[] = [
+                'sd'    => $start_date,
+                'fd'    => $end_date,
+                'color' => '00008B',
+            ];
+
+            $gantt_chart->cur_sections = json_encode($sections);
+            if ($end_date == null) {
+                $gantt_chart->cur_type = 'M';
+            }
+            $gantt_chart->save();
+            $file->sup_doc_2 = $request->sup_doc_2;
+        }
+        $file->milestones = $request->milestones ? implode(',', $request->milestones) : null;
         $file->save();
 
         return redirect('/project/files')->with('success', 'File Created successfully.');
@@ -262,15 +315,18 @@ class FileController extends ApiController
         $folder        = ProjectFolder::findOrFail($user->current_folder_id);
         $stake_holders = $project->stakeHolders;
         $file          = ProjectFile::where('slug', $id)->first();
+        $milestones    = Milestone::where('project_id', auth()->user()->current_project_id)->get();
+        $all_documents = Document::where('project_id', auth()->user()->current_project_id)->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
 
-        return view('project_dashboard.project_files.edit', compact('folder', 'users', 'stake_holders', 'file'));
+        return view('project_dashboard.project_files.edit', compact('folder','all_documents', 'milestones', 'users', 'stake_holders', 'file'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'     => 'required', // 10MB max
-            'owner_id' => 'required|exists:users,id',
+            'name'       => 'required', // 10MB max
+            'owner_id'   => 'required|exists:users,id',
+            'milestones' => 'array|nullable',
         ]);
 
         ProjectFile::where('id', $id)->update(['name' => $request->name, 'code'             => $request->code,
@@ -278,8 +334,11 @@ class FileController extends ApiController
             'against_id'                                  => $request->against_id, 'start_date' => $request->start_date,
             'end_date'                                    => $request->end_date,
             'notes'                                       => $request->notes,
+            'description1'                      => $request->description1,
+            'description2'                      => $request->description2,
             'analyses_complete'                           => intval($request->Percentage_Analysis_Complete)]);
-        $file = ProjectFile::findOrFail($id);
+        $file             = ProjectFile::findOrFail($id);
+        $file->milestones = $request->milestones ? implode(',', $request->milestones) : null;
         if ($request->time) {
             $file->time = '1';
         } else {
@@ -309,6 +368,56 @@ class FileController extends ApiController
             $file->assess_not_pursue = '1';
         } else {
             $file->assess_not_pursue = '0';
+        }
+        if ($request->sup_doc_1) {
+            $fileDoc = FileDocument::where('file_id', $file->id)->where('document_id', $request->sup_doc_1)->first();
+            if (! $fileDoc) {
+                $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $file->id, 'document_id' => $request->sup_doc_1]);
+                $start_date  = $fileDoc->document->start_date;
+                $end_date    = $fileDoc->document->end_date;
+                $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+                $gantt_chart->lp_sd = $start_date;
+                $gantt_chart->lp_fd = $end_date;
+
+                $sections[] = [
+                    'sd'    => $start_date,
+                    'fd'    => $end_date,
+                    'color' => '00008B',
+                ];
+
+                $gantt_chart->cur_sections = json_encode($sections);
+                if ($end_date == null) {
+                    $gantt_chart->cur_type = 'M';
+                }
+                $gantt_chart->save();
+            }
+            $file->sup_doc_1 = $request->sup_doc_1;
+        }
+        if ($request->sup_doc_2) {
+            $fileDoc = FileDocument::where('file_id', $file->id)->where('document_id', $request->sup_doc_2)->first();
+            if (! $fileDoc) {
+                $fileDoc     = FileDocument::create(['user_id' => auth()->user()->id, 'file_id' => $file->id, 'document_id' => $request->sup_doc_2]);
+                $start_date  = $fileDoc->document->start_date;
+                $end_date    = $fileDoc->document->end_date;
+                $gantt_chart = GanttChartDocData::create(['file_document_id' => $fileDoc->id]);
+
+                $gantt_chart->lp_sd = $start_date;
+                $gantt_chart->lp_fd = $end_date;
+
+                $sections[] = [
+                    'sd'    => $start_date,
+                    'fd'    => $end_date,
+                    'color' => '00008B',
+                ];
+
+                $gantt_chart->cur_sections = json_encode($sections);
+                if ($end_date == null) {
+                    $gantt_chart->cur_type = 'M';
+                }
+                $gantt_chart->save();
+            }
+            $file->sup_doc_2 = $request->sup_doc_2;
         }
         $file->save();
 
@@ -975,7 +1084,7 @@ class FileController extends ApiController
                         $hint       = $listNumber . ': ';
                         if ($request->fromForL_E) {
                             $text = strtolower(($paragraph->document->docType->name ?? '') . ' ' . ($paragraph->document->docType->description ?? ''));
-                           
+
                             if (preg_match('/\b(letter|email|e-mail)\b/', $text)) {
 
                                 $from = $paragraph->document->fromStakeHolder ? $paragraph->document->fromStakeHolder->narrative . "'s " : '';
@@ -2095,10 +2204,10 @@ class FileController extends ApiController
     {
         $request->validate([
             'file_slug' => 'required|exists:project_files,slug',
-            'flag'         => 'required|in:blue_flag,red_flag,green_flag',
+            'flag'      => 'required|in:blue_flag,red_flag,green_flag',
         ]);
 
-        $file = ProjectFile::where('slug',$request->file_slug)->first();
+        $file = ProjectFile::where('slug', $request->file_slug)->first();
 
         // قلب القيمة 0 ↔ 1
         $file->{$request->flag} = ! $file->{$request->flag};
@@ -2111,9 +2220,10 @@ class FileController extends ApiController
         ]);
     }
 
-    public function change_for_tOrDOrV(Request $request){
+    public function change_for_tOrDOrV(Request $request)
+    {
         if (count($request->file_ids) > 1) {
-            $do = ProjectFile::where('slug',$request->file_ids[0])->first();
+            $do = ProjectFile::where('slug', $request->file_ids[0])->first();
             $ac = $request->action_type;
             if ($do->$ac == '1') {
                 $va = '0';

@@ -243,8 +243,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
     </style>
     <div id="hintBox"
         style="
@@ -277,6 +277,10 @@
             <a style="margin-right: 0.5rem !important;" href="javascript:void(0)" class="btn mb-2 btn-outline-secondary"
                 id="exportExcel">
                 Window Ledger
+            </a>
+            <a style="margin-right: 0.5rem !important;" href="javascript:void(0)" class="btn mb-2 btn-outline-secondary"
+                id="exportNarrative">
+                Narrative
             </a>
             <!-- Create Window Button -->
             <a href="javascript:void(0)" class="btn mb-2 btn-outline-primary" id="openCreateWindow">
@@ -653,6 +657,93 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="exportNarrativeModal" tabindex="-1" role="dialog"
+        aria-labelledby="exportNarrativeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <form id="exportNarrativeForm" enctype="multipart/form-data" method="POST" novalidate>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exportNarrativeModalLabel">Narrative</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div style="display:flex;width:100%;margin-top:10px;">
+                            <div class="col-md-6" style="padding-left:0px;padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="title" style="margin-bottom: 0rem;">Header Title</label>
+                                    <input type="text" required name="title" class="form-control"
+                                        placeholder="Heading Title" id="title" value="Window Analysis">
+
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="headingNo" style="margin-bottom: 0rem;">Header No.</label>
+                                    <input type="Number" required name="headingNo" class="form-control"
+                                        placeholder="Heading 1" id="headingNo" value="1" min="1"
+                                        oninput="this.value = Math.max(1, this.value)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="lastMS" style="margin-bottom: 0rem;">Milestones</label>
+                            <select class="form-control" id="lastMS" name="lastMS" required>
+                                <option value="" disabled selected>Select Milestone</option>
+                                @foreach ($milestones as $milestone)
+                                    <option value="{{ $milestone->id }}"
+                                        {{ $milestone->id == $last_ms ? 'selected' : '' }}>
+                                        {{ $milestone->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div style="display:flex;width:100%;margin-top:10px;">
+                            <div class="col-md-6" style="padding-left:0px;padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="start_w" style="margin-bottom: 0rem;">Start Window</label>
+                                    <select class="form-control" id="start_w" name="start_w" required>
+                                        <option value="" disabled selected>Select Window</option>
+                                        @foreach ($all_windows as $wind)
+                                            <option value="{{ $wind->id }}"
+                                                {{ $wind->id == $all_windows->first()->id ? 'selected' : '' }}>
+                                                {{ $wind->no }}</option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="padding-right:0px;">
+                                <div class="form-group mb-3">
+                                    <label for="end_w" style="margin-bottom: 0rem;">End Window</label>
+                                    <select class="form-control" id="end_w" name="end_w" required>
+                                        <option value="" disabled selected>Select Window</option>
+                                        @foreach ($all_windows as $wind)
+                                            <option value="{{ $wind->id }}"
+                                                {{ $wind->id == $all_windows->last()->id ? 'selected' : '' }}>
+                                                {{ $wind->no }}</option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="Include But" name="Include_But"
+                                checked>
+                            <label class="custom-control-label" for="Include But">Include But - For Analysis</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="save_exportNarrative">Export</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -670,6 +761,62 @@
 
     <script>
         $(document).ready(function() {
+            $('#exportNarrative').click(function() {
+                $('#exportNarrativeModal').modal('show');
+            });
+            $('#exportNarrativeForm').on('submit', function(e) {
+                e.preventDefault(); // منع الإرسال العادي
+
+                // التحقق من الحقول المطلوبة
+                let valid = true;
+                $('#exportNarrativeForm [required]').each(function() {
+                    if (!$(this).val()) {
+                        valid = false;
+                        $(this).addClass('is-invalid'); // تظليل الحقل الفاضي
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+
+                if (!valid) {
+                    alert('⚠️ Please fill in all required fields.');
+                    return;
+                }
+
+                // تجهيز البيانات
+                let formData = new FormData(this);
+
+                // إرسال الطلب Ajax
+                $.ajax({
+                    url: "{{ route('project.window.export.narrative') }}", // ضع هنا الـ route الخاص بالـ Controller
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $('#save_exportNarrative').prop('disabled', true).text('Exporting...');
+                    },
+                    success: function(response) {
+                        $('#save_exportNarrative').prop('disabled', false).text('Export');
+
+                        if (response.success) {
+                            // alert('✅ Export completed successfully!');
+                            if (response.download_url) {
+                                window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                            }
+                            $('#exportNarrativeModal').modal('hide');
+                        } else {
+                            alert('⚠️ Something went wrong. Please try again.');
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#save_exportNarrative').prop('disabled', false).text('Export');
+                        console.error(xhr.responseText);
+                        alert('❌ Server error. Check console for details.');
+                    }
+                });
+            });
+
             $('#exportExcel').click(function() {
                 $('#exportExcelModal').modal('show');
             });

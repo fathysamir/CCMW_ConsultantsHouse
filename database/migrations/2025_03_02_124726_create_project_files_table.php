@@ -30,6 +30,13 @@ return new class extends Migration
             $table->foreign('older_folder_id')->references('id')->on('project_folders')->onDelete('cascade');
             $table->longText('notes')->nullable();
             $table->integer('analyses_complete')->nullable();
+            $table->string('milestones', 255)->nullable();
+            $table->unsignedBigInteger('sup_doc_1')->nullable();
+            $table->foreign('sup_doc_1')->references('id')->on('documents')->onDelete('cascade');
+            $table->unsignedBigInteger('sup_doc_2')->nullable();
+            $table->foreign('sup_doc_2')->references('id')->on('documents')->onDelete('cascade');
+            $table->longText('description1')->nullable();
+            $table->longText('description2')->nullable();
 
             $table->enum('time', ['0', '1'])->default('0');
             $table->enum('prolongation_cost', ['0', '1'])->default('0');

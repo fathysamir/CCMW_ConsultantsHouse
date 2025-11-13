@@ -370,9 +370,9 @@
                                                         transform: translateY(-50%);
                                                         background-color: #dc3545; /* Bootstrap red */
                                                         color: white;
-                                                        padding: 2px 8px;
-                                                        border-radius: 6px;
-                                                        font-size: 14px;
+                                                        padding: 1px 4px;
+                                                        border-radius: 4px;
+                                                        font-size: 10px;
                                                     ">
                                                     <b>closed</b>
                                                 </span>

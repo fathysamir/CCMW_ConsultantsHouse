@@ -392,5 +392,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/get-window-driving-activity', [WindowController::class, 'get_driving_activities'])->name('get-window-driving-activities');
     Route::post('/update_calculation_method', [WindowController::class, 'update_calculation_method'])->name('project.calculation-methods.update');
     Route::post('/windows/window-ledger', [WindowController::class, 'exportLedger'])->name('exportLedger');
+    Route::post('/project/window/export/narrative', [WindowController::class, 'exportNarrative'])->name('project.window.export.narrative');
 
 });

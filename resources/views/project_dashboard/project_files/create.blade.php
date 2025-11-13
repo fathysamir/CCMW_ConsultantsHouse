@@ -5,6 +5,14 @@
         .date {
             background-color: #fff !important;
         }
+
+        .select2-selection__choice {
+            margin-top: 5px !important;
+        }
+
+        .select2-container {
+            width: auto !important;
+        }
     </style>
     <h2 class="page-title">Create New File</h2>
     <div class="card shadow mb-4">
@@ -18,7 +26,7 @@
                         @csrf
                         <div class="row">
                             <!-- Name Input -->
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="padding-right:0px !important;">
                                 <div class="form-group mb-3">
                                     <label for="code">File #</label>
                                     <input type="number" name="code" id="code" class="form-control"
@@ -38,15 +46,29 @@
 
                         </div>
 
-
-                        <div class="form-group mb-3">
-                            <label for="owner">File Owner <span style="color: red">*</span></label>
-                            <select class="form-control" id="owner" required name="owner_id">
-                                <option value="" selected disabled>please select</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="row">
+                            <!-- Name Input -->
+                            <div class="col-md-3" style="padding-right:0px !important;">
+                                <div class="form-group mb-3">
+                                    <label for="owner">File Owner <span style="color: red">*</span></label>
+                                    <select class="form-control" id="owner" required name="owner_id">
+                                        <option value="" selected disabled>please select</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <label for="multi-select2_3">Impact Milestones.</label>
+                                <select class="form-control xxx" id="multi-select2_3" name="milestones[]" multiple>
+                                    @foreach ($milestones as $milestone)
+                                        <option value="{{ $milestone->id }}">
+                                            {{ $milestone->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label for="against_id">{{ $folder->label1 }}</label>
@@ -60,20 +82,68 @@
                         </div>
                         <div class="row">
                             <!-- Name Input -->
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="start_date">{{ $folder->label2 }}</label>
-                                    <input type="date" name="start_date" id="start_date" class="form-control date"
-                                        placeholder="Start Date"value="{{ old('start_date') }}">
+                            <div class="col-md-6" style="padding-right:0px !important;">
+                                <div class="row">
+                                    <!-- Name Input -->
+                                    <div class="col-md-3" style="padding-right:0px !important;">
+                                        <div class="form-group mb-3">
+                                            <label for="start_date">{{ $folder->label2 }}</label>
+                                            <input type="date" name="start_date" id="start_date"
+                                                class="form-control date"
+                                                placeholder="Start Date"value="{{ old('start_date') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="form-group mb-3">
+                                            <label for="sup_doc_1">Supported Document</label>
+                                            <select class="form-control select2" id="sup_doc_1" name="sup_doc_1">
+                                                <option value="">Select Document</option>
+                                                @foreach ($all_documents as $doc)
+                                                    <option value="{{ $doc->id }}">{{ $doc->reference }} ➡️
+                                                        {{ $doc->subject }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="Description1">Description</label>
+                                            <textarea name="description1" rows="5" id="Description1" class="form-control" placeholder="Description">{{ old('description1') }}</textarea>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+
                             <!-- Email Input -->
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="end_date">{{ $folder->label3 }}</label>
-                                    <input type="date" name="end_date" id="end_date" class="form-control date"
-                                        placeholder="End Date"value="{{ old('end_date') }}">
+                                <div class="row">
+                                    <!-- Name Input -->
+                                    <div class="col-md-3" style="padding-right:0px !important;">
+                                        <div class="form-group mb-3">
+                                            <label for="end_date">{{ $folder->label3 }}</label>
+                                            <input type="date" name="end_date" id="end_date" class="form-control date"
+                                                placeholder="End Date"value="{{ old('end_date') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="form-group mb-3">
+                                            <label for="sup_doc_2">Supported Document</label>
+                                            <select class="form-control select2" id="sup_doc_2" name="sup_doc_2">
+                                                <option value="">Select Document</option>
+                                                @foreach ($all_documents as $doc)
+                                                    <option value="{{ $doc->id }}">{{ $doc->reference }} ➡️
+                                                        {{ $doc->subject }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="Description2">Description</label>
+                                            <textarea name="description2" rows="5" id="Description2" class="form-control" placeholder="Description">{{ old('description2') }}</textarea>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -107,7 +177,8 @@
                                             Cost</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" name="variation"id="variation">
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="variation"id="variation">
                                         <label class="custom-control-label" for="variation">Variation</label>
                                     </div>
                                 </div>
@@ -137,10 +208,11 @@
                             <div class="col-md-6">
                                 <div class="row">
                                     <p style="margin-bottom:0px;">Percentage Analysis Complete : </p>
-                                    <input type="number" name="Percentage_Analysis_Complete" class="form-control"value="0"
-                                        style="width: 12%;margin-left:2%; margin-top:-5px;" min="0" max="100"
+                                    <input type="number" name="Percentage_Analysis_Complete"
+                                        class="form-control"value="0" style="width: 12%;margin-left:2%; margin-top:-5px;"
+                                        min="0" max="100"
                                         oninput="this.value = Math.min(Math.max(0, this.value), 100)">
-                                        <p style="margin-left:3px;">%</p>
+                                    <p style="margin-left:3px;">%</p>
 
                                 </div>
                             </div>
