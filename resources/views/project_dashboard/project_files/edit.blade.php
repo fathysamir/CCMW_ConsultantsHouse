@@ -5,7 +5,8 @@
         .date {
             background-color: #fff !important;
         }
-        .select2-selection__choice{
+
+        .select2-selection__choice {
             margin-top: 5px !important;
         }
     </style>
@@ -57,15 +58,17 @@
                                 </div>
                             </div>
                             <div class="col-md-9">
-                                <label for="multi-select2_3">Impact Milestones.</label>
-                                <select class="form-control xxx" id="multi-select2_3" name="milestones[]" multiple>
-                                    @foreach ($milestones as $milestone)
-                                        <option value="{{ $milestone->id }}"
-                                            {{ $file->milestones ? (in_array($milestone->id, array_map('intval', explode(',', $file->milestones))) ? 'selected' : '') : '' }}>
-                                            {{ $milestone->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                @if ($folder->potential_impact == '1')
+                                    <label for="multi-select2_3">Impact Milestones.</label>
+                                    <select class="form-control xxx" id="multi-select2_3" name="milestones[]" multiple>
+                                        @foreach ($milestones as $milestone)
+                                            <option value="{{ $milestone->id }}"
+                                                {{ $file->milestones ? (in_array($milestone->id, array_map('intval', explode(',', $file->milestones))) ? 'selected' : '') : '' }}>
+                                                {{ $milestone->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
                             </div>
                         </div>
                         <div class="form-group mb-3">
@@ -79,7 +82,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        
+
                         <div class="row">
                             <!-- Name Input -->
                             <div class="col-md-6" style="padding-right:0px !important;">
@@ -99,7 +102,9 @@
                                             <select class="form-control select2" id="sup_doc_1" name="sup_doc_1">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)
-                                                    <option value="{{ $doc->id }}" @if ($file->sup_doc_1 == $doc->id) selected @endif>{{ $doc->reference }} ➡️
+                                                    <option value="{{ $doc->id }}"
+                                                        @if ($file->sup_doc_1 == $doc->id) selected @endif>
+                                                        {{ $doc->reference }} ➡️
                                                         {{ $doc->subject }}</option>
                                                 @endforeach
                                             </select>
@@ -108,7 +113,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group mb-3">
                                             <label for="Description1">Description</label>
-                                            <textarea name="description1" rows="5" id="Description1" class="form-control" placeholder="Description">{{ old('description1',$file->description1) }}</textarea>
+                                            <textarea name="description1" rows="5" id="Description1" class="form-control" placeholder="Description">{{ old('description1', $file->description1) }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -123,7 +128,7 @@
                                         <div class="form-group mb-3">
                                             <label for="end_date">{{ $folder->label3 }}</label>
                                             <input type="date" name="end_date" id="end_date" class="form-control date"
-                                                placeholder="End Date"value="{{ old('end_date',$file->end_date) }}">
+                                                placeholder="End Date"value="{{ old('end_date', $file->end_date) }}">
                                         </div>
                                     </div>
                                     <div class="col-md-9">
@@ -132,7 +137,9 @@
                                             <select class="form-control select2" id="sup_doc_2" name="sup_doc_2">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)
-                                                    <option value="{{ $doc->id }}"@if ($file->sup_doc_2 == $doc->id) selected @endif>{{ $doc->reference }} ➡️
+                                                    <option
+                                                        value="{{ $doc->id }}"@if ($file->sup_doc_2 == $doc->id) selected @endif>
+                                                        {{ $doc->reference }} ➡️
                                                         {{ $doc->subject }}</option>
                                                 @endforeach
                                             </select>
@@ -141,7 +148,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group mb-3">
                                             <label for="Description2">Description</label>
-                                            <textarea name="description2" rows="5" id="Description2" class="form-control" placeholder="Description">{{ old('description2',$file->description2) }}</textarea>
+                                            <textarea name="description2" rows="5" id="Description2" class="form-control" placeholder="Description">{{ old('description2', $file->description2) }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -179,7 +186,8 @@
                                             Cost</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" name="variation"id="variation"
+                                        <input type="checkbox" class="custom-control-input"
+                                            name="variation"id="variation"
                                             @if ($file->variation == '1') checked @endif>
                                         <label class="custom-control-label" for="variation">Variation</label>
                                     </div>

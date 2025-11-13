@@ -60,14 +60,16 @@
                                 </div>
                             </div>
                             <div class="col-md-9">
-                                <label for="multi-select2_3">Impact Milestones.</label>
-                                <select class="form-control xxx" id="multi-select2_3" name="milestones[]" multiple>
-                                    @foreach ($milestones as $milestone)
-                                        <option value="{{ $milestone->id }}">
-                                            {{ $milestone->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                @if ($folder->potential_impact == '1')
+                                    <label for="multi-select2_3">Impact Milestones.</label>
+                                    <select class="form-control xxx" id="multi-select2_3" name="milestones[]" multiple>
+                                        @foreach ($milestones as $milestone)
+                                            <option value="{{ $milestone->id }}">
+                                                {{ $milestone->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
                             </div>
                         </div>
                         <div class="form-group mb-3">
