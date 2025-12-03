@@ -56,8 +56,7 @@ class WindowNarrativeSettingController extends ApiController
         ]);
         if (auth()->user()->current_account_id == null) {
             $setting                    = WindowNarrativeSetting::findOrFail($id);
-            $setting->paragraph_default = $request->paragraph;
-            $setting->save();
+            WindowNarrativeSetting::where('para_id',$setting->para_id)->update(['paragraph_default'=>$request->paragraph]);
             return redirect('/accounts/window/narrative-settings')->with('success', 'Narrative Settings updated successfully.');
         } elseif (auth()->user()->current_account_id != null && auth()->user()->current_project_id == null) {
             return redirect('/account/window/narrative-settings')->with('success', 'Narrative Settings updated successfully.');
