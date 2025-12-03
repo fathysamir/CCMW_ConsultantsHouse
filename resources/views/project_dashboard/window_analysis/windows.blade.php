@@ -262,8 +262,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -701,10 +701,12 @@
                             </div>
                             <div class="col-md-4" style="padding-right:0px;">
                                 <label for="d" style="margin-bottom: 0rem;"></label>
-                                <div class="custom-control custom-checkbox mb-2" style="margin-top: 0.3rem !important;margin-bottom: 0px !important;">
+                                <div class="custom-control custom-checkbox mb-2"
+                                    style="margin-top: 0.3rem !important;margin-bottom: 0px !important;">
                                     <input type="checkbox" class="custom-control-input" id="H_Include_LastMS"
                                         name="H_Include_LastMS" checked>
-                                    <label class="custom-control-label" for="H_Include_LastMS">Header Include Milestone Name</label>
+                                    <label class="custom-control-label" for="H_Include_LastMS">Header Include Milestone
+                                        Name</label>
                                 </div>
                             </div>
                             <div class="col-md-2" style="padding-right:0px;">
@@ -717,8 +719,8 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="lastMS" style="margin-bottom: 0rem;">Milestones</label>
-                            <select class="form-control" id="lastMS" name="lastMS" required>
+                            <label for="lastMS2" style="margin-bottom: 0rem;">Milestones</label>
+                            <select class="form-control" id="lastMS2" name="lastMS" required>
                                 <option value="" disabled selected>Select Milestone</option>
                                 @foreach ($milestones as $milestone)
                                     <option value="{{ $milestone->id }}"
@@ -780,7 +782,7 @@
                         </div>
                         <div class="custom-control custom-checkbox mb-2">
                             <input type="checkbox" class="custom-control-input" id="Include_BUT" name="Include_BUT"
-                                checked>
+                                {{ $last_ms ? 'checked' : 'disabled' }}>
                             <label class="custom-control-label" for="Include_BUT">Include BUT - For Analysis</label>
                         </div>
                         <div class="custom-control custom-checkbox mb-3">
@@ -816,7 +818,7 @@
                                 <div class="col-md-3" style="padding-right:0px;">
                                     <div class="custom-control custom-checkbox mb-3">
                                         <input type="checkbox" class="custom-control-input" id="table_show_BUT"
-                                            name="table_show_BUT" checked>
+                                            name="table_show_BUT" {{ $last_ms ? 'checked' : 'disabled' }}>
                                         <label class="custom-control-label" for="table_show_BUT">BUT</label>
                                     </div>
                                 </div>
@@ -839,7 +841,7 @@
                                 <div class="col-md-3" style="padding-left:0px;padding-right:0px;">
                                     <div class="custom-control custom-checkbox mb-0">
                                         <input type="checkbox" class="custom-control-input" id="table_show_Compensable"
-                                            name="table_show_Compensable" checked>
+                                            name="table_show_Compensable" {{ $last_ms ? 'checked' : 'disabled' }}>
                                         <label class="custom-control-label"
                                             for="table_show_Compensable">Compensable</label>
                                     </div>
@@ -848,7 +850,7 @@
                                     <div class="custom-control custom-checkbox mb-0">
                                         <input type="checkbox" class="custom-control-input"
                                             id="table_show_Compensable_transfer" name="table_show_Compensable_transfer"
-                                            checked>
+                                            {{ $last_ms ? 'checked' : 'disabled' }}>
                                         <label class="custom-control-label"
                                             for="table_show_Compensable_transfer">Compensable Transfer</label>
                                     </div>
@@ -927,7 +929,7 @@
                             }
                             $('#exportNarrativeModal').modal('hide');
                         } else {
-                            alert('⚠️ Something went wrong. ' + response.message );
+                            alert('⚠️ Something went wrong. ' + response.message);
                         }
                     },
                     error: function(xhr) {
@@ -986,6 +988,24 @@
                             alert('Server error, please try again.');
                         }
                     }
+                });
+            });
+            $('#lastMS2').on('change', function() {
+                const selectedValue = $(this).val();
+                const lastMs2 = '{{ $last_ms }}';
+                const ids = [
+                    'table_show_Compensable_transfer',
+                    'table_show_Compensable',
+                    'table_show_BUT',
+                    'Include_BUT'
+                ];
+
+                const enable = (selectedValue == lastMs2);
+
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    el.disabled = !enable;
+                    el.checked = enable;
                 });
             });
             $('#lastMS').on('change', function() {
