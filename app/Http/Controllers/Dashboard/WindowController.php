@@ -735,7 +735,7 @@ class WindowController extends ApiController
                     $B = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'B2')->first();
                 }
                 if(!$B){
-                            return response()->json(['success' => true, 'message' => 'Check Narrative Settings then Please try again.']);
+                            return response()->json(['success' => false, 'message' => 'Check Narrative Settings then Please try again.']);
 
                 }
                 //dd($B->paragraph);
