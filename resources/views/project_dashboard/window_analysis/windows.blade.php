@@ -704,7 +704,7 @@
                                 <div class="custom-control custom-checkbox mb-2" style="margin-top: 0.3rem !important;margin-bottom: 0px !important;">
                                     <input type="checkbox" class="custom-control-input" id="H_Include_LastMS"
                                         name="H_Include_LastMS" checked>
-                                    <label class="custom-control-label" for="H_Include_LastMS">Header Include Last Milestone</label>
+                                    <label class="custom-control-label" for="H_Include_LastMS">Header Include Milestone Name</label>
                                 </div>
                             </div>
                             <div class="col-md-2" style="padding-right:0px;">
@@ -927,7 +927,7 @@
                             }
                             $('#exportNarrativeModal').modal('hide');
                         } else {
-                            alert('⚠️ Something went wrong. Please try again.');
+                            alert('⚠️ Something went wrong. ' + response.message );
                         }
                     },
                     error: function(xhr) {
