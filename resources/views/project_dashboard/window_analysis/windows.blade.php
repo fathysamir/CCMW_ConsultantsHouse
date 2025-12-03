@@ -5,6 +5,25 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        .custom-fieldset2 {
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+
+            width: 100%;
+            background-color: #fefefe;
+            position: relative;
+        }
+
+        .custom-legend2 {
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 0 10px;
+
+            width: auto;
+            max-width: 100%;
+        }
+
         .is-invalid {
             border-color: red !important;
             box-shadow: 0 0 4px rgba(255, 0, 0, 0.4);
@@ -243,8 +262,8 @@
         }
 
         /* #dataTable-1_wrapper {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                max-height:650px;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max-height:650px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
     </style>
     <div id="hintBox"
         style="
@@ -680,7 +699,15 @@
 
                                 </div>
                             </div>
-                            <div class="col-md-6" style="padding-right:0px;">
+                            <div class="col-md-4" style="padding-right:0px;">
+                                <label for="d" style="margin-bottom: 0rem;"></label>
+                                <div class="custom-control custom-checkbox mb-2" style="margin-top: 0.3rem !important;margin-bottom: 0px !important;">
+                                    <input type="checkbox" class="custom-control-input" id="H_Include_LastMS"
+                                        name="H_Include_LastMS" checked>
+                                    <label class="custom-control-label" for="H_Include_LastMS">Header Include Last Milestone</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2" style="padding-right:0px;">
                                 <div class="form-group mb-3">
                                     <label for="headingNo" style="margin-bottom: 0rem;">Header No.</label>
                                     <input type="Number" required name="headingNo" class="form-control"
@@ -730,11 +757,104 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="custom-control custom-checkbox mb-3">
-                            <input type="checkbox" class="custom-control-input" id="Include But" name="Include_But"
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="Include_BAS" name="Include_BAS"
                                 checked>
-                            <label class="custom-control-label" for="Include But">Include But - For Analysis</label>
+                            <label class="custom-control-label" for="Include_BAS">Include BAS - For Analysis</label>
                         </div>
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="Include_Fragnet"
+                                name="Include_Fragnet" checked>
+                            <label class="custom-control-label" for="Include_Fragnet">Include Fragnet - For
+                                Analysis</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="Include_IMP" name="Include_IMP"
+                                checked>
+                            <label class="custom-control-label" for="Include_IMP">Include IMP - For Analysis</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="Include_UPD" name="Include_UPD"
+                                checked>
+                            <label class="custom-control-label" for="Include_UPD">Include UPD - For Analysis</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="Include_BUT" name="Include_BUT"
+                                checked>
+                            <label class="custom-control-label" for="Include_BUT">Include BUT - For Analysis</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="Include_Conclusion"
+                                name="Include_Conclusion" checked>
+                            <label class="custom-control-label" for="Include_Conclusion">Include Conclusion - For
+                                Analysis</label>
+                        </div>
+                        <fieldset class="custom-fieldset2">
+                            <legend class="custom-legend2"style="margin-bottom: 0px;">Table Conclusion</legend>
+                            <div style="display:flex;width:100%;margin-top:-10px;">
+                                <div class="col-md-3" style="padding-left:0px;padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_BAS"
+                                            name="table_show_BAS" checked>
+                                        <label class="custom-control-label" for="table_show_BAS">BAS</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_IMP"
+                                            name="table_show_IMP" checked>
+                                        <label class="custom-control-label" for="table_show_IMP">IMP</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="padding-left:0px;padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_UPD"
+                                            name="table_show_UPD" checked>
+                                        <label class="custom-control-label" for="table_show_UPD">UPD</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_BUT"
+                                            name="table_show_BUT" checked>
+                                        <label class="custom-control-label" for="table_show_BUT">BUT</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;width:100%;margin-top:-10px;">
+                                <div class="col-md-3" style="padding-left:0px;padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-0">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_Culpable"
+                                            name="table_show_Culpable" checked>
+                                        <label class="custom-control-label" for="table_show_Culpable">Culpable</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="custom-control custom-checkbox mb-0">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_Excusable"
+                                            name="table_show_Excusable" checked>
+                                        <label class="custom-control-label" for="table_show_Excusable">Excusable</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="padding-left:0px;padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-0">
+                                        <input type="checkbox" class="custom-control-input" id="table_show_Compensable"
+                                            name="table_show_Compensable" checked>
+                                        <label class="custom-control-label"
+                                            for="table_show_Compensable">Compensable</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" style="padding-right:0px;">
+                                    <div class="custom-control custom-checkbox mb-0">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="table_show_Compensable_transfer" name="table_show_Compensable_transfer"
+                                            checked>
+                                        <label class="custom-control-label"
+                                            for="table_show_Compensable_transfer">Compensable Transfer</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -802,7 +922,8 @@
                         if (response.success) {
                             // alert('✅ Export completed successfully!');
                             if (response.download_url) {
-                                window.location.href = response.download_url; // يبدأ التحميل فعليًا
+                                window.location.href = response
+                                    .download_url; // يبدأ التحميل فعليًا
                             }
                             $('#exportNarrativeModal').modal('hide');
                         } else {

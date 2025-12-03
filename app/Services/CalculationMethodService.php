@@ -1,9 +1,11 @@
 <?php
 namespace App\Services;
 
+use App\Models\Activity;
 use App\Models\CalculationMethod;
 use App\Models\DrivingActivity;
 use App\Models\Milestone;
+use App\Models\ProjectFile;
 use App\Models\Window;
 use Carbon\Carbon;
 
@@ -25,13 +27,52 @@ class CalculationMethodService
         return $latestDate;
     }
 
-    public function activities_num($project_id, $window_id, $prog, $ms, $liability)
+    public function activities_num($project_id, $window_id, $prog, $ms, $liability=null)
     {
         $date             = $this->comp_date($project_id, $window_id, $prog, [$ms]);
         $activities_count = DrivingActivity::where('project_id', $project_id)
             ->where('window_id', $window_id)
-            ->where('program', $prog)->where('milestone_id', $ms)->where('liability', $liability)->where('ms_come_date', $date)->count();
+            ->where('program', $prog)->where('milestone_id', $ms);
+            if($liability){
+               $activities_count->where('liability', $liability);
+            }
+            $activities_count=$activities_count->where('ms_come_date', $date)->count();
         return $activities_count;
+    }
+    public function activities($project_id, $window_id, $prog, $ms)
+    {
+        $date       = $this->comp_date($project_id, $window_id, $prog, [$ms]);
+        $activities = DrivingActivity::where('project_id', $project_id)
+            ->where('window_id', $window_id)
+            ->where('program', $prog)->where('milestone_id', $ms)->where('ms_come_date', $date)->pluck('activity_id')->toArray();
+        $activities = Activity::whereIn('id', $activities)->get();
+        return $activities;
+    }
+
+    public function fnListOfDEs($project_id, $window_id, $ms)
+    {
+        // Get window info
+        $window = Window::find($window_id);
+
+        if (! $window) {
+            return collect([]);
+        }
+
+        $claim_files = ProjectFile::where('project_id', $project_id)->where('assess_not_pursue','0')
+            ->whereHas('folder', function ($q) {
+                $q->where('potential_impact', '1');
+            })
+
+        // Check milestone exists in file.milestones
+            ->whereRaw("FIND_IN_SET(?, milestones)", [$ms])
+
+        // Check date intersection
+            ->whereDate('start_date', '<=', $window->end_date)
+            ->whereDate('end_date', '>=', $window->start_date)
+
+            ->orderBy('code', 'asc')->get();
+
+        return $claim_files;
     }
 
     public function compare_dates($date1, $date2)

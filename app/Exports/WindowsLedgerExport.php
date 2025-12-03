@@ -3,6 +3,7 @@ namespace App\Exports;
 
 use App\Models\DrivingActivity;
 use App\Models\Window;
+use App\Services\CalculationMethodService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -16,11 +17,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 class WindowsLedgerExport implements FromArray, WithEvents
 {
     protected $request;
-
+    protected $calc_method;
     public function __construct($request)
     {
 
-        $this->request = $request;
+        $this->request     = $request;
+        $this->calc_method = new CalculationMethodService();
     }
 
     public function array(): array
@@ -177,7 +179,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
 
                     if (isset($request['Culpable'])) {
                         $key += 1;
-                        if(!$start_Liability){
+                        if (! $start_Liability) {
                             $start_Liability = $col_array[$key];
                             $sheet->setCellValue($col_array[$key] . '1', 'Liability');
                         }
@@ -189,7 +191,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['Excusable'])) {
                         $key += 1;
-                        if(!$start_Liability){
+                        if (! $start_Liability) {
                             $start_Liability = $col_array[$key];
                             $sheet->setCellValue($col_array[$key] . '1', 'Liability');
                         }
@@ -201,7 +203,7 @@ class WindowsLedgerExport implements FromArray, WithEvents
                     }
                     if (isset($request['Compensable'])) {
                         $key += 1;
-                        if(!$start_Liability){
+                        if (! $start_Liability) {
                             $start_Liability = $col_array[$key];
                             $sheet->setCellValue($col_array[$key] . '1', 'Liability');
                         }
@@ -516,24 +518,29 @@ class WindowsLedgerExport implements FromArray, WithEvents
                         }
                     }
                     $key2 += 2;
+
                     if (isset($request['Culpable'])) {
                         $key2 += 1;
-                        $sheet->setCellValue($col_array[$key2] . $row_counter, $window->culpable);
+                        $cu = $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request['lastMS']);
+                        $sheet->setCellValue($col_array[$key2] . $row_counter, $cu);
                         $sheet->mergeCells($col_array[$key2] . $row_counter . ':' . $col_array[$key2] . $row_counter + $x);
                     }
                     if (isset($request['Excusable'])) {
                         $key2 += 1;
-                        $sheet->setCellValue($col_array[$key2] . $row_counter, $window->excusable);
+                        $ex = $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request['lastMS']);
+                        $sheet->setCellValue($col_array[$key2] . $row_counter, $ex);
                         $sheet->mergeCells($col_array[$key2] . $row_counter . ':' . $col_array[$key2] . $row_counter + $x);
                     }
                     if (isset($request['Compensable'])) {
                         $key2 += 1;
-                        $sheet->setCellValue($col_array[$key2] . $row_counter, $window->compensable);
+                        $co = $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                        $sheet->setCellValue($col_array[$key2] . $row_counter, $co);
                         $sheet->mergeCells($col_array[$key2] . $row_counter . ':' . $col_array[$key2] . $row_counter + $x);
                     }
                     if (isset($request['Compensable_Transfer'])) {
                         $key2 += 1;
-                        $sheet->setCellValue($col_array[$key2] . $row_counter, $window->transfer_compensable);
+                        $co_t = $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                        $sheet->setCellValue($col_array[$key2] . $row_counter, $co_t);
                         $sheet->mergeCells($col_array[$key2] . $row_counter . ':' . $col_array[$key2] . $row_counter + $x);
                     }
                     $sheet->mergeCells('A' . $row_counter . ':' . 'A' . $row_counter + $x);

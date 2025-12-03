@@ -92,4 +92,13 @@ class ProjectFile extends Model
         return $this->hasMany(FileAttachment::class, 'file_id');
     }
 
+    public function sup_document_1()
+    {
+        return $this->belongsTo(Document::class, 'sup_doc_1', 'id')->withTrashed();
+    }
+    public function sup_document_2()
+    {
+        return $this->belongsTo(Document::class, 'sup_doc_2', 'id')->withTrashed();
+    }
+
 }

@@ -96,8 +96,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-9">
-                                        <div class="form-group mb-3">
-                                            <label for="sup_doc_1">Supported Document</label>
+                                        <div class="form-group mb-3 d-none">
+                                            <label for="sup_doc_1">Supporting Document</label>
                                             <select class="form-control select2" id="sup_doc_1" name="sup_doc_1">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)
@@ -129,8 +129,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-9">
-                                        <div class="form-group mb-3">
-                                            <label for="sup_doc_2">Supported Document</label>
+                                        <div class="form-group mb-3 d-none">
+                                            <label for="sup_doc_2">Supporting Document</label>
                                             <select class="form-control select2" id="sup_doc_2" name="sup_doc_2">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)

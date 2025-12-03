@@ -263,7 +263,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Contractual report</h5>
+                                        <h5 class="modal-title">Notices And Contractual Communications</h5>
                                         <button type="button" class="close" data-bs-dismiss="modal"
                                             aria-label="Close">
                                             <span aria-hidden="true">&times;</span></button>
@@ -272,7 +272,7 @@
                                         <form id="report1Form">
                                             @csrf
                                             <div class="form-group">
-                                                <label for="cont_tag">Contractual Tags</label>
+                                                <label for="cont_tag">Contract Requirement</label>
                                                 <select class="form-control"id="cont_tag" name="cont_tag">
                                                     @foreach ($contract_tags as $tag)
                                                         <option value="{{ $tag->id }}">{{ $tag->name }}

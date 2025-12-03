@@ -316,7 +316,7 @@ class FileController extends ApiController
         $stake_holders = $project->stakeHolders;
         $file          = ProjectFile::where('slug', $id)->first();
         $milestones    = Milestone::where('project_id', auth()->user()->current_project_id)->get();
-        $all_documents = Document::where('project_id', auth()->user()->current_project_id)->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
+        $all_documents = $file->documents()->orderBy('start_date', 'asc')->orderBy('reference', 'asc')->get();
 
         return view('project_dashboard.project_files.edit', compact('folder','all_documents', 'milestones', 'users', 'stake_holders', 'file'));
     }

@@ -20,6 +20,7 @@ use App\Http\Controllers\Dashboard\settings\ContractTagController;
 use App\Http\Controllers\Dashboard\settings\DocumentTypeController;
 use App\Http\Controllers\Dashboard\settings\ExportFormateController;
 use App\Http\Controllers\Dashboard\settings\ProjectFolderController;
+use App\Http\Controllers\Dashboard\settings\WindowNarrativeSettingController;
 use App\Http\Controllers\Dashboard\UploadGroupDocumentController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\WindowController;
@@ -102,6 +103,10 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/accounts/project-folders/update/{id}', [ProjectFolderController::class, 'update'])->name('accounts.project-folders.update');
     Route::get('/accounts/project-folders/delete/{id}', [ProjectFolderController::class, 'delete'])->name('accounts.project-folders.delete');
 
+    Route::get('/accounts/window/narrative-settings', [WindowNarrativeSettingController::class, 'index'])->name('accounts.window-narrative-settings');
+    Route::get('/accounts/window/narrative-settings/edit/{id}', [WindowNarrativeSettingController::class, 'edit'])->name('accounts.window-narrative-settings.edit');
+    Route::post('/accounts/window/narrative-settings/update/{id}', [WindowNarrativeSettingController::class, 'update'])->name('accounts.window-narrative-settings.update');
+
     Route::get('/accounts/contract-settings/{id}', [ContractSettingController::class, 'index'])->name('accounts.contract-settings');
     Route::get('/accounts/contract-settings/{id}/create', [ContractSettingController::class, 'create'])->name('accounts.contract-settings.create');
     Route::post('/accounts/contract-settings/store', [ContractSettingController::class, 'store'])->name('accounts.contract-settings.store');
@@ -133,6 +138,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/account/project-folders', [ProjectFolderController::class, 'index'])->name('account.project-folders');
     Route::get('/account/project-folders/create', [ProjectFolderController::class, 'create'])->name('account.project-folders.create');
     Route::get('/account/project-folders/edit/{id}', [ProjectFolderController::class, 'edit'])->name('account.project-folders.edit');
+    Route::get('/account/window/narrative-settings', [WindowNarrativeSettingController::class, 'index'])->name('account.window-narrative-settings');
+    Route::get('/account/window/narrative-settings/edit/{id}', [WindowNarrativeSettingController::class, 'edit'])->name('account.window-narrative-settings.edit');
 
     Route::get('/account/users', [AccountDashboardController::class, 'account_users'])->name('account.users');
     Route::get('/account/user/{id}', [AccountDashboardController::class, 'edit_user'])->name('account.edit-user');
@@ -204,6 +211,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/project/project-folders', [ProjectFolderController::class, 'index'])->name('project.project-folders');
     Route::get('/project/project-folders/create', [ProjectFolderController::class, 'create'])->name('project.project-folders.create');
     Route::get('/project/project-folders/edit/{id}', [ProjectFolderController::class, 'edit'])->name('project.project-folders.edit');
+    Route::get('/project/window/narrative-settings', [WindowNarrativeSettingController::class, 'index'])->name('project.window-narrative-settings');
+    Route::get('/project/window/narrative-settings/edit/{id}', [WindowNarrativeSettingController::class, 'edit'])->name('project.window-narrative-settings.edit');
+
     Route::post('/project/assign_users', [ProjectDashboardController::class, 'assign_users'])->name('assign_users');
 
     Route::get('/project/upload-single-doc/create', [DocumentController::class, 'create_single_doc_view'])->name('project.upload_single_doc.create');

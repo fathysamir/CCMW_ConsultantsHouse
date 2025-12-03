@@ -13,6 +13,7 @@ use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
+use App\Models\WindowNarrativeSetting;
 use Illuminate\Support\Facades\Redirect;
 
 class AccountController extends ApiController
@@ -147,7 +148,10 @@ class AccountController extends ApiController
         foreach ($all_ContractSettings as $ContractSetting) {
             ContractSetting::create(['account_id' => $account->id, 'name' => $ContractSetting->name, 'order' => $ContractSetting->order, 'type' => $ContractSetting->type]);
         }
-
+        $settings = WindowNarrativeSetting::where('account_id', null)->where('project_id', null)->orderBy('id', 'asc')->get();
+        foreach ($settings as $setting) {
+                WindowNarrativeSetting::create(['account_id' => $account->id, 'para_id' => $setting->para_id, 'description' => $setting->description, 'location' => $setting->location, 'paragraph_default' => $setting->paragraph_default, 'paragraph' => $setting->paragraph]);
+        }
         $export_formate = ExportFormate::where('project_id', null)->where('account_id', null)->first();
         ExportFormate::create(['account_id' => $account->id, 'value' => $export_formate->value]);
 
@@ -203,6 +207,7 @@ class AccountController extends ApiController
         ProjectFolder::where('account_id', $account->id)->delete();
         AccountUser::where('account_id', $account->id)->delete();
         ProjectUser::where('account_id', $account->id)->delete();
+        WindowNarrativeSetting::where('account_id', $account->id)->delete();
         // If no employees are assigned to the department, proceed with deleting the department
         $account->delete();
 

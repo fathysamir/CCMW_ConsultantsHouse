@@ -103,3 +103,30 @@ function extractTextSnippet($html, $limit = 50)
 
     return $text;
 }
+
+function containsPlaceholder($text)
+{
+    $keys = [
+        'fnWNo(',
+        'fnPrevWNo(',
+        'fnCompDate(',
+        'fnDrivAct(',
+        'fnListOfDEs(',
+        'fnCulpable(',
+        'fnExcusable(',
+        'fnCompensable(',
+        'fnCompensableTransfer('
+    ];
+
+    foreach ($keys as $k) {
+        if (strpos($text, $k) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getFunctionValue($text){
+
+}
+

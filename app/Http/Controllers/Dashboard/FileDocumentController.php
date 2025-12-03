@@ -512,7 +512,6 @@ class FileDocumentController extends ApiController
                             $imgPath       = $matches[1];                                 // Extract image path
                             $altText       = isset($matches[2]) ? trim($matches[2]) : ''; // Extract alt text if exists
                             $fullImagePath = public_path($imgPath);                       // Convert relative path to absolute
-
                             if ($existedList) {
                                 if (file_exists($fullImagePath)) {
                                     $textRun = $section->addTextRun([

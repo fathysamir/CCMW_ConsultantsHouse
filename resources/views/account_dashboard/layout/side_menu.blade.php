@@ -100,6 +100,15 @@
                                         class="ml-1 item-text" style="color: #e4d125;">Project Folders</span></a>
                             </li>
                         @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                in_array('show_window_narrative_settings', $Account_Permissions ?? []))
+                            <li class="nav-item">
+                                <a class="nav-link pl-3 link_kkkkk"
+                                    href="{{ route('account.window-narrative-settings') }}"><span
+                                        class="ml-1 item-text" style="color: #e4d125;">Window Narrative
+                                        Settings</span></a>
+                            </li>
+                        @endif
                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_document_type', $Account_Permissions ?? []))
                             <li class="nav-item">
                                 <a class="nav-link pl-3 link_kkkkk" href="{{ route('account.document-types') }}"><span

@@ -178,13 +178,13 @@
                 <ul class="collapse list-unstyled pl-4 w-100" id="REPORTS">
                     <li class="nav-item">
                         <a class="nav-link pl-3 link_kkkkk"href="#" id="report1Link"><span
-                                class="ml-1 item-text"style="color: #e4d125;">Contractual report</span></a>
+                                class="ml-1 item-text"style="color: #e4d125;">Notices</span></a>
                     </li>
                 </ul>
             </li>
             <li class="nav-item">
 
-                
+
                 <a href="#windows" data-toggle="collapse" aria-expanded="false"
                     class="dropdown-toggle nav-link link_kkkkk">
                     <img src="{{ asset('/dashboard/assets/selected_images/w_analysis.png') }}" width="22">
@@ -203,7 +203,7 @@
                         <a class="nav-link pl-3 link_kkkkk"href="#" id="calcMethodLink"><span
                                 class="ml-1 item-text"style="color: #e4d125;">Calculation Method</span></a>
                     </li>
-                    
+
                 </ul>
             </li>
             <li class="nav-item">
@@ -261,6 +261,15 @@
                                 <a class="nav-link pl-3 link_kkkkk"
                                     href="{{ route('project.project-folders') }}"><span
                                         class="ml-1 item-text"style="color: #e4d125;">Project Folders</span></a>
+                            </li>
+                        @endif
+                        @if (auth()->user()->roles->first()->name == 'Super Admin' ||
+                                in_array('show_window_narrative_settings', $Project_Permissions ?? []))
+                            <li class="nav-item">
+                                <a class="nav-link pl-3 link_kkkkk"
+                                    href="{{ route('project.window-narrative-settings') }}"><span
+                                        class="ml-1 item-text" style="color: #e4d125;">Window Narrative
+                                        Settings</span></a>
                             </li>
                         @endif
                         @if (auth()->user()->roles->first()->name == 'Super Admin' || in_array('show_document_type', $Project_Permissions ?? []))

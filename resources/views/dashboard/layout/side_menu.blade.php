@@ -35,7 +35,7 @@
                         <span class="ml-3 item-text" style="color:whitesmoke;">Settings</span>
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100" id="forms">
-                        
+
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.export-formate-settings') }}"><span
                                     class="ml-1 item-text" style="color:#e4d125;">Writing Format</span></a>
@@ -48,6 +48,13 @@
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.project-folders') }}"><span
                                     class="ml-1 item-text" style="color:#e4d125;">Project Folders</span></a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link pl-3 link_kkkkk"
+                                href="{{ route('accounts.window-narrative-settings') }}"><span class="ml-1 item-text"
+                                    style="color: #e4d125;">Window Narrative Settings</span></a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link pl-3 link_kkkkk" href="{{ route('accounts.document-types') }}"><span
                                     class="ml-1 item-text" style="color:#e4d125;">Document Types</span></a>

@@ -10,6 +10,7 @@ use App\Models\ExportFormate;
 use App\Models\Milestone;
 use App\Models\ProjectFile;
 use App\Models\Window;
+use App\Models\WindowNarrativeSetting;
 use App\Services\CalculationMethodService;
 use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
@@ -29,7 +30,6 @@ class WindowController extends ApiController
     {
         $this->calc_method = $calc_method;
     }
-
     public function last_ms($project_id, $window_id)
     {
         $milestones_IDs = Milestone::where('project_id', auth()->user()->current_project_id)->pluck('id')->toArray();
@@ -156,10 +156,6 @@ class WindowController extends ApiController
 
         return redirect()->back()->with('success', 'Window created successfully!');
     }
-
-    /**
-     * Update an existing window.
-     */
     public function update(Request $request, $slug)
     {
         $validated = $request->validate([
@@ -194,7 +190,6 @@ class WindowController extends ApiController
 
         return redirect()->back()->with('success', 'Window updated successfully!');
     }
-
     public function delete($slug)
     {
         Window::where('slug', $slug)->delete();
@@ -202,7 +197,6 @@ class WindowController extends ApiController
     }
 
     ////////////////////////////////////////////////////////////////
-
     public function store_driving_activity(Request $request)
     {
         $validated = $request->validate([
@@ -290,7 +284,6 @@ class WindowController extends ApiController
 
         }
     }
-
     public function get_driving_activities(Request $request)
     {
 
@@ -409,7 +402,7 @@ class WindowController extends ApiController
         ]);
 
     }
-
+    
     public function exportLedger(Request $request)
     {
         $zip_file = session('zip_file');
@@ -687,13 +680,17 @@ class WindowController extends ApiController
                 'firstLine' => 0,
             ],
         ];
-
-        $phpWord->addTitleStyle(1, $GetStandardStylesH1, $GetParagraphStyleH1);
-        $phpWord->addTitleStyle(2, $GetStandardStylesH2, $GetParagraphStyleH2);
-        $phpWord->addTitleStyle(3, $GetStandardStylesH3, array_merge($GetParagraphStyleH3, ['numStyle' => 'multilevel', 'numLevel' => 1]));
+        //dd($request->all());
+        $phpWord->addTitleStyle(1, $GetStandardStylesH1, array_merge($GetParagraphStyleH1, ['numStyle' => 'multilevel', 'numLevel' => 0]));
+        $phpWord->addTitleStyle(2, $GetStandardStylesH2, array_merge($GetParagraphStyleH2, ['numStyle' => 'multilevel', 'numLevel' => 1]));
+        $phpWord->addTitleStyle(3, $GetStandardStylesH3, $GetParagraphStyleH3);
         $title = $request->title;
+        if ($request->H_Include_LastMS) {
+            $Milestone = Milestone::findOrFail($request->lastMS);
+            $title .= ' (' . $Milestone->name . ')';
+        }
         $title = str_replace('&', '&amp;', $title);
-        $section->addTitle($title, 2);
+        $section->addTitle($title, 1);
         $all_windows = Window::where('project_id', auth()->user()->current_project_id)
             ->orderByRaw('CAST(REGEXP_SUBSTR(no, "[0-9]+") AS UNSIGNED)')
             ->get();
@@ -710,40 +707,2434 @@ class WindowController extends ApiController
 
         $selected_windows = $all_windows->slice($start_index, $end_index - $start_index + 1)->values();
         //dd($selected_windows);
+        $window_counter = 0;
+        $perv_window    = null;
 
         foreach ($selected_windows as $window) {
-            
-            $section->addTitle('Window # ' . str_pad($window->no, 2, '0', STR_PAD_LEFT), 3);
+            $BASs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'BAS')->count();
+            $IMPs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'IMP')->count();
+            $UPDs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'UPD')->count();
+            $BUTs = DrivingActivity::where('project_id', auth()->user()->current_project_id)->where('window_id', $window->id)->where('program', 'BUT')->count();
+
+            $fnListOfDEs = false;
+            $window_counter++;
+            $figure_counter = 1;
+            $section->addTitle('Window # ' . str_pad($window->no, 2, '0', STR_PAD_LEFT), 2);
             $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
             $existedList = false;
             $w_st_date   = date('d F Y', strtotime($window->start_date));
             $w_en_date   = date('d F Y', strtotime($window->end_date));
             $listItemRun->addText('From ' . $w_st_date . ' - To ' . $w_en_date, $GetStandardStylesP);
+            if ($request->Include_BAS && $BASs > 0) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Base Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-BAS)';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                if ($window_counter == 1) {
+                    $B = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'B1')->first();
+                } else {
+                    $B = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'B2')->first();
+                }
+                //dd($B->paragraph);
+                $paragraph  = str_replace('</p><p>', "\n", $B->paragraph);
+                $paragraph  = str_replace('<span class="ql-cursor">\u{FEFF}</span>', "", $paragraph);
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                //dd($cleanParts);
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Base Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-BAS)';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                        if ($text == 'fnWNo()') {
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Fragnet Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-FRA)';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Impacted Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-IMP)';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Updated Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-UPD)';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - But-For Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-BUT)';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
 
-            $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Conclusion';
-            $subtitle = str_replace('&', '&amp;', $subtitle);
-            $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
-            
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }
+                        // $listItemRun2->addText($string, $GetStandardStylesP);
+                        $fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                        // $listItemRun->addText($string, $GetStandardStylesP);
+                    }
+
+                }
+
+                $imgPath = getFirstMediaUrl($window, $window->BASSnipCollection, false);
+                if ($imgPath) {
+                    $fullImagePath = public_path($imgPath);
+
+                    if (file_exists($fullImagePath)) {
+
+                        $textRun = $section->addTextRun([
+                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                            'indentation' => [
+                                'left' => 0,
+                            ],
+                            'keepNext'    => true,
+                        ]);
+                        // Add Image
+                        $shape = $textRun->addImage($fullImagePath, [
+                            'width'     => 450,
+                            'height'    => 200,
+                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
+                        ]);
+
+                        $textRun->addTextBreak(); // New line
+                        $textRun->addText('Figure ' . $headingNo . '.' . $window_counter . '.' . $figure_counter . ' - W0' . $window->no . '-BAS Longest Path', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                            'alignment'                                                                                                                                     => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                            'size'                                                                                                                                          => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                            'bold'                                                                                                                                          => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                            'italic'                                                                                                                                        => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                            'underline'                                                                                                                                     => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']
+                        ); // Add caption in italics
+                        $figure_counter++;
+
+                    }
+                }
+
+                $B          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'B3')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $B->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            if ($request->Include_Fragnet) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Fragnet';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                $F          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'F1')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $F->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+
+                $imgPath = getFirstMediaUrl($window, $window->FRAGSnipCollection, false);
+                if ($imgPath) {
+                    $fullImagePath = public_path($imgPath);
+
+                    if (file_exists($fullImagePath)) {
+
+                        $textRun = $section->addTextRun([
+                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                            'indentation' => [
+                                'left' => 0,
+                            ],
+                            'keepNext'    => true,
+                        ]);
+                        // Add Image
+                        $shape = $textRun->addImage($fullImagePath, [
+                            'width'     => 450,
+                            'height'    => 200,
+                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
+                        ]);
+
+                        $textRun->addTextBreak(); // New line
+                        $textRun->addText('Figure ' . $headingNo . '.' . $window_counter . '.' . $figure_counter . ' - W0' . $window->no . '-Fragnet', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                            'alignment'                                                                                                                            => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                            'size'                                                                                                                                 => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                            'bold'                                                                                                                                 => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                            'italic'                                                                                                                               => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                            'underline'                                                                                                                            => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']
+                        );
+                        $figure_counter++;
+                    }
+                }
+
+                $F          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'F2')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $F->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+            }
+            if ($request->Include_IMP && $IMPs > 0) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Impacted Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-IMP)';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                $I          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'I1')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $I->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+                $imgPath = getFirstMediaUrl($window, $window->IMPSnipCollection, false);
+                if ($imgPath) {
+                    $fullImagePath = public_path($imgPath);
+
+                    if (file_exists($fullImagePath)) {
+
+                        $textRun = $section->addTextRun([
+                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                            'indentation' => [
+                                'left' => 0,
+                            ],
+                            'keepNext'    => true,
+                        ]);
+                        // Add Image
+                        $shape = $textRun->addImage($fullImagePath, [
+                            'width'     => 450,
+                            'height'    => 200,
+                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
+                        ]);
+
+                        $textRun->addTextBreak(); // New line
+                        $textRun->addText('Figure ' . $headingNo . '.' . $window_counter . '.' . $figure_counter . ' - W0' . $window->no . '-IMP Longest Path', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                            'alignment'                                                                                                                                     => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                            'size'                                                                                                                                          => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                            'bold'                                                                                                                                          => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                            'italic'                                                                                                                                        => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                            'underline'                                                                                                                                     => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']
+                        );
+                        $figure_counter++;
+                    }
+                }
+                $date1    = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'IMP', [$request->lastMS]);
+                $date2    = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'BAS', [$request->lastMS]);
+                $start    = Carbon::parse($date2);
+                $end      = Carbon::parse($date1);
+                $duration = $start->diffInDays($end, false);
+                if ($duration <= $window->duration && $duration != 0) {
+                    $I = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'I2')->first();
+
+                } elseif ($duration > $window->duration && $duration <= ($window->duration + 4)) {
+                    $I = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'I3')->first();
+
+                } elseif ($duration > ($window->duration + 4)) {
+                    $I = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'I4')->first();
+
+                } elseif ($duration <= 0) {
+                    $I = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'I5')->first();
+
+                } else {
+                    $I = null;
+                }
+                if ($I) {
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $I->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnListOfDEs()') {
+                                if (! empty(trim($string))) {
+                                    $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                    $string      = str_replace('&', '&amp;', $string);
+                                    $listItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                foreach ($files as $file) {
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                    $string              = $file->code . ': ' . $file->name;
+                                    $string              = str_replace('&', '&amp;', $string);
+                                    $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $string      = '';
+                                $fnListOfDEs = true;
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+                    if (! empty(trim($string))) {
+                        if ($fnListOfDEs) {
+                            $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                                'indentation'       => [
+                                    'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                                ],
+                                'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                            ]);
+                            $string = str_replace('&', '&amp;', $string);
+                            $listItemRun2->addTextBreak();
+                            $lines     = explode("\n", trim($string));
+                            $lastIndex = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun2->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun2->addTextBreak();
+                                }
+                            }$fnListOfDEs = false;
+                        } else {
+                            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                            $string      = str_replace('&', '&amp;', $string);
+                            $lines       = explode("\n", trim($string));
+                            $lastIndex   = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun->addTextBreak();
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            if ($request->Include_UPD && $UPDs > 0) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Updated Program (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-UPD)';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                $U          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U1')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $U->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+                $imgPath = getFirstMediaUrl($window, $window->UPDSnipCollection, false);
+                if ($imgPath) {
+                    $fullImagePath = public_path($imgPath);
+
+                    if (file_exists($fullImagePath)) {
+
+                        $textRun = $section->addTextRun([
+                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                            'indentation' => [
+                                'left' => 0,
+                            ],
+                            'keepNext'    => true,
+                        ]);
+                        // Add Image
+                        $shape = $textRun->addImage($fullImagePath, [
+                            'width'     => 450,
+                            'height'    => 200,
+                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
+                        ]);
+
+                        $textRun->addTextBreak(); // New line
+                        $textRun->addText('Figure ' . $headingNo . '.' . $window_counter . '.' . $figure_counter . ' - W0' . $window->no . '-UPD Longest Path', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                            'alignment'                                                                                                                                     => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                            'size'                                                                                                                                          => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                            'bold'                                                                                                                                          => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                            'italic'                                                                                                                                        => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                            'underline'                                                                                                                                     => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']
+                        );
+                        $figure_counter++;
+                    }
+                }
+                $date1                = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'UPD', [$request->lastMS]);
+                $date2                = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'IMP', [$request->lastMS]);
+                $start                = Carbon::parse($date2);
+                $end                  = Carbon::parse($date1);
+                $duration             = $start->diffInDays($end, false);
+                $NoLiabitiy_Culpable  = $this->calc_method->activities_num(auth()->user()->current_project_id, $window->id, 'UPD', $request->lastMS, 'Culpable');
+                $NoLiabitiy_Excusable = $this->calc_method->activities_num(auth()->user()->current_project_id, $window->id, 'UPD', $request->lastMS, 'Excusable');
+                $NoLiabitiy_All       = $this->calc_method->activities_num(auth()->user()->current_project_id, $window->id, 'UPD', $request->lastMS);
+                if ($duration == 0 && $NoLiabitiy_Culpable == 0) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U2')->first();
+
+                } elseif ($duration == 0 && $NoLiabitiy_Culpable > 0 && $NoLiabitiy_Excusable > 0) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U3')->first();
+
+                } elseif ($duration > 0 && $NoLiabitiy_Culpable == $NoLiabitiy_All) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U4')->first();
+
+                } elseif ($duration > 0 && $NoLiabitiy_Culpable == 0) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U5')->first();
+
+                } elseif ($duration > 0 && $NoLiabitiy_Culpable > 0 && $NoLiabitiy_Excusable > 0) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U6')->first();
+
+                } elseif ($duration < 0 && $NoLiabitiy_Culpable == 0) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U7')->first();
+
+                } elseif ($duration < 0 && $NoLiabitiy_Culpable == $NoLiabitiy_All) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U8')->first();
+
+                } elseif ($duration < 0 && $NoLiabitiy_Culpable > 1 && $NoLiabitiy_Excusable > 1) {
+                    $U = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'U9')->first();
+
+                } else {
+                    $U = null;
+                }
+                if ($U) {
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $U->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnListOfDEs()') {
+                                if (! empty(trim($string))) {
+                                    $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                    $string      = str_replace('&', '&amp;', $string);
+                                    $listItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                foreach ($files as $file) {
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                    $string              = $file->code . ': ' . $file->name;
+                                    $string              = str_replace('&', '&amp;', $string);
+                                    $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $string      = '';
+                                $fnListOfDEs = true;
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+                    if (! empty(trim($string))) {
+                        if ($fnListOfDEs) {
+                            $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                                'indentation'       => [
+                                    'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                                ],
+                                'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                            ]);
+                            $string = str_replace('&', '&amp;', $string);
+                            $listItemRun2->addTextBreak();
+                            $lines     = explode("\n", trim($string));
+                            $lastIndex = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun2->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun2->addTextBreak();
+                                }
+                            }$fnListOfDEs = false;
+                        } else {
+                            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                            $string      = str_replace('&', '&amp;', $string);
+                            $lines       = explode("\n", trim($string));
+                            $lastIndex   = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun->addTextBreak();
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            if ($request->Include_BUT && $BUTs > 0) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - But-For Analysis (W' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . '-BUT)';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                $NoLiabitiy_Culpable = $this->calc_method->activities_num(auth()->user()->current_project_id, $window->id, 'UPD', $request->lastMS, 'Culpable');
+                $date1               = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'BUT', [$request->lastMS]);
+                $date2               = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'BAS', [$request->lastMS]);
+                if ($NoLiabitiy_Culpable > 1) {
+                    $T = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'T1')->first();
+                } elseif ($this->calc_method->compare_dates($date1, $date2) === 'after' && $NoLiabitiy_Culpable == 0) {
+                    $T = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'T2')->first();
+                } elseif (($this->calc_method->compare_dates($date1, $date2) === 'before' || $this->calc_method->compare_dates($date1, $date2) === 'equal') && $NoLiabitiy_Culpable == 0) {
+                    $T = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'T3')->first();
+                }
+                if ($T) {
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $T->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnListOfDEs()') {
+                                if (! empty(trim($string))) {
+                                    $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                    $string      = str_replace('&', '&amp;', $string);
+                                    $listItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                foreach ($files as $file) {
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                    $string              = $file->code . ': ' . $file->name;
+                                    $string              = str_replace('&', '&amp;', $string);
+                                    $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $string      = '';
+                                $fnListOfDEs = true;
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+                    if (! empty(trim($string))) {
+                        if ($fnListOfDEs) {
+                            $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                                'indentation'       => [
+                                    'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                                ],
+                                'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                            ]);
+                            $string = str_replace('&', '&amp;', $string);
+                            $listItemRun2->addTextBreak();
+                            $lines     = explode("\n", trim($string));
+                            $lastIndex = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun2->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun2->addTextBreak();
+                                }
+                            }$fnListOfDEs = false;
+                        } else {
+                            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                            $string      = str_replace('&', '&amp;', $string);
+                            $lines       = explode("\n", trim($string));
+                            $lastIndex   = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun->addTextBreak();
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                $imgPath = getFirstMediaUrl($window, $window->BUTSnipCollection, false);
+                if ($imgPath) {
+                    $fullImagePath = public_path($imgPath);
+
+                    if (file_exists($fullImagePath)) {
+
+                        $textRun = $section->addTextRun([
+                            'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                            'indentation' => [
+                                'left' => 0,
+                            ],
+                            'keepNext'    => true,
+                        ]);
+                        // Add Image
+                        $shape = $textRun->addImage($fullImagePath, [
+                            'width'     => 450,
+                            'height'    => 200,
+                            'alignment' => $formate_values ? $formate_values['body']['standard']['alignment'] : 'left',
+                        ]);
+
+                        $textRun->addTextBreak(); // New line
+                        $textRun->addText('Figure ' . $headingNo . '.' . $window_counter . '.' . $figure_counter . ' - W0' . $window->no . '-BUT Longest Path', ['name' => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                            'alignment'                                                                                                                                     => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left', // Options: left, center, right, justify
+                            'size'                                                                                                                                          => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                            'bold'                                                                                                                                          => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1' ? true : false) : false,
+                            'italic'                                                                                                                                        => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1' ? true : false) : true,
+                            'underline'                                                                                                                                     => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none']
+                        );
+                        $figure_counter++;
+                    }
+                }
+                if ($this->calc_method->compare_dates($date1, $date2) === 'after' && $NoLiabitiy_Culpable == 0) {
+                    $T = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'T4')->first();
+                }
+
+                if ($T) {
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $T->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnListOfDEs()') {
+                                if (! empty(trim($string))) {
+                                    $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                    $string      = str_replace('&', '&amp;', $string);
+                                    $listItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                foreach ($files as $file) {
+                                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                    $string              = $file->code . ': ' . $file->name;
+                                    $string              = str_replace('&', '&amp;', $string);
+                                    $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                                }
+                                $string      = '';
+                                $fnListOfDEs = true;
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+                    if (! empty(trim($string))) {
+                        if ($fnListOfDEs) {
+                            $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                                'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                                'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                                'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                                'indentation'       => [
+                                    'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                                ],
+                                'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                                'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                                'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                                'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                                'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                                'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                            ]);
+                            $string = str_replace('&', '&amp;', $string);
+                            $listItemRun2->addTextBreak();
+                            $lines     = explode("\n", trim($string));
+                            $lastIndex = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun2->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun2->addTextBreak();
+                                }
+                            }$fnListOfDEs = false;
+                        } else {
+                            $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                            $string      = str_replace('&', '&amp;', $string);
+                            $lines       = explode("\n", trim($string));
+                            $lastIndex   = count($lines) - 1;
+
+                            foreach ($lines as $index => $line) {
+                                $listItemRun->addText($line, $GetStandardStylesP);
+                                if ($index !== $lastIndex) {
+                                    $listItemRun->addTextBreak();
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            if ($request->Include_Conclusion && $BUTs > 0) {
+                $subtitle = 'Window ' . str_pad($window->no, 2, '0', STR_PAD_LEFT) . ' - Conclusion';
+                $subtitle = str_replace('&', '&amp;', $subtitle);
+                $section->addText($subtitle, $GetStandardStylesSubtitle, $GetParagraphStyleSubtitle);
+                $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C1')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnListOfDEs()') {
+                            if (! empty(trim($string))) {
+                                $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                                $string      = str_replace('&', '&amp;', $string);
+                                $listItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $files = $this->calc_method->fnListOfDEs(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            foreach ($files as $file) {
+                                $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2'); // Use a numbering style
+                                $string              = $file->code . ': ' . $file->name;
+                                $string              = str_replace('&', '&amp;', $string);
+                                $unNestedListItemRun->addText($string, $GetStandardStylesP);
+                            }
+                            $string      = '';
+                            $fnListOfDEs = true;
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+                if (! empty(trim($string))) {
+                    if ($fnListOfDEs) {
+                        $listItemRun2 = $section->addListItemRun(4, 'multilevel', [
+                            'spaceBefore'       => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                            'spaceAfter'        => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                            'lineHeight'        => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1.5,
+                            'indentation'       => [
+                                'left' => $formate_values ? ((float) $formate_values['body']['paragraph']['indentation']['left'] * 1436) : 1077,
+
+                            ],
+                            'keepLines'         => $formate_values ? ($formate_values['body']['paragraph']['keepLines'] == '1' ? true : false) : true,
+                            'hyphenation'       => $formate_values ? ($formate_values['body']['paragraph']['hyphenation'] == '1' ? true : false) : false,
+                            'contextualSpacing' => $formate_values ? ($formate_values['body']['paragraph']['contextualSpacing'] == '1' ? true : false) : false,
+                            'keepNext'          => $formate_values ? ($formate_values['body']['paragraph']['keepNext'] == '1' ? true : false) : true,
+                            'widowControl'      => $formate_values ? ($formate_values['body']['paragraph']['widowControl'] == '1' ? true : false) : true,
+                            'pageBreakBefore'   => $formate_values ? ($formate_values['body']['paragraph']['pageBreakBefore'] == '1' ? true : false) : false,
+
+                        ]);
+                        $string = str_replace('&', '&amp;', $string);
+                        $listItemRun2->addTextBreak();
+                        $lines     = explode("\n", trim($string));
+                        $lastIndex = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun2->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun2->addTextBreak();
+                            }
+                        }$fnListOfDEs = false;
+                    } else {
+                        $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                        $string      = str_replace('&', '&amp;', $string);
+                        $lines       = explode("\n", trim($string));
+                        $lastIndex   = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $listItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $listItemRun->addTextBreak();
+                            }
+                        }
+                    }
+
+                }
+
+                $phpWord->addTableStyle('CustomTable', [
+                    'borderSize'       => 6,
+                    'borderColor'      => '000000',
+                    'cellMarginTop'    => 80,
+                    'cellMarginBottom' => 80,
+                    'cellAlignment'    => 'center',
+                ]);
+
+                $headerStyle = [
+                    'bgColor'   => 'FFFF00',
+                    'valign'    => 'center',
+                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                ];
+                $paraCenter = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER];
+                $cellCenter = [
+                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                    'valign'    => 'center',
+                    'name'      => $formate_values ? $formate_values['body']['standard']['name'] : 'Arial',
+                    'size'      => 9,
+
+                ];
+
+                $table = $section->addTable('CustomTable');
+
+                $row1 = $table->addRow(
+                    320,
+                    ['exactHeight' => true]
+                );
+                $cell = $table->addCell(1200, $headerStyle);
+                $cell->getStyle()->setVMerge('restart');
+                $cell->addText("WNO", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+
+                $cell = $table->addCell(2000, $headerStyle);
+                $cell->getStyle()->setVMerge('restart');
+                $cell->addText("From", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+
+                $cell = $table->addCell(2000, $headerStyle);
+                $cell->getStyle()->setVMerge('restart');
+                $cell->addText("To", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                $cell_width = 0;
+                if ($request->table_show_BAS && $BASs > 0) {
+                    $cell_width += 2000;
+                }
+                if ($request->table_show_IMP && $IMPs > 0) {
+                    $cell_width += 2000;
+                }
+                if ($request->table_show_UPD && $UPDs > 0) {
+                    $cell_width += 2000;
+                }
+                if ($request->table_show_BUT && $BUTs > 0) {
+                    $cell_width += 2000;
+                }
+                if ($cell_width > 0) {
+                    $finish = $table->addCell($cell_width, $headerStyle);
+                    $finish->getStyle()->setGridSpan(4);
+                    $finish->addText("Finish Date", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+
+                $cell_width = 0;
+                if ($request->table_show_Culpable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $cell_width += 1100;
+                }
+                if ($request->table_show_Excusable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $cell_width += 1100;
+                }
+                if ($request->table_show_Compensable && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                    $cell_width += 1100;
+                }
+                if ($perv_window) {
+                    $compensableTransfer_perv_window = $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                } else {
+                    $compensableTransfer_perv_window = 0;
+                }
+                $compensableTransfer_current_window = $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                if ($request->table_show_Compensable_transfer && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0 && ! ($compensableTransfer_perv_window == 0 && $compensableTransfer_current_window == 0)) {
+                    $cell_width += 1300;
+                }
+                if ($cell_width > 0) {
+                    $liability = $table->addCell($cell_width, $headerStyle);
+                    $liability->getStyle()->setGridSpan(4);
+                    $liability->addText("Liability", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+
+                }
+
+                $row2 = $table->addRow(
+                    1250
+                );
+                $cell = $table->addCell(1200, $headerStyle);
+                $cell->getStyle()->setVMerge('continue');
+
+                $cell = $table->addCell(2000, $headerStyle);
+                $cell->getStyle()->setVMerge('continue');
+
+                $cell = $table->addCell(2000, $headerStyle);
+                $cell->getStyle()->setVMerge('continue');
+                if ($request->table_show_BAS && $BASs > 0) {
+                    $table->addCell(2000, $headerStyle)->addText("BAS", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_IMP && $IMPs > 0) {
+                    $table->addCell(2000, $headerStyle)->addText("IMP", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_UPD && $UPDs > 0) {
+                    $table->addCell(2000, $headerStyle)->addText("UPD", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_BUT && $BUTs > 0) {
+                    $table->addCell(2000, $headerStyle)->addText("BUT", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                $vertical = ['textDirection' => \PhpOffice\PhpWord\Style\Cell::TEXT_DIR_BTLR];
+                if ($request->table_show_Culpable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $table->addCell(1100, $headerStyle + $vertical)->addText("Culpable", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_Excusable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $table->addCell(1100, $headerStyle + $vertical)->addText("Excusable", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_Compensable && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                    $table->addCell(1100, $headerStyle + $vertical)->addText("Compensable", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+                if ($request->table_show_Compensable_transfer && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0 && ! ($compensableTransfer_perv_window == 0 && $compensableTransfer_current_window == 0)) {
+                    $table->addCell(1300, $headerStyle + $vertical)->addText("Compensable Transfer", array_merge($cellCenter, ['bold' => true]), $paraCenter);
+                }
+
+                $row3 = $table->addRow(
+                    300, // height in twips (approx ~0.4 inch)
+                    ['exactHeight' => true]
+                );
+                $table->addCell(1200)->addText(str_pad($window->no, 2, '0', STR_PAD_LEFT), $cellCenter, $paraCenter);
+                $table->addCell(2000)->addText(date('d-M-y', strtotime($window->start_date)), $cellCenter, $paraCenter);
+                $table->addCell(2000)->addText(date('d-M-y', strtotime($window->end_date)), $cellCenter, $paraCenter);
+                if ($request->table_show_BAS && $BASs > 0) {
+                    $bas_date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'BAS', [$request->lastMS]);
+                    $table->addCell(2000)->addText(date('d-M-y', strtotime($bas_date)), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_IMP && $IMPs > 0) {
+                    $imp_date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'IMP', [$request->lastMS]);
+                    $table->addCell(2000)->addText(date('d-M-y', strtotime($imp_date)), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_UPD && $UPDs > 0) {
+                    $upd_date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'UPD', [$request->lastMS]);
+                    $table->addCell(2000)->addText(date('d-M-y', strtotime($upd_date)), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_BUT && $BUTs > 0) {
+                    $but_date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, 'BUT', [$request->lastMS]);
+                    $table->addCell(2000)->addText(date('d-M-y', strtotime($but_date)), $cellCenter, $paraCenter);
+                }
+
+                if ($request->table_show_Culpable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $table->addCell(1100)->addText($this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_Excusable && $BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                    $table->addCell(1100)->addText($this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_Compensable && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                    $table->addCell(1100)->addText($this->calc_method->compensable(auth()->user()->current_project_id, $window->id), $cellCenter, $paraCenter);
+                }
+                if ($request->table_show_Compensable_transfer && $BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0 && ! ($compensableTransfer_perv_window == 0 && $compensableTransfer_current_window == 0)) {
+                    $table->addCell(1300)->addText($this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id), $cellCenter, $paraCenter);
+                }
+
+                $section->addText(
+                    'Table ' . $headingNo . '.' . $window_counter . '.1 - W0' . $window->no . '-Conclusion',
+                    [
+                        'name'      => $formate_values ? $formate_values['figure']['standard']['name'] : 'Calibri',
+                        'alignment' => $formate_values ? $formate_values['figure']['standard']['alignment'] : 'left',
+                        'size'      => $formate_values ? intval($formate_values['figure']['standard']['size']) : 9,
+                        'bold'      => $formate_values ? ($formate_values['figure']['standard']['bold'] == '1') : false,
+                        'italic'    => $formate_values ? ($formate_values['figure']['standard']['italic'] == '1') : true,
+                        'underline' => $formate_values ? ($formate_values['figure']['standard']['underline'] == '1' ? 'single' : 'none') : 'none',
+                    ], [
+                        'spaceBefore' => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceBefore'] * 20) : 0,
+                        'spaceAfter'  => $formate_values ? ((int) $formate_values['body']['paragraph']['spaceAfter'] * 20) : 240,
+                        'lineHeight'  => $formate_values ? (float) $formate_values['body']['paragraph']['lineHeight'] : 1,
+                        'indentation' => [
+                            'left' => 0,
+                        ],
+                        'keepNext'    => true,
+                    ]
+                );
+
+                $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C2')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+
+                if (! empty(trim($string))) {
+
+                    $listItemRun = $section->addListItemRun(2, 'multilevel', 'listParagraphStyle');
+                    $string      = str_replace('&', '&amp;', $string);
+                    $lines       = explode("\n", trim($string));
+                    $lastIndex   = count($lines) - 1;
+
+                    foreach ($lines as $index => $line) {
+                        $listItemRun->addText($line, $GetStandardStylesP);
+                        if ($index !== $lastIndex) {
+                            $listItemRun->addTextBreak();
+                        }
+                    }
+
+                }
+
+                $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C3')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+
+                if (! empty(trim($string))) {
+
+                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                    $string              = str_replace('&', '&amp;', $string);
+                    $lines               = explode("\n", trim($string));
+                    $lastIndex           = count($lines) - 1;
+
+                    foreach ($lines as $index => $line) {
+                        $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                        if ($index !== $lastIndex) {
+                            $unNestedListItemRun->addTextBreak();
+                        }
+                    }
+
+                }
+                $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C4')->first();
+                $pattern    = '/<strong>(.*?)<\/strong>/i';
+                $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $cleanParts = array_map('strip_tags', $parts);
+                $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                $cleanParts = array_values($cleanParts);
+                $string     = '';
+                foreach ($cleanParts as $index => $text) {
+                    if (containsPlaceholder($text)) {
+
+                        if ($text == 'fnWNo()') {
+                            $string .= $window->no;
+                        } elseif ($text == 'fnPrevWNo()') {
+                            if ($perv_window) {
+                                $string .= $perv_window->no;
+                            }
+                        } elseif (strpos($text, 'fnCompDate(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x    = $match[1];
+                            $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                            $date = date('d F Y', strtotime($date));
+                            $string .= $date;
+                        } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x          = $match[1];
+                            $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                            $x          = 1;
+                            foreach ($activities as $activity) {
+                                $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                if (count($activities) - $x > 0) {
+                                    if (count($activities) - $x == 1) {
+                                        $string .= ' and ';
+                                    } else {
+                                        $string .= ',';
+                                    }
+
+                                }
+                                $x++;
+                            }
+                        } elseif ($text == 'fnCulpable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnExcusable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                            }
+                        } elseif ($text == 'fnCompensable()') {
+                            if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                            }
+                        } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                            preg_match('/\((.*?)\)/', $text, $match);
+                            $x = $match[1];
+                            if ($x === 'WNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                            } elseif ($x === 'PrevWNo') {
+                                $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                            }
+                        }
+                    } else {
+                        $string .= $text;
+                    }
+                }
+
+                if (! empty(trim($string))) {
+
+                    $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                    $string              = str_replace('&', '&amp;', $string);
+                    $lines               = explode("\n", trim($string));
+                    $lastIndex           = count($lines) - 1;
+
+                    foreach ($lines as $index => $line) {
+                        $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                        if ($index !== $lastIndex) {
+                            $unNestedListItemRun->addTextBreak();
+                        }
+                    }
+
+                }
+
+                if ($compensableTransfer_perv_window == 0 && $compensableTransfer_current_window == 0) {
+                    $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C5')->first();
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+
+                    if (! empty(trim($string))) {
+
+                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                        $string              = str_replace('&', '&amp;', $string);
+                        $lines               = explode("\n", trim($string));
+                        $lastIndex           = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $unNestedListItemRun->addTextBreak();
+                            }
+                        }
+
+                    }
+                }
+                if ($compensableTransfer_perv_window == 1 && $compensableTransfer_current_window == 0) {
+                    $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C6')->first();
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+
+                    if (! empty(trim($string))) {
+
+                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                        $string              = str_replace('&', '&amp;', $string);
+                        $lines               = explode("\n", trim($string));
+                        $lastIndex           = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $unNestedListItemRun->addTextBreak();
+                            }
+                        }
+
+                    }
+                }
+                if ($compensableTransfer_perv_window == 0 && $compensableTransfer_current_window == 1) {
+                    $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C7')->first();
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+
+                    if (! empty(trim($string))) {
+
+                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                        $string              = str_replace('&', '&amp;', $string);
+                        $lines               = explode("\n", trim($string));
+                        $lastIndex           = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $unNestedListItemRun->addTextBreak();
+                            }
+                        }
+
+                    }
+                }
+                if ($compensableTransfer_perv_window == 1 && $compensableTransfer_current_window == 1) {
+                    $C          = WindowNarrativeSetting::where('account_id', auth()->user()->current_account_id)->where('project_id', auth()->user()->current_project_id)->where('para_id', 'C8')->first();
+                    $pattern    = '/<strong>(.*?)<\/strong>/i';
+                    $parts      = preg_split($pattern, $C->paragraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $cleanParts = array_map('strip_tags', $parts);
+                    $cleanParts = array_filter($cleanParts, fn($x) => trim($x) !== '');
+                    $cleanParts = array_values($cleanParts);
+                    $string     = '';
+                    foreach ($cleanParts as $index => $text) {
+                        if (containsPlaceholder($text)) {
+
+                            if ($text == 'fnWNo()') {
+                                $string .= $window->no;
+                            } elseif ($text == 'fnPrevWNo()') {
+                                if ($perv_window) {
+                                    $string .= $perv_window->no;
+                                }
+                            } elseif (strpos($text, 'fnCompDate(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x    = $match[1];
+                                $date = $this->calc_method->comp_date(auth()->user()->current_project_id, $window->id, $x, [$request->lastMS]);
+                                $date = date('d F Y', strtotime($date));
+                                $string .= $date;
+                            } elseif (strpos($text, 'fnDrivAct(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x          = $match[1];
+                                $activities = $this->calc_method->activities(auth()->user()->current_project_id, $window->id, $x, $request->lastMS);
+                                $x          = 1;
+                                foreach ($activities as $activity) {
+                                    $string .= '[' . $activity->act_id . ': ' . $activity->name . ']';
+                                    if (count($activities) - $x > 0) {
+                                        if (count($activities) - $x == 1) {
+                                            $string .= ' and ';
+                                        } else {
+                                            $string .= ',';
+                                        }
+
+                                    }
+                                    $x++;
+                                }
+                            } elseif ($text == 'fnCulpable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->culpable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnExcusable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0) {
+                                    $string .= $this->calc_method->excusable(auth()->user()->current_project_id, $window->id, $request->lastMS);
+                                }
+                            } elseif ($text == 'fnCompensable()') {
+                                if ($BASs > 0 && $IMPs > 0 && $UPDs > 0 && $BUTs > 0) {
+                                    $string .= $this->calc_method->compensable(auth()->user()->current_project_id, $window->id);
+                                }
+                            } elseif (strpos($text, 'fnCompensableTransfer(') !== false) {
+                                preg_match('/\((.*?)\)/', $text, $match);
+                                $x = $match[1];
+                                if ($x === 'WNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $window->id);
+                                } elseif ($x === 'PrevWNo') {
+                                    $string .= $this->calc_method->compensableTransfer(auth()->user()->current_project_id, $perv_window->id);
+                                }
+                            }
+                        } else {
+                            $string .= $text;
+                        }
+                    }
+
+                    if (! empty(trim($string))) {
+
+                        $unNestedListItemRun = $section->addListItemRun(0, 'unordered', 'listParagraphStyle2');
+                        $string              = str_replace('&', '&amp;', $string);
+                        $lines               = explode("\n", trim($string));
+                        $lastIndex           = count($lines) - 1;
+
+                        foreach ($lines as $index => $line) {
+                            $unNestedListItemRun->addText($line, $GetStandardStylesP);
+                            if ($index !== $lastIndex) {
+                                $unNestedListItemRun->addTextBreak();
+                            }
+                        }
+
+                    }
+                }
+            }
+            $perv_window = $window;
         }
         $projectFolder = 'projects/' . auth()->user()->current_project_id . '/temp';
         $path          = public_path($projectFolder);

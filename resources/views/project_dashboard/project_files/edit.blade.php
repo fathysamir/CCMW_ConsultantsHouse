@@ -98,11 +98,32 @@
                                     </div>
                                     <div class="col-md-9">
                                         <div class="form-group mb-3">
-                                            <label for="sup_doc_1">Supported Document</label>
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center;">
+                                                <label for="sup_doc_1">Supporting Document</label>
+                                                <!-- Conditionally show the "View PDF" icon if the old document exists -->
+                                                @if ($file->sup_doc_1 && $file->sup_document_1->storage_file_id)
+                                                    <div style="display: flex;cursor: pointer;">
+                                                        <img src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                            width="50"
+                                                            style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf1"
+                                                            title="PDF"
+                                                            data-file-path="{{ $file->sup_document_1->storageFile->path }}">
+                                                    </div>
+                                                @else
+                                                    <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                                        <img class="d-none"
+                                                            src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                            width="50" title="PDF"
+                                                            style="margin-bottom: -10px;"id="viewPdf1">
+                                                    </div>
+                                                @endif
+                                            </div>
                                             <select class="form-control select2" id="sup_doc_1" name="sup_doc_1">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)
                                                     <option value="{{ $doc->id }}"
+                                                        data-file-path="{{ $doc->storageFile->path }}"
                                                         @if ($file->sup_doc_1 == $doc->id) selected @endif>
                                                         {{ $doc->reference }} ➡️
                                                         {{ $doc->subject }}</option>
@@ -133,12 +154,33 @@
                                     </div>
                                     <div class="col-md-9">
                                         <div class="form-group mb-3">
-                                            <label for="sup_doc_2">Supported Document</label>
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center;">
+                                                <label for="sup_doc_2">Supporting Document</label>
+                                                <!-- Conditionally show the "View PDF" icon if the old document exists -->
+                                                @if ($file->sup_doc_2 && $file->sup_document_2->storage_file_id)
+                                                    <div style="display: flex;cursor: pointer;">
+                                                        <img src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                            width="50"
+                                                            style="margin-bottom: -20px;position: relative; top: -10px;"id="viewPdf2"
+                                                            title="PDF"
+                                                            data-file-path="{{ $file->sup_document_2->storageFile->path }}">
+                                                    </div>
+                                                @else
+                                                    <div style="display: flex;margin-right:6%;cursor: pointer;">
+                                                        <img class="d-none"
+                                                            src="{{ asset('/dashboard/assets/selected_images/eye3.png') }}"
+                                                            width="50" title="PDF"
+                                                            style="margin-bottom: -10px;"id="viewPdf2">
+                                                    </div>
+                                                @endif
+                                            </div>
                                             <select class="form-control select2" id="sup_doc_2" name="sup_doc_2">
                                                 <option value="">Select Document</option>
                                                 @foreach ($all_documents as $doc)
                                                     <option
-                                                        value="{{ $doc->id }}"@if ($file->sup_doc_2 == $doc->id) selected @endif>
+                                                        value="{{ $doc->id }}"data-file-path="{{ $doc->storageFile->path }}"
+                                                        @if ($file->sup_doc_2 == $doc->id) selected @endif>
                                                         {{ $doc->reference }} ➡️
                                                         {{ $doc->subject }}</option>
                                                 @endforeach
@@ -242,13 +284,68 @@
 @endsection
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         $(document).ready(function() {
+            const eye1 = document.getElementById("viewPdf1");
+            const eye2 = document.getElementById("viewPdf2");
+            
+            $('#sup_doc_1').on('select2:select', function(e) {
+                // This gives us the <option> element that Select2 actually selected
+                const originalOption = e.params.data.element;
 
+                // Read the file path
+                const filePath = originalOption.getAttribute("data-file-path");
+
+                const eye1 = document.getElementById("viewPdf1");
+
+                if (filePath) {
+                    eye1.setAttribute("data-file-path", filePath);
+                    eye1.classList.remove("d-none");
+                } else {
+                    eye1.classList.add("d-none");
+                    eye1.removeAttribute("data-file-path");
+                }
+            });
+
+            // when clicking the eye icon → open pdf
+            eye1.addEventListener("click", function() {
+                const pdfPath = this.getAttribute("data-file-path");
+                if (pdfPath) {
+                    window.open('/' + pdfPath, "_blank");
+                }
+            });
+            eye2.addEventListener("click", function() {
+                const pdfPath = this.getAttribute("data-file-path");
+                if (pdfPath) {
+                    window.open('/' + pdfPath, "_blank");
+                }
+            });
             setTimeout(function() {
                 $('#errorAlert').fadeOut();
                 $('#successAlert').fadeOut();
             }, 4000); // 4 seconds
+
+            // const viewPdfIcon1 = document.getElementById('viewPdf1');
+
+            // if (viewPdfIcon1) {
+            //     viewPdfIcon1.addEventListener('click', function() {
+            //         const filePath = this.getAttribute('data-file-path');
+            //         if (filePath) {
+            //             window.open('/' + filePath, '_blank'); // Open the file in a new tab
+            //         }
+            //     });
+            // }
+            // const viewPdfIcon2 = document.getElementById('viewPdf2');
+
+            // if (viewPdfIcon2) {
+            //     viewPdfIcon2.addEventListener('click', function() {
+            //         const filePath = this.getAttribute('data-file-path');
+            //         if (filePath) {
+            //             window.open('/' + filePath, '_blank'); // Open the file in a new tab
+            //         }
+            //     });
+            // }
         });
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

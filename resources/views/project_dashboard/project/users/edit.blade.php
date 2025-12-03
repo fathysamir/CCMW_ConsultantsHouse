@@ -271,6 +271,22 @@
                                 <label class="custom-control-label" for="delete_contract_settings">Delete Contract
                                     Settings</label>
                             </div>
+                            <div class="custom-control custom-checkbox" style="width:25%">
+
+                                <input type="checkbox" class="custom-control-input" name="account_permissions[]"
+                                    value="show_window_narrative_settings"id="show_window_narrative_settings"
+                                    @if (in_array('show_window_narrative_settings', $account_permission ?? [])) checked @endif>
+                                <label class="custom-control-label" for="show_window_narrative_settings">Show Window
+                                    Narrative Settings</label>
+                            </div>
+                            <div class="custom-control custom-checkbox" style="width:25%">
+
+                                <input type="checkbox" class="custom-control-input" name="account_permissions[]"
+                                    value="edit_window_narrative_settings"id="edit_window_narrative_settings"
+                                    @if (in_array('edit_window_narrative_settings', $account_permission ?? [])) checked @endif>
+                                <label class="custom-control-label" for="edit_window_narrative_settings">Edit Window
+                                    Narrative Settings</label>
+                            </div>
 
                         </div>
                         <div class="form-group"
@@ -634,6 +650,29 @@
                                             for="delete_project_contact{{ $project->id }}">Delete Project
                                             Contact</label>
                                     </div>
+
+                                    <div class="custom-control custom-checkbox" style="width:25%">
+
+                                        <input type="checkbox" class="custom-control-input project_per"
+                                            name="projects_permissions[]"
+                                            value="show_window_narrative_settings"id="show_window_narrative_settings{{ $project->id }}"
+                                            @if (in_array('show_window_narrative_settings', $project_permission ?? [])) checked @endif>
+                                        <label class="custom-control-label"
+                                            for="show_window_narrative_settings{{ $project->id }}">Show
+                                            Window Narrative Settings</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox" style="width:25%">
+
+                                        <input type="checkbox" class="custom-control-input project_per"
+                                            name="projects_permissions[]"
+                                            value="edit_window_narrative_settings"id="edit_window_narrative_settings{{ $project->id }}"
+                                            @if (in_array('edit_window_narrative_settings', $project_permission ?? [])) checked @endif>
+                                        <label class="custom-control-label"
+                                            for="edit_window_narrative_settings{{ $project->id }}">Edit Window Narrative
+                                            Settings</label>
+                                    </div>
+
+
 
 
 

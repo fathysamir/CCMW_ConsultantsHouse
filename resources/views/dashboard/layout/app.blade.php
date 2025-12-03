@@ -976,6 +976,8 @@
     <script src="{{ asset('dashboard/js/dropzone.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/uppy.min.js') }}"></script>
     <script src="{{ asset('dashboard/js/quill.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
+
     <script>
         $('.select2').select2({
             theme: 'bootstrap4',
@@ -1048,7 +1050,7 @@
             placeholder: "___.___.___.___"
         });
         // editor
-        var editor = document.getElementById('editor');
+        let editor = document.getElementById('editor');
         if (editor) {
             var toolbarOptions = [
                 [{

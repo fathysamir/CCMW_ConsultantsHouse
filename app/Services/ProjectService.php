@@ -4,11 +4,12 @@ namespace App\Services;
 use App\Models\ContractSetting;
 use App\Models\ContractTag;
 use App\Models\DocType;
+use App\Models\ExportFormate;
 use App\Models\Milestone;
 use App\Models\Project;
 use App\Models\ProjectFolder;
 use App\Models\StakeHolder;
-use App\Models\ExportFormate;
+use App\Models\WindowNarrativeSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -39,13 +40,23 @@ class ProjectService
         }
         $all_ContractTags = ContractTag::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_ContractTags as $ContractTag) {
-            ContractTag::create(['account_id' => $project->account_id, 'project_id'     => $project->id, 'name'                    => $ContractTag->name, 'order' => $ContractTag->order,
-                'description'                     => $ContractTag->description, 'is_notice' => $ContractTag->is_notice,
-                'sub_clause'                      => $ContractTag->sub_clause, 'for_letter' => $ContractTag->for_letter, 'var_process' => $ContractTag->var_process]);
+            ContractTag::create(['account_id' => $project->account_id,
+                'project_id'                      => $project->id,
+                'name'                            => $ContractTag->name,
+                'order'                           => $ContractTag->order,
+                'description'                     => $ContractTag->description,
+                'is_notice'                       => $ContractTag->is_notice,
+                'sub_clause'                      => $ContractTag->sub_clause,
+                'for_letter'                      => $ContractTag->for_letter,
+                'var_process'                     => $ContractTag->var_process]);
         }
         $all_ContractSettings = ContractSetting::where('project_id', null)->where('account_id', $project->account_id)->get();
         foreach ($all_ContractSettings as $ContractSetting) {
             ContractSetting::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'name' => $ContractSetting->name, 'order' => $ContractSetting->order, 'type' => $ContractSetting->type]);
+        }
+        $settings = WindowNarrativeSetting::where('account_id', null)->where('project_id', $project->account_id)->orderBy('id', 'asc')->get();
+        foreach ($settings as $setting) {
+            WindowNarrativeSetting::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'para_id' => $setting->para_id, 'description' => $setting->description, 'location' => $setting->location, 'paragraph_default' => $setting->paragraph_default, 'paragraph' => $setting->paragraph]);
         }
         $export_formate = ExportFormate::where('project_id', null)->where('account_id', $project->account_id)->first();
         ExportFormate::create(['account_id' => $project->account_id, 'project_id' => $project->id, 'value' => $export_formate->value]);
